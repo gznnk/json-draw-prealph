@@ -1,5 +1,4 @@
 import type React from "react";
-import { useEffect, useState, useRef } from "react";
 import Draggable from "./Draggable";
 import type { DraggableProps } from "./Draggable";
 
@@ -10,11 +9,11 @@ export type DragPointProps = DraggableProps & {
 
 const DragPoint: React.FC<DragPointProps> = ({
 	initialPoint,
+	cursor,
 	onDragStart,
 	onDrag,
 	onDragEnd,
-	// color = "rgba(157, 204, 224, 0.8)",
-	color = "red",
+	color = "rgba(61, 90, 128, 0.8)",
 	hidden = false,
 }) => {
 	if (hidden) {
@@ -27,8 +26,9 @@ const DragPoint: React.FC<DragPointProps> = ({
 			onDragStart={onDragStart}
 			onDrag={onDrag}
 			onDragEnd={onDragEnd}
+			cursor={cursor}
 		>
-			<circle cx={0} cy={0} r="4" fill={color} />
+			<circle cx={0} cy={0} r="5" fill={color} />
 		</Draggable>
 	);
 };

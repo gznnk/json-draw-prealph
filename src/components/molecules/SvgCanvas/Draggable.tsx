@@ -9,8 +9,12 @@ import {
 import type Point from "../../../types/Point";
 import styled from "@emotion/styled";
 
-const DraggableG = styled.g`
-    cursor: move
+type DraggableGProps = {
+	cursor: string;
+};
+
+const DraggableG = styled.g<DraggableGProps>`
+    cursor: ${({ cursor }) => cursor};
 `;
 
 export type DragEvent = {
@@ -20,16 +24,29 @@ export type DragEvent = {
 };
 
 export type DraggableProps = {
+	id?: string;
 	initialPoint: Point;
+	cursor?: string;
+	ref?: SVGGElement | null;
 	onDragStart?: (e: DragEvent) => void;
 	onDrag?: (e: DragEvent) => void;
 	onDragEnd?: (e: DragEvent) => void;
 	children?: React.ReactNode;
-	ref?: SVGGElement | null;
 };
 
 const Draggable = forwardRef<SVGGElement, DraggableProps>(
-	({ initialPoint, onDragStart, onDrag, onDragEnd, children }, ref) => {
+	(
+		{
+			id,
+			initialPoint,
+			cursor = "move",
+			onDragStart,
+			onDrag,
+			onDragEnd,
+			children,
+		},
+		ref,
+	) => {
 		const [point, setPoint] = useState(initialPoint);
 
 		const [isDragging, setIsDragging] = useState(false);
@@ -109,10 +126,12 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 
 		return (
 			<DraggableG
+				id={id}
 				transform={`translate(${point.x}, ${point.y})`}
 				onPointerDown={handlePointerDown}
 				onPointerMove={handlePointerMove}
 				onPointerUp={handlePointerUp}
+				cursor={cursor}
 				ref={domRef}
 			>
 				{children}
