@@ -2,7 +2,7 @@ import type React from "react";
 import { useState, useRef, useCallback } from "react";
 import type Point from "../../../types/Point";
 import DragPoint from "./DragPoint";
-import Draggable from "./Draggable";
+import Draggable, { DragDirection } from "./Draggable";
 import type { DragEvent } from "./Draggable";
 
 const updatedPoints = (point: Point, diagonalPoint: Point) => {
@@ -31,14 +31,41 @@ const updatedPoints = (point: Point, diagonalPoint: Point) => {
 		y: bottom,
 	};
 
+	const witdh = right - left;
+	const height = bottom - top;
+
+	const topCenterPoint = {
+		x: left + witdh / 2,
+		y: top,
+	};
+
+	const leftCenterPoint = {
+		x: left,
+		y: top + height / 2,
+	};
+
+	const rightCenterPoint = {
+		x: right,
+		y: top + height / 2,
+	};
+
+	const bottomCenterPoint = {
+		x: left + witdh / 2,
+		y: bottom,
+	};
+
 	return {
 		point: leftTopPoint,
 		leftTopPoint,
 		leftBottomPoint,
 		rightTopPoint,
 		rightBottomPoint,
-		width: right - left,
-		height: bottom - top,
+		topCenterPoint,
+		leftCenterPoint,
+		rightCenterPoint,
+		bottomCenterPoint,
+		width: witdh,
+		height: height,
 	};
 };
 
@@ -48,6 +75,7 @@ type RectangleProps = {
 	initialHeight: number;
 	fill?: string;
 	stroke?: string;
+	strokeWidth?: number;
 	children?: React.ReactNode;
 };
 
@@ -57,6 +85,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 	initialHeight,
 	fill = "transparent",
 	stroke = "black",
+	strokeWidth = 1,
 	children,
 }) => {
 	const [state, setState] = useState({
@@ -76,11 +105,31 @@ const Rectangle: React.FC<RectangleProps> = ({
 			x: initialPoint.x + initialWidth,
 			y: initialPoint.y + initialHeight,
 		},
+		topCenterPoint: {
+			x: initialPoint.x + initialWidth / 2,
+			y: initialPoint.y,
+		},
+		leftCenterPoint: {
+			x: initialPoint.x,
+			y: initialPoint.y + initialHeight / 2,
+		},
+		rightCenterPoint: {
+			x: initialPoint.x + initialWidth,
+			y: initialPoint.y + initialHeight / 2,
+		},
+		bottomCenterPoint: {
+			x: initialPoint.x + initialWidth / 2,
+			y: initialPoint.y + initialHeight,
+		},
 		isDragging: false,
 		isLeftTopDragging: false,
 		isLeftBottomDragging: false,
 		isRightTopDragging: false,
 		isRightBottomDragging: false,
+		isTopCenterDragging: false,
+		isLeftCenterDragging: false,
+		isRightCenterDragging: false,
+		isBottomCenterDragging: false,
 	});
 
 	const draggableRef = useRef<SVGGElement | null>(null);
@@ -123,6 +172,22 @@ const Rectangle: React.FC<RectangleProps> = ({
 				},
 				rightBottomPoint: {
 					x: e.point.x + state.width,
+					y: e.point.y + state.height,
+				},
+				topCenterPoint: {
+					x: e.point.x + state.width / 2,
+					y: e.point.y,
+				},
+				leftCenterPoint: {
+					x: e.point.x,
+					y: e.point.y + state.height / 2,
+				},
+				rightCenterPoint: {
+					x: e.point.x + state.width,
+					y: e.point.y + state.height / 2,
+				},
+				bottomCenterPoint: {
+					x: e.point.x + state.width / 2,
 					y: e.point.y + state.height,
 				},
 				isDragging: false,
@@ -275,6 +340,187 @@ const Rectangle: React.FC<RectangleProps> = ({
 		[state.leftTopPoint],
 	);
 
+	// --- 以下上中央の点のドラッグ ---
+
+	const onTopCenterDragStart = useCallback((_e: DragEvent) => {
+		setState((prevState) => ({
+			...prevState,
+			isDragging: true,
+			isTopCenterDragging: true,
+		}));
+	}, []);
+
+	const onTopCenterDrag = useCallback(
+		(e: DragEvent) => {
+			const height = Math.abs(state.leftBottomPoint.y - e.point.y);
+
+			const leftTopPoint = {
+				x: state.leftBottomPoint.x,
+				y: Math.min(e.point.y, state.leftBottomPoint.y),
+			};
+
+			updateDomPoints(leftTopPoint, state.width, height);
+		},
+		[updateDomPoints, state.leftBottomPoint, state.width],
+	);
+
+	const onTopCenterDragEnd = useCallback(
+		(e: DragEvent) => {
+			const leftTopPoint = {
+				x: state.leftTopPoint.x,
+				y: e.point.y,
+			};
+			const points = updatedPoints(leftTopPoint, state.rightBottomPoint);
+
+			setState((prevState) => ({
+				...prevState,
+				...points,
+				isDragging: false,
+				isTopCenterDragging: false,
+			}));
+		},
+		[state.rightBottomPoint, state.leftTopPoint.x],
+	);
+
+	// --- 以下左中央の点のドラッグ ---
+
+	const onLeftCenterDragStart = useCallback((_e: DragEvent) => {
+		setState((prevState) => ({
+			...prevState,
+			isDragging: true,
+			isLeftCenterDragging: true,
+		}));
+	}, []);
+
+	const onLeftCenterDrag = useCallback(
+		(e: DragEvent) => {
+			const width = Math.abs(state.rightBottomPoint.x - e.point.x);
+
+			const leftTopPoint = {
+				x: Math.min(e.point.x, state.rightBottomPoint.x),
+				y: state.rightTopPoint.y,
+			};
+
+			updateDomPoints(leftTopPoint, width, state.height);
+		},
+		[
+			updateDomPoints,
+			state.rightBottomPoint.x,
+			state.rightTopPoint.y,
+			state.height,
+		],
+	);
+
+	const onLeftCenterDragEnd = useCallback(
+		(e: DragEvent) => {
+			const leftTopPoint = {
+				x: Math.min(e.point.x, state.rightBottomPoint.x),
+				y: state.rightTopPoint.y,
+			};
+			const rightBottomPoint = {
+				x: Math.max(e.point.x, state.rightBottomPoint.x),
+				y: state.rightBottomPoint.y,
+			};
+			const points = updatedPoints(leftTopPoint, rightBottomPoint);
+
+			setState((prevState) => ({
+				...prevState,
+				...points,
+				isDragging: false,
+				isLeftCenterDragging: false,
+			}));
+		},
+		[state.rightTopPoint.y, state.rightBottomPoint],
+	);
+
+	// --- 以下右中央の点のドラッグ ---
+
+	const onRightCenterDragStart = useCallback((_e: DragEvent) => {
+		setState((prevState) => ({
+			...prevState,
+			isDragging: true,
+			isRightCenterDragging: true,
+		}));
+	}, []);
+
+	const onRightCenterDrag = useCallback(
+		(e: DragEvent) => {
+			const width = Math.abs(state.leftTopPoint.x - e.point.x);
+
+			const leftTopPoint = {
+				x: Math.min(e.point.x, state.leftTopPoint.x),
+				y: state.leftTopPoint.y,
+			};
+
+			updateDomPoints(leftTopPoint, width, state.height);
+		},
+		[updateDomPoints, state.leftTopPoint, state.height],
+	);
+
+	const onRightCenterDragEnd = useCallback(
+		(e: DragEvent) => {
+			const leftTopPoint = {
+				x: Math.min(e.point.x, state.leftTopPoint.x),
+				y: state.leftTopPoint.y,
+			};
+			const rightBottomPoint = {
+				x: Math.max(e.point.x, state.leftTopPoint.x),
+				y: state.rightBottomPoint.y,
+			};
+			const points = updatedPoints(leftTopPoint, rightBottomPoint);
+
+			setState((prevState) => ({
+				...prevState,
+				...points,
+				isDragging: false,
+				isRightCenterDragging: false,
+			}));
+		},
+		[state.leftTopPoint, state.rightBottomPoint],
+	);
+
+	// --- 以下下中央の点のドラッグ ---
+
+	const onBottomCenterDragStart = useCallback((_e: DragEvent) => {
+		setState((prevState) => ({
+			...prevState,
+			isDragging: true,
+			isBottomCenterDragging: true,
+		}));
+	}, []);
+
+	const onBottomCenterDrag = useCallback(
+		(e: DragEvent) => {
+			const height = Math.abs(state.leftTopPoint.y - e.point.y);
+
+			const leftTopPoint = {
+				x: state.leftTopPoint.x,
+				y: Math.min(e.point.y, state.leftTopPoint.y),
+			};
+
+			updateDomPoints(leftTopPoint, state.width, height);
+		},
+		[updateDomPoints, state.leftTopPoint, state.width],
+	);
+
+	const onBottomCenterDragEnd = useCallback(
+		(e: DragEvent) => {
+			const rightBottomPoint = {
+				x: state.rightTopPoint.x,
+				y: e.point.y,
+			};
+			const points = updatedPoints(rightBottomPoint, state.leftTopPoint);
+
+			setState((prevState) => ({
+				...prevState,
+				...points,
+				isDragging: false,
+				isBottomCenterDragging: false,
+			}));
+		},
+		[state.leftTopPoint, state.rightTopPoint.x],
+	);
+
 	return (
 		<>
 			<Draggable
@@ -290,6 +536,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 					height={state.height}
 					fill={fill}
 					stroke={stroke}
+					strokeWidth={strokeWidth}
 					ref={rectRef}
 				>
 					{children}
@@ -330,6 +577,46 @@ const Rectangle: React.FC<RectangleProps> = ({
 				onDragEnd={onRightBottomDragEnd}
 				cursor="se-resize"
 				hidden={state.isDragging && !state.isRightBottomDragging}
+			/>
+			{/* 上中央 */}
+			<DragPoint
+				initialPoint={state.topCenterPoint}
+				direction={DragDirection.Vertical}
+				onDragStart={onTopCenterDragStart}
+				onDrag={onTopCenterDrag}
+				onDragEnd={onTopCenterDragEnd}
+				cursor="n-resize"
+				hidden={state.isDragging && !state.isTopCenterDragging}
+			/>
+			{/* 左中央 */}
+			<DragPoint
+				initialPoint={state.leftCenterPoint}
+				direction={DragDirection.Horizontal}
+				onDragStart={onLeftCenterDragStart}
+				onDrag={onLeftCenterDrag}
+				onDragEnd={onLeftCenterDragEnd}
+				cursor="w-resize"
+				hidden={state.isDragging && !state.isLeftCenterDragging}
+			/>
+			{/* 右中央 */}
+			<DragPoint
+				initialPoint={state.rightCenterPoint}
+				direction={DragDirection.Horizontal}
+				onDragStart={onRightCenterDragStart}
+				onDrag={onRightCenterDrag}
+				onDragEnd={onRightCenterDragEnd}
+				cursor="e-resize"
+				hidden={state.isDragging && !state.isRightCenterDragging}
+			/>
+			{/* 下中央 */}
+			<DragPoint
+				initialPoint={state.bottomCenterPoint}
+				direction={DragDirection.Vertical}
+				onDragStart={onBottomCenterDragStart}
+				onDrag={onBottomCenterDrag}
+				onDragEnd={onBottomCenterDragEnd}
+				cursor="s-resize"
+				hidden={state.isDragging && !state.isBottomCenterDragging}
 			/>
 		</>
 	);

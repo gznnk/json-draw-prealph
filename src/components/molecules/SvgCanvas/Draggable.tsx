@@ -17,6 +17,12 @@ const DraggableG = styled.g<DraggableGProps>`
     cursor: ${({ cursor }) => cursor};
 `;
 
+export enum DragDirection {
+	All = 0,
+	Horizontal = 1,
+	Vertical = 2,
+}
+
 export type DragEvent = {
 	id?: string;
 	point: Point;
@@ -26,6 +32,7 @@ export type DragEvent = {
 export type DraggableProps = {
 	id?: string;
 	initialPoint: Point;
+	direction?: DragDirection;
 	cursor?: string;
 	ref?: SVGGElement | null;
 	onDragStart?: (e: DragEvent) => void;
@@ -39,6 +46,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		{
 			id,
 			initialPoint,
+			direction = DragDirection.All,
 			cursor = "move",
 			onDragStart,
 			onDrag,
@@ -63,9 +71,18 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		}, [initialPoint]);
 
 		const getPoint = (e: React.PointerEvent<SVGElement>) => {
+			const x =
+				direction === DragDirection.Vertical
+					? point.x
+					: e.clientX - startX.current;
+			const y =
+				direction === DragDirection.Horizontal
+					? point.y
+					: e.clientY - startY.current;
+
 			return {
-				x: e.clientX - startX.current,
-				y: e.clientY - startY.current,
+				x,
+				y,
 			};
 		};
 

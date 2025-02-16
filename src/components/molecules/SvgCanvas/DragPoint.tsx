@@ -9,6 +9,7 @@ export type DragPointProps = DraggableProps & {
 
 const DragPoint: React.FC<DragPointProps> = ({
 	initialPoint,
+	direction,
 	cursor,
 	onDragStart,
 	onDrag,
@@ -23,6 +24,7 @@ const DragPoint: React.FC<DragPointProps> = ({
 	return (
 		<Draggable
 			initialPoint={initialPoint}
+			direction={direction}
 			onDragStart={onDragStart}
 			onDrag={onDrag}
 			onDragEnd={onDragEnd}
