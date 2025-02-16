@@ -11,10 +11,17 @@ import styled from "@emotion/styled";
 
 type DraggableGProps = {
 	cursor: string;
+	visibility: string;
+	focusOutline: string;
 };
 
 const DraggableG = styled.g<DraggableGProps>`
     cursor: ${({ cursor }) => cursor};
+    visibility: ${({ visibility }) => visibility};
+    &:focus {
+        outline: ${({ focusOutline }) => focusOutline};
+        outline-offset: 4px;
+    }
 `;
 
 export enum DragDirection {
@@ -26,7 +33,7 @@ export enum DragDirection {
 export type DragEvent = {
 	id?: string;
 	point: Point;
-	reactEvent: React.PointerEvent<SVGElement>;
+	reactEvent?: React.PointerEvent<SVGElement>;
 };
 
 export type DraggableProps = {
@@ -34,10 +41,15 @@ export type DraggableProps = {
 	initialPoint: Point;
 	direction?: DragDirection;
 	cursor?: string;
+	visible?: boolean;
+	tabIndex?: number;
+	focusOutline?: string;
 	ref?: SVGGElement | null;
 	onDragStart?: (e: DragEvent) => void;
 	onDrag?: (e: DragEvent) => void;
 	onDragEnd?: (e: DragEvent) => void;
+	onFocus?: (e: React.FocusEvent<SVGGElement>) => void;
+	onBulr?: (e: React.FocusEvent<SVGGElement>) => void;
 	children?: React.ReactNode;
 };
 
@@ -48,15 +60,19 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			initialPoint,
 			direction = DragDirection.All,
 			cursor = "move",
+			visible = true,
+			tabIndex = 0,
+			focusOutline = "1px dashed blue",
 			onDragStart,
 			onDrag,
 			onDragEnd,
+			onFocus,
+			onBulr,
 			children,
 		},
 		ref,
 	) => {
 		const [point, setPoint] = useState(initialPoint);
-
 		const [isDragging, setIsDragging] = useState(false);
 
 		const startX = useRef(0);
@@ -94,12 +110,10 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 
 			e.currentTarget.setPointerCapture(e.pointerId);
 
-			if (onDragStart) {
-				onDragStart({
-					point: getPoint(e),
-					reactEvent: e,
-				});
-			}
+			onDragStart?.({
+				point: getPoint(e),
+				reactEvent: e,
+			});
 		};
 
 		const handlePointerMove = (e: React.PointerEvent<SVGElement>) => {
@@ -115,12 +129,10 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				);
 			}
 
-			if (onDrag) {
-				onDrag({
-					point: point,
-					reactEvent: e,
-				});
-			}
+			onDrag?.({
+				point: point,
+				reactEvent: e,
+			});
 		};
 
 		const handlePointerUp = (e: React.PointerEvent<SVGElement>) => {
@@ -133,10 +145,116 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 
 			setIsDragging(false);
 
-			if (onDragEnd) {
-				onDragEnd({
-					point: point,
-					reactEvent: e,
+			onDragEnd?.({
+				point: point,
+				reactEvent: e,
+			});
+		};
+
+		const handleFocus = (e: React.FocusEvent<SVGGElement>) => {
+			onFocus?.(e);
+		};
+
+		const handleBulr = (e: React.FocusEvent<SVGGElement>) => {
+			onBulr?.(e);
+		};
+
+		const handleKeyDown = (e: React.KeyboardEvent<SVGGElement>) => {
+			if (e.key === "ArrowRight") {
+				if (direction === DragDirection.Vertical) {
+					return;
+				}
+
+				setPoint((prevPoint) => {
+					const point = {
+						x: prevPoint.x + 1,
+						y: prevPoint.y,
+					};
+
+					onDragStart?.({
+						point: prevPoint,
+					});
+					onDrag?.({
+						point,
+					});
+
+					return point;
+				});
+			}
+			if (e.key === "ArrowLeft") {
+				if (direction === DragDirection.Vertical) {
+					return;
+				}
+
+				setPoint((prevPoint) => {
+					const point = {
+						x: prevPoint.x - 1,
+						y: prevPoint.y,
+					};
+
+					onDragStart?.({
+						point: prevPoint,
+					});
+					onDrag?.({
+						point,
+					});
+
+					return point;
+				});
+			}
+			if (e.key === "ArrowUp") {
+				if (direction === DragDirection.Horizontal) {
+					return;
+				}
+
+				setPoint((prevPoint) => {
+					const point = {
+						x: prevPoint.x,
+						y: prevPoint.y - 1,
+					};
+
+					onDragStart?.({
+						point: prevPoint,
+					});
+					onDrag?.({
+						point,
+					});
+
+					return point;
+				});
+			}
+			if (e.key === "ArrowDown") {
+				if (direction === DragDirection.Horizontal) {
+					return;
+				}
+
+				setPoint((prevPoint) => {
+					const point = {
+						x: prevPoint.x,
+						y: prevPoint.y + 1,
+					};
+
+					onDragStart?.({
+						point: prevPoint,
+					});
+					onDrag?.({
+						point,
+					});
+
+					return point;
+				});
+			}
+		};
+
+		const handleKeyUp = (e: React.KeyboardEvent<SVGGElement>) => {
+			if (
+				e.key === "ArrowRight" ||
+				e.key === "ArrowLeft" ||
+				e.key === "ArrowUp" ||
+				e.key === "ArrowDown"
+			) {
+				onDragEnd?.({
+					point,
 				});
 			}
 		};
@@ -148,8 +266,15 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				onPointerDown={handlePointerDown}
 				onPointerMove={handlePointerMove}
 				onPointerUp={handlePointerUp}
+				onFocus={handleFocus}
+				onBlur={handleBulr}
+				onKeyDown={handleKeyDown}
+				onKeyUp={handleKeyUp}
+				tabIndex={tabIndex}
 				cursor={cursor}
 				ref={domRef}
+				visibility={visible ? "visible" : "hidden"}
+				focusOutline={focusOutline}
 			>
 				{children}
 			</DraggableG>
