@@ -146,6 +146,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 		});
 
 		const draggableRef = useRef<SVGGElement>({} as SVGGElement);
+		const outlineRef = useRef<SVGRectElement>({} as SVGRectElement);
 
 		useEffect(() => {
 			onChangeEnd?.({
@@ -164,6 +165,8 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					"transform",
 					`translate(${leftTopPoint.x}, ${leftTopPoint.y})`,
 				);
+				outlineRef.current?.setAttribute("width", `${width}`);
+				outlineRef.current?.setAttribute("height", `${height}`);
 				onChange?.({
 					id: state.id,
 					point: leftTopPoint,
@@ -572,6 +575,19 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					ref={draggableRef}
 				>
 					{children}
+					{isSelected && (
+						<rect
+							x={0}
+							y={0}
+							width={initialWidth}
+							height={initialHeight}
+							fill="transparent"
+							stroke="blue"
+							strokeWidth="1px"
+							stroke-dasharray="3,3"
+							ref={outlineRef}
+						/>
+					)}
 				</Draggable>
 				{isSelected && (
 					<>

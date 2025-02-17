@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
 import type React from "react";
 import type { Item, ChangeEvent, ItemSelectEvent } from "./../types";
-import Rectangle from "./molecules/Rectangle";
-import Ellipse from "./molecules/Ellipse";
+import Rectangle from "./diagram/Rectangle";
+import Ellipse from "./diagram/Ellipse";
 import { useCallback, memo } from "react";
 
 const ContainerDiv = styled.div`

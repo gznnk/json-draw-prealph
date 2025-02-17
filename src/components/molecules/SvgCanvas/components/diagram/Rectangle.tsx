@@ -24,11 +24,11 @@ const Rectangle: React.FC<RectangleProps> = memo(
 		onPointerDown,
 		onChangeEnd,
 	}) => {
-		const rectRef = useRef<SVGRectElement>({} as SVGRectElement);
+		const ref = useRef<SVGRectElement>({} as SVGRectElement);
 
 		const onChange = useCallback((e: ChangeEvent) => {
-			rectRef.current?.setAttribute("width", `${e.width}`);
-			rectRef.current?.setAttribute("height", `${e.height}`);
+			ref.current?.setAttribute("width", `${e.width}`);
+			ref.current?.setAttribute("height", `${e.height}`);
 		}, []);
 
 		return (
@@ -48,7 +48,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 					y={0}
 					width={initialWidth}
 					height={initialHeight}
-					ref={rectRef}
+					ref={ref}
 					fill={fill}
 					stroke={stroke}
 					strokeWidth={strokeWidth}
