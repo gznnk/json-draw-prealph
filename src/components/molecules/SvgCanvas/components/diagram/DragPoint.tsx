@@ -17,6 +17,7 @@ const DragPoint: React.FC<DragPointProps> = ({
 	onDragStart,
 	onDrag,
 	onDragEnd,
+	dragPositioningFunction,
 	color = "rgba(61, 90, 128, 0.8)",
 	hidden = false,
 }) => {
@@ -36,6 +37,7 @@ const DragPoint: React.FC<DragPointProps> = ({
 			onDragStart={onDragStart}
 			onDrag={onDrag}
 			onDragEnd={onDragEnd}
+			dragPositioningFunction={dragPositioningFunction}
 		>
 			<circle cx={0} cy={0} r="5" fill={color} />
 		</Draggable>

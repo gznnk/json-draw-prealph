@@ -19,6 +19,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 		fill = "transparent",
 		stroke = "black",
 		strokeWidth = "1px",
+		keepProportion = false,
 		tabIndex = 0,
 		isSelected = false,
 		onPointerDown,
@@ -38,6 +39,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				initialWidth={initialWidth}
 				initialHeight={initialHeight}
 				tabIndex={tabIndex}
+				keepProportion={keepProportion}
 				isSelected={isSelected}
 				onPointerDown={onPointerDown}
 				onChange={onChange}

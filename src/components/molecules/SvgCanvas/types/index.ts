@@ -12,6 +12,7 @@ export type Item = {
 	fill: string;
 	stroke: string;
 	strokeWidth: string;
+	keepProportion: boolean;
 	isSelected: boolean;
 };
 

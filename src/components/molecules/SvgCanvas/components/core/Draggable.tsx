@@ -41,6 +41,7 @@ export type DraggableProps = {
 	onDragStart?: (e: DragEvent) => void;
 	onDrag?: (e: DragEvent) => void;
 	onDragEnd?: (e: DragEvent) => void;
+	dragPositioningFunction?: (point: Point) => Point;
 	children?: React.ReactNode;
 };
 
@@ -60,6 +61,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			onDragStart,
 			onDrag,
 			onDragEnd,
+			dragPositioningFunction,
 			children,
 		},
 		ref,
@@ -79,14 +81,18 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		}, [initialPoint]);
 
 		const getPoint = (e: React.PointerEvent<SVGElement>) => {
-			const x =
-				direction === DragDirection.Vertical
-					? point.x
-					: e.clientX - startX.current;
-			const y =
-				direction === DragDirection.Horizontal
-					? point.y
-					: e.clientY - startY.current;
+			let x = e.clientX - startX.current;
+			let y = e.clientY - startY.current;
+
+			if (dragPositioningFunction) {
+				const p = dragPositioningFunction({ x, y });
+				x = p.x;
+				y = p.y;
+			} else if (direction === DragDirection.Horizontal) {
+				y = point.y;
+			} else if (direction === DragDirection.Vertical) {
+				x = point.x;
+			}
 
 			return {
 				x: Math.floor(x),
@@ -152,10 +158,14 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 					return;
 				}
 
-				const newPoint = {
+				let newPoint = {
 					x: point.x + 1,
 					y: point.y,
 				};
+
+				if (dragPositioningFunction) {
+					newPoint = dragPositioningFunction({ ...newPoint });
+				}
 
 				onDragStart?.({ point });
 				onDrag?.({
@@ -168,10 +178,14 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 					return;
 				}
 
-				const newPoint = {
+				let newPoint = {
 					x: point.x - 1,
 					y: point.y,
 				};
+
+				if (dragPositioningFunction) {
+					newPoint = dragPositioningFunction({ ...newPoint });
+				}
 
 				onDragStart?.({ point });
 				onDrag?.({
@@ -184,10 +198,14 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 					return;
 				}
 
-				const newPoint = {
+				let newPoint = {
 					x: point.x,
 					y: point.y - 1,
 				};
+
+				if (dragPositioningFunction) {
+					newPoint = dragPositioningFunction({ ...newPoint });
+				}
 
 				onDragStart?.({ point });
 				onDrag?.({
@@ -200,10 +218,14 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 					return;
 				}
 
-				const newPoint = {
+				let newPoint = {
 					x: point.x,
 					y: point.y + 1,
 				};
+
+				if (dragPositioningFunction) {
+					newPoint = dragPositioningFunction({ ...newPoint });
+				}
 
 				onDragStart?.({ point });
 				onDrag?.({
@@ -221,7 +243,10 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				e.key === "ArrowDown"
 			) {
 				onDragEnd?.({
-					point,
+					point: {
+						x: Math.floor(point.x),
+						y: Math.floor(point.y),
+					},
 				});
 			}
 		};

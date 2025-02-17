@@ -19,6 +19,7 @@ const Ellipse: React.FC<EllipseProps> = memo(
 		fill = "transparent",
 		stroke = "black",
 		strokeWidth = "1px",
+		keepProportion = false,
 		tabIndex = 0,
 		isSelected = false,
 		onPointerDown,
@@ -39,6 +40,7 @@ const Ellipse: React.FC<EllipseProps> = memo(
 				initialPoint={initialPoint}
 				initialWidth={initialWidth}
 				initialHeight={initialHeight}
+				keepProportion={keepProportion}
 				tabIndex={tabIndex}
 				isSelected={isSelected}
 				onPointerDown={onPointerDown}

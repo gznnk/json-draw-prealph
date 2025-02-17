@@ -27,7 +27,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 
 		const renderedItems = items.map((item) => {
 			switch (item.type) {
-				case "rect":
+				case "rectangle":
 					return (
 						<Rectangle
 							key={item.id}
@@ -38,6 +38,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 							fill={item.fill}
 							stroke={item.stroke}
 							strokeWidth={item.strokeWidth}
+							keepProportion={item.keepProportion}
 							isSelected={item.isSelected}
 							onChangeEnd={onChangeEnd}
 							onPointerDown={onItemSelect}
@@ -54,6 +55,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 							fill={item.fill}
 							stroke={item.stroke}
 							strokeWidth={item.strokeWidth}
+							keepProportion={item.keepProportion}
 							isSelected={item.isSelected}
 							onChangeEnd={onChangeEnd}
 							onPointerDown={onItemSelect}

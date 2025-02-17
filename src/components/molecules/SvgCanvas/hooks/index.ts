@@ -17,6 +17,7 @@ const DEFAULT_ITEM_VALUE = {
 	fill: "transparent",
 	stroke: "black",
 	strokeWidth: "1px",
+	keepProportion: false,
 	isSelected: false,
 };
 

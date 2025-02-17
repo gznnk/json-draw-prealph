@@ -74,11 +74,36 @@ const updatedPoints = (point: Point, diagonalPoint: Point) => {
 	};
 };
 
+const createLinerDragY2xFunction = (p1: Point, p2: Point) => {
+	const a = (p2.y - p1.y) / (p2.x - p1.x);
+	const b = p1.y - a * p1.x;
+
+	return (p: Point) => {
+		return {
+			x: (p.y - b) / a,
+			y: p.y,
+		};
+	};
+};
+
+const createLinerDragX2yFunction = (p1: Point, p2: Point) => {
+	const a = (p2.y - p1.y) / (p2.x - p1.x);
+	const b = p1.y - a * p1.x;
+
+	return (p: Point) => {
+		return {
+			x: p.x,
+			y: a * p.x + b,
+		};
+	};
+};
+
 export type RectangleBaseProps = {
 	id?: string;
 	initialPoint: Point;
 	initialWidth: number;
 	initialHeight: number;
+	keepProportion?: boolean;
 	tabIndex?: number;
 	isSelected?: boolean;
 	onPointerDown?: (e: PointerDownEvent) => void;
@@ -93,6 +118,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 		initialPoint,
 		initialWidth,
 		initialHeight,
+		keepProportion = false,
 		tabIndex = 0,
 		isSelected = false,
 		onPointerDown,
@@ -262,6 +288,15 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			[state.rightBottomPoint],
 		);
 
+		const leftTopLinerDragFunction = useCallback(
+			(p: Point) =>
+				createLinerDragY2xFunction(
+					state.leftTopPoint,
+					state.rightBottomPoint,
+				)(p),
+			[state.leftTopPoint, state.rightBottomPoint],
+		);
+
 		// --- 以下左下の点のドラッグ ---
 
 		const onLeftBottomDragStart = useCallback((_e: DragEvent) => {
@@ -296,6 +331,15 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				}));
 			},
 			[state.rightTopPoint],
+		);
+
+		const leftBottomLinerDragFunction = useCallback(
+			(p: Point) =>
+				createLinerDragY2xFunction(
+					state.rightTopPoint,
+					state.leftBottomPoint,
+				)(p),
+			[state.rightTopPoint, state.leftBottomPoint],
 		);
 
 		// --- 以下右上の点のドラッグ ---
@@ -334,6 +378,15 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			[state.leftBottomPoint],
 		);
 
+		const rightTopLinerDragFunction = useCallback(
+			(p: Point) =>
+				createLinerDragY2xFunction(
+					state.rightTopPoint,
+					state.leftBottomPoint,
+				)(p),
+			[state.rightTopPoint, state.leftBottomPoint],
+		);
+
 		// --- 以下右下の点のドラッグ ---
 
 		const onRightBottomDragStart = useCallback((_e: DragEvent) => {
@@ -370,6 +423,15 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			[state.leftTopPoint],
 		);
 
+		const rightBottomLinerDragFunction = useCallback(
+			(p: Point) =>
+				createLinerDragY2xFunction(
+					state.leftTopPoint,
+					state.rightBottomPoint,
+				)(p),
+			[state.leftTopPoint, state.rightBottomPoint],
+		);
+
 		// --- 以下上中央の点のドラッグ ---
 
 		const onTopCenterDragStart = useCallback((_e: DragEvent) => {
@@ -380,27 +442,30 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			}));
 		}, []);
 
-		const onTopCenterDrag = useCallback(
+		const updateTopCenterPoint = useCallback(
 			(e: DragEvent) => {
-				const height = Math.abs(state.leftBottomPoint.y - e.point.y);
-
-				const leftTopPoint = {
-					x: state.leftBottomPoint.x,
-					y: Math.min(e.point.y, state.leftBottomPoint.y),
+				const rightTopPoint = {
+					x: state.leftTopPoint.x + (e.point.x - state.leftTopPoint.x) * 2,
+					y: e.point.y,
 				};
 
-				updateDomPoints(leftTopPoint, state.width, height);
+				return updatedPoints(state.leftBottomPoint, rightTopPoint);
 			},
-			[updateDomPoints, state.leftBottomPoint, state.width],
+			[state.leftTopPoint.x, state.leftBottomPoint],
+		);
+
+		const onTopCenterDrag = useCallback(
+			(e: DragEvent) => {
+				const { leftTopPoint, width, height } = updateTopCenterPoint(e);
+
+				updateDomPoints(leftTopPoint, width, height);
+			},
+			[updateTopCenterPoint, updateDomPoints],
 		);
 
 		const onTopCenterDragEnd = useCallback(
 			(e: DragEvent) => {
-				const leftTopPoint = {
-					x: state.leftTopPoint.x,
-					y: e.point.y,
-				};
-				const points = updatedPoints(leftTopPoint, state.rightBottomPoint);
+				const points = updateTopCenterPoint(e);
 
 				setState((prevState) => ({
 					...prevState,
@@ -409,7 +474,16 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					isTopCenterDragging: false,
 				}));
 			},
-			[state.rightBottomPoint, state.leftTopPoint.x],
+			[updateTopCenterPoint],
+		);
+
+		const topCenterLinerDragFunction = useCallback(
+			(p: Point) =>
+				createLinerDragY2xFunction(
+					state.topCenterPoint,
+					state.leftBottomPoint,
+				)(p),
+			[state.topCenterPoint, state.leftBottomPoint],
 		);
 
 		// --- 以下左中央の点のドラッグ ---
@@ -422,36 +496,31 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			}));
 		}, []);
 
-		const onLeftCenterDrag = useCallback(
+		const updateLeftCenterPoint = useCallback(
 			(e: DragEvent) => {
-				const width = Math.abs(state.rightBottomPoint.x - e.point.x);
-
 				const leftTopPoint = {
-					x: Math.min(e.point.x, state.rightBottomPoint.x),
-					y: state.rightTopPoint.y,
+					x: e.point.x,
+					y:
+						state.leftBottomPoint.y - (state.leftBottomPoint.y - e.point.y) * 2,
 				};
 
-				updateDomPoints(leftTopPoint, width, state.height);
+				return updatedPoints(leftTopPoint, state.rightBottomPoint);
 			},
-			[
-				updateDomPoints,
-				state.rightBottomPoint.x,
-				state.rightTopPoint.y,
-				state.height,
-			],
+			[state.leftBottomPoint.y, state.rightBottomPoint],
+		);
+
+		const onLeftCenterDrag = useCallback(
+			(e: DragEvent) => {
+				const { leftTopPoint, width, height } = updateLeftCenterPoint(e);
+
+				updateDomPoints(leftTopPoint, width, height);
+			},
+			[updateLeftCenterPoint, updateDomPoints],
 		);
 
 		const onLeftCenterDragEnd = useCallback(
 			(e: DragEvent) => {
-				const leftTopPoint = {
-					x: Math.min(e.point.x, state.rightBottomPoint.x),
-					y: state.rightTopPoint.y,
-				};
-				const rightBottomPoint = {
-					x: Math.max(e.point.x, state.rightBottomPoint.x),
-					y: state.rightBottomPoint.y,
-				};
-				const points = updatedPoints(leftTopPoint, rightBottomPoint);
+				const points = updateLeftCenterPoint(e);
 
 				setState((prevState) => ({
 					...prevState,
@@ -460,7 +529,16 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					isLeftCenterDragging: false,
 				}));
 			},
-			[state.rightTopPoint.y, state.rightBottomPoint],
+			[updateLeftCenterPoint],
+		);
+
+		const leftCenterLinerDragFunction = useCallback(
+			(p: Point) =>
+				createLinerDragX2yFunction(
+					state.leftCenterPoint,
+					state.rightBottomPoint,
+				)(p),
+			[state.leftCenterPoint, state.rightBottomPoint],
 		);
 
 		// --- 以下右中央の点のドラッグ ---
@@ -473,31 +551,37 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			}));
 		}, []);
 
-		const onRightCenterDrag = useCallback(
+		const updateRightCenterPoint = useCallback(
 			(e: DragEvent) => {
-				const width = Math.abs(state.leftTopPoint.x - e.point.x);
-
 				const leftTopPoint = {
-					x: Math.min(e.point.x, state.leftTopPoint.x),
-					y: state.leftTopPoint.y,
+					x: state.leftTopPoint.x,
+					y:
+						state.rightBottomPoint.y -
+						(state.rightBottomPoint.y - e.point.y) * 2,
 				};
 
-				updateDomPoints(leftTopPoint, width, state.height);
+				const rightBottomPoint = {
+					x: e.point.x,
+					y: state.rightBottomPoint.y,
+				};
+
+				return updatedPoints(leftTopPoint, rightBottomPoint);
 			},
-			[updateDomPoints, state.leftTopPoint, state.height],
+			[state.leftTopPoint.x, state.rightBottomPoint],
+		);
+
+		const onRightCenterDrag = useCallback(
+			(e: DragEvent) => {
+				const { leftTopPoint, width, height } = updateRightCenterPoint(e);
+
+				updateDomPoints(leftTopPoint, width, height);
+			},
+			[updateRightCenterPoint, updateDomPoints],
 		);
 
 		const onRightCenterDragEnd = useCallback(
 			(e: DragEvent) => {
-				const leftTopPoint = {
-					x: Math.min(e.point.x, state.leftTopPoint.x),
-					y: state.leftTopPoint.y,
-				};
-				const rightBottomPoint = {
-					x: Math.max(e.point.x, state.leftTopPoint.x),
-					y: state.rightBottomPoint.y,
-				};
-				const points = updatedPoints(leftTopPoint, rightBottomPoint);
+				const points = updateRightCenterPoint(e);
 
 				setState((prevState) => ({
 					...prevState,
@@ -506,7 +590,16 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					isRightCenterDragging: false,
 				}));
 			},
-			[state.leftTopPoint, state.rightBottomPoint],
+			[updateRightCenterPoint],
+		);
+
+		const rightCenterLinerDragFunction = useCallback(
+			(p: Point) =>
+				createLinerDragX2yFunction(
+					state.rightCenterPoint,
+					state.leftBottomPoint,
+				)(p),
+			[state.rightCenterPoint, state.leftBottomPoint],
 		);
 
 		// --- 以下下中央の点のドラッグ ---
@@ -519,27 +612,30 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			}));
 		}, []);
 
-		const onBottomCenterDrag = useCallback(
+		const updateBottomCenterPoint = useCallback(
 			(e: DragEvent) => {
-				const height = Math.abs(state.leftTopPoint.y - e.point.y);
-
-				const leftTopPoint = {
-					x: state.leftTopPoint.x,
-					y: Math.min(e.point.y, state.leftTopPoint.y),
+				const rightBottomPoint = {
+					x: state.leftTopPoint.x + (e.point.x - state.leftTopPoint.x) * 2,
+					y: e.point.y,
 				};
 
-				updateDomPoints(leftTopPoint, state.width, height);
+				return updatedPoints(state.leftTopPoint, rightBottomPoint);
 			},
-			[updateDomPoints, state.leftTopPoint, state.width],
+			[state.leftTopPoint],
+		);
+
+		const onBottomCenterDrag = useCallback(
+			(e: DragEvent) => {
+				const { leftTopPoint, width, height } = updateBottomCenterPoint(e);
+
+				updateDomPoints(leftTopPoint, width, height);
+			},
+			[updateBottomCenterPoint, updateDomPoints],
 		);
 
 		const onBottomCenterDragEnd = useCallback(
 			(e: DragEvent) => {
-				const rightBottomPoint = {
-					x: state.rightTopPoint.x,
-					y: e.point.y,
-				};
-				const points = updatedPoints(rightBottomPoint, state.leftTopPoint);
+				const points = updateBottomCenterPoint(e);
 
 				setState((prevState) => ({
 					...prevState,
@@ -548,7 +644,16 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					isBottomCenterDragging: false,
 				}));
 			},
-			[state.leftTopPoint, state.rightTopPoint.x],
+			[updateBottomCenterPoint],
+		);
+
+		const bottomCenterLinerDragFunction = useCallback(
+			(p: Point) =>
+				createLinerDragY2xFunction(
+					state.leftTopPoint,
+					state.bottomCenterPoint,
+				)(p),
+			[state.leftTopPoint, state.bottomCenterPoint],
 		);
 
 		// ポインターダウン時の処理
@@ -562,6 +667,8 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			},
 			[id, onPointerDown],
 		);
+
+		// 各ドラッグポイントの移動関数を生成
 
 		return (
 			<>
@@ -584,7 +691,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							fill="transparent"
 							stroke="blue"
 							strokeWidth="1px"
-							stroke-dasharray="3,3"
+							strokeDasharray="3,3"
 							ref={outlineRef}
 						/>
 					)}
@@ -597,6 +704,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							onDragStart={onLeftTopDragStart}
 							onDrag={onLeftTopDrag}
 							onDragEnd={onLeftTopDragEnd}
+							dragPositioningFunction={
+								keepProportion ? leftTopLinerDragFunction : undefined
+							}
 							cursor="nw-resize"
 							hidden={state.isDragging && !state.isLeftTopDragging}
 						/>
@@ -606,6 +716,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							onDragStart={onLeftBottomDragStart}
 							onDrag={onLeftBottomDrag}
 							onDragEnd={onLeftBottomDragEnd}
+							dragPositioningFunction={
+								keepProportion ? leftBottomLinerDragFunction : undefined
+							}
 							cursor="sw-resize"
 							hidden={state.isDragging && !state.isLeftBottomDragging}
 						/>
@@ -615,6 +728,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							onDragStart={onRightTopDragStart}
 							onDrag={onRightTopDrag}
 							onDragEnd={onRightTopDragEnd}
+							dragPositioningFunction={
+								keepProportion ? rightTopLinerDragFunction : undefined
+							}
 							cursor="ne-resize"
 							hidden={state.isDragging && !state.isRightTopDragging}
 						/>
@@ -624,6 +740,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							onDragStart={onRightBottomDragStart}
 							onDrag={onRightBottomDrag}
 							onDragEnd={onRightBottomDragEnd}
+							dragPositioningFunction={
+								keepProportion ? rightBottomLinerDragFunction : undefined
+							}
 							cursor="se-resize"
 							hidden={state.isDragging && !state.isRightBottomDragging}
 						/>
@@ -634,6 +753,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							onDragStart={onTopCenterDragStart}
 							onDrag={onTopCenterDrag}
 							onDragEnd={onTopCenterDragEnd}
+							dragPositioningFunction={
+								keepProportion ? topCenterLinerDragFunction : undefined
+							}
 							cursor="n-resize"
 							hidden={state.isDragging && !state.isTopCenterDragging}
 						/>
@@ -644,6 +766,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							onDragStart={onLeftCenterDragStart}
 							onDrag={onLeftCenterDrag}
 							onDragEnd={onLeftCenterDragEnd}
+							dragPositioningFunction={
+								keepProportion ? leftCenterLinerDragFunction : undefined
+							}
 							cursor="w-resize"
 							hidden={state.isDragging && !state.isLeftCenterDragging}
 						/>
@@ -654,6 +779,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							onDragStart={onRightCenterDragStart}
 							onDrag={onRightCenterDrag}
 							onDragEnd={onRightCenterDragEnd}
+							dragPositioningFunction={
+								keepProportion ? rightCenterLinerDragFunction : undefined
+							}
 							cursor="e-resize"
 							hidden={state.isDragging && !state.isRightCenterDragging}
 						/>
@@ -664,6 +792,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							onDragStart={onBottomCenterDragStart}
 							onDrag={onBottomCenterDrag}
 							onDragEnd={onBottomCenterDragEnd}
+							dragPositioningFunction={
+								keepProportion ? bottomCenterLinerDragFunction : undefined
+							}
 							cursor="s-resize"
 							hidden={state.isDragging && !state.isBottomCenterDragging}
 						/>

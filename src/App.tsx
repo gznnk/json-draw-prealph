@@ -13,37 +13,61 @@ function App() {
 	} = useSvgCanvas([
 		{
 			id: "1",
-			type: "rect",
+			type: "rectangle",
 			point: { x: 10, y: 10 },
-			width: 100,
+			width: 200,
 			height: 100,
 			fill: "transparent",
 			stroke: "black",
 			strokeWidth: "1px",
+			keepProportion: false,
 			isSelected: false,
 		},
 		{
 			id: "2",
 			type: "ellipse",
 			point: { x: 110, y: 110 },
-			width: 100,
+			width: 200,
 			height: 100,
 			fill: "transparent",
 			stroke: "black",
 			strokeWidth: "1px",
+			keepProportion: false,
 			isSelected: false,
 		},
 	]);
 
 	const handleAddRectangle = () => {
 		canvasFunctions.addItem({
-			type: "rect",
+			type: "rectangle",
+			width: 200,
+			height: 100,
 		});
 	};
 
 	const handleAddEllipse = () => {
 		canvasFunctions.addItem({
 			type: "ellipse",
+			width: 200,
+			height: 100,
+		});
+	};
+
+	const handleAddSquare = () => {
+		canvasFunctions.addItem({
+			type: "rectangle",
+			width: 100,
+			height: 100,
+			keepProportion: true,
+		});
+	};
+
+	const handleAddCircle = () => {
+		canvasFunctions.addItem({
+			type: "ellipse",
+			width: 100,
+			height: 100,
+			keepProportion: true,
 		});
 	};
 
@@ -76,6 +100,8 @@ function App() {
 			>
 				<Button onClick={handleAddRectangle}>Add Rectangle</Button>
 				<Button onClick={handleAddEllipse}>Add Ellipse</Button>
+				<Button onClick={handleAddSquare}>Add Square</Button>
+				<Button onClick={handleAddCircle}>Add Circle</Button>
 				<div>{canvasState.selectedItemId}</div>
 				<Input
 					value={canvasFunctions.getSelectedItem()?.fill || ""}
