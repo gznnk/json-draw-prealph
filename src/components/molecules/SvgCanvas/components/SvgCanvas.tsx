@@ -30,16 +30,8 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				case "rectangle":
 					return (
 						<Rectangle
+							{...item}
 							key={item.id}
-							id={item.id}
-							initialPoint={item.point}
-							initialWidth={item.width}
-							initialHeight={item.height}
-							fill={item.fill}
-							stroke={item.stroke}
-							strokeWidth={item.strokeWidth}
-							keepProportion={item.keepProportion}
-							isSelected={item.isSelected}
 							onChangeEnd={onChangeEnd}
 							onPointerDown={onItemSelect}
 						/>
@@ -47,16 +39,8 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				case "ellipse":
 					return (
 						<Ellipse
+							{...item}
 							key={item.id}
-							id={item.id}
-							initialPoint={item.point}
-							initialWidth={item.width}
-							initialHeight={item.height}
-							fill={item.fill}
-							stroke={item.stroke}
-							strokeWidth={item.strokeWidth}
-							keepProportion={item.keepProportion}
-							isSelected={item.isSelected}
 							onChangeEnd={onChangeEnd}
 							onPointerDown={onItemSelect}
 						/>

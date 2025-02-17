@@ -13,9 +13,9 @@ type EllipseProps = RectangleBaseProps & {
 const Ellipse: React.FC<EllipseProps> = memo(
 	({
 		id,
-		initialPoint,
-		initialWidth,
-		initialHeight,
+		point,
+		width,
+		height,
 		fill = "transparent",
 		stroke = "black",
 		strokeWidth = "1px",
@@ -37,9 +37,9 @@ const Ellipse: React.FC<EllipseProps> = memo(
 		return (
 			<RectangleBase
 				id={id}
-				initialPoint={initialPoint}
-				initialWidth={initialWidth}
-				initialHeight={initialHeight}
+				point={point}
+				width={width}
+				height={height}
 				keepProportion={keepProportion}
 				tabIndex={tabIndex}
 				isSelected={isSelected}
@@ -48,10 +48,10 @@ const Ellipse: React.FC<EllipseProps> = memo(
 				onChangeEnd={onChangeEnd}
 			>
 				<ellipse
-					cx={initialWidth / 2}
-					cy={initialHeight / 2}
-					rx={initialWidth / 2}
-					ry={initialHeight / 2}
+					cx={width / 2}
+					cy={height / 2}
+					rx={width / 2}
+					ry={height / 2}
 					ref={ref}
 					fill={fill}
 					stroke={stroke}

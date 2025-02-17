@@ -7,7 +7,7 @@ function App() {
 	// console.log("App render");
 
 	const {
-		state: [canvasState, setCanvasState],
+		state: [canvasState, _setCanvasState],
 		canvasProps,
 		canvasFunctions,
 	} = useSvgCanvas([
@@ -102,7 +102,9 @@ function App() {
 				<Button onClick={handleAddEllipse}>Add Ellipse</Button>
 				<Button onClick={handleAddSquare}>Add Square</Button>
 				<Button onClick={handleAddCircle}>Add Circle</Button>
-				<div>{canvasState.selectedItemId}</div>
+				<div>{`id:${canvasState.selectedItemId}`}</div>
+				<div>{`width:${canvasFunctions.getSelectedItem()?.width}`}</div>
+				<div>{`height:${canvasFunctions.getSelectedItem()?.height}`}</div>
 				<Input
 					value={canvasFunctions.getSelectedItem()?.fill || ""}
 					onChange={(e) => {

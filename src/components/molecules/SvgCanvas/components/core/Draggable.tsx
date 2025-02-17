@@ -29,7 +29,7 @@ const DraggableG = styled.g<DraggableGProps>`
 export type DraggableProps = {
 	key?: string;
 	id?: string;
-	initialPoint: Point;
+	point: Point;
 	direction?: DragDirection;
 	cursor?: string;
 	visible?: boolean;
@@ -50,7 +50,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		{
 			key,
 			id,
-			initialPoint,
+			point,
 			direction = DragDirection.All,
 			cursor = "move",
 			visible = true,
@@ -66,7 +66,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		},
 		ref,
 	) => {
-		const [point, setPoint] = useState(initialPoint);
+		const [state, setState] = useState({ point });
 		const [isDragging, setIsDragging] = useState(false);
 
 		const startX = useRef(0);
@@ -77,8 +77,8 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		useImperativeHandle(ref, () => domRef.current);
 
 		useEffect(() => {
-			setPoint(initialPoint);
-		}, [initialPoint]);
+			setState({ point });
+		}, [point]);
 
 		const getPoint = (e: React.PointerEvent<SVGElement>) => {
 			let x = e.clientX - startX.current;
@@ -89,9 +89,9 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				x = p.x;
 				y = p.y;
 			} else if (direction === DragDirection.Horizontal) {
-				y = point.y;
+				y = state.point.y;
 			} else if (direction === DragDirection.Vertical) {
-				x = point.x;
+				x = state.point.x;
 			}
 
 			return {
@@ -103,8 +103,8 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		const handlePointerDown = (e: React.PointerEvent<SVGElement>) => {
 			setIsDragging(true);
 
-			startX.current = e.clientX - point.x;
-			startY.current = e.clientY - point.y;
+			startX.current = e.clientX - state.point.x;
+			startY.current = e.clientY - state.point.y;
 
 			e.currentTarget.setPointerCapture(e.pointerId);
 
@@ -141,13 +141,15 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				return;
 			}
 
-			const point = getPoint(e);
-			setPoint(point);
+			const newPoint = getPoint(e);
+			setState({
+				point: newPoint,
+			});
 
 			setIsDragging(false);
 
 			onDragEnd?.({
-				point: point,
+				point: newPoint,
 				reactEvent: e,
 			});
 		};
@@ -159,19 +161,21 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				}
 
 				let newPoint = {
-					x: point.x + 1,
-					y: point.y,
+					x: state.point.x + 1,
+					y: state.point.y,
 				};
 
 				if (dragPositioningFunction) {
 					newPoint = dragPositioningFunction({ ...newPoint });
 				}
 
-				onDragStart?.({ point });
+				onDragStart?.({ point: state.point });
 				onDrag?.({
 					point: newPoint,
 				});
-				setPoint(newPoint);
+				setState({
+					point: newPoint,
+				});
 			}
 			if (e.key === "ArrowLeft") {
 				if (direction === DragDirection.Vertical) {
@@ -179,19 +183,21 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				}
 
 				let newPoint = {
-					x: point.x - 1,
-					y: point.y,
+					x: state.point.x - 1,
+					y: state.point.y,
 				};
 
 				if (dragPositioningFunction) {
 					newPoint = dragPositioningFunction({ ...newPoint });
 				}
 
-				onDragStart?.({ point });
+				onDragStart?.({ point: state.point });
 				onDrag?.({
 					point: newPoint,
 				});
-				setPoint(newPoint);
+				setState({
+					point: newPoint,
+				});
 			}
 			if (e.key === "ArrowUp") {
 				if (direction === DragDirection.Horizontal) {
@@ -199,19 +205,21 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				}
 
 				let newPoint = {
-					x: point.x,
-					y: point.y - 1,
+					x: state.point.x,
+					y: state.point.y - 1,
 				};
 
 				if (dragPositioningFunction) {
 					newPoint = dragPositioningFunction({ ...newPoint });
 				}
 
-				onDragStart?.({ point });
+				onDragStart?.({ point: state.point });
 				onDrag?.({
 					point: newPoint,
 				});
-				setPoint(newPoint);
+				setState({
+					point: newPoint,
+				});
 			}
 			if (e.key === "ArrowDown") {
 				if (direction === DragDirection.Horizontal) {
@@ -219,19 +227,21 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				}
 
 				let newPoint = {
-					x: point.x,
-					y: point.y + 1,
+					x: state.point.x,
+					y: state.point.y + 1,
 				};
 
 				if (dragPositioningFunction) {
 					newPoint = dragPositioningFunction({ ...newPoint });
 				}
 
-				onDragStart?.({ point });
+				onDragStart?.({ point: state.point });
 				onDrag?.({
 					point: newPoint,
 				});
-				setPoint(newPoint);
+				setState({
+					point: newPoint,
+				});
 			}
 		};
 
@@ -244,8 +254,8 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			) {
 				onDragEnd?.({
 					point: {
-						x: Math.floor(point.x),
-						y: Math.floor(point.y),
+						x: Math.floor(state.point.x),
+						y: Math.floor(state.point.y),
 					},
 				});
 			}
@@ -255,7 +265,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			<DraggableG
 				key={key}
 				id={id}
-				transform={`translate(${point.x}, ${point.y})`}
+				transform={`translate(${state.point.x}, ${state.point.y})`}
 				onPointerDown={handlePointerDown}
 				onPointerMove={handlePointerMove}
 				onPointerUp={handlePointerUp}

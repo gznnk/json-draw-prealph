@@ -4,12 +4,11 @@ import type { DraggableProps } from "../core/Draggable";
 
 export type DragPointProps = DraggableProps & {
 	color?: string;
-	visible?: boolean;
 	hidden?: boolean;
 };
 
 const DragPoint: React.FC<DragPointProps> = ({
-	initialPoint,
+	point,
 	direction,
 	cursor,
 	visible,
@@ -27,7 +26,7 @@ const DragPoint: React.FC<DragPointProps> = ({
 
 	return (
 		<Draggable
-			initialPoint={initialPoint}
+			point={point}
 			direction={direction}
 			cursor={cursor}
 			visible={visible}

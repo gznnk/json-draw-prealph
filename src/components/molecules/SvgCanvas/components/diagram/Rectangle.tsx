@@ -13,9 +13,9 @@ type RectangleProps = RectangleBaseProps & {
 const Rectangle: React.FC<RectangleProps> = memo(
 	({
 		id,
-		initialPoint,
-		initialWidth,
-		initialHeight,
+		point,
+		width,
+		height,
 		fill = "transparent",
 		stroke = "black",
 		strokeWidth = "1px",
@@ -35,9 +35,9 @@ const Rectangle: React.FC<RectangleProps> = memo(
 		return (
 			<RectangleBase
 				id={id}
-				initialPoint={initialPoint}
-				initialWidth={initialWidth}
-				initialHeight={initialHeight}
+				point={point}
+				width={width}
+				height={height}
 				tabIndex={tabIndex}
 				keepProportion={keepProportion}
 				isSelected={isSelected}
@@ -48,8 +48,8 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				<rect
 					x={0}
 					y={0}
-					width={initialWidth}
-					height={initialHeight}
+					width={width}
+					height={height}
 					ref={ref}
 					fill={fill}
 					stroke={stroke}
