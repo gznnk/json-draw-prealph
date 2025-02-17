@@ -552,7 +552,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 			[state.leftTopPoint, state.rightTopPoint.x],
 		);
 
-		// フォーカスイベント
+		// ポインターダウン時の処理
 		const handlePointerDown = useCallback(
 			(e: PointerDownEvent) => {
 				onPointerDown?.({
@@ -570,7 +570,6 @@ const Rectangle: React.FC<RectangleProps> = memo(
 					id={id}
 					initialPoint={state.point}
 					tabIndex={tabIndex}
-					focusOutline="none"
 					onPointerDown={handlePointerDown}
 					onDragStart={onDragStart}
 					onDragEnd={onDragEnd}

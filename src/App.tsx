@@ -2,7 +2,7 @@ import SvgCanvas from "./components/molecules/SvgCanvas";
 import { useSvgCanvas } from "./components/molecules/SvgCanvas/hooks";
 
 function App() {
-	console.log("App render");
+	// console.log("App render");
 
 	const {
 		state: [canvasState, setCanvasState],

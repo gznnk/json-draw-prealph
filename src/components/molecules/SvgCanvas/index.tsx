@@ -3,7 +3,7 @@ import type React from "react";
 import type Point from "../../../types/Point";
 import type { ChangeEvent, ItemSelectEvent } from "./types";
 import Rectangle from "./components/molecules/Rectangle";
-import { memo } from "react";
+import { useCallback, memo } from "react";
 
 export type Item = {
 	id: string;
@@ -31,7 +31,7 @@ type SvgCanvasProps = {
 
 const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 	({ title, items, onChangeEnd, onItemSelect }) => {
-		console.log("SvgCanvas render");
+		// console.log("SvgCanvas render");
 
 		const renderedItems = items.map((item) => (
 			<Rectangle
@@ -46,16 +46,32 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 			/>
 		));
 
+		const handlePointerDown = useCallback(
+			(e: React.PointerEvent<SVGSVGElement>) => {
+				if (e.target === e.currentTarget) {
+					onItemSelect?.({});
+				}
+			},
+			[onItemSelect],
+		);
+
+		const handleKeyDown = useCallback(
+			(e: React.KeyboardEvent<SVGSVGElement>) => {
+				if (e.target !== e.currentTarget) {
+					e.stopPropagation();
+					e.preventDefault();
+				}
+			},
+			[],
+		);
+
 		return (
 			<ContainerDiv>
 				<svg
 					width="120vw"
 					height="120vh"
-					onPointerDown={(e) => {
-						if (e.target === e.currentTarget) {
-							onItemSelect?.({});
-						}
-					}}
+					onPointerDown={handlePointerDown}
+					onKeyDown={handleKeyDown}
 				>
 					<title>{title}</title>
 					{renderedItems}

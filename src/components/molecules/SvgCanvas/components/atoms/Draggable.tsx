@@ -14,6 +14,7 @@ type DraggableGProps = {
 	cursor: string;
 	visibility: string;
 	focusOutline: string;
+	focusOutlineOffset?: string;
 };
 
 const DraggableG = styled.g<DraggableGProps>`
@@ -21,7 +22,7 @@ const DraggableG = styled.g<DraggableGProps>`
     visibility: ${({ visibility }) => visibility};
     &:focus {
         outline: ${({ focusOutline }) => focusOutline};
-        outline-offset: 4px;
+        outline-offset: ${({ focusOutlineOffset }) => focusOutlineOffset};
     }
 `;
 
@@ -34,6 +35,7 @@ export type DraggableProps = {
 	visible?: boolean;
 	tabIndex?: number;
 	focusOutline?: string;
+	focusOutlineOffset?: string;
 	ref?: SVGGElement | null;
 	onPointerDown?: (e: PointerDownEvent) => void;
 	onDragStart?: (e: DragEvent) => void;
@@ -53,6 +55,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			visible = true,
 			tabIndex = 0,
 			focusOutline = "1px dashed blue",
+			focusOutlineOffset = "0px",
 			onPointerDown,
 			onDragStart,
 			onDrag,
@@ -149,84 +152,64 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 					return;
 				}
 
-				setPoint((prevPoint) => {
-					const point = {
-						x: prevPoint.x + 1,
-						y: prevPoint.y,
-					};
+				const newPoint = {
+					x: point.x + 1,
+					y: point.y,
+				};
 
-					onDragStart?.({
-						point: prevPoint,
-					});
-					onDrag?.({
-						point,
-					});
-
-					return point;
+				onDragStart?.({ point });
+				onDrag?.({
+					point: newPoint,
 				});
+				setPoint(newPoint);
 			}
 			if (e.key === "ArrowLeft") {
 				if (direction === DragDirection.Vertical) {
 					return;
 				}
 
-				setPoint((prevPoint) => {
-					const point = {
-						x: prevPoint.x - 1,
-						y: prevPoint.y,
-					};
+				const newPoint = {
+					x: point.x - 1,
+					y: point.y,
+				};
 
-					onDragStart?.({
-						point: prevPoint,
-					});
-					onDrag?.({
-						point,
-					});
-
-					return point;
+				onDragStart?.({ point });
+				onDrag?.({
+					point: newPoint,
 				});
+				setPoint(newPoint);
 			}
 			if (e.key === "ArrowUp") {
 				if (direction === DragDirection.Horizontal) {
 					return;
 				}
 
-				setPoint((prevPoint) => {
-					const point = {
-						x: prevPoint.x,
-						y: prevPoint.y - 1,
-					};
+				const newPoint = {
+					x: point.x,
+					y: point.y - 1,
+				};
 
-					onDragStart?.({
-						point: prevPoint,
-					});
-					onDrag?.({
-						point,
-					});
-
-					return point;
+				onDragStart?.({ point });
+				onDrag?.({
+					point: newPoint,
 				});
+				setPoint(newPoint);
 			}
 			if (e.key === "ArrowDown") {
 				if (direction === DragDirection.Horizontal) {
 					return;
 				}
 
-				setPoint((prevPoint) => {
-					const point = {
-						x: prevPoint.x,
-						y: prevPoint.y + 1,
-					};
+				const newPoint = {
+					x: point.x,
+					y: point.y + 1,
+				};
 
-					onDragStart?.({
-						point: prevPoint,
-					});
-					onDrag?.({
-						point,
-					});
-
-					return point;
+				onDragStart?.({ point });
+				onDrag?.({
+					point: newPoint,
 				});
+				setPoint(newPoint);
 			}
 		};
 
@@ -258,6 +241,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				ref={domRef}
 				visibility={visible ? "visible" : "hidden"}
 				focusOutline={focusOutline}
+				focusOutlineOffset={focusOutlineOffset}
 			>
 				{children}
 			</DraggableG>

@@ -30,6 +30,7 @@ const DragPoint: React.FC<DragPointProps> = ({
 			direction={direction}
 			cursor={cursor}
 			visible={visible}
+			focusOutlineOffset="4px"
 			onPointerDown={onPointerDown}
 			onDragStart={onDragStart}
 			onDrag={onDrag}
