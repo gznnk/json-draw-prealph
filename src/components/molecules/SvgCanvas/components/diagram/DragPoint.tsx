@@ -1,6 +1,6 @@
 import type React from "react";
-import Draggable from "../atoms/Draggable";
-import type { DraggableProps } from "../atoms/Draggable";
+import Draggable from "../core/Draggable";
+import type { DraggableProps } from "../core/Draggable";
 
 export type DragPointProps = DraggableProps & {
 	color?: string;

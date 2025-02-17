@@ -3,6 +3,18 @@ export type Point = {
 	y: number;
 };
 
+export type Item = {
+	id: string;
+	type: string;
+	point: Point;
+	width: number;
+	height: number;
+	fill: string;
+	stroke: string;
+	strokeWidth: string;
+	isSelected: boolean;
+};
+
 export enum DragDirection {
 	All = 0,
 	Horizontal = 1,

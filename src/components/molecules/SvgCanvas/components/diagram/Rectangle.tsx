@@ -1,16 +1,16 @@
 import type React from "react";
 import { useRef, useCallback, memo } from "react";
 import type { ChangeEvent } from "../../types";
-import RectangleBase from "./RectangleBase";
-import type { RectangleBaseProps } from "./RectangleBase";
+import RectangleBase from "../core/RectangleBase";
+import type { RectangleBaseProps } from "../core/RectangleBase";
 
-type EllipseProps = RectangleBaseProps & {
+type RectangleProps = RectangleBaseProps & {
 	fill?: string;
 	stroke?: string;
 	strokeWidth?: string;
 };
 
-const Ellipse: React.FC<EllipseProps> = memo(
+const Rectangle: React.FC<RectangleProps> = memo(
 	({
 		id,
 		initialPoint,
@@ -24,13 +24,11 @@ const Ellipse: React.FC<EllipseProps> = memo(
 		onPointerDown,
 		onChangeEnd,
 	}) => {
-		const ref = useRef<SVGEllipseElement>({} as SVGEllipseElement);
+		const rectRef = useRef<SVGRectElement>({} as SVGRectElement);
 
 		const onChange = useCallback((e: ChangeEvent) => {
-			ref.current?.setAttribute("cx", `${e.width / 2}`);
-			ref.current?.setAttribute("cy", `${e.height / 2}`);
-			ref.current?.setAttribute("rx", `${e.width / 2}`);
-			ref.current?.setAttribute("ry", `${e.height / 2}`);
+			rectRef.current?.setAttribute("width", `${e.width}`);
+			rectRef.current?.setAttribute("height", `${e.height}`);
 		}, []);
 
 		return (
@@ -45,12 +43,12 @@ const Ellipse: React.FC<EllipseProps> = memo(
 				onChange={onChange}
 				onChangeEnd={onChangeEnd}
 			>
-				<ellipse
-					cx={initialWidth / 2}
-					cy={initialHeight / 2}
-					rx={initialWidth / 2}
-					ry={initialHeight / 2}
-					ref={ref}
+				<rect
+					x={0}
+					y={0}
+					width={initialWidth}
+					height={initialHeight}
+					ref={rectRef}
 					fill={fill}
 					stroke={stroke}
 					strokeWidth={strokeWidth}
@@ -60,4 +58,4 @@ const Ellipse: React.FC<EllipseProps> = memo(
 	},
 );
 
-export default Ellipse;
+export default Rectangle;

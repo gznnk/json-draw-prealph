@@ -1,6 +1,7 @@
 import SvgCanvas from "./components/molecules/SvgCanvas";
 import { useSvgCanvas } from "./components/molecules/SvgCanvas/hooks";
 import Button from "./components/atoms/Button";
+import Input from "./components/atoms/Input";
 
 function App() {
 	// console.log("App render");
@@ -9,7 +10,42 @@ function App() {
 		state: [canvasState, setCanvasState],
 		canvasProps,
 		canvasFunctions,
-	} = useSvgCanvas();
+	} = useSvgCanvas([
+		{
+			id: "1",
+			type: "rect",
+			point: { x: 10, y: 10 },
+			width: 100,
+			height: 100,
+			fill: "transparent",
+			stroke: "black",
+			strokeWidth: "1px",
+			isSelected: false,
+		},
+		{
+			id: "2",
+			type: "ellipse",
+			point: { x: 110, y: 110 },
+			width: 100,
+			height: 100,
+			fill: "transparent",
+			stroke: "black",
+			strokeWidth: "1px",
+			isSelected: false,
+		},
+	]);
+
+	const handleAddRectangle = () => {
+		canvasFunctions.addItem({
+			type: "rect",
+		});
+	};
+
+	const handleAddEllipse = () => {
+		canvasFunctions.addItem({
+			type: "ellipse",
+		});
+	};
 
 	return (
 		<div className="App">
@@ -35,10 +71,22 @@ function App() {
 					bottom: 0,
 					width: "100px",
 					backgroundColor: "lightgray",
+					overflow: "hidden",
 				}}
 			>
-				<Button onClick={canvasFunctions.addRectangle}>Add Rectangle</Button>
-				{canvasState.selectedItemId}
+				<Button onClick={handleAddRectangle}>Add Rectangle</Button>
+				<Button onClick={handleAddEllipse}>Add Ellipse</Button>
+				<div>{canvasState.selectedItemId}</div>
+				<Input
+					value={canvasFunctions.getSelectedItem()?.fill || ""}
+					onChange={(e) => {
+						if (!canvasState.selectedItemId) return;
+						canvasFunctions.updateItem({
+							id: canvasState.selectedItemId,
+							fill: e.target.value,
+						});
+					}}
+				/>
 			</div>
 			<div
 				style={{

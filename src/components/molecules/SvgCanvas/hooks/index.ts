@@ -1,25 +1,28 @@
 import { useState, useCallback } from "react";
-import type { ItemSelectEvent, ChangeEvent } from "../types";
+import type { Item, ItemSelectEvent, ChangeEvent } from "../types";
+import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 
-export const useSvgCanvas = () => {
-	const [canvasState, setCanvasState] = useState({
-		items: [
-			{
-				id: "1",
-				type: "rect",
-				point: { x: 10, y: 10 },
-				width: 100,
-				height: 100,
-			},
-			{
-				id: "2",
-				type: "ellipse",
-				point: { x: 110, y: 110 },
-				width: 100,
-				height: 100,
-			},
-		],
-		selectedItemId: "",
+type SvgCanvasState = {
+	items: Item[];
+	selectedItemId?: string;
+};
+
+type AddItem = Omit<PartiallyRequired<Item, "type">, "id" | "isSelected">;
+type UpdateItem = Omit<PartiallyRequired<Item, "id">, "type" | "isSelected">;
+
+const DEFAULT_ITEM_VALUE = {
+	point: { x: 10, y: 10 },
+	width: 100,
+	height: 100,
+	fill: "transparent",
+	stroke: "black",
+	strokeWidth: "1px",
+	isSelected: false,
+};
+
+export const useSvgCanvas = (initialItems: Item[]) => {
+	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
+		items: initialItems,
 	});
 
 	const onChangeEnd = useCallback((e: ChangeEvent) => {
@@ -44,7 +47,7 @@ export const useSvgCanvas = () => {
 			return {
 				...prevState,
 				items,
-				selectedItemId: e.id || "",
+				selectedItemId: e.id,
 			};
 		});
 	}, []);
@@ -55,23 +58,38 @@ export const useSvgCanvas = () => {
 		onItemSelect,
 	};
 
+	const getSelectedItem = useCallback(() => {
+		return canvasState.items.find((item) => item.isSelected);
+	}, [canvasState.items]);
+
+	const addItem = useCallback((item: AddItem) => {
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: [
+				...prevState.items.map((item) => ({ ...item, isSelected: false })),
+				{
+					...DEFAULT_ITEM_VALUE,
+					id: String(prevState.items.length + 1),
+					isSelected: true,
+					...item,
+				},
+			],
+		}));
+	}, []);
+
+	const updateItem = useCallback((item: UpdateItem) => {
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: prevState.items.map((i) =>
+				i.id === item.id ? { ...i, ...item } : i,
+			),
+		}));
+	}, []);
+
 	const canvasFunctions = {
-		addRectangle: () => {
-			setCanvasState((prevState) => ({
-				...prevState,
-				items: [
-					...prevState.items.map((item) => ({ ...item, isSelected: false })),
-					{
-						id: String(prevState.items.length + 1),
-						type: "rect",
-						point: { x: 10, y: 10 },
-						width: 100,
-						height: 100,
-						isSelected: true,
-					},
-				],
-			}));
-		},
+		getSelectedItem,
+		addItem,
+		updateItem,
 	};
 
 	return {

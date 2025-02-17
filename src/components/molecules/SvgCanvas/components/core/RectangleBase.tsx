@@ -7,8 +7,8 @@ import type {
 	ChangeEvent,
 } from "../../types";
 import { DragDirection } from "../../types";
-import DragPoint from "./DragPoint";
-import Draggable from "../atoms/Draggable";
+import DragPoint from "../diagram/DragPoint";
+import Draggable from "./Draggable";
 
 const updatedPoints = (point: Point, diagonalPoint: Point) => {
 	const top = Math.min(point.y, diagonalPoint.y);
@@ -79,9 +79,6 @@ export type RectangleBaseProps = {
 	initialPoint: Point;
 	initialWidth: number;
 	initialHeight: number;
-	fill?: string;
-	stroke?: string;
-	strokeWidth?: number;
 	tabIndex?: number;
 	isSelected?: boolean;
 	onPointerDown?: (e: PointerDownEvent) => void;
