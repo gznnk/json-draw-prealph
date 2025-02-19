@@ -16,7 +16,10 @@ import {
 	createLinerDragY2xFunction,
 } from "./RectangleBaseFunctions";
 
-const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
+const DragPointRightBottom = forwardRef<
+	SVGGElement,
+	RectangleBaseDragPointProps
+>(
 	(
 		{
 			leftTopPoint,
@@ -34,33 +37,33 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 		useImperativeHandle(ref, () => domRef.current);
 
 		const onDragStart = useCallback(() => {
-			onArrangementChangeStart(DragPointType.LeftTop);
+			onArrangementChangeStart(DragPointType.RightBottom);
 		}, [onArrangementChangeStart]);
 
 		const onDrag = useCallback(
 			(e: DragEvent) => {
 				const newArrangment = calcArrangement(
 					e.point,
-					rightBottomPoint,
+					leftTopPoint,
 					keepProportion,
 				);
 
 				onArrangementChange(newArrangment);
 			},
-			[onArrangementChange, rightBottomPoint, keepProportion],
+			[onArrangementChange, leftTopPoint, keepProportion],
 		);
 
 		const onDragEnd = useCallback(
 			(e: DragEvent) => {
 				const newArrangment = calcArrangement(
 					e.point,
-					rightBottomPoint,
+					leftTopPoint,
 					keepProportion,
 				);
 
 				onArrangementChangeEnd(newArrangment);
 			},
-			[onArrangementChangeEnd, rightBottomPoint, keepProportion],
+			[onArrangementChangeEnd, leftTopPoint, keepProportion],
 		);
 
 		const linerDragFunction = useCallback(
@@ -69,18 +72,18 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 			[leftTopPoint, rightBottomPoint],
 		);
 
-		if (draggingPoint && draggingPoint !== DragPointType.LeftTop) {
+		if (draggingPoint && draggingPoint !== DragPointType.RightBottom) {
 			return;
 		}
 
 		return (
 			<DragPoint
-				point={leftTopPoint}
+				point={rightBottomPoint}
 				onDragStart={onDragStart}
 				onDrag={onDrag}
 				onDragEnd={onDragEnd}
 				dragPositioningFunction={keepProportion ? linerDragFunction : undefined}
-				cursor="nw-resize"
+				cursor="se-resize"
 				hidden={hidden}
 				ref={domRef}
 			/>
@@ -88,4 +91,4 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 	},
 );
 
-export default DragPointLeftTop;
+export default DragPointRightBottom;

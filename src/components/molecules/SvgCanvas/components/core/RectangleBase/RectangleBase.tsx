@@ -9,19 +9,20 @@ import type {
 import { DragDirection } from "../../../types";
 import DragPoint from "../DragPoint";
 import Draggable from "../Draggable";
-import {
-	createLinerDragY2xFunction,
-	createLinerDragX2yFunction,
-} from "./RectangleBaseFunctions";
 import type {
 	UpdatedPoints,
 	RectangleBaseState,
 	RectangleBaseArrangement,
 } from "./RectangleBaseTypes";
-import { DragPointType } from "./RectangleBaseTypes";
+import type { DragPointType } from "./RectangleBaseTypes";
 import DragPointLeftTop from "./DragPointLeftTop";
 import DragPointLeftBottom from "./DragPointLeftBottom";
 import DragPointRightTop from "./DragPointRightTop";
+import DragPointRightBottom from "./DragPointRightBottom";
+import DragPointTopCenter from "./DragPointTopCenter";
+import DragPointLeftCenter from "./DragPointLeftCenter";
+import DragPointRightCenter from "./DragPointRightCenter";
+import DragPointBottomCenter from "./DragPointBottomCenter";
 
 export type RectangleBaseProps = {
 	id?: string;
@@ -192,33 +193,31 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 
 		const updateDragPointFocus = useCallback(
 			(dragEndPoint: Point, newPoints: UpdatedPoints) => {
-				const focusElement = document.activeElement as HTMLElement;
-				if (focusElement) {
-					focusElement.blur();
-				}
-
-				const isPointEquals = (p1: Point, p2: Point) =>
-					Math.abs(p1.x - p2.x) < 1 && Math.abs(p1.y - p2.y) < 1;
-
-				setTimeout(() => {
-					if (isPointEquals(dragEndPoint, newPoints.leftTopPoint)) {
-						leftTopPointRef.current?.focus();
-					} else if (isPointEquals(dragEndPoint, newPoints.leftBottomPoint)) {
-						leftBottomPointRef.current?.focus();
-					} else if (isPointEquals(dragEndPoint, newPoints.rightTopPoint)) {
-						rightTopPointRef.current?.focus();
-					} else if (isPointEquals(dragEndPoint, newPoints.rightBottomPoint)) {
-						rightBottomPointRef.current?.focus();
-					} else if (isPointEquals(dragEndPoint, newPoints.topCenterPoint)) {
-						topCenterPointRef.current?.focus();
-					} else if (isPointEquals(dragEndPoint, newPoints.leftCenterPoint)) {
-						leftCenterPointRef.current?.focus();
-					} else if (isPointEquals(dragEndPoint, newPoints.rightCenterPoint)) {
-						rightCenterPointRef.current?.focus();
-					} else if (isPointEquals(dragEndPoint, newPoints.bottomCenterPoint)) {
-						bottomCenterPointRef.current?.focus();
-					}
-				}, 10); // TODO 次のレンダリングでフォーカスが移動するように修正したい
+				// const focusElement = document.activeElement as HTMLElement;
+				// if (focusElement) {
+				// 	focusElement.blur();
+				// }
+				// const isPointEquals = (p1: Point, p2: Point) =>
+				// 	Math.abs(p1.x - p2.x) < 1 && Math.abs(p1.y - p2.y) < 1;
+				// setTimeout(() => {
+				// 	if (isPointEquals(dragEndPoint, newPoints.leftTopPoint)) {
+				// 		leftTopPointRef.current?.focus();
+				// 	} else if (isPointEquals(dragEndPoint, newPoints.leftBottomPoint)) {
+				// 		leftBottomPointRef.current?.focus();
+				// 	} else if (isPointEquals(dragEndPoint, newPoints.rightTopPoint)) {
+				// 		rightTopPointRef.current?.focus();
+				// 	} else if (isPointEquals(dragEndPoint, newPoints.rightBottomPoint)) {
+				// 		rightBottomPointRef.current?.focus();
+				// 	} else if (isPointEquals(dragEndPoint, newPoints.topCenterPoint)) {
+				// 		topCenterPointRef.current?.focus();
+				// 	} else if (isPointEquals(dragEndPoint, newPoints.leftCenterPoint)) {
+				// 		leftCenterPointRef.current?.focus();
+				// 	} else if (isPointEquals(dragEndPoint, newPoints.rightCenterPoint)) {
+				// 		rightCenterPointRef.current?.focus();
+				// 	} else if (isPointEquals(dragEndPoint, newPoints.bottomCenterPoint)) {
+				// 		bottomCenterPointRef.current?.focus();
+				// 	}
+				// }, 10); // TODO 次のレンダリングでフォーカスが移動するように修正したい
 			},
 			[],
 		);
@@ -278,7 +277,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			(dragPointType: DragPointType) => {
 				setState((prevState) => ({
 					...prevState,
-					isDragging: true,
 					draggingPoint: dragPointType,
 				}));
 			},
@@ -314,373 +312,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				setState((prevState) => ({
 					...prevState,
 					...newArrangment,
-					isDragging: false,
 					draggingPoint: undefined,
 				}));
 
 				// TODO changeEndの伝番
 			},
 			[],
-		);
-
-		// --- 以下右下の点のドラッグ ---
-
-		const onRightBottomDragStart = useCallback((_e: DragEvent) => {
-			setState((prevState) => ({
-				...prevState,
-				isDragging: true,
-				draggingPoint: DragPointType.RightBottom,
-			}));
-		}, []);
-
-		const onRightBottomDrag = useCallback(
-			(e: DragEvent) => {
-				const {
-					leftTopPoint: newLeftTopPoint,
-					width: newWidth,
-					height: newHeight,
-				} = updatedPoints(e.point, state.leftTopPoint);
-
-				updateDomPoints(newLeftTopPoint, newWidth, newHeight);
-			},
-			[updatedPoints, updateDomPoints, state.leftTopPoint],
-		);
-
-		const onRightBottomDragEnd = useCallback(
-			(e: DragEvent) => {
-				const points = updatedPoints(e.point, state.leftTopPoint);
-
-				setState((prevState) => ({
-					...prevState,
-					...points,
-					isDragging: false,
-					draggingPoint: undefined,
-				}));
-
-				updateDragPointFocus(e.point, points);
-			},
-			[updatedPoints, updateDragPointFocus, state.leftTopPoint],
-		);
-
-		const rightBottomLinerDragFunction = useCallback(
-			(p: Point) =>
-				createLinerDragY2xFunction(
-					state.leftTopPoint,
-					state.rightBottomPoint,
-				)(p),
-			[state.leftTopPoint, state.rightBottomPoint],
-		);
-
-		// --- 以下上中央の点のドラッグ ---
-
-		const onTopCenterDragStart = useCallback((_e: DragEvent) => {
-			setState((prevState) => ({
-				...prevState,
-				isDragging: true,
-				draggingPoint: DragPointType.TopCenter,
-			}));
-		}, []);
-
-		const updateTopCenterPoint = useCallback(
-			(e: DragEvent) => {
-				if (keepProportion) {
-					const newHeight = state.leftBottomPoint.y - e.point.y;
-					const newWidth = newHeight * state.aspectRatio;
-
-					const rightTopPoint = {
-						x: state.leftBottomPoint.x + newWidth,
-						y: e.point.y,
-					};
-
-					return updatedPoints(state.leftBottomPoint, rightTopPoint);
-				}
-
-				const rightTopPoint = {
-					x: state.rightBottomPoint.x,
-					y: e.point.y,
-				};
-
-				return updatedPoints(state.leftBottomPoint, rightTopPoint);
-			},
-			[
-				updatedPoints,
-				keepProportion,
-				state.leftBottomPoint, // 起点
-				state.rightBottomPoint.x, // 動点の反対の辺の、起点じゃない方の角
-				state.aspectRatio,
-			],
-		);
-
-		const onTopCenterDrag = useCallback(
-			(e: DragEvent) => {
-				const {
-					leftTopPoint: newLeftTopPoint,
-					width: newWidth,
-					height: newHeight,
-				} = updateTopCenterPoint(e);
-
-				updateDomPoints(newLeftTopPoint, newWidth, newHeight);
-			},
-			[updateTopCenterPoint, updateDomPoints],
-		);
-
-		const onTopCenterDragEnd = useCallback(
-			(e: DragEvent) => {
-				const points = updateTopCenterPoint(e);
-
-				setState((prevState) => ({
-					...prevState,
-					...points,
-					isDragging: false,
-					draggingPoint: undefined,
-				}));
-
-				updateDragPointFocus(e.point, points);
-			},
-			[updateTopCenterPoint, updateDragPointFocus],
-		);
-
-		const topCenterLinerDragFunction = useCallback(
-			(p: Point) =>
-				createLinerDragY2xFunction(
-					state.topCenterPoint,
-					state.leftBottomPoint,
-				)(p),
-			[state.topCenterPoint, state.leftBottomPoint],
-		);
-
-		// --- 以下左中央の点のドラッグ ---
-
-		const onLeftCenterDragStart = useCallback((_e: DragEvent) => {
-			setState((prevState) => ({
-				...prevState,
-				isDragging: true,
-				draggingPoint: DragPointType.LeftCenter,
-			}));
-		}, []);
-
-		const updateLeftCenterPoint = useCallback(
-			(e: DragEvent) => {
-				if (keepProportion) {
-					const newWidth = state.rightBottomPoint.x - e.point.x;
-					const newHeight = newWidth / state.aspectRatio;
-
-					const leftTopPoint = {
-						x: e.point.x,
-						y: state.rightBottomPoint.y - newHeight,
-					};
-
-					return updatedPoints(leftTopPoint, state.rightBottomPoint);
-				}
-
-				const leftTopPoint = {
-					x: e.point.x,
-					y: state.leftTopPoint.y,
-				};
-
-				return updatedPoints(leftTopPoint, state.rightBottomPoint);
-			},
-			[
-				updatedPoints,
-				keepProportion,
-				state.rightBottomPoint,
-				state.leftTopPoint.y,
-				state.aspectRatio,
-			],
-		);
-
-		const onLeftCenterDrag = useCallback(
-			(e: DragEvent) => {
-				const {
-					leftTopPoint: newLeftTopPoint,
-					width: newWidth,
-					height: newHeight,
-				} = updateLeftCenterPoint(e);
-
-				updateDomPoints(newLeftTopPoint, newWidth, newHeight);
-			},
-			[updateLeftCenterPoint, updateDomPoints],
-		);
-
-		const onLeftCenterDragEnd = useCallback(
-			(e: DragEvent) => {
-				const points = updateLeftCenterPoint(e);
-
-				setState((prevState) => ({
-					...prevState,
-					...points,
-					isDragging: false,
-					draggingPoint: undefined,
-				}));
-
-				updateDragPointFocus(e.point, points);
-			},
-			[updateLeftCenterPoint, updateDragPointFocus],
-		);
-
-		const leftCenterLinerDragFunction = useCallback(
-			(p: Point) =>
-				createLinerDragX2yFunction(
-					state.leftCenterPoint,
-					state.rightBottomPoint,
-				)(p),
-			[state.leftCenterPoint, state.rightBottomPoint],
-		);
-
-		// --- 以下右中央の点のドラッグ ---
-
-		const onRightCenterDragStart = useCallback((_e: DragEvent) => {
-			setState((prevState) => ({
-				...prevState,
-				isDragging: true,
-				draggingPoint: DragPointType.RightCenter,
-			}));
-		}, []);
-
-		const updateRightCenterPoint = useCallback(
-			(e: DragEvent) => {
-				if (keepProportion) {
-					const newWidth = e.point.x - state.leftBottomPoint.x;
-					const newHeight = newWidth / state.aspectRatio;
-
-					const rightTopPoint = {
-						x: e.point.x,
-						y: state.leftBottomPoint.y - newHeight,
-					};
-
-					return updatedPoints(state.leftBottomPoint, rightTopPoint);
-				}
-
-				const rightBottomPoint = {
-					x: e.point.x,
-					y: state.leftBottomPoint.y,
-				};
-
-				return updatedPoints(state.leftTopPoint, rightBottomPoint);
-			},
-			[
-				updatedPoints,
-				keepProportion,
-				state.leftBottomPoint,
-				state.leftTopPoint,
-				state.aspectRatio,
-			],
-		);
-
-		const onRightCenterDrag = useCallback(
-			(e: DragEvent) => {
-				const {
-					leftTopPoint: newLeftTopPoint,
-					width: newWidth,
-					height: newHeight,
-				} = updateRightCenterPoint(e);
-
-				updateDomPoints(newLeftTopPoint, newWidth, newHeight);
-			},
-			[updateRightCenterPoint, updateDomPoints],
-		);
-
-		const onRightCenterDragEnd = useCallback(
-			(e: DragEvent) => {
-				const points = updateRightCenterPoint(e);
-
-				setState((prevState) => ({
-					...prevState,
-					...points,
-					isDragging: false,
-					draggingPoint: undefined,
-				}));
-
-				updateDragPointFocus(e.point, points);
-			},
-			[updateRightCenterPoint, updateDragPointFocus],
-		);
-
-		const rightCenterLinerDragFunction = useCallback(
-			(p: Point) =>
-				createLinerDragX2yFunction(
-					state.rightCenterPoint,
-					state.leftBottomPoint,
-				)(p),
-			[state.rightCenterPoint, state.leftBottomPoint],
-		);
-
-		// --- 以下下中央の点のドラッグ ---
-
-		const onBottomCenterDragStart = useCallback((_e: DragEvent) => {
-			setState((prevState) => ({
-				...prevState,
-				isDragging: true,
-				draggingPoint: DragPointType.BottomCenter,
-			}));
-		}, []);
-
-		const updateBottomCenterPoint = useCallback(
-			(e: DragEvent) => {
-				if (keepProportion) {
-					const newHeight = e.point.y - state.leftTopPoint.y;
-					const newWidth = newHeight * state.aspectRatio;
-
-					const rightBottomPoint = {
-						x: state.leftTopPoint.x + newWidth,
-						y: e.point.y,
-					};
-
-					return updatedPoints(state.leftTopPoint, rightBottomPoint);
-				}
-
-				const rightBottomPoint = {
-					x: state.rightBottomPoint.x,
-					y: e.point.y,
-				};
-
-				return updatedPoints(state.leftTopPoint, rightBottomPoint);
-			},
-			[
-				updatedPoints,
-				keepProportion,
-				state.leftTopPoint,
-				state.rightBottomPoint.x,
-				state.aspectRatio,
-			],
-		);
-
-		const onBottomCenterDrag = useCallback(
-			(e: DragEvent) => {
-				const {
-					leftTopPoint: newLeftTopPoint,
-					width: newWidth,
-					height: newHeight,
-				} = updateBottomCenterPoint(e);
-
-				updateDomPoints(newLeftTopPoint, newWidth, newHeight);
-			},
-			[updateBottomCenterPoint, updateDomPoints],
-		);
-
-		const onBottomCenterDragEnd = useCallback(
-			(e: DragEvent) => {
-				const points = updateBottomCenterPoint(e);
-
-				setState((prevState) => ({
-					...prevState,
-					...points,
-					isDragging: false,
-					draggingPoint: undefined,
-				}));
-
-				updateDragPointFocus(e.point, points);
-			},
-			[updateBottomCenterPoint, updateDragPointFocus],
-		);
-
-		const bottomCenterLinerDragFunction = useCallback(
-			(p: Point) =>
-				createLinerDragY2xFunction(
-					state.leftTopPoint,
-					state.bottomCenterPoint,
-				)(p),
-			[state.leftTopPoint, state.bottomCenterPoint],
 		);
 
 		// ポインターダウン時の処理
@@ -723,7 +360,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						/>
 					)}
 				</Draggable>
-				{isSelected && (
+				{isSelected && !state.isDragging && (
 					<>
 						,{/* 左上 */}
 						<DragPointLeftTop
@@ -753,91 +390,48 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							ref={rightTopPointRef}
 						/>
 						{/* 右下 */}
-						<DragPoint
-							point={state.rightBottomPoint}
-							onDragStart={onRightBottomDragStart}
-							onDrag={onRightBottomDrag}
-							onDragEnd={onRightBottomDragEnd}
-							dragPositioningFunction={
-								keepProportion ? rightBottomLinerDragFunction : undefined
-							}
-							cursor="se-resize"
-							hidden={
-								state.isDragging &&
-								state.draggingPoint !== DragPointType.RightBottom
-							}
+						<DragPointRightBottom
+							{...state}
+							keepProportion={keepProportion}
+							onArrangementChangeStart={onArrangementChangeStart}
+							onArrangementChange={onArrangementChange}
+							onArrangementChangeEnd={onArrangementChangeEnd}
 							ref={rightBottomPointRef}
 						/>
 						{/* 上中央 */}
-						<DragPoint
-							point={state.topCenterPoint}
-							direction={DragDirection.Vertical}
-							allowXDecimal
-							onDragStart={onTopCenterDragStart}
-							onDrag={onTopCenterDrag}
-							onDragEnd={onTopCenterDragEnd}
-							dragPositioningFunction={
-								keepProportion ? topCenterLinerDragFunction : undefined
-							}
-							cursor="n-resize"
-							hidden={
-								state.isDragging &&
-								state.draggingPoint !== DragPointType.TopCenter
-							}
+						<DragPointTopCenter
+							{...state}
+							keepProportion={keepProportion}
+							onArrangementChangeStart={onArrangementChangeStart}
+							onArrangementChange={onArrangementChange}
+							onArrangementChangeEnd={onArrangementChangeEnd}
 							ref={topCenterPointRef}
 						/>
 						{/* 左中央 */}
-						<DragPoint
-							point={state.leftCenterPoint}
-							direction={DragDirection.Horizontal}
-							allowYDecimal
-							onDragStart={onLeftCenterDragStart}
-							onDrag={onLeftCenterDrag}
-							onDragEnd={onLeftCenterDragEnd}
-							dragPositioningFunction={
-								keepProportion ? leftCenterLinerDragFunction : undefined
-							}
-							cursor="w-resize"
-							hidden={
-								state.isDragging &&
-								state.draggingPoint !== DragPointType.LeftCenter
-							}
+						<DragPointLeftCenter
+							{...state}
+							keepProportion={keepProportion}
+							onArrangementChangeStart={onArrangementChangeStart}
+							onArrangementChange={onArrangementChange}
+							onArrangementChangeEnd={onArrangementChangeEnd}
 							ref={leftCenterPointRef}
 						/>
 						{/* 右中央 */}
-						<DragPoint
-							point={state.rightCenterPoint}
-							direction={DragDirection.Horizontal}
-							allowYDecimal
-							onDragStart={onRightCenterDragStart}
-							onDrag={onRightCenterDrag}
-							onDragEnd={onRightCenterDragEnd}
-							dragPositioningFunction={
-								keepProportion ? rightCenterLinerDragFunction : undefined
-							}
-							cursor="e-resize"
-							hidden={
-								state.isDragging &&
-								state.draggingPoint !== DragPointType.RightCenter
-							}
+						<DragPointRightCenter
+							{...state}
+							keepProportion={keepProportion}
+							onArrangementChangeStart={onArrangementChangeStart}
+							onArrangementChange={onArrangementChange}
+							onArrangementChangeEnd={onArrangementChangeEnd}
 							ref={rightCenterPointRef}
 						/>
 						{/* 下中央 */}
-						<DragPoint
-							point={state.bottomCenterPoint}
-							direction={DragDirection.Vertical}
-							allowXDecimal
-							onDragStart={onBottomCenterDragStart}
-							onDrag={onBottomCenterDrag}
-							onDragEnd={onBottomCenterDragEnd}
-							dragPositioningFunction={
-								keepProportion ? bottomCenterLinerDragFunction : undefined
-							}
-							cursor="s-resize"
-							hidden={
-								state.isDragging &&
-								state.draggingPoint !== DragPointType.BottomCenter
-							}
+						<DragPointBottomCenter
+							{...state}
+							keepProportion={keepProportion}
+							onArrangementChangeStart={onArrangementChangeStart}
+							onArrangementChange={onArrangementChange}
+							onArrangementChangeEnd={onArrangementChangeEnd}
 							ref={bottomCenterPointRef}
 						/>
 					</>

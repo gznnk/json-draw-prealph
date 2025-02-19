@@ -3,6 +3,7 @@ import { useRef, forwardRef, useImperativeHandle, useCallback } from "react";
 
 // SvgCanvas関連型定義をインポート
 import type { Point, DragEvent } from "../../../types";
+import { DragDirection } from "../../../types";
 // SvgCanvasコンポーネントをインポート
 import DragPoint from "../DragPoint";
 
@@ -16,13 +17,15 @@ import {
 	createLinerDragY2xFunction,
 } from "./RectangleBaseFunctions";
 
-const DragPointRightTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
+const DragPointTopCenter = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 	(
 		{
-			rightTopPoint,
+			topCenterPoint,
 			leftBottomPoint,
+			rightTopPoint,
 			draggingPoint,
 			keepProportion = false,
+			aspectRatio,
 			hidden = false,
 			onArrangementChangeStart,
 			onArrangementChange,
@@ -34,53 +37,79 @@ const DragPointRightTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 		useImperativeHandle(ref, () => domRef.current);
 
 		const onDragStart = useCallback(() => {
-			onArrangementChangeStart(DragPointType.RightTop);
+			onArrangementChangeStart(DragPointType.TopCenter);
 		}, [onArrangementChangeStart]);
+
+		const calcArrangementWithCenterPoint = useCallback(
+			(e: DragEvent) => {
+				if (keepProportion && aspectRatio) {
+					const newHeight = leftBottomPoint.y - e.point.y;
+					const newWidth = newHeight * aspectRatio;
+
+					const newRightTopPoint = {
+						x: leftBottomPoint.x + newWidth,
+						y: e.point.y,
+					};
+
+					return calcArrangement(
+						leftBottomPoint,
+						newRightTopPoint,
+						keepProportion,
+					);
+				}
+
+				const newRightTopPoint = {
+					x: rightTopPoint.x,
+					y: e.point.y,
+				};
+
+				return calcArrangement(
+					leftBottomPoint,
+					newRightTopPoint,
+					keepProportion,
+				);
+			},
+			[leftBottomPoint, rightTopPoint.x, keepProportion, aspectRatio],
+		);
 
 		const onDrag = useCallback(
 			(e: DragEvent) => {
-				const newArrangment = calcArrangement(
-					e.point,
-					leftBottomPoint,
-					keepProportion,
-				);
+				const newArrangment = calcArrangementWithCenterPoint(e);
 
 				onArrangementChange(newArrangment);
 			},
-			[onArrangementChange, leftBottomPoint, keepProportion],
+			[onArrangementChange, calcArrangementWithCenterPoint],
 		);
 
 		const onDragEnd = useCallback(
 			(e: DragEvent) => {
-				const newArrangment = calcArrangement(
-					e.point,
-					leftBottomPoint,
-					keepProportion,
-				);
+				const newArrangment = calcArrangementWithCenterPoint(e);
 
 				onArrangementChangeEnd(newArrangment);
 			},
-			[onArrangementChangeEnd, leftBottomPoint, keepProportion],
+			[onArrangementChangeEnd, calcArrangementWithCenterPoint],
 		);
 
 		const linerDragFunction = useCallback(
 			(p: Point) =>
-				createLinerDragY2xFunction(rightTopPoint, leftBottomPoint)(p),
-			[rightTopPoint, leftBottomPoint],
+				createLinerDragY2xFunction(leftBottomPoint, topCenterPoint)(p),
+			[leftBottomPoint, topCenterPoint],
 		);
 
-		if (draggingPoint && draggingPoint !== DragPointType.RightTop) {
+		if (draggingPoint && draggingPoint !== DragPointType.TopCenter) {
 			return;
 		}
 
 		return (
 			<DragPoint
-				point={rightTopPoint}
+				point={topCenterPoint}
+				direction={keepProportion ? DragDirection.All : DragDirection.Vertical}
+				allowXDecimal
 				onDragStart={onDragStart}
 				onDrag={onDrag}
 				onDragEnd={onDragEnd}
 				dragPositioningFunction={keepProportion ? linerDragFunction : undefined}
-				cursor="ne-resize"
+				cursor="n-resize"
 				hidden={hidden}
 				ref={domRef}
 			/>
@@ -88,4 +117,4 @@ const DragPointRightTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 	},
 );
 
-export default DragPointRightTop;
+export default DragPointTopCenter;

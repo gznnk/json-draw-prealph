@@ -16,14 +16,11 @@ import {
 	createLinerDragY2xFunction,
 } from "./RectangleBaseFunctions";
 
-const DRAG_POINT_TYPE = DragPointType.LeftBottom;
-
 const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 	(
 		{
 			rightTopPoint,
 			leftBottomPoint,
-			isDragging,
 			draggingPoint,
 			keepProportion = false,
 			hidden = false,
@@ -37,7 +34,7 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 		useImperativeHandle(ref, () => domRef.current);
 
 		const onDragStart = useCallback(() => {
-			onArrangementChangeStart(DRAG_POINT_TYPE);
+			onArrangementChangeStart(DragPointType.LeftBottom);
 		}, [onArrangementChangeStart]);
 
 		const onDrag = useCallback(
@@ -72,7 +69,7 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 			[rightTopPoint, leftBottomPoint],
 		);
 
-		if (isDragging && draggingPoint !== DRAG_POINT_TYPE) {
+		if (draggingPoint && draggingPoint !== DragPointType.LeftBottom) {
 			return;
 		}
 
