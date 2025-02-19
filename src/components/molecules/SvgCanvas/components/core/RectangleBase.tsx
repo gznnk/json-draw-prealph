@@ -34,6 +34,50 @@ const createLinerDragX2yFunction = (p1: Point, p2: Point) => {
 	};
 };
 
+type RectangleBaseState = {
+	id?: string;
+	point: Point;
+	width: number;
+	height: number;
+	aspectRatio: number;
+	leftTopPoint: Point;
+	leftBottomPoint: Point;
+	rightTopPoint: Point;
+	rightBottomPoint: Point;
+	topCenterPoint: Point;
+	leftCenterPoint: Point;
+	rightCenterPoint: Point;
+	bottomCenterPoint: Point;
+	isDragging: boolean;
+	draggingPoint?: DragPointType;
+};
+
+type UpdatedPoints = {
+	point: Point;
+	width: number;
+	height: number;
+	aspectRatio?: number;
+	leftTopPoint: Point;
+	leftBottomPoint: Point;
+	rightTopPoint: Point;
+	rightBottomPoint: Point;
+	topCenterPoint: Point;
+	leftCenterPoint: Point;
+	rightCenterPoint: Point;
+	bottomCenterPoint: Point;
+};
+
+enum DragPointType {
+	LeftTop = "leftTop",
+	LeftBottom = "leftBottom",
+	RightTop = "rightTop",
+	RightBottom = "rightBottom",
+	TopCenter = "topCenter",
+	LeftCenter = "leftCenter",
+	RightCenter = "rightCenter",
+	BottomCenter = "bottomCenter",
+}
+
 export type RectangleBaseProps = {
 	id?: string;
 	point: Point;
@@ -62,7 +106,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 		onChangeEnd,
 		children,
 	}) => {
-		const [state, setState] = useState({
+		const [state, setState] = useState<RectangleBaseState>({
 			id: id,
 			point: point,
 			width: width,
@@ -98,18 +142,20 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				y: point.y + height,
 			},
 			isDragging: false,
-			isLeftTopDragging: false,
-			isLeftBottomDragging: false,
-			isRightTopDragging: false,
-			isRightBottomDragging: false,
-			isTopCenterDragging: false,
-			isLeftCenterDragging: false,
-			isRightCenterDragging: false,
-			isBottomCenterDragging: false,
+			draggingPoint: undefined,
 		});
 
 		const draggableRef = useRef<SVGGElement>({} as SVGGElement);
 		const outlineRef = useRef<SVGRectElement>({} as SVGRectElement);
+
+		const leftTopPointRef = useRef<SVGGElement>({} as SVGGElement);
+		const rightTopPointRef = useRef<SVGGElement>({} as SVGGElement);
+		const leftBottomPointRef = useRef<SVGGElement>({} as SVGGElement);
+		const rightBottomPointRef = useRef<SVGGElement>({} as SVGGElement);
+		const topCenterPointRef = useRef<SVGGElement>({} as SVGGElement);
+		const leftCenterPointRef = useRef<SVGGElement>({} as SVGGElement);
+		const rightCenterPointRef = useRef<SVGGElement>({} as SVGGElement);
+		const bottomCenterPointRef = useRef<SVGGElement>({} as SVGGElement);
 
 		useEffect(() => {
 			onChangeEnd?.({
@@ -123,7 +169,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 		// -- 以下共通関数 --
 
 		const updatedPoints = useCallback(
-			(point: Point, diagonalPoint: Point) => {
+			(point: Point, diagonalPoint: Point): UpdatedPoints => {
 				const top = Math.round(Math.min(point.y, diagonalPoint.y));
 				const bottom = Math.round(Math.max(point.y, diagonalPoint.y));
 				const left = Math.round(Math.min(point.x, diagonalPoint.x));
@@ -137,7 +183,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				const newWidth = right - left;
 				const newHeight = bottom - top;
 
-				const result = {
+				const result: UpdatedPoints = {
 					point: leftTopPoint,
 					width: newWidth,
 					height: newHeight,
@@ -170,19 +216,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						x: left + newWidth / 2,
 						y: bottom,
 					},
-				} as {
-					point: Point;
-					width: number;
-					height: number;
-					aspectRatio?: number;
-					leftTopPoint: Point;
-					leftBottomPoint: Point;
-					rightTopPoint: Point;
-					rightBottomPoint: Point;
-					topCenterPoint: Point;
-					leftCenterPoint: Point;
-					rightCenterPoint: Point;
-					bottomCenterPoint: Point;
 				};
 
 				if (!keepProportion) {
@@ -210,6 +243,39 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				});
 			},
 			[onChange, state.id],
+		);
+
+		const updateDragPointFocus = useCallback(
+			(dragEndPoint: Point, newPoints: UpdatedPoints) => {
+				const focusElement = document.activeElement as HTMLElement;
+				if (focusElement) {
+					focusElement.blur();
+				}
+
+				const isPointEquals = (p1: Point, p2: Point) =>
+					Math.abs(p1.x - p2.x) < 1 && Math.abs(p1.y - p2.y) < 1;
+
+				setTimeout(() => {
+					if (isPointEquals(dragEndPoint, newPoints.leftTopPoint)) {
+						leftTopPointRef.current?.focus();
+					} else if (isPointEquals(dragEndPoint, newPoints.leftBottomPoint)) {
+						leftBottomPointRef.current?.focus();
+					} else if (isPointEquals(dragEndPoint, newPoints.rightTopPoint)) {
+						rightTopPointRef.current?.focus();
+					} else if (isPointEquals(dragEndPoint, newPoints.rightBottomPoint)) {
+						rightBottomPointRef.current?.focus();
+					} else if (isPointEquals(dragEndPoint, newPoints.topCenterPoint)) {
+						topCenterPointRef.current?.focus();
+					} else if (isPointEquals(dragEndPoint, newPoints.leftCenterPoint)) {
+						leftCenterPointRef.current?.focus();
+					} else if (isPointEquals(dragEndPoint, newPoints.rightCenterPoint)) {
+						rightCenterPointRef.current?.focus();
+					} else if (isPointEquals(dragEndPoint, newPoints.bottomCenterPoint)) {
+						bottomCenterPointRef.current?.focus();
+					}
+				}, 10); // TODO 次のレンダリングでフォーカスが移動するように修正したい
+			},
+			[],
 		);
 
 		// --- 以下四角形全体のドラッグ ---
@@ -267,7 +333,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			setState((prevState) => ({
 				...prevState,
 				isDragging: true,
-				isLeftTopDragging: true,
+				draggingPoint: DragPointType.LeftTop,
 			}));
 		}, []);
 
@@ -292,10 +358,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					...prevState,
 					...points,
 					isDragging: false,
-					isLeftTopDragging: false,
+					draggingPoint: undefined,
 				}));
+
+				updateDragPointFocus(e.point, points);
 			},
-			[updatedPoints, state.rightBottomPoint],
+			[updatedPoints, updateDragPointFocus, state.rightBottomPoint],
 		);
 
 		const leftTopLinerDragFunction = useCallback(
@@ -313,7 +381,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			setState((prevState) => ({
 				...prevState,
 				isDragging: true,
-				isLeftBottomDragging: true,
+				draggingPoint: DragPointType.LeftBottom,
 			}));
 		}, []);
 
@@ -338,10 +406,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					...prevState,
 					...points,
 					isDragging: false,
-					isLeftBottomDragging: false,
+					draggingPoint: undefined,
 				}));
+
+				updateDragPointFocus(e.point, points);
 			},
-			[updatedPoints, state.rightTopPoint],
+			[updatedPoints, updateDragPointFocus, state.rightTopPoint],
 		);
 
 		const leftBottomLinerDragFunction = useCallback(
@@ -359,7 +429,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			setState((prevState) => ({
 				...prevState,
 				isDragging: true,
-				isRightTopDragging: true,
+				draggingPoint: DragPointType.RightTop,
 			}));
 		}, []);
 
@@ -384,10 +454,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					...prevState,
 					...points,
 					isDragging: false,
-					isRightTopDragging: false,
+					draggingPoint: undefined,
 				}));
+
+				updateDragPointFocus(e.point, points);
 			},
-			[updatedPoints, state.leftBottomPoint],
+			[updatedPoints, updateDragPointFocus, state.leftBottomPoint],
 		);
 
 		const rightTopLinerDragFunction = useCallback(
@@ -405,7 +477,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			setState((prevState) => ({
 				...prevState,
 				isDragging: true,
-				isRightBottomDragging: true,
+				draggingPoint: DragPointType.RightBottom,
 			}));
 		}, []);
 
@@ -430,10 +502,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					...prevState,
 					...points,
 					isDragging: false,
-					isRightBottomDragging: false,
+					draggingPoint: undefined,
 				}));
+
+				updateDragPointFocus(e.point, points);
 			},
-			[updatedPoints, state.leftTopPoint],
+			[updatedPoints, updateDragPointFocus, state.leftTopPoint],
 		);
 
 		const rightBottomLinerDragFunction = useCallback(
@@ -451,7 +525,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			setState((prevState) => ({
 				...prevState,
 				isDragging: true,
-				isTopCenterDragging: true,
+				draggingPoint: DragPointType.TopCenter,
 			}));
 		}, []);
 
@@ -507,10 +581,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					...prevState,
 					...points,
 					isDragging: false,
-					isTopCenterDragging: false,
+					draggingPoint: undefined,
 				}));
+
+				updateDragPointFocus(e.point, points);
 			},
-			[updateTopCenterPoint],
+			[updateTopCenterPoint, updateDragPointFocus],
 		);
 
 		const topCenterLinerDragFunction = useCallback(
@@ -528,7 +604,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			setState((prevState) => ({
 				...prevState,
 				isDragging: true,
-				isLeftCenterDragging: true,
+				draggingPoint: DragPointType.LeftCenter,
 			}));
 		}, []);
 
@@ -583,10 +659,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					...prevState,
 					...points,
 					isDragging: false,
-					isLeftCenterDragging: false,
+					draggingPoint: undefined,
 				}));
+
+				updateDragPointFocus(e.point, points);
 			},
-			[updateLeftCenterPoint],
+			[updateLeftCenterPoint, updateDragPointFocus],
 		);
 
 		const leftCenterLinerDragFunction = useCallback(
@@ -604,7 +682,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			setState((prevState) => ({
 				...prevState,
 				isDragging: true,
-				isRightCenterDragging: true,
+				draggingPoint: DragPointType.RightCenter,
 			}));
 		}, []);
 
@@ -660,10 +738,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					...prevState,
 					...points,
 					isDragging: false,
-					isRightCenterDragging: false,
+					draggingPoint: undefined,
 				}));
+
+				updateDragPointFocus(e.point, points);
 			},
-			[updateRightCenterPoint],
+			[updateRightCenterPoint, updateDragPointFocus],
 		);
 
 		const rightCenterLinerDragFunction = useCallback(
@@ -681,7 +761,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			setState((prevState) => ({
 				...prevState,
 				isDragging: true,
-				isBottomCenterDragging: true,
+				draggingPoint: DragPointType.BottomCenter,
 			}));
 		}, []);
 
@@ -736,10 +816,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					...prevState,
 					...points,
 					isDragging: false,
-					isBottomCenterDragging: false,
+					draggingPoint: undefined,
 				}));
+
+				updateDragPointFocus(e.point, points);
 			},
-			[updateBottomCenterPoint],
+			[updateBottomCenterPoint, updateDragPointFocus],
 		);
 
 		const bottomCenterLinerDragFunction = useCallback(
@@ -803,7 +885,11 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								keepProportion ? leftTopLinerDragFunction : undefined
 							}
 							cursor="nw-resize"
-							hidden={state.isDragging && !state.isLeftTopDragging}
+							hidden={
+								state.isDragging &&
+								state.draggingPoint !== DragPointType.LeftTop
+							}
+							ref={leftTopPointRef}
 						/>
 						{/* 左下 */}
 						<DragPoint
@@ -815,7 +901,11 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								keepProportion ? leftBottomLinerDragFunction : undefined
 							}
 							cursor="sw-resize"
-							hidden={state.isDragging && !state.isLeftBottomDragging}
+							hidden={
+								state.isDragging &&
+								state.draggingPoint !== DragPointType.LeftBottom
+							}
+							ref={leftBottomPointRef}
 						/>
 						{/* 右上 */}
 						<DragPoint
@@ -827,7 +917,11 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								keepProportion ? rightTopLinerDragFunction : undefined
 							}
 							cursor="ne-resize"
-							hidden={state.isDragging && !state.isRightTopDragging}
+							hidden={
+								state.isDragging &&
+								state.draggingPoint !== DragPointType.RightTop
+							}
+							ref={rightTopPointRef}
 						/>
 						{/* 右下 */}
 						<DragPoint
@@ -839,7 +933,11 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								keepProportion ? rightBottomLinerDragFunction : undefined
 							}
 							cursor="se-resize"
-							hidden={state.isDragging && !state.isRightBottomDragging}
+							hidden={
+								state.isDragging &&
+								state.draggingPoint !== DragPointType.RightBottom
+							}
+							ref={rightBottomPointRef}
 						/>
 						{/* 上中央 */}
 						<DragPoint
@@ -853,7 +951,11 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								keepProportion ? topCenterLinerDragFunction : undefined
 							}
 							cursor="n-resize"
-							hidden={state.isDragging && !state.isTopCenterDragging}
+							hidden={
+								state.isDragging &&
+								state.draggingPoint !== DragPointType.TopCenter
+							}
+							ref={topCenterPointRef}
 						/>
 						{/* 左中央 */}
 						<DragPoint
@@ -867,7 +969,11 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								keepProportion ? leftCenterLinerDragFunction : undefined
 							}
 							cursor="w-resize"
-							hidden={state.isDragging && !state.isLeftCenterDragging}
+							hidden={
+								state.isDragging &&
+								state.draggingPoint !== DragPointType.LeftCenter
+							}
+							ref={leftCenterPointRef}
 						/>
 						{/* 右中央 */}
 						<DragPoint
@@ -881,7 +987,11 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								keepProportion ? rightCenterLinerDragFunction : undefined
 							}
 							cursor="e-resize"
-							hidden={state.isDragging && !state.isRightCenterDragging}
+							hidden={
+								state.isDragging &&
+								state.draggingPoint !== DragPointType.RightCenter
+							}
+							ref={rightCenterPointRef}
 						/>
 						{/* 下中央 */}
 						<DragPoint
@@ -895,7 +1005,11 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								keepProportion ? bottomCenterLinerDragFunction : undefined
 							}
 							cursor="s-resize"
-							hidden={state.isDragging && !state.isBottomCenterDragging}
+							hidden={
+								state.isDragging &&
+								state.draggingPoint !== DragPointType.BottomCenter
+							}
+							ref={bottomCenterPointRef}
 						/>
 					</>
 				)}
