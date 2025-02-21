@@ -3,6 +3,7 @@ import React from "react";
 import type {
 	Diagram,
 	DiagramType,
+	DiagramRef,
 	ChangeEvent,
 	ItemSelectEvent,
 } from "./../types";
@@ -20,6 +21,7 @@ const ContainerDiv = styled.div`
 	overflow: auto;
 `;
 
+// TODO: 場所
 type SvgCanvasProps = {
 	title?: string;
 	items: Array<Diagram>;
@@ -27,13 +29,11 @@ type SvgCanvasProps = {
 	onItemSelect?: (e: ItemSelectEvent) => void;
 };
 
+// TODO: 場所
 type DiagramProps = Diagram & {
 	onChangeEnd?: (e: ChangeEvent) => void;
 	onPointerDown?: (e: ItemSelectEvent) => void;
-	ref?: React.Ref<{
-		draggableRef: React.RefObject<SVGElement>;
-		onParentChange: (e: ChangeEvent) => void;
-	}>;
+	ref?: React.Ref<DiagramRef>;
 };
 
 // TODO: 場所

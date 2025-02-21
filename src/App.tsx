@@ -41,7 +41,7 @@ const testItems2 = [
 		fill: "transparent",
 		stroke: "black",
 		strokeWidth: "1px",
-		keepProportion: false,
+		keepProportion: true,
 		isSelected: false,
 		items: [
 			{

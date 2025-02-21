@@ -1,6 +1,6 @@
 import type React from "react";
 import { useRef, useCallback, memo } from "react";
-import type { ChangeEvent } from "../../types";
+import type { ChangeEvent, DiagramRef, ParentResizeEvent } from "../../types";
 import RectangleBase from "../core/RectangleBase";
 import type { RectangleBaseProps } from "../core/RectangleBase";
 import { forwardRef, useImperativeHandle } from "react";
@@ -9,16 +9,11 @@ type EllipseProps = RectangleBaseProps & {
 	fill?: string;
 	stroke?: string;
 	strokeWidth?: string;
+	ref?: React.Ref<DiagramRef>;
 };
 
 const Ellipse: React.FC<EllipseProps> = memo(
-	forwardRef<
-		{
-			draggableRef: React.RefObject<SVGGElement>;
-			onParentChange: (e: ChangeEvent) => void;
-		},
-		EllipseProps
-	>(
+	forwardRef<DiagramRef, EllipseProps>(
 		(
 			{
 				id,
@@ -36,21 +31,30 @@ const Ellipse: React.FC<EllipseProps> = memo(
 			},
 			ref,
 		) => {
-			const domRef = useRef<SVGEllipseElement>({} as SVGEllipseElement);
+			const svgRef = useRef<SVGEllipseElement>({} as SVGEllipseElement);
+			const diagramRef = useRef<DiagramRef>({} as DiagramRef);
 
 			useImperativeHandle(ref, () => ({
-				draggableRef: domRef,
-				onParentChange: () => {
-					console.log("onParentChange");
+				svgRef,
+				draggableRef: diagramRef.current.draggableRef,
+				onParentResize: (e: ParentResizeEvent) => {
+					diagramRef.current.draggableRef?.current?.setAttribute(
+						"transform",
+						`translate(${point.x * e.scaleX}, ${point.y * e.scaleY})`,
+					);
+					svgRef.current?.setAttribute("cx", `${(width * e.scaleX) / 2}`);
+					svgRef.current?.setAttribute("cy", `${(height * e.scaleY) / 2}`);
+					svgRef.current?.setAttribute("rx", `${(width * e.scaleX) / 2}`);
+					svgRef.current?.setAttribute("ry", `${(height * e.scaleY) / 2}`);
 				},
 			}));
 
 			const onChange = useCallback((e: ChangeEvent) => {
 				if (e.width && e.height) {
-					domRef.current?.setAttribute("cx", `${e.width / 2}`);
-					domRef.current?.setAttribute("cy", `${e.height / 2}`);
-					domRef.current?.setAttribute("rx", `${e.width / 2}`);
-					domRef.current?.setAttribute("ry", `${e.height / 2}`);
+					svgRef.current?.setAttribute("cx", `${e.width / 2}`);
+					svgRef.current?.setAttribute("cy", `${e.height / 2}`);
+					svgRef.current?.setAttribute("rx", `${e.width / 2}`);
+					svgRef.current?.setAttribute("ry", `${e.height / 2}`);
 				}
 			}, []);
 
@@ -66,13 +70,14 @@ const Ellipse: React.FC<EllipseProps> = memo(
 					onPointerDown={onPointerDown}
 					onChange={onChange}
 					onChangeEnd={onChangeEnd}
+					ref={diagramRef}
 				>
 					<ellipse
 						cx={width / 2}
 						cy={height / 2}
 						rx={width / 2}
 						ry={height / 2}
-						ref={domRef}
+						ref={svgRef}
 						fill={fill}
 						stroke={stroke}
 						strokeWidth={strokeWidth}

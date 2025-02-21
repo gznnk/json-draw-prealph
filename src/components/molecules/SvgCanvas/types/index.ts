@@ -5,6 +5,12 @@ export type Point = {
 
 export type DiagramType = "group" | "rectangle" | "ellipse";
 
+export type DiagramRef = {
+	svgRef?: React.RefObject<SVGGElement>;
+	draggableRef?: React.RefObject<SVGGElement>;
+	onParentResize?: (e: ParentResizeEvent) => void;
+};
+
 // TODO: 精査
 export type Diagram = {
 	id: string;
@@ -43,6 +49,11 @@ export type ChangeEvent = {
 	point: Point;
 	width?: number;
 	height?: number;
+};
+
+export type ParentResizeEvent = {
+	scaleX: number;
+	scaleY: number;
 };
 
 export type FocusEvent = {

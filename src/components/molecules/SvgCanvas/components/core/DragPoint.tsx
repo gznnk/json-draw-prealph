@@ -26,8 +26,8 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 		},
 		ref,
 	) => {
-		const domRef = useRef<SVGGElement>({} as SVGGElement);
-		useImperativeHandle(ref, () => domRef.current);
+		const svgRef = useRef<SVGGElement>({} as SVGGElement);
+		useImperativeHandle(ref, () => svgRef.current);
 
 		if (hidden) {
 			return;
@@ -48,7 +48,7 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 				onDrag={onDrag}
 				onDragEnd={onDragEnd}
 				dragPositioningFunction={dragPositioningFunction}
-				ref={domRef}
+				ref={svgRef}
 			>
 				<circle cx={0} cy={0} r="5" fill={color} />
 			</Draggable>

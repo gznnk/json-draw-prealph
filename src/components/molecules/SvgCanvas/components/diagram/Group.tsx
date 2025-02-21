@@ -1,7 +1,7 @@
 import React from "react";
 import { useRef, memo } from "react";
 import RectangleBase from "../core/RectangleBase";
-import type { ChangeEvent, Diagram } from "../../types";
+import type { ChangeEvent, Diagram, DiagramRef } from "../../types";
 import type { RectangleProps } from "./Rectangle";
 import Rectangle from "./Rectangle";
 
@@ -25,10 +25,7 @@ const Group: React.FC<GroupProps> = memo(
 		items = [],
 	}) => {
 		const ref = useRef<{
-			[key: string]: {
-				draggableRef: React.RefObject<SVGElement>;
-				onParentChange: (e: ChangeEvent) => void;
-			} | null;
+			[key: string]: DiagramRef | undefined;
 		}>({});
 
 		const createDiagram = (item: Diagram): React.ReactNode => {
@@ -36,10 +33,7 @@ const Group: React.FC<GroupProps> = memo(
 			const props = {
 				...item,
 				key: item.id,
-				ref: (r: {
-					draggableRef: React.RefObject<SVGElement>;
-					onParentChange: (e: ChangeEvent) => void;
-				}) => {
+				ref: (r: DiagramRef) => {
 					ref.current[item.id] = r;
 				},
 			};
@@ -64,22 +58,13 @@ const Group: React.FC<GroupProps> = memo(
 				onPointerDown={onPointerDown}
 				onChange={(e: ChangeEvent) => {
 					if (e.width && e.height) {
+						const scaleX = e.width / width;
+						const scaleY = e.height / height;
 						for (const item of items) {
-							ref.current[item.id]?.onParentChange(e);
-							console.log(ref.current[item.id]?.draggableRef.current);
-							// const wr = e.width / width;
-							// const wh = e.height / height;
-							// const elm = document.getElementById(item.id);
-							// elm?.setAttribute(
-							// 	"transform",
-							// 	`translate(${item.point.x / wr}, ${item.point.y / wh})`,
-							// );
-							// elm
-							// 	?.getElementsByTagName("rect")?.[0]
-							// 	.setAttribute("width", `${item.width * wr}`);
-							// elm
-							// 	?.getElementsByTagName("rect")?.[0]
-							// 	.setAttribute("height", `${item.height * wh}`);
+							ref.current[item.id]?.onParentResize?.({
+								scaleX,
+								scaleY,
+							});
 						}
 					}
 				}}

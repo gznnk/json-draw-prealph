@@ -39,7 +39,7 @@ export type DraggableProps = {
 	tabIndex?: number;
 	outline?: string;
 	outlineOffset?: string;
-	ref?: SVGGElement | null;
+	ref?: SVGGElement;
 	onPointerDown?: (e: PointerDownEvent) => void;
 	onDragStart?: (e: DragEvent) => void;
 	onDrag?: (e: DragEvent) => void;
@@ -77,9 +77,9 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		const startX = useRef(0);
 		const startY = useRef(0);
 
-		const domRef = useRef<SVGGElement>({} as SVGGElement);
+		const svgRef = useRef<SVGGElement>({} as SVGGElement);
 
-		useImperativeHandle(ref, () => domRef.current);
+		useImperativeHandle(ref, () => svgRef.current);
 
 		useEffect(() => {
 			setState({ point });
@@ -152,8 +152,8 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			}
 
 			const point = getPoint(e);
-			if (domRef) {
-				domRef.current?.setAttribute(
+			if (svgRef) {
+				svgRef.current?.setAttribute(
 					"transform",
 					`translate(${point.x}, ${point.y})`,
 				);
@@ -255,7 +255,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				onPointerUp={handlePointerUp}
 				onKeyDown={handleKeyDown}
 				onKeyUp={handleKeyUp}
-				ref={domRef}
+				ref={svgRef}
 			>
 				{children}
 			</DraggableG>

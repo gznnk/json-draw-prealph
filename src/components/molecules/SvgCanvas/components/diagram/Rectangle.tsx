@@ -1,6 +1,6 @@
 import type React from "react";
 import { useRef, useCallback, useImperativeHandle, memo } from "react";
-import type { ChangeEvent } from "../../types";
+import type { ChangeEvent, DiagramRef, ParentResizeEvent } from "../../types";
 import RectangleBase from "../core/RectangleBase";
 import type { RectangleBaseProps } from "../core/RectangleBase";
 import { forwardRef } from "react";
@@ -9,16 +9,11 @@ export type RectangleProps = RectangleBaseProps & {
 	fill?: string;
 	stroke?: string;
 	strokeWidth?: string;
+	ref?: React.Ref<DiagramRef>;
 };
 
 const Rectangle: React.FC<RectangleProps> = memo(
-	forwardRef<
-		{
-			draggableRef: React.RefObject<SVGGElement>;
-			onParentChange: (e: ChangeEvent) => void;
-		},
-		RectangleProps
-	>(
+	forwardRef<DiagramRef, RectangleProps>(
 		(
 			{
 				id,
@@ -38,20 +33,27 @@ const Rectangle: React.FC<RectangleProps> = memo(
 			},
 			ref,
 		) => {
-			const domRef = useRef<SVGRectElement>({} as SVGRectElement);
+			const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
+			const diagramRef = useRef<DiagramRef>({} as DiagramRef);
 
 			useImperativeHandle(ref, () => ({
-				draggableRef: domRef,
-				onParentChange: (e: ChangeEvent) => {
-					console.log("onParentChange");
+				svgRef,
+				draggableRef: diagramRef.current.draggableRef,
+				onParentResize: (e: ParentResizeEvent) => {
+					diagramRef.current.draggableRef?.current?.setAttribute(
+						"transform",
+						`translate(${point.x * e.scaleX}, ${point.y * e.scaleY})`,
+					);
+					svgRef?.current?.setAttribute("width", `${width * e.scaleX}`);
+					svgRef?.current?.setAttribute("height", `${height * e.scaleY}`);
 				},
 			}));
 
 			const handleChange = useCallback(
 				(e: ChangeEvent) => {
 					if (e.width && e.height) {
-						domRef.current?.setAttribute("width", `${e.width}`);
-						domRef.current?.setAttribute("height", `${e.height}`);
+						svgRef.current?.setAttribute("width", `${e.width}`);
+						svgRef.current?.setAttribute("height", `${e.height}`);
 					}
 					onChange?.(e);
 				},
@@ -70,13 +72,14 @@ const Rectangle: React.FC<RectangleProps> = memo(
 					onPointerDown={onPointerDown}
 					onChange={handleChange}
 					onChangeEnd={onChangeEnd}
+					diagramRef={diagramRef}
 				>
 					<rect
 						x={0}
 						y={0}
 						width={width}
 						height={height}
-						ref={domRef}
+						ref={svgRef}
 						fill={fill}
 						stroke={stroke}
 						strokeWidth={strokeWidth}
