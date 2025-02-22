@@ -44,6 +44,7 @@ const Ellipse: React.FC<EllipseProps> = memo(
 				tabIndex = 0,
 				isSelected = false,
 				onPointerDown,
+				onDiagramChange,
 				onDiagramChangeEnd,
 			},
 			ref,
@@ -51,8 +52,22 @@ const Ellipse: React.FC<EllipseProps> = memo(
 			const svgRef = useRef<SVGEllipseElement>({} as SVGEllipseElement);
 			const diagramRef = useRef<DiagramRef>({} as DiagramRef);
 
+			// 親から参照するためのRefを作成
+			useImperativeHandle(ref, () => ({
+				svgRef,
+				draggableRef: diagramRef.current.draggableRef,
+				onParentDiagramResize: onParentDiagramResize,
+				onParentDiagramResizeEnd: onParentDiagramResizeEnd,
+			}));
+
+			/**
+			 * 親図形のリサイズ中イベントハンドラ
+			 *
+			 * @param {ParentDiagramResizeEvent} e 親図形のリサイズ中イベント
+			 */
 			const onParentDiagramResize = useCallback(
 				(e: ParentDiagramResizeEvent) => {
+					// 親図形のリサイズ完了に伴うこの図形の変更を計算
 					const newArrangment = calcArrangmentOnParentDiagramResize(
 						e,
 						point,
@@ -60,23 +75,34 @@ const Ellipse: React.FC<EllipseProps> = memo(
 						height,
 					);
 
+					// 描画処理負荷軽減のため、DOMを直接操作
+					// 短径領域の移動をDOMの直接操作で実施
 					diagramRef.current.draggableRef?.current?.setAttribute(
 						"transform",
 						`translate(${newArrangment.point.x}, ${newArrangment.point.y})`,
 					);
 
+					// 円形のリサイズをDOMの直接操作で実施
 					const rx = newArrangment.width / 2;
 					const ry = newArrangment.height / 2;
 					svgRef.current?.setAttribute("cx", `${rx}`);
 					svgRef.current?.setAttribute("cy", `${ry}`);
 					svgRef.current?.setAttribute("rx", `${rx}`);
 					svgRef.current?.setAttribute("ry", `${ry}`);
+
+					// 親図形のリサイズが契機で、かつDOMを直接更新しての変更なので、親側への変更通知はしない
 				},
 				[point, width, height],
 			);
 
+			/**
+			 * 親図形のリサイズ完了イベントハンドラ
+			 *
+			 * @param {ParentDiagramResizeEvent} e 親図形のリサイズ完了イベント
+			 */
 			const onParentDiagramResizeEnd = useCallback(
 				(e: ParentDiagramResizeEvent) => {
+					// 親図形のリサイズ完了に伴うこの図形の変更を親に通知し、Propsの更新を親側にしてもらう
 					onDiagramChangeEnd?.({
 						id,
 						...calcArrangmentOnParentDiagramResize(e, point, width, height),
@@ -85,19 +111,24 @@ const Ellipse: React.FC<EllipseProps> = memo(
 				[id, point, width, height, onDiagramChangeEnd],
 			);
 
-			useImperativeHandle(ref, () => ({
-				svgRef,
-				draggableRef: diagramRef.current.draggableRef,
-				onParentDiagramResize: onParentDiagramResize,
-				onParentDiagramResizeEnd: onParentDiagramResizeEnd,
-			}));
+			/**
+			 * 短形領域の変更中イベントハンドラ
+			 *
+			 * @param {DiagramChangeEvent} e 短形領域の変更中イベント
+			 */
+			const handleDiagramChange = useCallback(
+				(e: DiagramChangeEvent) => {
+					// 描画処理負荷軽減のため、DOMを直接操作
+					svgRef.current?.setAttribute("cx", `${e.width / 2}`);
+					svgRef.current?.setAttribute("cy", `${e.height / 2}`);
+					svgRef.current?.setAttribute("rx", `${e.width / 2}`);
+					svgRef.current?.setAttribute("ry", `${e.height / 2}`);
 
-			const onDiagramChange = useCallback((e: DiagramChangeEvent) => {
-				svgRef.current?.setAttribute("cx", `${e.width / 2}`);
-				svgRef.current?.setAttribute("cy", `${e.height / 2}`);
-				svgRef.current?.setAttribute("rx", `${e.width / 2}`);
-				svgRef.current?.setAttribute("ry", `${e.height / 2}`);
-			}, []);
+					// 親コンポーネントに変更中イベントを伝番
+					onDiagramChange?.(e);
+				},
+				[onDiagramChange],
+			);
 
 			return (
 				<RectangleBase
@@ -109,8 +140,8 @@ const Ellipse: React.FC<EllipseProps> = memo(
 					tabIndex={tabIndex}
 					isSelected={isSelected}
 					onPointerDown={onPointerDown}
-					onDiagramChange={onDiagramChange}
-					onDiagramChangeEnd={onDiagramChangeEnd}
+					onDiagramChange={handleDiagramChange}
+					onDiagramChangeEnd={onDiagramChangeEnd} // 短形領域の変更完了イベントはそのまま親に伝番させて、Propsの更新を親側にしてもらう
 					ref={diagramRef}
 				>
 					<ellipse

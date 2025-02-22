@@ -53,8 +53,22 @@ const Rectangle: React.FC<RectangleProps> = memo(
 			const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 			const diagramRef = useRef<DiagramRef>({} as DiagramRef);
 
+			// 親から参照するためのRefを作成
+			useImperativeHandle(ref, () => ({
+				svgRef,
+				draggableRef: diagramRef.current.draggableRef,
+				onParentDiagramResize: onParentDiagramResize,
+				onParentDiagramResizeEnd: onParentDiagramResizeEnd,
+			}));
+
+			/**
+			 * 親図形のリサイズ中イベントハンドラ
+			 *
+			 * @param {ParentDiagramResizeEvent} e 親図形のリサイズ中イベント
+			 */
 			const onParentDiagramResize = useCallback(
 				(e: ParentDiagramResizeEvent) => {
+					// 親図形のリサイズ完了に伴うこの図形の変更を計算
 					const newArrangment = calcArrangmentOnParentDiagramResize(
 						e,
 						point,
@@ -62,18 +76,30 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						height,
 					);
 
+					// 描画処理負荷軽減のため、DOMを直接操作
+					// 短径領域の移動をDOMの直接操作で実施
 					diagramRef.current.draggableRef?.current?.setAttribute(
 						"transform",
 						`translate(${newArrangment.point.x}, ${newArrangment.point.y})`,
 					);
+
+					// 四角形のリサイズをDOMの直接操作で実施
 					svgRef?.current?.setAttribute("width", `${newArrangment.width}`);
 					svgRef?.current?.setAttribute("height", `${newArrangment.height}`);
+
+					// 親図形のリサイズが契機で、かつDOMを直接更新しての変更なので、親側への変更通知はしない
 				},
 				[point, width, height],
 			);
 
+			/**
+			 * 親図形のリサイズ完了イベントハンドラ
+			 *
+			 * @param {ParentDiagramResizeEvent} e 親図形のリサイズ完了イベント
+			 */
 			const onParentDiagramResizeEnd = useCallback(
 				(e: ParentDiagramResizeEvent) => {
+					// 親図形のリサイズ完了に伴うこの図形の変更を親に通知し、Propsの更新を親側にしてもらう
 					onDiagramChangeEnd?.({
 						id,
 						...calcArrangmentOnParentDiagramResize(e, point, width, height),
@@ -82,19 +108,18 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				[id, point, width, height, onDiagramChangeEnd],
 			);
 
-			useImperativeHandle(ref, () => ({
-				svgRef,
-				draggableRef: diagramRef.current.draggableRef,
-				onParentDiagramResize: onParentDiagramResize,
-				onParentDiagramResizeEnd: onParentDiagramResizeEnd,
-			}));
-
-			const handleChange = useCallback(
+			/**
+			 * 短形領域の変更中イベントハンドラ
+			 *
+			 * @param {DiagramChangeEvent} e 短形領域の変更中イベント
+			 */
+			const handleDiagramChange = useCallback(
 				(e: DiagramChangeEvent) => {
-					if (e.width && e.height) {
-						svgRef.current?.setAttribute("width", `${e.width}`);
-						svgRef.current?.setAttribute("height", `${e.height}`);
-					}
+					// 描画処理負荷軽減のため、DOMを直接操作
+					svgRef.current?.setAttribute("width", `${e.width}`);
+					svgRef.current?.setAttribute("height", `${e.height}`);
+
+					// 親に変更中イベントを伝番
 					onDiagramChange?.(e);
 				},
 				[onDiagramChange],
@@ -110,8 +135,8 @@ const Rectangle: React.FC<RectangleProps> = memo(
 					keepProportion={keepProportion}
 					isSelected={isSelected}
 					onPointerDown={onPointerDown}
-					onDiagramChange={handleChange}
-					onDiagramChangeEnd={onDiagramChangeEnd}
+					onDiagramChange={handleDiagramChange}
+					onDiagramChangeEnd={onDiagramChangeEnd} // 短形領域の変更完了イベントはそのまま親に伝番させて、Propsの更新を親側にしてもらう
 					ref={diagramRef}
 				>
 					<rect

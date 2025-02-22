@@ -96,6 +96,85 @@ const testItems2 = [
 	},
 ] as Diagram[];
 
+const testItems3 = [
+	{
+		id: "0",
+		type: "group",
+		point: { x: 10, y: 10 },
+		width: 250,
+		height: 250,
+		fill: "transparent",
+		stroke: "black",
+		strokeWidth: "1px",
+		keepProportion: true,
+		isSelected: false,
+		items: [
+			{
+				id: "1",
+				type: "rectangle",
+				point: { x: 0, y: 0 },
+				width: 100,
+				height: 100,
+				fill: "transparent",
+				stroke: "black",
+				strokeWidth: "1px",
+				keepProportion: false,
+				isSelected: false,
+			},
+			{
+				id: "10",
+				type: "group",
+				point: { x: 50, y: 50 },
+				width: 200,
+				height: 200,
+				fill: "transparent",
+				stroke: "black",
+				strokeWidth: "1px",
+				keepProportion: true,
+				isSelected: false,
+				items: [
+					{
+						id: "2",
+						type: "ellipse",
+						point: { x: 100, y: 0 },
+						width: 100,
+						height: 100,
+						fill: "transparent",
+						stroke: "black",
+						strokeWidth: "1px",
+						keepProportion: false,
+						isSelected: false,
+					},
+					{
+						id: "3",
+						type: "rectangle",
+						point: { x: 100, y: 100 },
+						width: 100,
+						height: 100,
+						fill: "transparent",
+						stroke: "black",
+						strokeWidth: "1px",
+						keepProportion: false,
+						isSelected: false,
+					},
+					{
+						id: "4",
+						type: "ellipse",
+						point: { x: 0, y: 100 },
+						width: 100,
+						height: 100,
+						fill: "transparent",
+						stroke: "black",
+						strokeWidth: "1px",
+						keepProportion: false,
+						isSelected: false,
+					},
+				],
+			},
+		],
+	},
+] as Diagram[];
+
 function App() {
 	// console.log("App render");
 
@@ -103,7 +182,7 @@ function App() {
 		state: [canvasState, _setCanvasState],
 		canvasProps,
 		canvasFunctions,
-	} = useSvgCanvas(testItems2);
+	} = useSvgCanvas(testItems3);
 
 	const handleAddRectangle = () => {
 		canvasFunctions.addItem({
