@@ -35,6 +35,7 @@ export type ParentDiagramResizeEvent = {
 	scaleY: number;
 };
 
+// TODO: 選択処理の精査
 export type ItemSelectEvent = {
 	id?: string;
 };

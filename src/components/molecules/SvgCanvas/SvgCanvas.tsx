@@ -6,29 +6,9 @@ import { useCallback, memo } from "react";
 import styled from "@emotion/styled";
 
 // SvgCanvas関連型定義をインポート
-import type { Diagram, DiagramType, DiagramRef } from "../types/DiagramTypes";
-import type { DiagramChangeEvent, ItemSelectEvent } from "../types/EventTypes";
-
-// SvgCanvas関連コンポーネントをインポート
-import Group from "./diagram/Group";
-import Rectangle from "./diagram/Rectangle";
-import Ellipse from "./diagram/Ellipse";
-
-// TODO: 場所
-type DiagramProps = Diagram & {
-	onDiagramChangeEnd?: (e: DiagramChangeEvent) => void;
-	onPointerDown?: (e: ItemSelectEvent) => void;
-	ref?: React.Ref<DiagramRef>;
-};
-
-// TODO: 場所
-export const ITEM_TYPE_COMPONENT_MAP: {
-	[key in DiagramType]: React.FC<DiagramProps>;
-} = {
-	group: Group,
-	rectangle: Rectangle,
-	ellipse: Ellipse,
-};
+import type { Diagram } from "./types/DiagramTypes";
+import { DiagramTypeComponentMap } from "./types/DiagramTypes";
+import type { DiagramChangeEvent, ItemSelectEvent } from "./types/EventTypes";
 
 const ContainerDiv = styled.div`
 	position: absolute;
@@ -51,7 +31,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		// console.log("SvgCanvas render");
 
 		const createDiagram = (item: Diagram): React.ReactNode => {
-			const itemType = ITEM_TYPE_COMPONENT_MAP[item.type];
+			const itemType = DiagramTypeComponentMap[item.type];
 			const props = {
 				...item,
 				key: item.id,

@@ -77,7 +77,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			ref,
 		) => {
 			const [state, setState] = useState<RectangleBaseState>({
-				id: id,
 				...calcArrangment(point, { x: point.x + width, y: point.y + height }),
 				aspectRatio: width / height,
 				isDragging: false,
@@ -158,13 +157,13 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					outlineRef.current?.setAttribute("height", `${newHeight}`);
 
 					onDiagramChange?.({
-						id: state.id,
+						id: id,
 						point: newLeftTopPoint,
 						width: newWidth,
 						height: newHeight,
 					});
 				},
-				[onDiagramChange, state.id],
+				[onDiagramChange, id],
 			);
 
 			const onArrangmentChangeEnd = useCallback(

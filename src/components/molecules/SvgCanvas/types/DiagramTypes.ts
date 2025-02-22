@@ -1,7 +1,17 @@
 // 図形に関する型定義
 
+// SvgCanvas関連型定義をインポート
 import type { Point } from "./CoordinateTypes";
-import type { ParentDiagramResizeEvent } from "./EventTypes";
+import type {
+	ParentDiagramResizeEvent,
+	DiagramChangeEvent,
+	ItemSelectEvent,
+} from "./EventTypes";
+
+// SvgCanvas関連コンポーネントをインポート
+import Group from "../components/diagram/Group";
+import Rectangle from "../components/diagram/Rectangle";
+import Ellipse from "../components/diagram/Ellipse";
 
 /**
  * 図形の種類
@@ -31,4 +41,21 @@ export type Diagram = {
 	keepProportion: boolean;
 	isSelected: boolean;
 	items?: Diagram[];
+};
+
+export type DiagramProps = Diagram & {
+	onDiagramChangeEnd?: (e: DiagramChangeEvent) => void;
+	onPointerDown?: (e: ItemSelectEvent) => void;
+	ref?: React.Ref<DiagramRef>;
+};
+
+/**
+ * 図形の種類とコンポーネントのマッピング
+ */
+export const DiagramTypeComponentMap: {
+	[key in DiagramType]: React.FC<DiagramProps>;
+} = {
+	group: Group,
+	rectangle: Rectangle,
+	ellipse: Ellipse,
 };

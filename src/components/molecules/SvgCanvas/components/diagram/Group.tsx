@@ -4,13 +4,11 @@ import React, { memo, useCallback, useRef } from "react";
 // SvgCanvas関連型定義をインポート
 import type { Diagram, DiagramRef } from "../../types/DiagramTypes";
 import type { DiagramChangeEvent } from "../../types/EventTypes";
+import { DiagramTypeComponentMap } from "../../types/DiagramTypes";
 
 // SvgCanvas関連コンポーネントをインポート
 import type { RectangleProps } from "./Rectangle";
 import Rectangle from "./Rectangle";
-
-// TODO
-import { ITEM_TYPE_COMPONENT_MAP } from "../SvgCanvas";
 
 type GroupProps = RectangleProps & {
 	items?: Diagram[];
@@ -34,7 +32,7 @@ const Group: React.FC<GroupProps> = memo(
 		}>({});
 
 		const createDiagram = (item: Diagram): React.ReactNode => {
-			const itemType = ITEM_TYPE_COMPONENT_MAP[item.type];
+			const itemType = DiagramTypeComponentMap[item.type];
 			const props = {
 				...item,
 				key: item.id,

@@ -1,5 +1,6 @@
 // RectangleBase関連型定義ファイル
 
+// SvgCanvas関連型定義をインポート
 import type { Point } from "../../../types/CoordinateTypes";
 
 /**
@@ -41,7 +42,6 @@ export enum DragPointType {
  * 矩形の基底コンポーネントのState型定義
  */
 export type RectangleBaseState = RectangleBaseArrangement & {
-	id?: string;
 	aspectRatio: number;
 	isDragging: boolean;
 	draggingPointType?: DragPointType;

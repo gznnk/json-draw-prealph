@@ -1,3 +1,3 @@
-import SvgCanvas from "./components/SvgCanvas";
+import SvgCanvas from "./SvgCanvas";
 
 export default SvgCanvas;
