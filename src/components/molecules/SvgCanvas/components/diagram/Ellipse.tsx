@@ -19,6 +19,9 @@ import type {
 import type { RectangleBaseProps } from "../core/RectangleBase";
 import RectangleBase from "../core/RectangleBase";
 
+// RectangleBase関連関数をインポート
+import { calcArrangmentOnParentDiagramResize } from "../core/RectangleBase/RectangleBaseFunctions";
+
 type EllipseProps = RectangleBaseProps & {
 	fill?: string;
 	stroke?: string;
@@ -48,39 +51,52 @@ const Ellipse: React.FC<EllipseProps> = memo(
 			const svgRef = useRef<SVGEllipseElement>({} as SVGEllipseElement);
 			const diagramRef = useRef<DiagramRef>({} as DiagramRef);
 
+			const onParentDiagramResize = useCallback(
+				(e: ParentDiagramResizeEvent) => {
+					const newArrangment = calcArrangmentOnParentDiagramResize(
+						e,
+						point,
+						width,
+						height,
+					);
+
+					diagramRef.current.draggableRef?.current?.setAttribute(
+						"transform",
+						`translate(${newArrangment.point.x}, ${newArrangment.point.y})`,
+					);
+
+					const rx = newArrangment.width / 2;
+					const ry = newArrangment.height / 2;
+					svgRef.current?.setAttribute("cx", `${rx}`);
+					svgRef.current?.setAttribute("cy", `${ry}`);
+					svgRef.current?.setAttribute("rx", `${rx}`);
+					svgRef.current?.setAttribute("ry", `${ry}`);
+				},
+				[point, width, height],
+			);
+
+			const onParentDiagramResizeEnd = useCallback(
+				(e: ParentDiagramResizeEvent) => {
+					onDiagramChangeEnd?.({
+						id,
+						...calcArrangmentOnParentDiagramResize(e, point, width, height),
+					});
+				},
+				[id, point, width, height, onDiagramChangeEnd],
+			);
+
 			useImperativeHandle(ref, () => ({
 				svgRef,
 				draggableRef: diagramRef.current.draggableRef,
-				onParentDiagramResize: (e: ParentDiagramResizeEvent) => {
-					diagramRef.current.draggableRef?.current?.setAttribute(
-						"transform",
-						`translate(${point.x * e.scaleX}, ${point.y * e.scaleY})`,
-					);
-					svgRef.current?.setAttribute("cx", `${(width * e.scaleX) / 2}`);
-					svgRef.current?.setAttribute("cy", `${(height * e.scaleY) / 2}`);
-					svgRef.current?.setAttribute("rx", `${(width * e.scaleX) / 2}`);
-					svgRef.current?.setAttribute("ry", `${(height * e.scaleY) / 2}`);
-				},
-				onParentDiagramResizeEnd: (e: ParentDiagramResizeEvent) => {
-					onDiagramChangeEnd?.({
-						id,
-						point: {
-							x: point.x * e.scaleX,
-							y: point.y * e.scaleY,
-						},
-						width: width * e.scaleX,
-						height: height * e.scaleY,
-					});
-				},
+				onParentDiagramResize: onParentDiagramResize,
+				onParentDiagramResizeEnd: onParentDiagramResizeEnd,
 			}));
 
 			const onDiagramChange = useCallback((e: DiagramChangeEvent) => {
-				if (e.width && e.height) {
-					svgRef.current?.setAttribute("cx", `${e.width / 2}`);
-					svgRef.current?.setAttribute("cy", `${e.height / 2}`);
-					svgRef.current?.setAttribute("rx", `${e.width / 2}`);
-					svgRef.current?.setAttribute("ry", `${e.height / 2}`);
-				}
+				svgRef.current?.setAttribute("cx", `${e.width / 2}`);
+				svgRef.current?.setAttribute("cy", `${e.height / 2}`);
+				svgRef.current?.setAttribute("rx", `${e.width / 2}`);
+				svgRef.current?.setAttribute("ry", `${e.height / 2}`);
 			}, []);
 
 			return (

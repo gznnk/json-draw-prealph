@@ -19,6 +19,9 @@ import type {
 import type { RectangleBaseProps } from "../core/RectangleBase";
 import RectangleBase from "../core/RectangleBase";
 
+// RectangleBase関連関数をインポート
+import { calcArrangmentOnParentDiagramResize } from "../core/RectangleBase/RectangleBaseFunctions";
+
 export type RectangleProps = RectangleBaseProps & {
 	fill?: string;
 	stroke?: string;
@@ -50,28 +53,40 @@ const Rectangle: React.FC<RectangleProps> = memo(
 			const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 			const diagramRef = useRef<DiagramRef>({} as DiagramRef);
 
+			const onParentDiagramResize = useCallback(
+				(e: ParentDiagramResizeEvent) => {
+					const newArrangment = calcArrangmentOnParentDiagramResize(
+						e,
+						point,
+						width,
+						height,
+					);
+
+					diagramRef.current.draggableRef?.current?.setAttribute(
+						"transform",
+						`translate(${newArrangment.point.x}, ${newArrangment.point.y})`,
+					);
+					svgRef?.current?.setAttribute("width", `${newArrangment.width}`);
+					svgRef?.current?.setAttribute("height", `${newArrangment.height}`);
+				},
+				[point, width, height],
+			);
+
+			const onParentDiagramResizeEnd = useCallback(
+				(e: ParentDiagramResizeEvent) => {
+					onDiagramChangeEnd?.({
+						id,
+						...calcArrangmentOnParentDiagramResize(e, point, width, height),
+					});
+				},
+				[id, point, width, height, onDiagramChangeEnd],
+			);
+
 			useImperativeHandle(ref, () => ({
 				svgRef,
 				draggableRef: diagramRef.current.draggableRef,
-				onParentDiagramResize: (e: ParentDiagramResizeEvent) => {
-					diagramRef.current.draggableRef?.current?.setAttribute(
-						"transform",
-						`translate(${point.x * e.scaleX}, ${point.y * e.scaleY})`,
-					);
-					svgRef?.current?.setAttribute("width", `${width * e.scaleX}`);
-					svgRef?.current?.setAttribute("height", `${height * e.scaleY}`);
-				},
-				onParentDiagramResizeEnd: (e: ParentDiagramResizeEvent) => {
-					onDiagramChangeEnd?.({
-						id,
-						point: {
-							x: point.x * e.scaleX,
-							y: point.y * e.scaleY,
-						},
-						width: width * e.scaleX,
-						height: height * e.scaleY,
-					});
-				},
+				onParentDiagramResize: onParentDiagramResize,
+				onParentDiagramResizeEnd: onParentDiagramResizeEnd,
 			}));
 
 			const handleChange = useCallback(

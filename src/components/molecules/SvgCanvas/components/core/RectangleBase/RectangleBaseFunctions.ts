@@ -1,5 +1,6 @@
 // RectangleBase関連関数定義ファイル
 
+import type { ParentDiagramResizeEvent } from "../../../types/EventTypes";
 import type { Point } from "../../../types/CoordinateTypes";
 import type { RectangleBaseArrangement } from "./RectangleBaseTypes";
 
@@ -63,6 +64,40 @@ export const calcArrangment = (
 	};
 
 	return result;
+};
+
+/**
+ * 与えられた2つの点（pointとdiagonalPoint）から矩形の配置情報を計算します。
+ * 親図形のリサイズ時に使用します。
+ *
+ * @param e - 親図形のリサイズイベント
+ * @param point - 矩形の一つの頂点を表す点
+ * @param width - 矩形の幅
+ * @param height - 矩形の高さ
+ * @returns 矩形の配置情報を含むオブジェクト
+ */
+export const calcArrangmentOnParentDiagramResize = (
+	e: ParentDiagramResizeEvent,
+	point: Point,
+	width: number,
+	height: number,
+) => {
+	const newX = Math.round(point.x * e.scaleX);
+	const newY = Math.round(point.y * e.scaleY);
+
+	let newWidth = Math.round(width * e.scaleX);
+	let newHeight = Math.round(height * e.scaleY);
+	if (newX + newWidth > e.width) {
+		newWidth = e.width - newX;
+	}
+	if (newY + newHeight > e.height) {
+		newHeight = e.height - newY;
+	}
+	return {
+		point: { x: newX, y: newY },
+		width: newWidth,
+		height: newHeight,
+	};
 };
 
 /**

@@ -23,14 +23,17 @@ export type DiagramDragEvent = {
 export type DiagramChangeEvent = {
 	id?: string;
 	point: Point;
-	width?: number;
-	height?: number;
+	width: number;
+	height: number;
 };
 
 /**
  * 親図形のリサイズイベント
  */
 export type ParentDiagramResizeEvent = {
+	point: Point;
+	width: number;
+	height: number;
 	scaleX: number;
 	scaleY: number;
 };

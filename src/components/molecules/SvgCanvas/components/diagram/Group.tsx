@@ -56,6 +56,9 @@ const Group: React.FC<GroupProps> = memo(
 					const scaleY = e.height / height;
 					for (const item of items) {
 						itemsRef.current[item.id]?.onParentDiagramResize?.({
+							point: e.point,
+							width: e.width,
+							height: e.height,
 							scaleX,
 							scaleY,
 						});
@@ -73,6 +76,9 @@ const Group: React.FC<GroupProps> = memo(
 					const scaleY = e.height / height;
 					for (const item of items) {
 						itemsRef.current[item.id]?.onParentDiagramResizeEnd?.({
+							point: e.point,
+							width: e.width,
+							height: e.height,
 							scaleX,
 							scaleY,
 						});

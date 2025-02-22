@@ -113,6 +113,13 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 
 			const onDragEnd = useCallback(
 				(e: DiagramDragEvent) => {
+					onDiagramChangeEnd?.({
+						id,
+						point: e.point,
+						width: state.width,
+						height: state.height,
+					});
+
 					setState((prevState) => ({
 						...prevState,
 						...calcArrangment(e.point, {
@@ -121,13 +128,8 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						}),
 						isDragging: false,
 					}));
-
-					onDiagramChangeEnd?.({
-						id,
-						point: e.point,
-					});
 				},
-				[onDiagramChangeEnd, id],
+				[onDiagramChangeEnd, id, state.width, state.height],
 			);
 
 			// --- 以下点のドラッグ ---
