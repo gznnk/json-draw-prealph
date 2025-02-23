@@ -68,31 +68,45 @@ export const calcArrangment = (
 
 /**
  * 与えられた2つの点（pointとdiagonalPoint）から矩形の配置情報を計算します。
- * 親図形のリサイズ時に使用します。
+ * グループ図形の変更時に使用します。
  *
- * @param e - 親図形のリサイズイベント
+ * @param e - グループ図形の変更イベント
  * @param point - 矩形の一つの頂点を表す点
  * @param width - 矩形の幅
  * @param height - 矩形の高さ
  * @returns 矩形の配置情報を含むオブジェクト
  */
-export const calcArrangmentOnParentDiagramResize = (
+export const calcArrangmentOnGroupDiagramChange = (
 	e: ParentDiagramResizeEvent,
 	point: Point,
 	width: number,
 	height: number,
 ) => {
-	const newX = Math.round(point.x * e.scaleX);
-	const newY = Math.round(point.y * e.scaleY);
+	// 変更前のグループ内での相対X座標
+	const oldRelativeX = point.x - e.oldPoint.x;
+	// 変更前のグループ内での相対Y座標
+	const oldRelativeY = point.y - e.oldPoint.y;
 
+	// 変更後のX座標
+	const newX = e.newPoint.x + Math.round(oldRelativeX * e.scaleX);
+	// 変更後のY座標
+	const newY = e.newPoint.y + Math.round(oldRelativeY * e.scaleY);
+
+	// 変更後の幅
 	let newWidth = Math.round(width * e.scaleX);
+	// 変更後の高さ
 	let newHeight = Math.round(height * e.scaleY);
-	if (newX + newWidth > e.width) {
-		newWidth = e.width - newX;
+
+	// グループの右端からはみ出ないよう変更後の幅を調整
+	if (newX + newWidth > e.newPoint.x + e.newWidth) {
+		newWidth = e.newPoint.x + e.newWidth - newX;
 	}
-	if (newY + newHeight > e.height) {
-		newHeight = e.height - newY;
+
+	// グループの下端からはみ出ないよう変更後の高さを調整
+	if (newY + newHeight > e.newPoint.y + e.newHeight) {
+		newHeight = e.newPoint.y + e.newHeight - newY;
 	}
+
 	return {
 		point: { x: newX, y: newY },
 		width: newWidth,

@@ -27,12 +27,14 @@ const DragPointRightBottom = forwardRef<
 >(
 	(
 		{
+			id,
 			rightBottomPoint,
 			leftTopPoint,
 			draggingPointType,
 			dragEndPointType,
 			keepProportion,
 			hidden,
+			isSelected,
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
@@ -72,12 +74,14 @@ const DragPointRightBottom = forwardRef<
 
 		return (
 			<RectangleBaseDragPointBase
+				id={id}
 				point={rightBottomPoint}
 				dragPointType={DragPointType.RightBottom}
 				cursor="se-resize"
 				draggingPointType={draggingPointType}
 				dragEndPointType={dragEndPointType}
 				hidden={hidden}
+				isSelected={isSelected}
 				onArrangmentChangeStart={onArrangmentChangeStart}
 				onArrangmentChange={onArrangmentChange}
 				onArrangmentChangeEnd={onArrangmentChangeEnd}

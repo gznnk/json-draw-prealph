@@ -24,12 +24,14 @@ import {
 const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 	(
 		{
+			id,
 			leftTopPoint,
 			rightBottomPoint,
 			draggingPointType,
 			dragEndPointType,
 			keepProportion,
 			hidden,
+			isSelected,
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
@@ -69,12 +71,14 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 
 		return (
 			<RectangleBaseDragPointBase
+				id={id}
 				point={leftTopPoint}
 				dragPointType={DragPointType.LeftTop}
 				cursor="nw-resize"
 				draggingPointType={draggingPointType}
 				dragEndPointType={dragEndPointType}
 				hidden={hidden}
+				isSelected={isSelected}
 				onArrangmentChangeStart={onArrangmentChangeStart}
 				onArrangmentChange={onArrangmentChange}
 				onArrangmentChangeEnd={onArrangmentChangeEnd}

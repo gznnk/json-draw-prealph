@@ -17,7 +17,7 @@ import type { Point } from "../../types/CoordinateTypes";
 import { DragDirection } from "../../types/CoordinateTypes";
 import type {
 	DiagramDragEvent,
-	PointerDownEvent,
+	DiagramPointerEvent,
 } from "../../types/EventTypes";
 
 type DraggableGProps = {
@@ -38,7 +38,7 @@ const DraggableG = styled.g<DraggableGProps>`
 
 export type DraggableProps = {
 	key?: string;
-	id?: string;
+	id: string;
 	point: Point;
 	direction?: DragDirection;
 	allowXDecimal?: boolean;
@@ -48,8 +48,11 @@ export type DraggableProps = {
 	tabIndex?: number;
 	outline?: string;
 	outlineOffset?: string;
+	isSelected?: boolean;
 	ref?: SVGGElement;
-	onPointerDown?: (e: PointerDownEvent) => void;
+	onPointerDown?: (e: DiagramPointerEvent) => void;
+	onPointerUp?: (e: DiagramPointerEvent) => void;
+	onClick?: (e: DiagramPointerEvent) => void;
 	onDragStart?: (e: DiagramDragEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragEnd?: (e: DiagramDragEvent) => void;
@@ -71,7 +74,10 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			tabIndex = 0,
 			outline = "none",
 			outlineOffset = "0px",
+			isSelected = false, // TODO: 名前
 			onPointerDown,
+			onPointerUp,
+			onClick,
 			onDragStart,
 			onDrag,
 			onDragEnd,
@@ -81,6 +87,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		ref,
 	) => {
 		const [state, setState] = useState({ point });
+		const [isPointerDown, setIsPointerDown] = useState(false);
 		const [isDragging, setIsDragging] = useState(false);
 
 		const startX = useRef(0);
@@ -139,57 +146,90 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		};
 
 		const handlePointerDown = (e: React.PointerEvent<SVGElement>) => {
-			setIsDragging(true);
+			setIsPointerDown(true);
 
 			startX.current = e.clientX - state.point.x;
 			startY.current = e.clientY - state.point.y;
 
-			e.currentTarget.setPointerCapture(e.pointerId);
+			// console.log(e.target);
+			// console.log(e.currentTarget);
+
+			if ((e.target as HTMLElement).id === id) {
+				// console.log(e.target);
+				e.currentTarget.setPointerCapture(e.pointerId);
+			}
+
+			// e.currentTarget.setPointerCapture(e.pointerId);
 
 			const event = {
+				id,
 				point: getPoint(e),
 				reactEvent: e,
 			};
 
 			onPointerDown?.(event);
-			onDragStart?.(event);
 		};
 
 		const handlePointerMove = (e: React.PointerEvent<SVGElement>) => {
-			if (!isDragging) {
+			// console.log(`isPointerDown: ${isPointerDown}`);
+
+			if (!isPointerDown) {
 				return;
 			}
 
-			const point = getPoint(e);
-			if (svgRef) {
-				svgRef.current?.setAttribute(
-					"transform",
-					`translate(${point.x}, ${point.y})`,
-				);
+			const event = {
+				id,
+				point: getPoint(e),
+				reactEvent: e,
+			};
+
+			// console.log(`isDragging: ${isDragging}`);
+			if (!isDragging) {
+				onDragStart?.(event);
+				setIsDragging(true);
 			}
 
-			onDrag?.({
-				point: point,
-				reactEvent: e,
-			});
+			// 自分（を利用している図形）が選択されている場合は、DOMを直接操作して移動する
+			// そうでない場合は、所属しているグループ側のDOMの移動により、自分のDOMも移動される
+			if (isSelected) {
+			}
+
+			svgRef?.current?.setAttribute(
+				"transform",
+				`translate(${event.point.x}, ${event.point.y})`,
+			);
+
+			onDrag?.(event);
 		};
 
 		const handlePointerUp = (e: React.PointerEvent<SVGElement>) => {
-			if (!isDragging) {
-				return;
-			}
-
 			const newPoint = getPoint(e);
-			setState({
-				point: newPoint,
-			});
 
-			setIsDragging(false);
-
-			onDragEnd?.({
+			const event = {
+				id,
 				point: newPoint,
 				reactEvent: e,
-			});
+			};
+
+			if (isDragging) {
+				onDragEnd?.(event);
+				if (isSelected) {
+					// setState({
+					// 	point: newPoint,
+					// });
+				}
+			}
+
+			if (isPointerDown && !isDragging) {
+				console.log(`click: ${id}`);
+				// ドラッグ後のポインターアップでなければ、クリックイベントを利用側に通知する
+				onClick?.(event);
+			}
+
+			onPointerUp?.(event);
+
+			setIsDragging(false);
+			setIsPointerDown(false);
 		};
 
 		const handleKeyDown = (e: React.KeyboardEvent<SVGGElement>) => {
@@ -209,8 +249,9 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 
 				newPoint = adjustCoordinates(newPoint);
 
-				onDragStart?.({ point: state.point });
+				onDragStart?.({ id, point: state.point });
 				onDrag?.({
+					id,
 					point: newPoint,
 				});
 				setState({
@@ -244,6 +285,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				e.key === "ArrowDown"
 			) {
 				onDragEnd?.({
+					id,
 					point: state.point,
 				});
 			}
@@ -252,7 +294,6 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		return (
 			<DraggableG
 				key={key}
-				id={id}
 				transform={`translate(${state.point.x}, ${state.point.y})`}
 				tabIndex={tabIndex}
 				cursor={cursor}

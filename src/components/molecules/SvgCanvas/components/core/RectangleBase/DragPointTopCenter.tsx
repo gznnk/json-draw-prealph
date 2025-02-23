@@ -29,6 +29,7 @@ import { DRAG_LINE_SPACE } from "./RectangleBaseConstants";
 const DragPointTopCenter = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 	(
 		{
+			id,
 			topCenterPoint,
 			leftBottomPoint,
 			rightTopPoint,
@@ -37,6 +38,7 @@ const DragPointTopCenter = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 			keepProportion,
 			aspectRatio,
 			hidden,
+			isSelected,
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
@@ -90,6 +92,7 @@ const DragPointTopCenter = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 		return (
 			<>
 				<DragLine
+					id={id}
 					startPoint={{
 						x: leftBottomPoint.x + DRAG_LINE_SPACE,
 						y: topCenterPoint.y,
@@ -101,12 +104,14 @@ const DragPointTopCenter = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 					dragPointType={DragPointType.TopSide}
 					direction={DragDirection.Vertical}
 					cursor="n-resize"
+					isSelected={isSelected}
 					onArrangmentChangeStart={onArrangmentChangeStart}
 					onArrangmentChange={onArrangmentChange}
 					onArrangmentChangeEnd={onArrangmentChangeEnd}
 					calcArrangmentFunction={calcArrangmentFunction}
 				/>
 				<RectangleBaseDragPointBase
+					id={id}
 					point={topCenterPoint}
 					dragPointType={DragPointType.TopCenter}
 					direction={
@@ -117,6 +122,7 @@ const DragPointTopCenter = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 					draggingPointType={draggingPointType}
 					dragEndPointType={dragEndPointType}
 					hidden={hidden}
+					isSelected={isSelected}
 					onArrangmentChangeStart={onArrangmentChangeStart}
 					onArrangmentChange={onArrangmentChange}
 					onArrangmentChangeEnd={onArrangmentChangeEnd}

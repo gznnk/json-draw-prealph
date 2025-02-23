@@ -16,6 +16,7 @@ import type {
 } from "./RectangleBaseTypes";
 
 type DragLineProps = {
+	id: string;
 	startPoint: Point;
 	endPoint: Point;
 	dragPointType: DragPointType;
@@ -26,6 +27,7 @@ type DragLineProps = {
 	draggingPointType?: DragPointType;
 	dragEndPointType?: DragPointType;
 	hidden?: boolean;
+	isSelected?: boolean;
 	onArrangmentChangeStart: (e: { dragPointType: DragPointType }) => void;
 	onArrangmentChange: (e: { arrangment: RectangleBaseArrangement }) => void;
 	onArrangmentChangeEnd: (e: {
@@ -36,11 +38,13 @@ type DragLineProps = {
 };
 
 const DragLine: React.FC<DragLineProps> = ({
+	id,
 	startPoint,
 	endPoint,
 	dragPointType,
 	direction,
 	cursor,
+	isSelected,
 	onArrangmentChangeStart,
 	onArrangmentChange,
 	onArrangmentChangeEnd,
@@ -71,16 +75,21 @@ const DragLine: React.FC<DragLineProps> = ({
 		[calcArrangmentFunction, onArrangmentChangeEnd],
 	);
 
+	const dragLineId = `${id}-${dragPointType}`;
+
 	return (
 		<Draggable
+			id={dragLineId}
 			point={startPoint}
 			direction={direction}
 			cursor={cursor}
+			isSelected={isSelected}
 			onDragStart={onDragStart}
 			onDrag={onDrag}
 			onDragEnd={onDragEnd}
 		>
 			<line
+				id={dragLineId}
 				x1={0}
 				y1={0}
 				x2={endPoint.x - startPoint.x}

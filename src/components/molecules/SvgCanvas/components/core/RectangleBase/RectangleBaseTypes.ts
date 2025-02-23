@@ -81,11 +81,13 @@ export type ArrangmentChangeEndEvent = {
  * 矩形の基底コンポーネントのドラッグポイントのProps型定義
  */
 export type RectangleBaseDragPointProps = RectangleBaseArrangement & {
+	id: string;
 	draggingPointType?: DragPointType;
 	dragEndPointType?: DragPointType;
 	keepProportion: boolean;
 	aspectRatio?: number;
 	hidden?: boolean;
+	isSelected?: boolean;
 	onArrangmentChangeStart: (e: ArrangmentChangeStartEvent) => void;
 	onArrangmentChange: (e: ArrangmentChangeEvent) => void;
 	onArrangmentChangeEnd: (e: ArrangmentChangeEndEvent) => void;

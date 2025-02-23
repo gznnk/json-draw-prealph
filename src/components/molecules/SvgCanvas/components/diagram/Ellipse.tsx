@@ -20,7 +20,7 @@ import type { RectangleBaseProps } from "../core/RectangleBase";
 import RectangleBase from "../core/RectangleBase";
 
 // RectangleBase関連関数をインポート
-import { calcArrangmentOnParentDiagramResize } from "../core/RectangleBase/RectangleBaseFunctions";
+import { calcArrangmentOnGroupDiagramChange } from "../core/RectangleBase/RectangleBaseFunctions";
 
 type EllipseProps = RectangleBaseProps & {
 	fill?: string;
@@ -43,9 +43,10 @@ const Ellipse: React.FC<EllipseProps> = memo(
 				keepProportion = false,
 				tabIndex = 0,
 				isSelected = false,
-				onPointerDown,
+				onDiagramClick,
 				onDiagramChange,
 				onDiagramChangeEnd,
+				onDiagramSelect,
 			},
 			ref,
 		) => {
@@ -68,7 +69,7 @@ const Ellipse: React.FC<EllipseProps> = memo(
 			const onParentDiagramResize = useCallback(
 				(e: ParentDiagramResizeEvent) => {
 					// 親図形のリサイズ完了に伴うこの図形の変更を計算
-					const newArrangment = calcArrangmentOnParentDiagramResize(
+					const newArrangment = calcArrangmentOnGroupDiagramChange(
 						e,
 						point,
 						width,
@@ -102,13 +103,15 @@ const Ellipse: React.FC<EllipseProps> = memo(
 			 */
 			const onParentDiagramResizeEnd = useCallback(
 				(e: ParentDiagramResizeEvent) => {
+					console.log("Ellipse onParentDiagramResizeEnd", id);
+
 					// 親図形のリサイズ完了に伴うこの図形の変更を親に通知し、Propsの更新を親側にしてもらう
-					onDiagramChangeEnd?.({
+					return {
 						id,
-						...calcArrangmentOnParentDiagramResize(e, point, width, height),
-					});
+						...calcArrangmentOnGroupDiagramChange(e, point, width, height),
+					};
 				},
-				[id, point, width, height, onDiagramChangeEnd],
+				[id, point, width, height],
 			);
 
 			/**
@@ -139,12 +142,14 @@ const Ellipse: React.FC<EllipseProps> = memo(
 					keepProportion={keepProportion}
 					tabIndex={tabIndex}
 					isSelected={isSelected}
-					onPointerDown={onPointerDown}
+					onDiagramClick={onDiagramClick}
 					onDiagramChange={handleDiagramChange}
 					onDiagramChangeEnd={onDiagramChangeEnd} // 短形領域の変更完了イベントはそのまま親に伝番させて、Propsの更新を親側にしてもらう
+					onDiagramSelect={onDiagramSelect}
 					ref={diagramRef}
 				>
 					<ellipse
+						id={id}
 						cx={width / 2}
 						cy={height / 2}
 						rx={width / 2}

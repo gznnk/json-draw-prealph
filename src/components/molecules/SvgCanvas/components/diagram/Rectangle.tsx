@@ -20,7 +20,7 @@ import type { RectangleBaseProps } from "../core/RectangleBase";
 import RectangleBase from "../core/RectangleBase";
 
 // RectangleBase関連関数をインポート
-import { calcArrangmentOnParentDiagramResize } from "../core/RectangleBase/RectangleBaseFunctions";
+import { calcArrangmentOnGroupDiagramChange } from "../core/RectangleBase/RectangleBaseFunctions";
 
 export type RectangleProps = RectangleBaseProps & {
 	fill?: string;
@@ -43,9 +43,10 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				keepProportion = false,
 				tabIndex = 0,
 				isSelected = false,
-				onPointerDown,
+				onDiagramClick,
 				onDiagramChange,
 				onDiagramChangeEnd,
+				onDiagramSelect,
 				children,
 			},
 			ref,
@@ -69,7 +70,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 			const onParentDiagramResize = useCallback(
 				(e: ParentDiagramResizeEvent) => {
 					// 親図形のリサイズ完了に伴うこの図形の変更を計算
-					const newArrangment = calcArrangmentOnParentDiagramResize(
+					const newArrangment = calcArrangmentOnGroupDiagramChange(
 						e,
 						point,
 						width,
@@ -100,12 +101,12 @@ const Rectangle: React.FC<RectangleProps> = memo(
 			const onParentDiagramResizeEnd = useCallback(
 				(e: ParentDiagramResizeEvent) => {
 					// 親図形のリサイズ完了に伴うこの図形の変更を親に通知し、Propsの更新を親側にしてもらう
-					onDiagramChangeEnd?.({
+					return {
 						id,
-						...calcArrangmentOnParentDiagramResize(e, point, width, height),
-					});
+						...calcArrangmentOnGroupDiagramChange(e, point, width, height),
+					};
 				},
-				[id, point, width, height, onDiagramChangeEnd],
+				[id, point, width, height],
 			);
 
 			/**
@@ -134,12 +135,14 @@ const Rectangle: React.FC<RectangleProps> = memo(
 					tabIndex={tabIndex}
 					keepProportion={keepProportion}
 					isSelected={isSelected}
-					onPointerDown={onPointerDown}
+					onDiagramClick={onDiagramClick}
 					onDiagramChange={handleDiagramChange}
 					onDiagramChangeEnd={onDiagramChangeEnd} // 短形領域の変更完了イベントはそのまま親に伝番させて、Propsの更新を親側にしてもらう
+					onDiagramSelect={onDiagramSelect}
 					ref={diagramRef}
 				>
 					<rect
+						id={id}
 						x={0}
 						y={0}
 						width={width}

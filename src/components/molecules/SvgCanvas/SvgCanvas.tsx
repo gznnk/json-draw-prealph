@@ -36,7 +36,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				...item,
 				key: item.id,
 				onDiagramChangeEnd,
-				onPointerDown: onItemSelect,
+				onDiagramSelect: onItemSelect,
 			};
 
 			return React.createElement(itemType, props);
@@ -57,6 +57,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 
 		const handleKeyDown = useCallback(
 			(e: React.KeyboardEvent<SVGSVGElement>) => {
+				// キャンバスにフォーカスがない場合はイベントをキャンセルし、スクロールを無効化
 				if (e.target !== e.currentTarget) {
 					e.stopPropagation();
 					e.preventDefault();

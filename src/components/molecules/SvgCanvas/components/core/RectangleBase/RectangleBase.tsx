@@ -16,7 +16,8 @@ import type { DiagramRef } from "../../../types/DiagramTypes";
 import type {
 	DiagramChangeEvent,
 	DiagramDragEvent,
-	PointerDownEvent,
+	DiagramPointerEvent,
+	DiagramSelectEvent,
 } from "../../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
@@ -52,9 +53,10 @@ export type RectangleBaseProps = {
 	tabIndex?: number;
 	isSelected?: boolean;
 	ref?: React.Ref<DiagramRef>;
-	onPointerDown?: (e: PointerDownEvent) => void;
+	onDiagramClick?: (e: DiagramPointerEvent) => void; // TODO: 型
 	onDiagramChange?: (e: DiagramChangeEvent) => void;
 	onDiagramChangeEnd?: (e: DiagramChangeEvent) => void;
+	onDiagramSelect?: (e: DiagramSelectEvent) => void;
 	children?: React.ReactNode;
 };
 
@@ -69,9 +71,10 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				keepProportion = false,
 				tabIndex = 0,
 				isSelected = false,
-				onPointerDown,
+				onDiagramClick,
 				onDiagramChange,
 				onDiagramChangeEnd,
+				onDiagramSelect,
 				children,
 			},
 			ref,
@@ -110,6 +113,18 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					dragEndPointType: undefined,
 				}));
 			}, []);
+
+			const onDrag = useCallback(
+				(e: DiagramDragEvent) => {
+					onDiagramChange?.({
+						id,
+						point: e.point,
+						width: state.width,
+						height: state.height,
+					});
+				},
+				[onDiagramChange, id, state.width, state.height],
+			);
 
 			const onDragEnd = useCallback(
 				(e: DiagramDragEvent) => {
@@ -192,14 +207,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 
 			// ポインターダウン時の処理
 			const handlePointerDown = useCallback(
-				(e: PointerDownEvent) => {
-					onPointerDown?.({
-						id: id,
-						point: e.point,
-						reactEvent: e.reactEvent,
+				(_e: DiagramPointerEvent) => {
+					onDiagramSelect?.({
+						id,
 					});
 				},
-				[id, onPointerDown],
+				[id, onDiagramSelect],
 			);
 
 			return (
@@ -208,13 +221,17 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						id={id}
 						point={state.point}
 						tabIndex={tabIndex}
+						isSelected={isSelected}
 						onPointerDown={handlePointerDown}
+						onClick={onDiagramClick}
 						onDragStart={onDragStart}
+						onDrag={onDrag}
 						onDragEnd={onDragEnd}
 						ref={draggableRef}
 					>
 						{children}
 						{isSelected && (
+							// アウトライン用の四角形
 							<rect
 								x={0}
 								y={0}
@@ -224,16 +241,19 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								stroke="blue"
 								strokeWidth="1px"
 								strokeDasharray="3,3"
+								pointerEvents={"none"}
 								ref={outlineRef}
 							/>
 						)}
 					</Draggable>
 					{isSelected && !state.isDragging && (
 						<>
-							,{/* 左上 */}
+							{/* 左上 */}
 							<DragPointLeftTop
 								{...state}
+								id={id}
 								keepProportion={keepProportion}
+								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -241,7 +261,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							{/* 左下 */}
 							<DragPointLeftBottom
 								{...state}
+								id={id}
 								keepProportion={keepProportion}
+								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -249,7 +271,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							{/* 右上 */}
 							<DragPointRightTop
 								{...state}
+								id={id}
 								keepProportion={keepProportion}
+								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -257,7 +281,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							{/* 右下 */}
 							<DragPointRightBottom
 								{...state}
+								id={id}
 								keepProportion={keepProportion}
+								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -265,7 +291,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							{/* 上中央 */}
 							<DragPointTopCenter
 								{...state}
+								id={id}
 								keepProportion={keepProportion}
+								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -273,7 +301,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							{/* 左中央 */}
 							<DragPointLeftCenter
 								{...state}
+								id={id}
 								keepProportion={keepProportion}
+								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -281,7 +311,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							{/* 右中央 */}
 							<DragPointRightCenter
 								{...state}
+								id={id}
 								keepProportion={keepProportion}
+								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -289,7 +321,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							{/* 下中央 */}
 							<DragPointBottomCenter
 								{...state}
+								id={id}
 								keepProportion={keepProportion}
+								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}

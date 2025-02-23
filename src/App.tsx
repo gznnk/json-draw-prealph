@@ -4,7 +4,7 @@ import Button from "./components/atoms/Button";
 import Input from "./components/atoms/Input";
 import type { Diagram } from "./components/molecules/SvgCanvas/types/DiagramTypes";
 
-const testItems = [
+const testItems1 = [
 	{
 		id: "1",
 		type: "rectangle",
@@ -28,6 +28,68 @@ const testItems = [
 		strokeWidth: "1px",
 		keepProportion: false,
 		isSelected: false,
+	},
+	{
+		id: "g-0",
+		type: "group",
+		point: { x: 200, y: 200 },
+		width: 200,
+		height: 200,
+		fill: "transparent",
+		stroke: "black",
+		strokeWidth: "1px",
+		keepProportion: true,
+		isSelected: false,
+		items: [
+			{
+				id: "3",
+				type: "rectangle",
+				point: { x: 200, y: 200 },
+				width: 100,
+				height: 100,
+				fill: "transparent",
+				stroke: "black",
+				strokeWidth: "1px",
+				keepProportion: false,
+				isSelected: false,
+			},
+			{
+				id: "4",
+				type: "ellipse",
+				point: { x: 300, y: 200 },
+				width: 100,
+				height: 100,
+				fill: "transparent",
+				stroke: "black",
+				strokeWidth: "1px",
+				keepProportion: false,
+				isSelected: false,
+			},
+			{
+				id: "5",
+				type: "rectangle",
+				point: { x: 300, y: 300 },
+				width: 100,
+				height: 100,
+				fill: "transparent",
+				stroke: "black",
+				strokeWidth: "1px",
+				keepProportion: false,
+				isSelected: false,
+			},
+			{
+				id: "6",
+				type: "ellipse",
+				point: { x: 200, y: 300 },
+				width: 100,
+				height: 100,
+				fill: "transparent",
+				stroke: "black",
+				strokeWidth: "1px",
+				keepProportion: false,
+				isSelected: false,
+			},
+		],
 	},
 ] as Diagram[];
 
@@ -182,7 +244,7 @@ function App() {
 		state: [canvasState, _setCanvasState],
 		canvasProps,
 		canvasFunctions,
-	} = useSvgCanvas(testItems3);
+	} = useSvgCanvas(testItems1);
 
 	const handleAddRectangle = () => {
 		canvasFunctions.addItem({
@@ -217,6 +279,8 @@ function App() {
 			keepProportion: true,
 		});
 	};
+
+	console.log(`selectedItemId: ${canvasState.selectedItemId}`);
 
 	return (
 		<div className="App">

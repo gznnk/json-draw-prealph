@@ -32,6 +32,7 @@ const DragPointBottomCenter = forwardRef<
 >(
 	(
 		{
+			id,
 			bottomCenterPoint,
 			leftTopPoint,
 			rightBottomPoint,
@@ -40,6 +41,7 @@ const DragPointBottomCenter = forwardRef<
 			keepProportion,
 			aspectRatio,
 			hidden,
+			isSelected,
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
@@ -93,6 +95,7 @@ const DragPointBottomCenter = forwardRef<
 		return (
 			<>
 				<DragLine
+					id={id}
 					startPoint={{
 						x: leftTopPoint.x + DRAG_LINE_SPACE,
 						y: bottomCenterPoint.y,
@@ -104,12 +107,14 @@ const DragPointBottomCenter = forwardRef<
 					dragPointType={DragPointType.BottomSide}
 					direction={DragDirection.Vertical}
 					cursor="s-resize"
+					isSelected={isSelected}
 					onArrangmentChangeStart={onArrangmentChangeStart}
 					onArrangmentChange={onArrangmentChange}
 					onArrangmentChangeEnd={onArrangmentChangeEnd}
 					calcArrangmentFunction={calcArrangmentFunction}
 				/>
 				<RectangleBaseDragPointBase
+					id={id}
 					point={bottomCenterPoint}
 					dragPointType={DragPointType.BottomCenter}
 					direction={
@@ -120,6 +125,7 @@ const DragPointBottomCenter = forwardRef<
 					draggingPointType={draggingPointType}
 					dragEndPointType={dragEndPointType}
 					hidden={hidden}
+					isSelected={isSelected}
 					onArrangmentChangeStart={onArrangmentChangeStart}
 					onArrangmentChange={onArrangmentChange}
 					onArrangmentChangeEnd={onArrangmentChangeEnd}

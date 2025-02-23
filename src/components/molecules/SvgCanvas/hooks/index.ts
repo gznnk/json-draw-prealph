@@ -28,13 +28,13 @@ const DEFAULT_ITEM_VALUE = {
 	childItems: [],
 };
 
-const assignItem = (e: DiagramChangeEvent, items: Diagram[]) => {
+const applyRecursive = (items: Diagram[], func: (item: Diagram) => Diagram) => {
 	return items.map((item) => {
-		const newItem = item;
+		const newItem = func(item);
 		if (item.type === "group") {
-			newItem.items = assignItem(e, item.items ?? []);
+			newItem.items = applyRecursive(item.items ?? [], func);
 		}
-		return newItem.id === e.id ? { ...newItem, ...e } : newItem;
+		return newItem;
 	});
 };
 
@@ -44,17 +44,21 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	});
 
 	const onDiagramChangeEnd = useCallback((e: DiagramChangeEvent) => {
+		console.log(`onDiagramChangeEnd: ${JSON.stringify(e)}`);
+
 		setCanvasState((prevState) => ({
 			...prevState,
-			items: assignItem(e, prevState.items),
+			items: applyRecursive(prevState.items, (item) =>
+				item.id === e.id ? { ...item, ...e } : item,
+			),
 		}));
 	}, []);
 
 	const onItemSelect = useCallback((e: ItemSelectEvent) => {
 		setCanvasState((prevState) => {
-			console.log(e);
+			console.log(`onItemSelect: ${e.id}`);
 
-			const items = prevState.items.map((item) =>
+			const items = applyRecursive(prevState.items, (item) =>
 				item.id === e.id
 					? { ...item, isSelected: true }
 					: { ...item, isSelected: false },
@@ -75,7 +79,19 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	};
 
 	const getSelectedItem = useCallback(() => {
-		return canvasState.items.find((item) => item.isSelected);
+		let selectedItem: Diagram | undefined;
+		const findSelectedItem = (items: Diagram[]) => {
+			for (const item of items) {
+				if (item.isSelected) {
+					selectedItem = item;
+				}
+				if (item.type === "group") {
+					findSelectedItem(item.items ?? []);
+				}
+			}
+		};
+		findSelectedItem(canvasState.items);
+		return selectedItem;
 	}, [canvasState.items]);
 
 	const addItem = useCallback((item: AddItem) => {

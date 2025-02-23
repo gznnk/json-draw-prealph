@@ -2,8 +2,11 @@
 
 import type { Point } from "./CoordinateTypes";
 
-export type PointerDownEvent = {
-	id?: string;
+/**
+ * 図形のポインターダウンイベント
+ */
+export type DiagramPointerEvent = {
+	id: string;
 	point: Point;
 	reactEvent?: React.PointerEvent<SVGElement>;
 };
@@ -12,7 +15,7 @@ export type PointerDownEvent = {
  * 図形のドラッグイベント
  */
 export type DiagramDragEvent = {
-	id?: string;
+	id: string;
 	point: Point;
 	reactEvent?: React.PointerEvent<SVGElement>;
 };
@@ -21,7 +24,7 @@ export type DiagramDragEvent = {
  * 図形の変更イベント
  */
 export type DiagramChangeEvent = {
-	id?: string;
+	id: string;
 	point: Point;
 	width: number;
 	height: number;
@@ -31,14 +34,22 @@ export type DiagramChangeEvent = {
  * 親図形のリサイズイベント
  */
 export type ParentDiagramResizeEvent = {
-	point: Point;
-	width: number;
-	height: number;
+	id: string;
+	oldPoint: Point;
+	oldWidth: number;
+	oldHeight: number;
+	newPoint: Point;
+	newWidth: number;
+	newHeight: number;
 	scaleX: number;
 	scaleY: number;
 };
 
-// TODO: 選択処理の精査
+// TODO: 廃止予定
 export type ItemSelectEvent = {
-	id?: string;
+	id: string;
+};
+
+export type DiagramSelectEvent = {
+	id: string;
 };

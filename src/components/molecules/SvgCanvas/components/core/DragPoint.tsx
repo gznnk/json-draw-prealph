@@ -13,13 +13,14 @@ export type DragPointProps = DraggableProps & {
 const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 	(
 		{
+			id,
 			point,
 			direction,
 			allowXDecimal = false,
 			allowYDecimal = false,
 			cursor,
 			visible,
-			onPointerDown,
+			isSelected,
 			onDragStart,
 			onDrag,
 			onDragEnd,
@@ -38,6 +39,7 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 
 		return (
 			<Draggable
+				id={id}
 				point={point}
 				direction={direction}
 				allowXDecimal={allowXDecimal}
@@ -46,14 +48,14 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 				visible={visible}
 				outline="1px dashed blue"
 				outlineOffset="4px"
-				onPointerDown={onPointerDown}
+				isSelected={isSelected}
 				onDragStart={onDragStart}
 				onDrag={onDrag}
 				onDragEnd={onDragEnd}
 				dragPositioningFunction={dragPositioningFunction}
 				ref={svgRef}
 			>
-				<circle cx={0} cy={0} r="5" fill={color} />
+				<circle id={id} cx={0} cy={0} r="5" fill={color} />
 			</Draggable>
 		);
 	},
