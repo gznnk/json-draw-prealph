@@ -41,7 +41,6 @@ const DragPointBottomCenter = forwardRef<
 			keepProportion,
 			aspectRatio,
 			hidden,
-			isSelected,
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
@@ -107,7 +106,6 @@ const DragPointBottomCenter = forwardRef<
 					dragPointType={DragPointType.BottomSide}
 					direction={DragDirection.Vertical}
 					cursor="s-resize"
-					isSelected={isSelected}
 					onArrangmentChangeStart={onArrangmentChangeStart}
 					onArrangmentChange={onArrangmentChange}
 					onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -125,7 +123,6 @@ const DragPointBottomCenter = forwardRef<
 					draggingPointType={draggingPointType}
 					dragEndPointType={dragEndPointType}
 					hidden={hidden}
-					isSelected={isSelected}
 					onArrangmentChangeStart={onArrangmentChangeStart}
 					onArrangmentChange={onArrangmentChange}
 					onArrangmentChangeEnd={onArrangmentChangeEnd}

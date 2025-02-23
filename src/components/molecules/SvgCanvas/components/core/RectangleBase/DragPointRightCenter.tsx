@@ -41,7 +41,6 @@ const DragPointRightCenter = forwardRef<
 			keepProportion,
 			aspectRatio,
 			hidden,
-			isSelected,
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
@@ -107,7 +106,6 @@ const DragPointRightCenter = forwardRef<
 					dragPointType={DragPointType.RightSide}
 					direction={DragDirection.Horizontal}
 					cursor="e-resize"
-					isSelected={isSelected}
 					onArrangmentChangeStart={onArrangmentChangeStart}
 					onArrangmentChange={onArrangmentChange}
 					onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -122,7 +120,6 @@ const DragPointRightCenter = forwardRef<
 					}
 					allowYDecimal
 					cursor="e-resize"
-					isSelected={isSelected}
 					draggingPointType={draggingPointType}
 					dragEndPointType={dragEndPointType}
 					hidden={hidden}

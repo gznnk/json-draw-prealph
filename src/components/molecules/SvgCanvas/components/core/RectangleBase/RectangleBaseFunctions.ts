@@ -1,7 +1,10 @@
 // RectangleBase関連関数定義ファイル
 
-import type { ParentDiagramResizeEvent } from "../../../types/EventTypes";
 import type { Point } from "../../../types/CoordinateTypes";
+import type {
+	GroupDragEvent,
+	GroupResizeEvent,
+} from "../../../types/EventTypes";
 import type { RectangleBaseArrangement } from "./RectangleBaseTypes";
 
 /**
@@ -67,17 +70,31 @@ export const calcArrangment = (
 };
 
 /**
+ * グループのドラッグに伴う図形の移動を計算します。
+ *
+ * @param e - グループのドラッグイベント
+ * @param point - 移動する図形の左上の頂点を表す点
+ * @returns 移動後の図形の左上の頂点を表す点
+ */
+export const calcPointOnGroupDrag = (e: GroupDragEvent, point: Point) => {
+	return {
+		x: e.newPoint.x + (point.x - e.oldPoint.x),
+		y: e.newPoint.y + (point.y - e.oldPoint.y),
+	};
+};
+
+/**
  * 与えられた2つの点（pointとdiagonalPoint）から矩形の配置情報を計算します。
  * グループ図形の変更時に使用します。
  *
  * @param e - グループ図形の変更イベント
- * @param point - 矩形の一つの頂点を表す点
+ * @param point - 矩形の左上の頂点を表す点
  * @param width - 矩形の幅
  * @param height - 矩形の高さ
  * @returns 矩形の配置情報を含むオブジェクト
  */
-export const calcArrangmentOnGroupDiagramChange = (
-	e: ParentDiagramResizeEvent,
+export const calcArrangmentOnGroupResize = (
+	e: GroupResizeEvent,
 	point: Point,
 	width: number,
 	height: number,

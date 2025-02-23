@@ -1,6 +1,5 @@
 // Reactのインポート
-import React from "react";
-import { useCallback, memo } from "react";
+import React, { memo, useCallback } from "react";
 
 // ライブラリのインポート
 import styled from "@emotion/styled";
@@ -8,7 +7,11 @@ import styled from "@emotion/styled";
 // SvgCanvas関連型定義をインポート
 import type { Diagram } from "./types/DiagramTypes";
 import { DiagramTypeComponentMap } from "./types/DiagramTypes";
-import type { DiagramChangeEvent, ItemSelectEvent } from "./types/EventTypes";
+import type {
+	DiagramDragEvent,
+	DiagramResizeEvent,
+	ItemSelectEvent,
+} from "./types/EventTypes";
 
 const ContainerDiv = styled.div`
 	position: absolute;
@@ -22,12 +25,21 @@ const ContainerDiv = styled.div`
 type SvgCanvasProps = {
 	title?: string;
 	items: Array<Diagram>;
-	onDiagramChangeEnd?: (e: DiagramChangeEvent) => void;
+	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
+	onDiagramDragEndByGroup?: (e: DiagramDragEvent) => void;
+	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
 	onItemSelect?: (e: ItemSelectEvent) => void;
 };
 
 const SvgCanvas: React.FC<SvgCanvasProps> = memo(
-	({ title, items, onDiagramChangeEnd, onItemSelect }) => {
+	({
+		title,
+		items,
+		onDiagramDragEnd,
+		onDiagramDragEndByGroup,
+		onDiagramResizeEnd,
+		onItemSelect,
+	}) => {
 		// console.log("SvgCanvas render");
 
 		const createDiagram = (item: Diagram): React.ReactNode => {
@@ -35,7 +47,9 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 			const props = {
 				...item,
 				key: item.id,
-				onDiagramChangeEnd,
+				onDiagramDragEnd,
+				onDiagramDragEndByGroup,
+				onDiagramResizeEnd,
 				onDiagramSelect: onItemSelect,
 			};
 
@@ -49,7 +63,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		const handlePointerDown = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
 				if (e.target === e.currentTarget) {
-					onItemSelect?.({});
+					onItemSelect?.({ id: "dummy" });
 				}
 			},
 			[onItemSelect],

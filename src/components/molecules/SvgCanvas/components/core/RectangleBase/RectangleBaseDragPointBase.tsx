@@ -31,7 +31,6 @@ export type RectangleBaseDragPointBaseProps = {
 	draggingPointType?: DragPointType;
 	dragEndPointType?: DragPointType;
 	hidden?: boolean;
-	isSelected?: boolean;
 	onArrangmentChangeStart: (e: { dragPointType: DragPointType }) => void;
 	onArrangmentChange: (e: { arrangment: RectangleBaseArrangement }) => void;
 	onArrangmentChangeEnd: (e: {
@@ -61,7 +60,6 @@ const RectangleBaseDragPointBase = forwardRef<
 			draggingPointType,
 			dragEndPointType,
 			hidden,
-			isSelected,
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
@@ -120,7 +118,6 @@ const RectangleBaseDragPointBase = forwardRef<
 				direction={direction}
 				allowXDecimal={allowXDecimal}
 				allowYDecimal={allowYDecimal}
-				isSelected={isSelected}
 				onDragStart={onDragStart}
 				onDrag={onDrag}
 				onDragEnd={onDragEnd}

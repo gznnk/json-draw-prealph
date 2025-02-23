@@ -19,8 +19,6 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 			allowXDecimal = false,
 			allowYDecimal = false,
 			cursor,
-			visible,
-			isSelected,
 			onDragStart,
 			onDrag,
 			onDragEnd,
@@ -45,10 +43,8 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 				allowXDecimal={allowXDecimal}
 				allowYDecimal={allowYDecimal}
 				cursor={cursor}
-				visible={visible}
 				outline="1px dashed blue"
 				outlineOffset="4px"
-				isSelected={isSelected}
 				onDragStart={onDragStart}
 				onDrag={onDrag}
 				onDragEnd={onDragEnd}

@@ -23,7 +23,7 @@ export type DiagramDragEvent = {
 /**
  * 図形の変更イベント
  */
-export type DiagramChangeEvent = {
+export type DiagramResizeEvent = {
 	id: string;
 	point: Point;
 	width: number;
@@ -31,9 +31,18 @@ export type DiagramChangeEvent = {
 };
 
 /**
- * 親図形のリサイズイベント
+ * グループのドラッグイベント
  */
-export type ParentDiagramResizeEvent = {
+export type GroupDragEvent = {
+	id: string;
+	oldPoint: Point;
+	newPoint: Point;
+};
+
+/**
+ * グループのリサイズイベント
+ */
+export type GroupResizeEvent = {
 	id: string;
 	oldPoint: Point;
 	oldWidth: number;
@@ -45,11 +54,23 @@ export type ParentDiagramResizeEvent = {
 	scaleY: number;
 };
 
-// TODO: 廃止予定
-export type ItemSelectEvent = {
+/**
+ * 図形のクリックイベント
+ */
+export type DiagramClickEvent = {
+	id: string;
+	point: Point;
+	reactEvent?: React.PointerEvent<SVGElement>;
+};
+
+/**
+ * 図形の選択イベント
+ */
+export type DiagramSelectEvent = {
 	id: string;
 };
 
-export type DiagramSelectEvent = {
+// TODO: 廃止予定
+export type ItemSelectEvent = {
 	id: string;
 };

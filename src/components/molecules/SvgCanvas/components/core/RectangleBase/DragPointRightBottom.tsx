@@ -34,7 +34,6 @@ const DragPointRightBottom = forwardRef<
 			dragEndPointType,
 			keepProportion,
 			hidden,
-			isSelected,
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
@@ -81,7 +80,6 @@ const DragPointRightBottom = forwardRef<
 				draggingPointType={draggingPointType}
 				dragEndPointType={dragEndPointType}
 				hidden={hidden}
-				isSelected={isSelected}
 				onArrangmentChangeStart={onArrangmentChangeStart}
 				onArrangmentChange={onArrangmentChange}
 				onArrangmentChangeEnd={onArrangmentChangeEnd}

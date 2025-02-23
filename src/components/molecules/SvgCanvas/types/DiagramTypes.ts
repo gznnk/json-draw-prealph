@@ -3,10 +3,12 @@
 // SvgCanvas関連型定義をインポート
 import type { Point } from "./CoordinateTypes";
 import type {
-	DiagramChangeEvent,
-	DiagramPointerEvent,
+	DiagramClickEvent,
+	DiagramDragEvent,
+	DiagramResizeEvent,
 	DiagramSelectEvent,
-	ParentDiagramResizeEvent,
+	GroupDragEvent,
+	GroupResizeEvent,
 } from "./EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
@@ -19,16 +21,17 @@ import Rectangle from "../components/diagram/Rectangle";
  */
 export type DiagramType = "group" | "rectangle" | "ellipse";
 
+// TODO: グループのは別にする？
 /**
  * 子コンポーネントの図形への参照
  */
 export type DiagramRef = {
-	svgRef?: React.RefObject<SVGGElement>;
+	svgRef?: React.RefObject<SVGGElement>; // TODO: いらないかも
 	draggableRef?: React.RefObject<SVGGElement>;
-	onParentDiagramResize?: (e: ParentDiagramResizeEvent) => void;
-	onParentDiagramResizeEnd?: (
-		e: ParentDiagramResizeEvent,
-	) => DiagramChangeEvent;
+	onGroupDrag?: (e: GroupDragEvent) => void;
+	onGroupDragEnd?: (e: GroupDragEvent) => void;
+	onGroupResize?: (e: GroupResizeEvent) => void;
+	onGroupResizeEnd?: (e: GroupResizeEvent) => void;
 };
 
 // TODO: 精査
@@ -47,8 +50,13 @@ export type Diagram = {
 };
 
 export type DiagramProps = Diagram & {
-	onDiagramClick?: (e: DiagramPointerEvent) => void; // TODO: 型
-	onDiagramChangeEnd?: (e: DiagramChangeEvent) => void;
+	onDiagramClick?: (e: DiagramClickEvent) => void;
+	onDiagramDragStart?: (e: DiagramDragEvent) => void;
+	onDiagramDrag?: (e: DiagramDragEvent) => void;
+	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
+	onDiagramResizeStart?: (e: DiagramResizeEvent) => void;
+	onDiagramResizing?: (e: DiagramResizeEvent) => void;
+	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
 	ref?: React.Ref<DiagramRef>;
 };

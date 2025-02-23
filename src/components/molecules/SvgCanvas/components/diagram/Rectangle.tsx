@@ -11,8 +11,9 @@ import {
 // SvgCanvas関連型定義をインポート
 import type { DiagramRef } from "../../types/DiagramTypes";
 import type {
-	DiagramChangeEvent,
-	ParentDiagramResizeEvent,
+	DiagramResizeEvent,
+	GroupResizeEvent,
+	GroupDragEvent,
 } from "../../types/EventTypes";
 
 // RectangleBase関連コンポーネントをインポート
@@ -20,7 +21,10 @@ import type { RectangleBaseProps } from "../core/RectangleBase";
 import RectangleBase from "../core/RectangleBase";
 
 // RectangleBase関連関数をインポート
-import { calcArrangmentOnGroupDiagramChange } from "../core/RectangleBase/RectangleBaseFunctions";
+import {
+	calcArrangmentOnGroupResize,
+	calcPointOnGroupDrag,
+} from "../core/RectangleBase/RectangleBaseFunctions";
 
 export type RectangleProps = RectangleBaseProps & {
 	fill?: string;
@@ -44,8 +48,13 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				tabIndex = 0,
 				isSelected = false,
 				onDiagramClick,
-				onDiagramChange,
-				onDiagramChangeEnd,
+				onDiagramDragStart,
+				onDiagramDrag,
+				onDiagramDragEnd,
+				onDiagramDragEndByGroup,
+				onDiagramResizeStart,
+				onDiagramResizing,
+				onDiagramResizeEnd,
 				onDiagramSelect,
 				children,
 			},
@@ -56,21 +65,61 @@ const Rectangle: React.FC<RectangleProps> = memo(
 
 			// 親から参照するためのRefを作成
 			useImperativeHandle(ref, () => ({
-				svgRef,
-				draggableRef: diagramRef.current.draggableRef,
-				onParentDiagramResize: onParentDiagramResize,
-				onParentDiagramResizeEnd: onParentDiagramResizeEnd,
+				// svgRef,
+				// draggableRef: diagramRef.current.draggableRef,
+				onGroupDrag: handleGroupDrag,
+				onGroupDragEnd: handleGroupDragEnd,
+				onGroupResize: onGroupResize,
+				onGroupResizeEnd: onGroupResizeEnd,
 			}));
 
 			/**
-			 * 親図形のリサイズ中イベントハンドラ
+			 * グループのドラッグ中イベントハンドラ
 			 *
-			 * @param {ParentDiagramResizeEvent} e 親図形のリサイズ中イベント
+			 * @param {GroupDragEvent} e グループのドラッグ中イベント
+			 * @returns {void}
 			 */
-			const onParentDiagramResize = useCallback(
-				(e: ParentDiagramResizeEvent) => {
-					// 親図形のリサイズ完了に伴うこの図形の変更を計算
-					const newArrangment = calcArrangmentOnGroupDiagramChange(
+			const handleGroupDrag = useCallback(
+				(e: GroupDragEvent) => {
+					// グループのドラッグに伴うこの図形の座標を計算
+					const newPoint = calcPointOnGroupDrag(e, point);
+
+					// 描画処理負荷軽減のため、DOMを直接操作
+					// 短径領域の移動をDOMの直接操作で実施
+					diagramRef.current.draggableRef?.current?.setAttribute(
+						"transform",
+						`translate(${newPoint.x}, ${newPoint.y})`,
+					);
+				},
+				[point],
+			);
+
+			/**
+			 * グループのドラッグ完了イベントハンドラ
+			 *
+			 * @param {GroupDragEvent} e グループのドラッグ完了イベント
+			 * @returns {void}
+			 */
+			const handleGroupDragEnd = useCallback(
+				(e: GroupDragEvent) => {
+					// グループのドラッグ完了に伴うこの図形の位置変更をグループ側に通知し、SvgCanvasまで変更を伝番してもらう
+					onDiagramDragEndByGroup?.({
+						id,
+						point: calcPointOnGroupDrag(e, point),
+					});
+				},
+				[onDiagramDragEndByGroup, id, point],
+			);
+
+			/**
+			 * グループのリサイズ中イベントハンドラ
+			 *
+			 * @param {GroupResizeEvent} e グループのリサイズ中イベント
+			 */
+			const onGroupResize = useCallback(
+				(e: GroupResizeEvent) => {
+					// グループのリサイズ完了に伴うこの図形の変更を計算
+					const newArrangment = calcArrangmentOnGroupResize(
 						e,
 						point,
 						width,
@@ -88,42 +137,42 @@ const Rectangle: React.FC<RectangleProps> = memo(
 					svgRef?.current?.setAttribute("width", `${newArrangment.width}`);
 					svgRef?.current?.setAttribute("height", `${newArrangment.height}`);
 
-					// 親図形のリサイズが契機で、かつDOMを直接更新しての変更なので、親側への変更通知はしない
+					// グループのリサイズが契機で、かつDOMを直接更新しての変更なので、グループ側への変更通知はしない
 				},
 				[point, width, height],
 			);
 
 			/**
-			 * 親図形のリサイズ完了イベントハンドラ
+			 * グループのリサイズ完了イベントハンドラ
 			 *
-			 * @param {ParentDiagramResizeEvent} e 親図形のリサイズ完了イベント
+			 * @param {GroupResizeEvent} e グループのリサイズ完了イベント
 			 */
-			const onParentDiagramResizeEnd = useCallback(
-				(e: ParentDiagramResizeEvent) => {
-					// 親図形のリサイズ完了に伴うこの図形の変更を親に通知し、Propsの更新を親側にしてもらう
-					return {
+			const onGroupResizeEnd = useCallback(
+				(e: GroupResizeEvent) => {
+					// グループのリサイズ完了に伴うこの図形のサイズ変更を親に通知し、SvgCanvasまで変更を伝番してもらう
+					onDiagramResizeEnd?.({
 						id,
-						...calcArrangmentOnGroupDiagramChange(e, point, width, height),
-					};
+						...calcArrangmentOnGroupResize(e, point, width, height),
+					});
 				},
-				[id, point, width, height],
+				[onDiagramResizeEnd, id, point, width, height],
 			);
 
 			/**
 			 * 短形領域の変更中イベントハンドラ
 			 *
-			 * @param {DiagramChangeEvent} e 短形領域の変更中イベント
+			 * @param {DiagramResizeEvent} e 短形領域の変更中イベント
 			 */
-			const handleDiagramChange = useCallback(
-				(e: DiagramChangeEvent) => {
+			const handleDiagramResizing = useCallback(
+				(e: DiagramResizeEvent) => {
 					// 描画処理負荷軽減のため、DOMを直接操作
 					svgRef.current?.setAttribute("width", `${e.width}`);
 					svgRef.current?.setAttribute("height", `${e.height}`);
 
-					// 親に変更中イベントを伝番
-					onDiagramChange?.(e);
+					// グループ側に変更中イベントを通知
+					onDiagramResizing?.(e);
 				},
-				[onDiagramChange],
+				[onDiagramResizing],
 			);
 
 			return (
@@ -136,8 +185,12 @@ const Rectangle: React.FC<RectangleProps> = memo(
 					keepProportion={keepProportion}
 					isSelected={isSelected}
 					onDiagramClick={onDiagramClick}
-					onDiagramChange={handleDiagramChange}
-					onDiagramChangeEnd={onDiagramChangeEnd} // 短形領域の変更完了イベントはそのまま親に伝番させて、Propsの更新を親側にしてもらう
+					onDiagramDragStart={onDiagramDragStart}
+					onDiagramDrag={onDiagramDrag}
+					onDiagramDragEnd={onDiagramDragEnd}
+					onDiagramResizeStart={onDiagramResizeStart}
+					onDiagramResizing={handleDiagramResizing}
+					onDiagramResizeEnd={onDiagramResizeEnd} // 短形領域の変更完了イベントはそのまま親に伝番させて、Propsの更新を親側にしてもらう
 					onDiagramSelect={onDiagramSelect}
 					ref={diagramRef}
 				>

@@ -3,25 +3,37 @@ import React, {
 	forwardRef,
 	memo,
 	useCallback,
+	useEffect,
 	useImperativeHandle,
 	useRef,
+	useState,
 } from "react";
 
 // SvgCanvas関連型定義をインポート
 import type { Diagram, DiagramRef } from "../../types/DiagramTypes";
 import { DiagramTypeComponentMap } from "../../types/DiagramTypes";
 import type {
-	DiagramChangeEvent,
-	ParentDiagramResizeEvent,
+	DiagramResizeEvent,
 	DiagramSelectEvent,
+	GroupResizeEvent,
+	DiagramDragEvent,
 } from "../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import type { RectangleProps } from "./Rectangle";
 import RectangleBase from "../core/RectangleBase";
+import type { RectangleProps } from "./Rectangle";
 
 // RectangleBase関連関数をインポート
-import { calcArrangmentOnGroupDiagramChange } from "../core/RectangleBase/RectangleBaseFunctions";
+import { calcArrangmentOnGroupResize } from "../core/RectangleBase/RectangleBaseFunctions";
+
+/**
+ * 子図形の選択状態を再帰的に判定する
+ *
+ * @param {Diagram[]} diagrams 図形リスト
+ * @returns {boolean} 子図形が選択されているかどうか
+ */
+const isChildDiagramSelected = (diagrams: Diagram[]): boolean =>
+	diagrams.some((d) => d.isSelected || isChildDiagramSelected(d.items || []));
 
 type GroupProps = RectangleProps & {
 	items?: Diagram[];
@@ -38,20 +50,24 @@ const Group: React.FC<GroupProps> = memo(
 				keepProportion = false,
 				tabIndex = 0,
 				isSelected = false,
-				onDiagramChangeEnd,
+				onDiagramResizeEnd,
+				onDiagramDragEnd,
+				onDiagramDragEndByGroup,
 				onDiagramSelect,
 				items = [],
 			},
 			ref,
 		) => {
+			const [isDragging, setIsDragging] = useState(false);
+			const [isReselect, setIsReselect] = useState(false);
+
 			const diagramRef = useRef<DiagramRef>({} as DiagramRef);
 
 			// 親から参照するためのRefを作成
 			useImperativeHandle(ref, () => ({
-				svgRef: diagramRef.current.svgRef,
-				draggableRef: diagramRef.current.draggableRef,
-				onParentDiagramResize: onParentDiagramResize,
-				onParentDiagramResizeEnd: onParentDiagramResizeEnd,
+				// draggableRef: diagramRef.current.draggableRef,
+				onGroupResize: onParentGroupResize,
+				onGroupResizeEnd: onParentGroupResizeEnd,
 			}));
 
 			// 子の図形への参照を保持するRef作成
@@ -59,71 +75,137 @@ const Group: React.FC<GroupProps> = memo(
 				[key: string]: DiagramRef | undefined;
 			}>({});
 
-			// TODO: 精査
+			/**
+			 * 子図形の選択イベントハンドラ
+			 *
+			 * @param {DiagramSelectEvent} _e 図形選択イベント
+			 * @returns {void}
+			 */
 			const handleChildDiagramSelect = useCallback(
-				(e: DiagramSelectEvent) => {
-					console.log("Group handleChildDiagramSelect", e);
-					onDiagramSelect?.({
-						id: isSelected ? e.id : id,
-					});
+				(_e: DiagramSelectEvent) => {
+					// 子図形が選択されていない場合、このグループを選択状態にする
+					if (!isChildDiagramSelected(items)) {
+						onDiagramSelect?.({
+							id,
+						});
+					}
+
+					if (isSelected) {
+						// 再選択時後のクリック（ポインターアップ）時に子図形を選択したいので、再選択フラグを立てる
+						setIsReselect(true);
+					}
 				},
-				[onDiagramSelect, id, isSelected],
+				[onDiagramSelect, id, isSelected, items],
 			);
 
-			// TODO: 精査
+			/**
+			 * 子図形のクリックイベントハンドラ
+			 *
+			 * @param {DiagramSelectEvent} e 図形選択イベント
+			 * @returns {void}
+			 */
 			const handleChildDiagramClick = useCallback(
 				(e: DiagramSelectEvent) => {
-					console.log("Group handleChildDiagramClick", e);
-					// onDiagramSelect?.(e);
+					// 再選択時のクリック（ポインターアップ）時であれば、その子図形を選択状態にする
+					if (isReselect) {
+						onDiagramSelect?.(e);
+						setIsReselect(false);
+					}
 				},
-				[onDiagramSelect],
+				[onDiagramSelect, isReselect],
 			);
 
-			const handleChildDiagramChange = useCallback(
-				(e: DiagramChangeEvent) => {
+			useEffect(() => {
+				// 選択が外れたら再選択フラグも解除
+				if (!isSelected) {
+					setIsReselect(false);
+				}
+			}, [isSelected]);
+
+			/**
+			 * 子図形のドラッグ開始イベントハンドラ
+			 *
+			 * @param {DiagramDragEvent} _e 図形ドラッグ開始イベント
+			 */
+			const handleChildDiagramDragStart = useCallback(
+				(_e: DiagramDragEvent) => {
+					setIsDragging(true);
+				},
+				[],
+			);
+
+			/**
+			 * 子図形のドラッグ中イベントハンドラ
+			 *
+			 * @param {DiagramDragEvent} e 図形ドラッグ中イベント
+			 */
+			const handleChildDiagramDrag = useCallback(
+				(e: DiagramDragEvent) => {
 					const changeDiagram = items.find((item) => item.id === e.id);
 					if (changeDiagram) {
 						const dx = e.point.x - changeDiagram.point.x;
 						const dy = e.point.y - changeDiagram.point.y;
 
-						// グループ変更中イベントを発火
-						handleGroupDiagramChange({
-							id,
-							point: {
-								x: point.x + dx,
-								y: point.y + dy,
-							},
-							width: width,
-							height: height,
-						});
+						// グループ内の図形にドラッグ中イベントを通知し、同じグループ内の図形も移動させる
+						for (const item of items) {
+							if (e.id !== item.id) {
+								itemsRef.current[item.id]?.onGroupDrag?.({
+									id,
+									oldPoint: point,
+									newPoint: {
+										x: point.x + dx,
+										y: point.y + dy,
+									},
+								});
+							}
+						}
 					}
 				},
-				[id, point, width, height, items],
+				[id, point, items],
 			);
 
-			const handleChildDiagramChangeEnd = useCallback(
-				(e: DiagramChangeEvent) => {
+			/**
+			 * 子図形のドラッグ終了イベントハンドラ
+			 *
+			 * @param {DiagramDragEvent} e 図形ドラッグ終了イベント
+			 */
+			const handleChildDiagramDragEnd = useCallback(
+				(e: DiagramDragEvent) => {
 					const changeDiagram = items.find((item) => item.id === e.id);
 					if (changeDiagram) {
 						const dx = e.point.x - changeDiagram.point.x;
 						const dy = e.point.y - changeDiagram.point.y;
 
-						// グループ変更中イベントを発火
-						handleGroupDiagramChangeEnd({
+						// グループ内の図形にドラッグ完了イベントを通知し、同じグループ内の図形も移動させる
+						for (const item of items) {
+							if (e.id !== item.id) {
+								itemsRef.current[item.id]?.onGroupDragEnd?.({
+									id,
+									oldPoint: point,
+									newPoint: {
+										x: point.x + dx,
+										y: point.y + dy,
+									},
+								});
+							}
+						}
+
+						// ドラッグされた子図形のドラッグ終了イベントを伝番
+						onDiagramDragEnd?.(e);
+
+						// グループの位置も更新
+						onDiagramDragEnd?.({
 							id,
 							point: {
 								x: point.x + dx,
 								y: point.y + dy,
 							},
-							width: width,
-							height: height,
 						});
-
-						// 子図形の変更完了イベントを親へ伝番
-						onDiagramChangeEnd?.(e);
 					}
+
+					setIsDragging(false);
 				},
-				[onDiagramChangeEnd, id, point, width, height, items],
+				[onDiagramDragEnd, id, point, items],
 			);
 
 			// TODO: 共通化
@@ -133,8 +215,11 @@ const Group: React.FC<GroupProps> = memo(
 					...item,
 					key: item.id,
 					onDiagramClick: handleChildDiagramClick,
-					onDiagramChange: handleChildDiagramChange,
-					onDiagramChangeEnd: handleChildDiagramChangeEnd,
+					onDiagramDragStart: handleChildDiagramDragStart,
+					onDiagramDrag: handleChildDiagramDrag,
+					onDiagramDragEnd: handleChildDiagramDragEnd,
+					onDiagramDragEndByGroup: onDiagramDragEndByGroup,
+					onDiagramResizeEnd: onDiagramResizeEnd,
 					onDiagramSelect: handleChildDiagramSelect,
 					ref: (r: DiagramRef) => {
 						itemsRef.current[item.id] = r;
@@ -149,26 +234,25 @@ const Group: React.FC<GroupProps> = memo(
 				return createDiagram(item);
 			});
 
-			// TODO: 修正
 			/**
-			 * 親図形のリサイズ中イベントハンドラ
+			 * 親グループのリサイズ中イベントハンドラ
 			 *
-			 * @param {ParentDiagramResizeEvent} e 親図形のリサイズ中イベント
+			 * @param {GroupResizeEvent} e 親図形のリサイズ中イベント
 			 */
-			const onParentDiagramResize = useCallback(
-				(e: ParentDiagramResizeEvent) => {
+			const onParentGroupResize = useCallback(
+				(e: GroupResizeEvent) => {
 					// グループの枠表示用の四角形へ親図形のリサイズ中イベントを伝播
-					diagramRef.current.onParentDiagramResize?.(e);
+					// diagramRef.current.onGroupResize?.(e);
 
-					// 親図形のリサイズ中に伴うこの図形の変更を計算
-					const newArrangment = calcArrangmentOnGroupDiagramChange(
+					// グループのリサイズ完了に伴うこの図形の変更を計算
+					const newArrangment = calcArrangmentOnGroupResize(
 						e,
 						point,
 						width,
 						height,
 					);
 
-					// 変更中イベント作成
+					// リサイズ中イベント作成
 					const event = {
 						id,
 						oldPoint: point,
@@ -183,34 +267,33 @@ const Group: React.FC<GroupProps> = memo(
 
 					// グループ内の図形にリサイズ中イベントを通知
 					for (const item of items) {
-						itemsRef.current[item.id]?.onParentDiagramResize?.(event);
+						itemsRef.current[item.id]?.onGroupResize?.(event);
 					}
 
-					// 親図形のリサイズが契機で、かつDOMを直接更新しての変更なので、親側への変更通知はしない
+					// グループのリサイズが契機で、かつDOMを直接更新しての変更なので、グループ側への変更通知はしない
 				},
 				[id, point, width, height, items],
 			);
 
-			// TODO: 修正
 			/**
-			 * 親図形のリサイズ完了イベントハンドラ
+			 * 親グループのリサイズ完了イベントハンドラ
 			 *
-			 * @param {ParentDiagramResizeEvent} e 親図形のリサイズ完了イベント
+			 * @param {GroupResizeEvent} e グループのリサイズ完了イベント
 			 */
-			const onParentDiagramResizeEnd = useCallback(
-				(e: ParentDiagramResizeEvent) => {
+			const onParentGroupResizeEnd = useCallback(
+				(e: GroupResizeEvent) => {
 					// グループの枠表示用の四角形へ親図形のリサイズ中イベントを伝播
-					diagramRef.current.onParentDiagramResizeEnd?.(e);
+					// diagramRef.current.onGroupResizeEnd?.(e);
 
-					// 親図形のリサイズ完了に伴うこの図形の変更を計算
-					const newArrangment = calcArrangmentOnGroupDiagramChange(
+					// グループのリサイズ完了に伴うこの図形の変更を計算
+					const newArrangment = calcArrangmentOnGroupResize(
 						e,
 						point,
 						width,
 						height,
 					);
 
-					// 変更完了イベント作成
+					// リサイズ完了イベント作成
 					const event = {
 						id,
 						oldPoint: point,
@@ -225,19 +308,25 @@ const Group: React.FC<GroupProps> = memo(
 
 					// グループ内の図形にリサイズ完了イベントを通知
 					for (const item of items) {
-						itemsRef.current[item.id]?.onParentDiagramResizeEnd?.(event);
+						itemsRef.current[item.id]?.onGroupResizeEnd?.(event);
 					}
+
+					// グループのリサイズ完了に伴うこのグループのサイズ変更を親に通知し、SvgCanvasまで変更を伝番してもらう
+					onDiagramResizeEnd?.({
+						id,
+						...newArrangment,
+					});
 				},
-				[id, point, width, height, items],
+				[onDiagramResizeEnd, id, point, width, height, items],
 			);
 
 			/**
-			 * グループの変更中イベントハンドラ
+			 * このグループのリサイズ中イベントハンドラ
 			 *
-			 * @param {DiagramChangeEvent} e 短形領域の変更中イベント
+			 * @param {DiagramResizeEvent} e 短形領域の変更中イベント
 			 */
-			const handleGroupDiagramChange = useCallback(
-				(e: DiagramChangeEvent) => {
+			const handleThisGroupResize = useCallback(
+				(e: DiagramResizeEvent) => {
 					// グループ内の図形への変更中イベント作成
 					const event = {
 						id,
@@ -253,7 +342,7 @@ const Group: React.FC<GroupProps> = memo(
 					// グループ内の図形に変更中イベントを通知
 					for (const item of items) {
 						if (e.id !== item.id) {
-							itemsRef.current[item.id]?.onParentDiagramResize?.(event);
+							itemsRef.current[item.id]?.onGroupResize?.(event);
 						}
 					}
 				},
@@ -261,12 +350,12 @@ const Group: React.FC<GroupProps> = memo(
 			);
 
 			/**
-			 * グループの変更完了イベントハンドラ
+			 * このグループのリサイズ完了イベントハンドラ
 			 *
-			 * @param {DiagramChangeEvent} e 短形領域の変更完了イベント
+			 * @param {DiagramResizeEvent} e 短形領域の変更完了イベント
 			 */
-			const handleGroupDiagramChangeEnd = useCallback(
-				(e: DiagramChangeEvent) => {
+			const handleThisGroupResizeEnd = useCallback(
+				(e: DiagramResizeEvent) => {
 					// グループ内の図形への変更完了イベント作成
 					const event = {
 						id,
@@ -281,36 +370,31 @@ const Group: React.FC<GroupProps> = memo(
 					};
 					// グループ内の図形に変更完了イベントを通知
 					for (const item of items) {
-						if (e.id !== item.id) {
-							const diagramChangeEndEvent =
-								itemsRef.current[item.id]?.onParentDiagramResizeEnd?.(event);
-							if (diagramChangeEndEvent) {
-								// グループ内の図形の変更完了イベントを親に伝番させて、Propsの更新を親側にしてもらう
-								onDiagramChangeEnd?.(diagramChangeEndEvent);
-							}
-						}
+						itemsRef.current[item.id]?.onGroupResizeEnd?.(event);
 					}
 
 					// グループの枠表示用の四角形の変更完了イベントを親に伝番させて、Propsの更新を親側にしてもらう
-					onDiagramChangeEnd?.(e);
+					onDiagramResizeEnd?.(e);
 				},
-				[onDiagramChangeEnd, id, items, point, width, height],
+				[onDiagramResizeEnd, id, items, point, width, height],
 			);
 
 			return (
 				<>
-					<RectangleBase
-						id={id}
-						point={point}
-						width={width}
-						height={height}
-						tabIndex={tabIndex}
-						keepProportion={keepProportion}
-						isSelected={isSelected}
-						onDiagramChange={handleGroupDiagramChange}
-						onDiagramChangeEnd={handleGroupDiagramChangeEnd}
-						ref={diagramRef}
-					/>
+					{!isDragging && (
+						<RectangleBase
+							id={id}
+							point={point}
+							width={width}
+							height={height}
+							tabIndex={tabIndex}
+							keepProportion={keepProportion}
+							isSelected={isSelected}
+							onDiagramResizing={handleThisGroupResize}
+							onDiagramResizeEnd={handleThisGroupResizeEnd}
+							ref={diagramRef}
+						/>
+					)}
 					{children}
 				</>
 			);

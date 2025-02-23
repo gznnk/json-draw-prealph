@@ -6,7 +6,11 @@ import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 
 // SvgCanvas関連型定義をインポート
 import type { Diagram } from "../types/DiagramTypes";
-import type { ItemSelectEvent, DiagramChangeEvent } from "../types/EventTypes";
+import type {
+	ItemSelectEvent,
+	DiagramDragEvent,
+	DiagramResizeEvent,
+} from "../types/EventTypes";
 
 type SvgCanvasState = {
 	items: Diagram[];
@@ -43,8 +47,17 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		items: initialItems,
 	});
 
-	const onDiagramChangeEnd = useCallback((e: DiagramChangeEvent) => {
-		console.log(`onDiagramChangeEnd: ${JSON.stringify(e)}`);
+	const onDiagramDragEnd = useCallback((e: DiagramDragEvent) => {
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: applyRecursive(prevState.items, (item) =>
+				item.id === e.id ? { ...item, ...e } : item,
+			),
+		}));
+	}, []);
+
+	const onDiagramResizeEnd = useCallback((e: DiagramResizeEvent) => {
+		console.log(`onDiagramResizeEnd: ${JSON.stringify(e)}`);
 
 		setCanvasState((prevState) => ({
 			...prevState,
@@ -74,7 +87,9 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 
 	const canvasProps = {
 		...canvasState,
-		onDiagramChangeEnd,
+		onDiagramDragEnd,
+		onDiagramDragEndByGroup: onDiagramDragEnd,
+		onDiagramResizeEnd,
 		onItemSelect,
 	};
 

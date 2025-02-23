@@ -27,7 +27,6 @@ type DragLineProps = {
 	draggingPointType?: DragPointType;
 	dragEndPointType?: DragPointType;
 	hidden?: boolean;
-	isSelected?: boolean;
 	onArrangmentChangeStart: (e: { dragPointType: DragPointType }) => void;
 	onArrangmentChange: (e: { arrangment: RectangleBaseArrangement }) => void;
 	onArrangmentChangeEnd: (e: {
@@ -44,7 +43,6 @@ const DragLine: React.FC<DragLineProps> = ({
 	dragPointType,
 	direction,
 	cursor,
-	isSelected,
 	onArrangmentChangeStart,
 	onArrangmentChange,
 	onArrangmentChangeEnd,
@@ -83,7 +81,6 @@ const DragLine: React.FC<DragLineProps> = ({
 			point={startPoint}
 			direction={direction}
 			cursor={cursor}
-			isSelected={isSelected}
 			onDragStart={onDragStart}
 			onDrag={onDrag}
 			onDragEnd={onDragEnd}

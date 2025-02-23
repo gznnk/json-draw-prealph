@@ -30,7 +30,7 @@ const testItems1 = [
 		isSelected: false,
 	},
 	{
-		id: "g-0",
+		id: "g-1",
 		type: "group",
 		point: { x: 200, y: 200 },
 		width: 200,
@@ -88,6 +88,56 @@ const testItems1 = [
 				strokeWidth: "1px",
 				keepProportion: false,
 				isSelected: false,
+			},
+			{
+				id: "g-2",
+				type: "group",
+				point: { x: 400, y: 400 },
+				width: 200,
+				height: 200,
+				fill: "transparent",
+				stroke: "black",
+				strokeWidth: "1px",
+				keepProportion: true,
+				isSelected: false,
+				items: [
+					{
+						id: "7",
+						type: "rectangle",
+						point: { x: 400, y: 400 },
+						width: 100,
+						height: 100,
+						fill: "transparent",
+						stroke: "black",
+						strokeWidth: "1px",
+						keepProportion: false,
+						isSelected: false,
+					},
+					{
+						id: "8",
+						type: "ellipse",
+						point: { x: 500, y: 400 },
+						width: 100,
+						height: 100,
+						fill: "transparent",
+						stroke: "black",
+						strokeWidth: "1px",
+						keepProportion: false,
+						isSelected: false,
+					},
+					{
+						id: "9",
+						type: "rectangle",
+						point: { x: 500, y: 500 },
+						width: 100,
+						height: 100,
+						fill: "transparent",
+						stroke: "black",
+						strokeWidth: "1px",
+						keepProportion: false,
+						isSelected: false,
+					},
+				],
 			},
 		],
 	},
@@ -281,6 +331,7 @@ function App() {
 	};
 
 	console.log(`selectedItemId: ${canvasState.selectedItemId}`);
+	console.log("canvasState:", canvasState);
 
 	return (
 		<div className="App">
@@ -314,6 +365,8 @@ function App() {
 				<Button onClick={handleAddSquare}>Add Square</Button>
 				<Button onClick={handleAddCircle}>Add Circle</Button>
 				<div>{`id:${canvasState.selectedItemId}`}</div>
+				<div>{`x:${canvasFunctions.getSelectedItem()?.point.x}`}</div>
+				<div>{`y:${canvasFunctions.getSelectedItem()?.point.y}`}</div>
 				<div>{`width:${canvasFunctions.getSelectedItem()?.width}`}</div>
 				<div>{`height:${canvasFunctions.getSelectedItem()?.height}`}</div>
 				<Input

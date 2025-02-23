@@ -14,9 +14,10 @@ import {
 import type { Point } from "../../../types/CoordinateTypes";
 import type { DiagramRef } from "../../../types/DiagramTypes";
 import type {
-	DiagramChangeEvent,
+	DiagramClickEvent,
 	DiagramDragEvent,
 	DiagramPointerEvent,
+	DiagramResizeEvent,
 	DiagramSelectEvent,
 } from "../../../types/EventTypes";
 
@@ -53,9 +54,14 @@ export type RectangleBaseProps = {
 	tabIndex?: number;
 	isSelected?: boolean;
 	ref?: React.Ref<DiagramRef>;
-	onDiagramClick?: (e: DiagramPointerEvent) => void; // TODO: 型
-	onDiagramChange?: (e: DiagramChangeEvent) => void;
-	onDiagramChangeEnd?: (e: DiagramChangeEvent) => void;
+	onDiagramClick?: (e: DiagramClickEvent) => void;
+	onDiagramDragStart?: (e: DiagramDragEvent) => void;
+	onDiagramDrag?: (e: DiagramDragEvent) => void;
+	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
+	onDiagramResizeStart?: (e: DiagramResizeEvent) => void;
+	onDiagramResizing?: (e: DiagramResizeEvent) => void;
+	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
+	onDiagramDragEndByGroup?: (e: DiagramDragEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
 	children?: React.ReactNode;
 };
@@ -72,8 +78,12 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				tabIndex = 0,
 				isSelected = false,
 				onDiagramClick,
-				onDiagramChange,
-				onDiagramChangeEnd,
+				onDiagramDragStart,
+				onDiagramDrag,
+				onDiagramDragEnd,
+				onDiagramResizeStart,
+				onDiagramResizing,
+				onDiagramResizeEnd,
 				onDiagramSelect,
 				children,
 			},
@@ -92,6 +102,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				draggableRef,
 			}));
 
+			/**
+			 * Propsの変更を検知して状態を更新
+			 */
 			useEffect(() => {
 				setState((prevState) => ({
 					...prevState,
@@ -104,37 +117,65 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				}));
 			}, [id, point, width, height]);
 
-			// --- 以下全体のドラッグ ---
-
-			const onDragStart = useCallback((_e: DiagramDragEvent) => {
-				setState((prevState) => ({
-					...prevState,
-					isDragging: true,
-					dragEndPointType: undefined,
-				}));
-			}, []);
-
-			const onDrag = useCallback(
+			/**
+			 * ドラッグ開始イベントハンドラ
+			 *
+			 * @param {DiagramDragEvent} e ドラッグイベント
+			 * @returns {void}
+			 */
+			const onDragStart = useCallback(
 				(e: DiagramDragEvent) => {
-					onDiagramChange?.({
+					// 親にドラッグ開始イベントを通知
+					onDiagramDragStart?.({
 						id,
-						point: e.point,
-						width: state.width,
-						height: state.height,
+						point: state.point,
+						reactEvent: e.reactEvent,
 					});
+
+					// ドラッグ中フラグを立てる
+					setState((prevState) => ({
+						...prevState,
+						isDragging: true,
+						dragEndPointType: undefined,
+					}));
 				},
-				[onDiagramChange, id, state.width, state.height],
+				[onDiagramDragStart, id, state.point],
 			);
 
-			const onDragEnd = useCallback(
+			/**
+			 * ドラッグ中イベントハンドラ
+			 *
+			 * @param {DiagramDragEvent} e ドラッグイベント
+			 * @returns {void}
+			 */
+			const onDrag = useCallback(
 				(e: DiagramDragEvent) => {
-					onDiagramChangeEnd?.({
+					// 親にドラッグ中イベントを通知
+					onDiagramDrag?.({
 						id,
 						point: e.point,
-						width: state.width,
-						height: state.height,
+						reactEvent: e.reactEvent,
+					});
+				},
+				[onDiagramDrag, id],
+			);
+
+			/**
+			 * ドラッグ終了イベントハンドラ
+			 *
+			 * @param {DiagramDragEvent} e ドラッグイベント
+			 * @returns {void}
+			 */
+			const onDragEnd = useCallback(
+				(e: DiagramDragEvent) => {
+					// 親にドラッグ終了イベントを通知
+					onDiagramDragEnd?.({
+						id,
+						point: e.point,
+						reactEvent: e.reactEvent,
 					});
 
+					// ドラッグポイントの位置を更新
 					setState((prevState) => ({
 						...prevState,
 						...calcArrangment(e.point, {
@@ -144,19 +185,26 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						isDragging: false,
 					}));
 				},
-				[onDiagramChangeEnd, id, state.width, state.height],
+				[onDiagramDragEnd, id],
 			);
 
 			// --- 以下点のドラッグ ---
 
 			const onArrangmentChangeStart = useCallback(
 				(e: ArrangmentChangeStartEvent) => {
+					onDiagramResizeStart?.({
+						id,
+						point: state.point,
+						width: state.width,
+						height: state.height,
+					});
+
 					setState((prevState) => ({
 						...prevState,
 						draggingPointType: e.dragPointType,
 					}));
 				},
-				[],
+				[onDiagramResizeStart, id, state.point, state.width, state.height],
 			);
 			const onArrangmentChange = useCallback(
 				(e: ArrangmentChangeEvent) => {
@@ -173,14 +221,14 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					outlineRef.current?.setAttribute("width", `${newWidth}`);
 					outlineRef.current?.setAttribute("height", `${newHeight}`);
 
-					onDiagramChange?.({
+					onDiagramResizing?.({
 						id: id,
 						point: newLeftTopPoint,
 						width: newWidth,
 						height: newHeight,
 					});
 				},
-				[onDiagramChange, id],
+				[onDiagramResizing, id],
 			);
 
 			const onArrangmentChangeEnd = useCallback(
@@ -195,19 +243,20 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						dragEndPointType: e.dragPointType,
 					}));
 
-					onDiagramChangeEnd?.({
+					onDiagramResizeEnd?.({
 						id,
 						point: e.arrangment.leftTopPoint,
 						width: e.arrangment.width,
 						height: e.arrangment.height,
 					});
 				},
-				[onDiagramChangeEnd, id, keepProportion],
+				[onDiagramResizeEnd, id, keepProportion],
 			);
 
 			// ポインターダウン時の処理
 			const handlePointerDown = useCallback(
 				(_e: DiagramPointerEvent) => {
+					// 親に図形選択イベントを通知
 					onDiagramSelect?.({
 						id,
 					});
@@ -221,7 +270,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						id={id}
 						point={state.point}
 						tabIndex={tabIndex}
-						isSelected={isSelected}
 						onPointerDown={handlePointerDown}
 						onClick={onDiagramClick}
 						onDragStart={onDragStart}
@@ -253,7 +301,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								{...state}
 								id={id}
 								keepProportion={keepProportion}
-								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -263,7 +310,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								{...state}
 								id={id}
 								keepProportion={keepProportion}
-								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -273,7 +319,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								{...state}
 								id={id}
 								keepProportion={keepProportion}
-								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -283,7 +328,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								{...state}
 								id={id}
 								keepProportion={keepProportion}
-								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -293,7 +337,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								{...state}
 								id={id}
 								keepProportion={keepProportion}
-								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -303,7 +346,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								{...state}
 								id={id}
 								keepProportion={keepProportion}
-								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -313,7 +355,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								{...state}
 								id={id}
 								keepProportion={keepProportion}
-								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -323,7 +364,6 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								{...state}
 								id={id}
 								keepProportion={keepProportion}
-								isSelected={isSelected}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}

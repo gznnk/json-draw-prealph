@@ -16,20 +16,19 @@ import styled from "@emotion/styled";
 import type { Point } from "../../types/CoordinateTypes";
 import { DragDirection } from "../../types/CoordinateTypes";
 import type {
+	DiagramClickEvent,
 	DiagramDragEvent,
 	DiagramPointerEvent,
 } from "../../types/EventTypes";
 
 type DraggableGProps = {
 	cursor: string;
-	visibility: string;
 	outline?: string;
 	outlineOffset?: string;
 };
 
 const DraggableG = styled.g<DraggableGProps>`
     cursor: ${({ cursor }) => cursor};
-    visibility: ${({ visibility }) => visibility};
     &:focus {
         outline: ${({ outline }) => outline};
         outline-offset: ${({ outlineOffset }) => outlineOffset};
@@ -44,15 +43,13 @@ export type DraggableProps = {
 	allowXDecimal?: boolean;
 	allowYDecimal?: boolean;
 	cursor?: string;
-	visible?: boolean;
 	tabIndex?: number;
 	outline?: string;
 	outlineOffset?: string;
-	isSelected?: boolean;
 	ref?: SVGGElement;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onPointerUp?: (e: DiagramPointerEvent) => void;
-	onClick?: (e: DiagramPointerEvent) => void;
+	onClick?: (e: DiagramClickEvent) => void;
 	onDragStart?: (e: DiagramDragEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragEnd?: (e: DiagramDragEvent) => void;
@@ -70,11 +67,9 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			allowXDecimal = false,
 			allowYDecimal = false,
 			cursor = "move",
-			visible = true,
 			tabIndex = 0,
 			outline = "none",
 			outlineOffset = "0px",
-			isSelected = false, // TODO: 名前
 			onPointerDown,
 			onPointerUp,
 			onClick,
@@ -151,15 +146,9 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			startX.current = e.clientX - state.point.x;
 			startY.current = e.clientY - state.point.y;
 
-			// console.log(e.target);
-			// console.log(e.currentTarget);
-
 			if ((e.target as HTMLElement).id === id) {
-				// console.log(e.target);
 				e.currentTarget.setPointerCapture(e.pointerId);
 			}
-
-			// e.currentTarget.setPointerCapture(e.pointerId);
 
 			const event = {
 				id,
@@ -171,8 +160,6 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		};
 
 		const handlePointerMove = (e: React.PointerEvent<SVGElement>) => {
-			// console.log(`isPointerDown: ${isPointerDown}`);
-
 			if (!isPointerDown) {
 				return;
 			}
@@ -183,15 +170,9 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				reactEvent: e,
 			};
 
-			// console.log(`isDragging: ${isDragging}`);
 			if (!isDragging) {
 				onDragStart?.(event);
 				setIsDragging(true);
-			}
-
-			// 自分（を利用している図形）が選択されている場合は、DOMを直接操作して移動する
-			// そうでない場合は、所属しているグループ側のDOMの移動により、自分のDOMも移動される
-			if (isSelected) {
 			}
 
 			svgRef?.current?.setAttribute(
@@ -213,15 +194,9 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 
 			if (isDragging) {
 				onDragEnd?.(event);
-				if (isSelected) {
-					// setState({
-					// 	point: newPoint,
-					// });
-				}
 			}
 
 			if (isPointerDown && !isDragging) {
-				console.log(`click: ${id}`);
 				// ドラッグ後のポインターアップでなければ、クリックイベントを利用側に通知する
 				onClick?.(event);
 			}
@@ -297,7 +272,6 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				transform={`translate(${state.point.x}, ${state.point.y})`}
 				tabIndex={tabIndex}
 				cursor={cursor}
-				visibility={visible ? "visible" : "hidden"}
 				outline={outline}
 				outlineOffset={outlineOffset}
 				onPointerDown={handlePointerDown}
