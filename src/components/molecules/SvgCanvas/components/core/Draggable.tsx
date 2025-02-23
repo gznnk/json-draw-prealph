@@ -170,9 +170,17 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				reactEvent: e,
 			};
 
-			if (!isDragging) {
+			if (
+				!isDragging &&
+				(Math.abs(e.clientX - state.point.x - startX.current) > 3 ||
+					Math.abs(e.clientY - state.point.y - startY.current) > 3)
+			) {
 				onDragStart?.(event);
 				setIsDragging(true);
+			}
+
+			if (!isDragging) {
+				return;
 			}
 
 			svgRef?.current?.setAttribute(
