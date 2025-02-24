@@ -51,14 +51,12 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyRecursive(prevState.items, (item) =>
-				item.id === e.id ? { ...item, ...e } : item,
+				item.id === e.id ? { ...item, point: e.new.point } : item,
 			),
 		}));
 	}, []);
 
 	const onDiagramResizeEnd = useCallback((e: DiagramResizeEvent) => {
-		console.log(`onDiagramResizeEnd: ${JSON.stringify(e)}`);
-
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyRecursive(prevState.items, (item) =>
@@ -69,8 +67,6 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 
 	const onItemSelect = useCallback((e: ItemSelectEvent) => {
 		setCanvasState((prevState) => {
-			console.log(`onItemSelect: ${e.id}`);
-
 			const items = applyRecursive(prevState.items, (item) =>
 				item.id === e.id
 					? { ...item, isSelected: true }

@@ -8,7 +8,6 @@ import type { Point } from "./CoordinateTypes";
 export type DiagramPointerEvent = {
 	id: string;
 	point: Point;
-	reactEvent?: React.PointerEvent<SVGElement>;
 };
 
 /**
@@ -16,8 +15,16 @@ export type DiagramPointerEvent = {
  */
 export type DiagramDragEvent = {
 	id: string;
-	point: Point;
-	reactEvent?: React.PointerEvent<SVGElement>;
+	old: {
+		point: Point;
+		width: number;
+		height: number;
+	};
+	new: {
+		point: Point;
+		width: number;
+		height: number;
+	};
 };
 
 /**
@@ -59,8 +66,6 @@ export type GroupResizeEvent = {
  */
 export type DiagramClickEvent = {
 	id: string;
-	point: Point;
-	reactEvent?: React.PointerEvent<SVGElement>;
 };
 
 /**

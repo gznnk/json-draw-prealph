@@ -41,7 +41,7 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 		useImperativeHandle(ref, () => domRef.current);
 
 		const calcArrangmentFunction = useCallback(
-			(e: DiagramDragEvent) => calcArrangment(e.point, rightBottomPoint),
+			(e: DiagramDragEvent) => calcArrangment(e.new.point, rightBottomPoint),
 			[rightBottomPoint],
 		);
 

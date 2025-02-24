@@ -44,7 +44,7 @@ const DragPointRightBottom = forwardRef<
 		useImperativeHandle(ref, () => domRef.current);
 
 		const calcArrangmentFunction = useCallback(
-			(e: DiagramDragEvent) => calcArrangment(e.point, leftTopPoint),
+			(e: DiagramDragEvent) => calcArrangment(e.new.point, leftTopPoint),
 			[leftTopPoint],
 		);
 

@@ -50,12 +50,12 @@ const DragPointTopCenter = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 		const calcArrangmentFunction = useCallback(
 			(e: DiagramDragEvent) => {
 				if (keepProportion && aspectRatio) {
-					const newHeight = leftBottomPoint.y - e.point.y;
+					const newHeight = leftBottomPoint.y - e.new.point.y;
 					const newWidth = newHeight * aspectRatio;
 
 					const newRightTopPoint = {
 						x: leftBottomPoint.x + newWidth,
-						y: e.point.y,
+						y: e.new.point.y,
 					};
 
 					return calcArrangment(leftBottomPoint, newRightTopPoint);
@@ -63,7 +63,7 @@ const DragPointTopCenter = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 
 				const newRightTopPoint = {
 					x: rightTopPoint.x,
-					y: e.point.y,
+					y: e.new.point.y,
 				};
 
 				return calcArrangment(leftBottomPoint, newRightTopPoint);

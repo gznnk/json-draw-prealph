@@ -34,7 +34,7 @@ import {
  * 選択されたグループ内の図形のIDを再帰的に取得する
  *
  * @param {Diagram[]} diagrams 図形リスト
- * @returns {string | null} 選択されたグループ内の図形のID
+ * @returns {string | undefined} 選択されたグループ内の図形のID
  */
 const getSelectedChildDiagramId = (diagrams: Diagram[]): string | undefined => {
 	for (const diagram of diagrams) {
@@ -64,7 +64,11 @@ const Group: React.FC<GroupProps> = memo(
 				tabIndex = 0,
 				isSelected = false,
 				onDiagramClick,
+				onDiagramResizeStart,
+				onDiagramResizing,
 				onDiagramResizeEnd,
+				onDiagramDragStart,
+				onDiagramDrag,
 				onDiagramDragEnd,
 				onDiagramDragEndByGroup,
 				onDiagramSelect,
@@ -132,11 +136,10 @@ const Group: React.FC<GroupProps> = memo(
 						// このグループのクリックイベントに差し替えて、このグループが選択されるようにする
 						onDiagramClick?.({
 							id,
-							point: point,
 						});
 					}
 				},
-				[onDiagramSelect, onDiagramClick, isReselect, point, id],
+				[onDiagramSelect, onDiagramClick, isReselect, id],
 			);
 
 			useEffect(() => {
@@ -192,10 +195,19 @@ const Group: React.FC<GroupProps> = memo(
 					// グループの位置も更新
 					onDiagramDragEndByGroup?.({
 						id,
-						point: newPoint,
+						old: {
+							point: point,
+							width,
+							height,
+						},
+						new: {
+							point: newPoint,
+							width,
+							height,
+						},
 					});
 				},
-				[onDiagramDragEndByGroup, point, id, items],
+				[onDiagramDragEndByGroup, id, point, width, height, items],
 			);
 
 			/**
@@ -284,12 +296,16 @@ const Group: React.FC<GroupProps> = memo(
 			 * @param {DiagramDragEvent} _e 図形ドラッグ開始イベント
 			 */
 			const handleChildDiagramDragStart = useCallback(
-				(_e: DiagramDragEvent) => {
+				(e: DiagramDragEvent) => {
 					if (isSelected) {
+						// グループ選択時であれば、グループ全体をドラッグ可能にする
 						setIsDragging(true);
 					}
+
+					// ドラッグイベントをそのまま伝番させる
+					onDiagramDragStart?.(e);
 				},
-				[isSelected],
+				[onDiagramDragStart, isSelected],
 			);
 
 			/**
@@ -299,32 +315,30 @@ const Group: React.FC<GroupProps> = memo(
 			 */
 			const handleChildDiagramDrag = useCallback(
 				(e: DiagramDragEvent) => {
-					// グループのドラッグでなければ処理しない
 					if (!isDragging) {
+						// グループのドラッグでなければ、ドラッグイベントをそのまま伝番させて終了
+						onDiagramDrag?.(e);
 						return;
 					}
 
-					const dragDiagram = items.find((item) => item.id === e.id);
-					if (dragDiagram) {
-						const dx = e.point.x - dragDiagram.point.x;
-						const dy = e.point.y - dragDiagram.point.y;
+					const dx = e.new.point.x - e.old.point.x;
+					const dy = e.new.point.y - e.old.point.y;
 
-						// グループ内の図形にドラッグ中イベントを通知し、同じグループ内の図形も移動させる
-						for (const item of items) {
-							if (e.id !== item.id) {
-								itemsRef.current[item.id]?.onGroupDrag?.({
-									id,
-									oldPoint: point,
-									newPoint: {
-										x: point.x + dx,
-										y: point.y + dy,
-									},
-								});
-							}
+					// グループ内の図形にドラッグ中イベントを通知し、同じグループ内の図形も移動させる
+					for (const item of items) {
+						if (e.id !== item.id) {
+							itemsRef.current[item.id]?.onGroupDrag?.({
+								id,
+								oldPoint: point,
+								newPoint: {
+									x: point.x + dx,
+									y: point.y + dy,
+								},
+							});
 						}
 					}
 				},
-				[isDragging, id, point, items],
+				[onDiagramDrag, isDragging, id, point, items],
 			);
 
 			/**
@@ -334,70 +348,93 @@ const Group: React.FC<GroupProps> = memo(
 			 */
 			const handleChildDiagramDragEnd = useCallback(
 				(e: DiagramDragEvent) => {
-					// グループ内の図形のドラッグ終了イベントを伝番
+					// グループ内の図形のドラッグ終了イベントを伝番し、ドラッグされた図形の位置を更新
 					onDiagramDragEnd?.(e);
 
-					const dragDiagram = items.find((item) => item.id === e.id);
-					if (dragDiagram) {
-						// グループのドラッグでない場合、グループの配置を更新する
-						if (!isDragging) {
+					// グループ全体のドラッグでない、かつグループ内の選択された図形のドラッグの場合、その図形の位置変更によるグループの配置を更新する
+					if (!isDragging && getSelectedChildDiagramId(items)) {
+						const calcGroupArrangment = (list: Diagram[]) => {
 							let top = point.y + height;
 							let bottom = point.y;
 							let left = point.x + width;
 							let right = point.x;
-							for (const item of items) {
+							for (const item of list) {
 								if (e.id !== item.id) {
-									top = Math.min(top, item.point.y);
-									bottom = Math.max(bottom, item.point.y + item.height);
-									left = Math.min(left, item.point.x);
-									right = Math.max(right, item.point.x + item.width);
+									if (item.type === "group") {
+										const groupArrangment = calcGroupArrangment(
+											item.items ?? [],
+										);
+										top = Math.min(top, groupArrangment.top);
+										bottom = Math.max(bottom, groupArrangment.bottom);
+										left = Math.min(left, groupArrangment.left);
+										right = Math.max(right, groupArrangment.right);
+									} else {
+										top = Math.min(top, item.point.y);
+										bottom = Math.max(bottom, item.point.y + item.height);
+										left = Math.min(left, item.point.x);
+										right = Math.max(right, item.point.x + item.width);
+									}
 								}
 							}
-							top = Math.min(top, e.point.y);
-							bottom = Math.max(bottom, e.point.y + dragDiagram.height);
-							left = Math.min(left, e.point.x);
-							right = Math.max(right, e.point.x + dragDiagram.width);
 
-							onDiagramResizeEnd?.({
-								id,
-								point: {
-									x: left,
-									y: top,
-								},
-								width: right - left,
-								height: bottom - top,
-							});
-							return;
-						}
+							return {
+								top: Math.min(top, e.new.point.y),
+								bottom: Math.max(bottom, e.new.point.y + e.new.height),
+								left: Math.min(left, e.new.point.x),
+								right: Math.max(right, e.new.point.x + e.new.width),
+							};
+						};
 
-						// 以降、グループ全体のドラッグの場合の処理
+						const { top, bottom, left, right } = calcGroupArrangment(items);
 
-						const dx = e.point.x - dragDiagram.point.x;
-						const dy = e.point.y - dragDiagram.point.y;
-
-						// グループ内の図形にドラッグ完了イベントを通知し、同じグループ内の図形も移動させる
-						for (const item of items) {
-							if (e.id !== item.id) {
-								itemsRef.current[item.id]?.onGroupDragEnd?.({
-									id,
-									oldPoint: point,
-									newPoint: {
-										x: point.x + dx,
-										y: point.y + dy,
-									},
-								});
-							}
-						}
-
-						// グループの位置も更新
-						onDiagramDragEnd?.({
+						onDiagramResizeEnd?.({
 							id,
+							point: {
+								x: left,
+								y: top,
+							},
+							width: right - left,
+							height: bottom - top,
+						});
+						return;
+					}
+
+					// 以降、グループ全体のドラッグの場合の処理
+
+					const dx = e.new.point.x - e.old.point.x;
+					const dy = e.new.point.y - e.old.point.y;
+
+					// グループ内の図形にドラッグ完了イベントを通知し、同じグループ内の図形を移動させる
+					for (const item of items) {
+						if (e.id !== item.id) {
+							itemsRef.current[item.id]?.onGroupDragEnd?.({
+								id,
+								oldPoint: point,
+								newPoint: {
+									x: point.x + dx,
+									y: point.y + dy,
+								},
+							});
+						}
+					}
+
+					// グループの位置も更新
+					onDiagramDragEnd?.({
+						id,
+						old: {
+							point: point,
+							width,
+							height,
+						},
+						new: {
 							point: {
 								x: point.x + dx,
 								y: point.y + dy,
 							},
-						});
-					}
+							width,
+							height,
+						},
+					});
 
 					setIsDragging(false);
 				},
@@ -424,6 +461,8 @@ const Group: React.FC<GroupProps> = memo(
 					onDiagramDrag: handleChildDiagramDrag,
 					onDiagramDragEnd: handleChildDiagramDragEnd,
 					onDiagramDragEndByGroup: onDiagramDragEndByGroup,
+					onDiagramResizeStart: onDiagramResizeStart,
+					onDiagramResizing: onDiagramResizing,
 					onDiagramResizeEnd: onDiagramResizeEnd,
 					onDiagramSelect: handleChildDiagramSelect,
 					ref: (r: DiagramRef) => {

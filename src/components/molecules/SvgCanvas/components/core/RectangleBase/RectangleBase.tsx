@@ -125,8 +125,16 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					// 親にドラッグ開始イベントを通知
 					onDiagramDragStart?.({
 						id,
-						point: state.point,
-						reactEvent: e.reactEvent,
+						old: {
+							point: e.old.point,
+							width: state.width,
+							height: state.height,
+						},
+						new: {
+							point: e.new.point,
+							width: state.width,
+							height: state.height,
+						},
 					});
 
 					// ドラッグ中フラグを立てる
@@ -136,7 +144,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						dragEndPointType: undefined,
 					}));
 				},
-				[onDiagramDragStart, id, state.point],
+				[onDiagramDragStart, id, state.width, state.height],
 			);
 
 			/**
@@ -150,11 +158,19 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					// 親にドラッグ中イベントを通知
 					onDiagramDrag?.({
 						id,
-						point: e.point,
-						reactEvent: e.reactEvent,
+						old: {
+							point: e.old.point,
+							width: state.width,
+							height: state.height,
+						},
+						new: {
+							point: e.new.point,
+							width: state.width,
+							height: state.height,
+						},
 					});
 				},
-				[onDiagramDrag, id],
+				[onDiagramDrag, id, state.width, state.height],
 			);
 
 			/**
@@ -168,21 +184,29 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					// 親にドラッグ終了イベントを通知
 					onDiagramDragEnd?.({
 						id,
-						point: e.point,
-						reactEvent: e.reactEvent,
+						old: {
+							point: e.old.point,
+							width: state.width,
+							height: state.height,
+						},
+						new: {
+							point: e.new.point,
+							width: state.width,
+							height: state.height,
+						},
 					});
 
 					// ドラッグポイントの位置を更新
 					setState((prevState) => ({
 						...prevState,
-						...calcArrangment(e.point, {
-							x: e.point.x + prevState.width,
-							y: e.point.y + prevState.height,
+						...calcArrangment(e.new.point, {
+							x: e.new.point.x + prevState.width,
+							y: e.new.point.y + prevState.height,
 						}),
 						isDragging: false,
 					}));
 				},
-				[onDiagramDragEnd, id],
+				[onDiagramDragEnd, id, state.width, state.height],
 			);
 
 			// --- 以下点のドラッグ ---

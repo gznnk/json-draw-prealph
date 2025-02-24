@@ -153,7 +153,6 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			const event = {
 				id,
 				point: getPoint(e),
-				reactEvent: e,
 			};
 
 			onPointerDown?.(event);
@@ -166,8 +165,16 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 
 			const event = {
 				id,
-				point: getPoint(e),
-				reactEvent: e,
+				old: {
+					point: state.point,
+					width: 0,
+					height: 0,
+				},
+				new: {
+					point: getPoint(e),
+					width: 0,
+					height: 0,
+				},
 			};
 
 			if (
@@ -185,7 +192,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 
 			svgRef?.current?.setAttribute(
 				"transform",
-				`translate(${event.point.x}, ${event.point.y})`,
+				`translate(${event.new.point.x}, ${event.new.point.y})`,
 			);
 
 			onDrag?.(event);
@@ -194,22 +201,33 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		const handlePointerUp = (e: React.PointerEvent<SVGElement>) => {
 			const newPoint = getPoint(e);
 
-			const event = {
-				id,
-				point: newPoint,
-				reactEvent: e,
-			};
-
 			if (isDragging) {
-				onDragEnd?.(event);
+				onDragEnd?.({
+					id,
+					old: {
+						point: state.point,
+						width: 0,
+						height: 0,
+					},
+					new: {
+						point: newPoint,
+						width: 0,
+						height: 0,
+					},
+				});
 			}
 
 			if (isPointerDown && !isDragging) {
 				// ドラッグ後のポインターアップでなければ、クリックイベントを利用側に通知する
-				onClick?.(event);
+				onClick?.({
+					id,
+				});
 			}
 
-			onPointerUp?.(event);
+			onPointerUp?.({
+				id,
+				point: newPoint,
+			});
 
 			setIsDragging(false);
 			setIsPointerDown(false);
@@ -232,11 +250,22 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 
 				newPoint = adjustCoordinates(newPoint);
 
-				onDragStart?.({ id, point: state.point });
-				onDrag?.({
+				const dragEvent = {
 					id,
-					point: newPoint,
-				});
+					old: {
+						point: state.point,
+						width: 0,
+						height: 0,
+					},
+					new: {
+						point: newPoint,
+						width: 0,
+						height: 0,
+					},
+				};
+
+				onDragStart?.(dragEvent);
+				onDrag?.(dragEvent);
 				setState({
 					point: newPoint,
 				});
@@ -269,7 +298,16 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			) {
 				onDragEnd?.({
 					id,
-					point: state.point,
+					old: {
+						point: state.point,
+						width: 0,
+						height: 0,
+					},
+					new: {
+						point: state.point,
+						width: 0,
+						height: 0,
+					},
 				});
 			}
 		};
