@@ -295,24 +295,30 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 
 			// シフトキーの状態を監視
 			useEffect(() => {
-				const handleKeyDown = (e: KeyboardEvent) => {
-					setShiftKeyDown(e.shiftKey);
-				};
-				const handleKeyUp = (e: KeyboardEvent) => {
-					if (e.key === "Shift") {
-						setShiftKeyDown(false);
-					}
-				};
+				let handleKeyDown: (e: KeyboardEvent) => void;
+				let handleKeyUp: (e: KeyboardEvent) => void;
+				if (isSelected) {
+					handleKeyDown = (e: KeyboardEvent) => {
+						setShiftKeyDown(e.shiftKey);
+					};
+					handleKeyUp = (e: KeyboardEvent) => {
+						if (e.key === "Shift") {
+							setShiftKeyDown(false);
+						}
+					};
 
-				window.addEventListener("keydown", handleKeyDown);
-				window.addEventListener("keyup", handleKeyUp);
+					window.addEventListener("keydown", handleKeyDown);
+					window.addEventListener("keyup", handleKeyUp);
+				}
 
 				return () => {
 					// クリーンアップ
-					window.removeEventListener("keydown", handleKeyDown);
-					window.removeEventListener("keyup", handleKeyUp);
+					if (isSelected) {
+						window.removeEventListener("keydown", handleKeyDown);
+						window.removeEventListener("keyup", handleKeyUp);
+					}
 				};
-			}, []);
+			}, [isSelected]);
 
 			return (
 				<>
