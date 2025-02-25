@@ -43,14 +43,16 @@ export type GroupDragEvent = {
  */
 export type GroupResizeEvent = {
 	id: string;
-	oldPoint: Point;
-	oldWidth: number;
-	oldHeight: number;
-	newPoint: Point;
-	newWidth: number;
-	newHeight: number;
-	scaleX: number;
-	scaleY: number;
+	startSize: {
+		point: Point;
+		width: number;
+		height: number;
+	};
+	endSize: {
+		point: Point;
+		width: number;
+		height: number;
+	};
 };
 
 /**
@@ -64,10 +66,5 @@ export type DiagramClickEvent = {
  * 図形の選択イベント
  */
 export type DiagramSelectEvent = {
-	id: string;
-};
-
-// TODO: 廃止予定
-export type ItemSelectEvent = {
 	id: string;
 };

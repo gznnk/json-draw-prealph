@@ -14,6 +14,7 @@ import type {
 	DiagramDragEvent,
 	DiagramPointerEvent,
 	GroupDragEvent,
+	GroupResizeEvent,
 } from "../../types/EventTypes";
 import type {
 	Diagram,
@@ -25,11 +26,8 @@ import type {
 // ユーティリティをインポート
 import { getLogger } from "../../../../../utils/Logger";
 
-// // RectangleBase関連関数をインポート TODO: 関数の場所
-// import {
-// 	calcArrangmentOnGroupResize,
-// 	calcPointOnGroupDrag,
-// } from "../core/RectangleBase/RectangleBaseFunctions";
+// RectangleBase関連関数をインポート TODO: 関数の場所
+import { calcArrangmentOnGroupResize } from "../core/RectangleBase/RectangleBaseFunctions";
 
 const logger = getLogger("Line");
 
@@ -53,18 +51,17 @@ const Line: React.FC<LineProps> = memo(
 			{
 				id,
 				point,
+				width,
+				height,
 				fill = "none",
 				stroke = "black",
 				strokeWidth = "1px",
-				keepProportion = false,
 				isSelected = false,
 				onDiagramClick,
 				onDiagramDragStart,
 				onDiagramDrag,
 				onDiagramDragEnd,
 				onDiagramDragEndByGroup,
-				onDiagramResizeStart,
-				onDiagramResizing,
 				onDiagramResizeEnd,
 				onDiagramSelect,
 				items = [],
@@ -80,8 +77,8 @@ const Line: React.FC<LineProps> = memo(
 			useImperativeHandle(ref, () => ({
 				onGroupDrag: handleGroupDrag,
 				onGroupDragEnd: handleGroupDragEnd,
-				//onGroupResize: onGroupResize,
-				//onGroupResizeEnd: onGroupResizeEnd,
+				onGroupResize: onGroupResize,
+				onGroupResizeEnd: onGroupResizeEnd,
 			}));
 
 			/**
@@ -155,6 +152,117 @@ const Line: React.FC<LineProps> = memo(
 				[onDiagramDragEndByGroup, id, point, items],
 			);
 
+			/**
+			 * グループのリサイズ中イベントハンドラ
+			 *
+			 * @param {GroupResizeEvent} e グループのリサイズ中イベント
+			 * @returns {void}
+			 */
+			const onGroupResize = useCallback(
+				(e: GroupResizeEvent) => {
+					// グループのリサイズに伴うこの図形の変更を計算
+					const newArrangment = calcArrangmentOnGroupResize(
+						e,
+						point,
+						width,
+						height,
+					);
+
+					logger.debug(
+						"onGroupResize newArrangment",
+						"point:",
+						newArrangment.point,
+						"width:",
+						newArrangment.width,
+						"height:",
+						newArrangment.height,
+					);
+
+					// 描画処理負荷軽減のため、DOMを直接操作
+					// 短径領域の移動をDOMの直接操作で実施
+					const scaleX = e.endSize.width / e.startSize.width;
+					const scaleY = e.endSize.height / e.startSize.height;
+					const newItems = items.map((item) => {
+						const relativeX = item.point.x - point.x;
+						const relativeY = item.point.y - point.y;
+
+						logger.debug(
+							"onGroupResize relativeX:",
+							relativeX,
+							"relativeY:",
+							relativeY,
+						);
+
+						const x = newArrangment.point.x + Math.round(relativeX * scaleX);
+						const y = newArrangment.point.y + Math.round(relativeY * scaleY);
+
+						logger.debug("onGroupResize x:", x, "y:", y);
+
+						return {
+							...item,
+							point: {
+								x,
+								y,
+							},
+						};
+					});
+					const d = createDValue(newItems);
+					svgRef.current.setAttribute("d", d);
+
+					// グループのリサイズが契機で、かつDOMを直接更新しての変更なので、グループ側への変更通知はしない
+				},
+				[point, width, height, items],
+			);
+
+			/**
+			 * グループのリサイズ完了イベントハンドラ
+			 *
+			 * @param {GroupResizeEvent} e グループのリサイズ完了イベント
+			 */
+			const onGroupResizeEnd = useCallback(
+				(e: GroupResizeEvent) => {
+					// グループのリサイズ完了に伴うこの図形の変更を計算
+					const newArrangment = calcArrangmentOnGroupResize(
+						e,
+						point,
+						width,
+						height,
+					);
+
+					onDiagramResizeEnd?.({
+						id,
+						...newArrangment,
+					});
+
+					// ドラッグポイントの位置変更も通知
+					const scaleX = e.endSize.width / e.startSize.width;
+					const scaleY = e.endSize.height / e.startSize.height;
+					items.map((item) => {
+						const relativeX = item.point.x - point.x;
+						const relativeY = item.point.y - point.y;
+						const x = newArrangment.point.x + Math.round(relativeX * scaleX);
+						const y = newArrangment.point.y + Math.round(relativeY * scaleY);
+
+						onDiagramResizeEnd?.({
+							id: item.id,
+							point: {
+								x,
+								y,
+							},
+							width: item.width,
+							height: item.height,
+						});
+					});
+				},
+				[onDiagramResizeEnd, id, point, width, height, items],
+			);
+
+			/**
+			 * ドラッグポイントのドラッグ開始イベントハンドラ
+			 *
+			 * @param {DiagramDragEvent} e ドラッグ開始イベント
+			 * @returns {void}
+			 */
 			const handleDragPointDragStart = useCallback(
 				(e: DiagramDragEvent) => {
 					onDiagramDragStart?.(e);
@@ -162,6 +270,12 @@ const Line: React.FC<LineProps> = memo(
 				[onDiagramDragStart],
 			);
 
+			/**
+			 * ドラッグポイントのドラッグ中イベントハンドラ
+			 *
+			 * @param {DiagramDragEvent} e ドラッグ中イベント
+			 * @returns {void}
+			 */
 			const handleDragPointDrag = useCallback(
 				(e: DiagramDragEvent) => {
 					let d = "";

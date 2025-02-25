@@ -10,7 +10,7 @@ import { DiagramTypeComponentMap } from "./types/DiagramTypes";
 import type {
 	DiagramDragEvent,
 	DiagramResizeEvent,
-	ItemSelectEvent,
+	DiagramSelectEvent,
 } from "./types/EventTypes";
 
 const ContainerDiv = styled.div`
@@ -28,7 +28,7 @@ type SvgCanvasProps = {
 	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
 	onDiagramDragEndByGroup?: (e: DiagramDragEvent) => void;
 	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
-	onItemSelect?: (e: ItemSelectEvent) => void;
+	onDiagramSelect?: (e: DiagramSelectEvent) => void;
 };
 
 const SvgCanvas: React.FC<SvgCanvasProps> = memo(
@@ -38,7 +38,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		onDiagramDragEnd,
 		onDiagramDragEndByGroup,
 		onDiagramResizeEnd,
-		onItemSelect,
+		onDiagramSelect,
 	}) => {
 		const createDiagram = (item: Diagram): React.ReactNode => {
 			const itemType = DiagramTypeComponentMap[item.type];
@@ -48,7 +48,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				onDiagramDragEnd,
 				onDiagramDragEndByGroup,
 				onDiagramResizeEnd,
-				onDiagramSelect: onItemSelect,
+				onDiagramSelect: onDiagramSelect,
 			};
 
 			return React.createElement(itemType, props);
@@ -61,10 +61,10 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		const handlePointerDown = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
 				if (e.target === e.currentTarget) {
-					onItemSelect?.({ id: "dummy" });
+					onDiagramSelect?.({ id: "dummy" });
 				}
 			},
-			[onItemSelect],
+			[onDiagramSelect],
 		);
 
 		const handleKeyDown = useCallback(

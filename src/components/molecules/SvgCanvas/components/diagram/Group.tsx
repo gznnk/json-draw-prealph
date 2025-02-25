@@ -244,14 +244,12 @@ const Group: React.FC<GroupProps> = memo(
 					// リサイズ中イベント作成
 					const event = {
 						id,
-						oldPoint: point,
-						oldWidth: width,
-						oldHeight: height,
-						newPoint: newArrangment.point,
-						newWidth: newArrangment.width,
-						newHeight: newArrangment.height,
-						scaleX: e.scaleX,
-						scaleY: e.scaleY,
+						startSize: {
+							point,
+							width,
+							height,
+						},
+						endSize: newArrangment,
 					};
 
 					// グループ内の図形にリサイズ中イベントを通知
@@ -282,14 +280,12 @@ const Group: React.FC<GroupProps> = memo(
 					// リサイズ完了イベント作成
 					const event = {
 						id,
-						oldPoint: point,
-						oldWidth: width,
-						oldHeight: height,
-						newPoint: newArrangment.point,
-						newWidth: newArrangment.width,
-						newHeight: newArrangment.height,
-						scaleX: e.scaleX,
-						scaleY: e.scaleY,
+						startSize: {
+							point,
+							width,
+							height,
+						},
+						endSize: newArrangment,
 					};
 
 					// グループ内の図形にリサイズ完了イベントを通知
@@ -556,14 +552,12 @@ const Group: React.FC<GroupProps> = memo(
 					// グループ内の図形への変更中イベント作成
 					const event = {
 						id,
-						oldPoint: point,
-						oldWidth: width,
-						oldHeight: height,
-						newPoint: e.point,
-						newWidth: e.width,
-						newHeight: e.height,
-						scaleX: e.width / width,
-						scaleY: e.height / height,
+						startSize: {
+							point,
+							width,
+							height,
+						},
+						endSize: e,
 					};
 					// グループ内の図形に変更中イベントを通知
 					for (const item of items) {
@@ -585,14 +579,12 @@ const Group: React.FC<GroupProps> = memo(
 					// グループ内の図形への変更完了イベント作成
 					const event = {
 						id,
-						oldPoint: point,
-						oldWidth: width,
-						oldHeight: height,
-						newPoint: e.point,
-						newWidth: e.width,
-						newHeight: e.height,
-						scaleX: e.width / width,
-						scaleY: e.height / height,
+						startSize: {
+							point,
+							width,
+							height,
+						},
+						endSize: e,
 					};
 					// グループ内の図形に変更完了イベントを通知
 					for (const item of items) {

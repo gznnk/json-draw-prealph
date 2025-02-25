@@ -99,29 +99,34 @@ export const calcArrangmentOnGroupResize = (
 	width: number,
 	height: number,
 ) => {
+	// 変更前の幅と変更後の幅の比率
+	const scaleX = e.endSize.width / e.startSize.width;
+	// 変更前の高さと変更後の高さの比率
+	const scaleY = e.endSize.height / e.startSize.height;
+
 	// 変更前のグループ内での相対X座標
-	const oldRelativeX = point.x - e.oldPoint.x;
+	const oldRelativeX = point.x - e.startSize.point.x;
 	// 変更前のグループ内での相対Y座標
-	const oldRelativeY = point.y - e.oldPoint.y;
+	const oldRelativeY = point.y - e.startSize.point.y;
 
 	// 変更後のX座標
-	const newX = e.newPoint.x + Math.round(oldRelativeX * e.scaleX);
+	const newX = e.endSize.point.x + Math.round(oldRelativeX * scaleX);
 	// 変更後のY座標
-	const newY = e.newPoint.y + Math.round(oldRelativeY * e.scaleY);
+	const newY = e.endSize.point.y + Math.round(oldRelativeY * scaleY);
 
 	// 変更後の幅
-	let newWidth = Math.round(width * e.scaleX);
+	let newWidth = Math.round(width * scaleX);
 	// 変更後の高さ
-	let newHeight = Math.round(height * e.scaleY);
+	let newHeight = Math.round(height * scaleY);
 
 	// グループの右端からはみ出ないよう変更後の幅を調整
-	if (newX + newWidth > e.newPoint.x + e.newWidth) {
-		newWidth = e.newPoint.x + e.newWidth - newX;
+	if (newX + newWidth > e.endSize.point.x + e.endSize.width) {
+		newWidth = e.endSize.point.x + e.endSize.width - newX;
 	}
 
 	// グループの下端からはみ出ないよう変更後の高さを調整
-	if (newY + newHeight > e.newPoint.y + e.newHeight) {
-		newHeight = e.newPoint.y + e.newHeight - newY;
+	if (newY + newHeight > e.endSize.point.y + e.endSize.height) {
+		newHeight = e.endSize.point.y + e.endSize.height - newY;
 	}
 
 	return {

@@ -7,7 +7,7 @@ import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 // SvgCanvas関連型定義をインポート
 import type { Diagram, GroupData } from "../types/DiagramTypes";
 import type {
-	ItemSelectEvent,
+	DiagramSelectEvent,
 	DiagramDragEvent,
 	DiagramResizeEvent,
 } from "../types/EventTypes";
@@ -74,7 +74,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		}));
 	}, []);
 
-	const onItemSelect = useCallback((e: ItemSelectEvent) => {
+	const onDiagramSelect = useCallback((e: DiagramSelectEvent) => {
 		setCanvasState((prevState) => {
 			const items = applyRecursive(prevState.items, (item) =>
 				item.id === e.id
@@ -95,7 +95,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onDiagramDragEnd,
 		onDiagramDragEndByGroup: onDiagramDragEnd,
 		onDiagramResizeEnd,
-		onItemSelect,
+		onDiagramSelect,
 	};
 
 	const getSelectedItem = useCallback(() => {
