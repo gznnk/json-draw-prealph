@@ -1,25 +1,36 @@
 import type React from "react";
-import { useCallback, useRef, forwardRef, memo } from "react";
+import {
+	useCallback,
+	useRef,
+	forwardRef,
+	memo,
+	useImperativeHandle,
+} from "react";
 import Draggable from "../core/Draggable";
 import DragPoint from "../core/DragPoint";
 import type { Point } from "../../types/CoordinateTypes";
-import type { DiagramDragEvent } from "../../types/EventTypes";
 import type {
+	DiagramDragEvent,
+	DiagramPointerEvent,
+} from "../../types/EventTypes";
+import type {
+	Diagram,
 	DiagramRef,
 	DiagramBaseProps,
 	LineData,
 } from "../../types/DiagramTypes";
+import Group from "./Group";
 
-const getRelativePoint = (point: Point, relativePoint: Point) => {
-	return {
-		x: relativePoint.x - point.x,
-		y: relativePoint.y - point.y,
-	};
-};
-
-const getRelativePointString = (point: Point, relativePoint: Point) => {
-	const relativePointValue = getRelativePoint(point, relativePoint);
-	return `${relativePointValue.x} ${relativePointValue.y}`;
+const createDValue = (
+	items: Diagram[],
+	originPoint: Point = { x: 0, y: 0 },
+) => {
+	let d = "";
+	for (let i = 0; i < items.length; i++) {
+		const item = items[i];
+		d += `${i === 0 ? "M" : "L"} ${item.point.x - originPoint.x} ${item.point.y - originPoint.y} `;
+	}
+	return d;
 };
 
 export type LineProps = DiagramBaseProps & LineData;
@@ -30,99 +41,158 @@ const Line: React.FC<LineProps> = memo(
 			{
 				id,
 				point,
-				startPoint,
-				endPoint,
-				stroke,
-				strokeWidth,
+				width,
+				height,
+				fill = "none",
+				stroke = "black",
+				strokeWidth = "1px",
+				keepProportion = false,
+				isSelected = false,
+				onDiagramClick,
+				onDiagramResizeStart,
+				onDiagramResizing,
+				onDiagramResizeEnd,
+				onDiagramDragStart,
+				onDiagramDrag,
 				onDiagramDragEnd,
+				onDiagramDragEndByGroup,
+				onDiagramSelect,
+				items = [],
 			},
-			_ref,
+			ref,
 		) => {
-			const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
+			const svgRef = useRef<SVGPathElement>({} as SVGPathElement);
+			const dragSvgRef = useRef<SVGPathElement>({} as SVGPathElement);
+			const groupRef = useRef<DiagramRef>({} as DiagramRef);
 
-			const handleDrag = useCallback(
+			useImperativeHandle(ref, () => groupRef.current);
+
+			const handleChildDiagramDrag = useCallback(
 				(e: DiagramDragEvent) => {
-					const newPoint = e.endPoint;
-					const diffX = newPoint.x - point.x;
-					const diffY = newPoint.y - point.y;
-					const newStartPoint = {
-						x: startPoint.x + diffX,
-						y: startPoint.y + diffY,
-					};
-					const newEndPoint = {
-						x: endPoint.x + diffX,
-						y: endPoint.y + diffY,
-					};
+					let d = "";
+					for (let i = 0; i < items.length; i++) {
+						const item = items[i];
+						const x = item.id === e.id ? e.endPoint.x : item.point.x;
+						const y = item.id === e.id ? e.endPoint.y : item.point.y;
+						if (i === 0) {
+							d += `M ${x} ${y} `;
+						} else {
+							d += `L ${x} ${y} `;
+						}
+					}
+					svgRef.current.setAttribute("d", d);
 
-					svgRef.current.setAttribute(
-						"d",
-						`M ${getRelativePointString(newPoint, newStartPoint)} L ${getRelativePointString(newPoint, newEndPoint)}`,
-					);
+					onDiagramDrag?.(e);
 				},
-				[point, startPoint, endPoint],
+				[items, onDiagramDrag],
 			);
 
-			const handleDragEnd = useCallback(
-				(e: DiagramDragEvent) => {
-					onDiagramDragEnd?.(e);
+			/**
+			 * ポインターダウンイベントハンドラ
+			 *
+			 * @param {DiagramPointerEvent} _e ポインターイベント
+			 * @returns {void}
+			 */
+			const handlePointerDown = useCallback(
+				(_e: DiagramPointerEvent) => {
+					// 図形選択イベントを発火
+					onDiagramSelect?.({
+						id,
+					});
 				},
-				[onDiagramDragEnd],
+				[id, onDiagramSelect],
 			);
 
-			const handleStartPointDrag = useCallback(
+			// ドラッグ用のPath要素のonDragイベントにて、ドラッグ中の移動量を計算し、描画用のPath要素に対してDOMを直接更新し、座標を更新
+			const handleDraggablePathDrag = useCallback(
 				(e: DiagramDragEvent) => {
-					const newPoint = e.endPoint;
-					svgRef.current.setAttribute(
-						"d",
-						`M ${getRelativePointString(point, newPoint)} L ${endPoint.x} ${endPoint.y}`,
-					);
+					const dx = e.endPoint.x - e.startPoint.x;
+					const dy = e.endPoint.y - e.startPoint.y;
+
+					const d = createDValue(items, {
+						x: -dx,
+						y: -dy,
+					});
+
+					svgRef.current.setAttribute("d", d);
 				},
-				[point, endPoint],
+				[items],
 			);
 
-			const handleEndPointDrag = useCallback(
+			const handleDraggablePathDragEnd = useCallback(
 				(e: DiagramDragEvent) => {
-					const newPoint = e.endPoint;
-					svgRef.current.setAttribute(
-						"d",
-						`M ${startPoint.x} ${startPoint.y} L ${getRelativePointString(point, newPoint)}`,
-					);
+					onDiagramDragEnd?.({
+						id,
+						startPoint: e.startPoint,
+						endPoint: e.endPoint,
+					});
+					const dx = e.endPoint.x - e.startPoint.x;
+					const dy = e.endPoint.y - e.startPoint.y;
+					for (let i = 0; i < items.length; i++) {
+						const item = items[i];
+						const x = item.point.x + dx;
+						const y = item.point.y + dy;
+						onDiagramDragEnd?.({
+							id: item.id,
+							startPoint: item.point,
+							endPoint: { x, y },
+						});
+					}
 				},
-				[point, startPoint],
+				[id, items, onDiagramDragEnd],
 			);
+
+			const d = createDValue(items);
+			const dragD = createDValue(items, point);
 
 			return (
 				<>
-					<Draggable
-						id={id}
-						point={point}
-						onDrag={handleDrag}
-						onDragEnd={handleDragEnd}
-					>
-						<path
-							id={id}
-							d={`M ${startPoint.x - point.x} ${startPoint.y - point.y} L ${endPoint.x - point.x} ${endPoint.y - point.y}`}
-							stroke={stroke}
-							strokeWidth={strokeWidth}
-							ref={svgRef}
-						/>
-					</Draggable>
 					<path
 						id={id}
-						d={`M ${startPoint.x} ${startPoint.y} L ${endPoint.x} ${endPoint.y}`}
+						d={d}
+						fill={fill}
 						stroke={stroke}
 						strokeWidth={strokeWidth}
 						ref={svgRef}
 					/>
-					<DragPoint
-						id={`${id}-start`}
-						point={startPoint}
-						onDrag={handleStartPointDrag}
-					/>
-					<DragPoint
-						id={`${id}-end`}
-						point={endPoint}
-						onDrag={handleEndPointDrag}
+					<Draggable
+						id={`${id}-draggable`}
+						point={point}
+						onPointerDown={handlePointerDown}
+						onClick={onDiagramClick}
+						onDragStart={onDiagramDragStart}
+						onDrag={handleDraggablePathDrag}
+						onDragEnd={handleDraggablePathDragEnd}
+					>
+						<path
+							id={`${id}-draggable`}
+							d={dragD}
+							fill="none"
+							stroke="transparent"
+							strokeWidth={7}
+							ref={dragSvgRef}
+						/>
+					</Draggable>
+					<Group
+						id={id}
+						point={point}
+						width={width}
+						height={height}
+						keepProportion={keepProportion}
+						isSelected={isSelected}
+						onDiagramClick={onDiagramClick}
+						onDiagramResizeStart={onDiagramResizeStart}
+						onDiagramResizing={onDiagramResizing}
+						onDiagramResizeEnd={onDiagramResizeEnd}
+						onDiagramDragStart={onDiagramDragStart}
+						onDiagramDrag={handleChildDiagramDrag}
+						onDiagramDragEnd={onDiagramDragEnd}
+						onDiagramDragEndByGroup={onDiagramDragEndByGroup}
+						onDiagramSelect={onDiagramSelect}
+						items={items}
+						ref={(r: DiagramRef | null) => {
+							groupRef.current = r ?? {};
+						}}
 					/>
 				</>
 			);

@@ -12,6 +12,9 @@ import type {
 	DiagramResizeEvent,
 } from "../types/EventTypes";
 
+// SvgCanvas関連関数をインポート
+import { isGroupData } from "../SvgCanvasFunctions";
+
 type SvgCanvasState = {
 	items: Diagram[];
 	selectedItemId?: string;
@@ -35,11 +38,8 @@ const DEFAULT_ITEM_VALUE = {
 const applyRecursive = (items: Diagram[], func: (item: Diagram) => Diagram) => {
 	return items.map((item) => {
 		const newItem = func(item);
-		if (item.type === "group") {
-			(newItem as GroupData).items = applyRecursive(
-				(item as GroupData).items ?? [],
-				func,
-			);
+		if (isGroupData(item) && isGroupData(newItem)) {
+			newItem.items = applyRecursive(item.items ?? [], func);
 		}
 		return newItem;
 	});
@@ -51,6 +51,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	});
 
 	const onDiagramDragEnd = useCallback((e: DiagramDragEvent) => {
+		console.log("SvgCanvas onDiagramDragEnd", e);
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyRecursive(prevState.items, (item) =>

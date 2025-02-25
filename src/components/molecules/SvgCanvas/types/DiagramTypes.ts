@@ -15,12 +15,18 @@ import type {
 import Ellipse from "../components/diagram/Ellipse";
 import Group from "../components/diagram/Group";
 import Line from "../components/diagram/Line";
+import LinePoint from "../components/diagram/LinePoint";
 import Rectangle from "../components/diagram/Rectangle";
 
 /**
  * 図形の種類
  */
-export type DiagramType = "ellipse" | "group" | "line" | "rectangle";
+export type DiagramType =
+	| "ellipse"
+	| "group"
+	| "line"
+	| "linePoint"
+	| "rectangle";
 
 export type DiagramBaseData = {
 	id: string;
@@ -36,9 +42,9 @@ export type EllipseData = DiagramBaseData & {
 	stroke: string;
 	strokeWidth: string;
 };
-export type LineData = DiagramBaseData & {
-	startPoint: Point;
-	endPoint: Point;
+export type LinePointData = DiagramBaseData;
+export type LineData = GroupData & {
+	fill?: string;
 	stroke: string;
 	strokeWidth: string;
 };
@@ -51,7 +57,12 @@ export type RectangleData = DiagramBaseData & {
 	strokeWidth: string;
 };
 
-type DiagramCombined = EllipseData | GroupData | LineData | RectangleData;
+type DiagramCombined =
+	| EllipseData
+	| GroupData
+	| LineData
+	| LinePointData
+	| RectangleData;
 
 export type Diagram = DiagramCombined & {
 	type: DiagramType;
@@ -90,5 +101,6 @@ export const DiagramTypeComponentMap: {
 	ellipse: Ellipse,
 	group: Group,
 	line: Line,
+	linePoint: LinePoint,
 	rectangle: Rectangle,
 };
