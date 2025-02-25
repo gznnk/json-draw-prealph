@@ -93,6 +93,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				aspectRatio: width / height,
 				isDragging: false,
 			});
+			const [isShiftKeyDown, setShiftKeyDown] = useState(false);
+
+			const _keepProportion = isShiftKeyDown || keepProportion;
 
 			const draggableRef = useRef<SVGGElement>({} as SVGGElement);
 			const outlineRef = useRef<SVGRectElement>({} as SVGRectElement);
@@ -257,7 +260,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					setState((prevState) => ({
 						...prevState,
 						...e.arrangment,
-						aspectRatio: keepProportion
+						aspectRatio: _keepProportion
 							? prevState.aspectRatio
 							: e.arrangment.width / e.arrangment.height,
 						draggingPointType: undefined,
@@ -271,19 +274,45 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						height: e.arrangment.height,
 					});
 				},
-				[onDiagramResizeEnd, id, keepProportion],
+				[onDiagramResizeEnd, id, _keepProportion],
 			);
 
-			// ポインターダウン時の処理
+			/**
+			 * ポインターダウンイベントハンドラ
+			 *
+			 * @param {DiagramPointerEvent} _e ポインターイベント
+			 * @returns {void}
+			 */
 			const handlePointerDown = useCallback(
 				(_e: DiagramPointerEvent) => {
-					// 親に図形選択イベントを通知
+					// 図形選択イベントを発火
 					onDiagramSelect?.({
 						id,
 					});
 				},
 				[id, onDiagramSelect],
 			);
+
+			// シフトキーの状態を監視
+			useEffect(() => {
+				const handleKeyDown = (e: KeyboardEvent) => {
+					setShiftKeyDown(e.shiftKey);
+				};
+				const handleKeyUp = (e: KeyboardEvent) => {
+					if (e.key === "Shift") {
+						setShiftKeyDown(false);
+					}
+				};
+
+				window.addEventListener("keydown", handleKeyDown);
+				window.addEventListener("keyup", handleKeyUp);
+
+				return () => {
+					// クリーンアップ
+					window.removeEventListener("keydown", handleKeyDown);
+					window.removeEventListener("keyup", handleKeyUp);
+				};
+			}, []);
 
 			return (
 				<>
@@ -321,7 +350,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							<DragPointLeftTop
 								{...state}
 								id={id}
-								keepProportion={keepProportion}
+								keepProportion={_keepProportion}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -330,7 +359,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							<DragPointLeftBottom
 								{...state}
 								id={id}
-								keepProportion={keepProportion}
+								keepProportion={_keepProportion}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -339,7 +368,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							<DragPointRightTop
 								{...state}
 								id={id}
-								keepProportion={keepProportion}
+								keepProportion={_keepProportion}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -348,7 +377,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							<DragPointRightBottom
 								{...state}
 								id={id}
-								keepProportion={keepProportion}
+								keepProportion={_keepProportion}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -357,7 +386,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							<DragPointTopCenter
 								{...state}
 								id={id}
-								keepProportion={keepProportion}
+								keepProportion={_keepProportion}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -366,7 +395,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							<DragPointLeftCenter
 								{...state}
 								id={id}
-								keepProportion={keepProportion}
+								keepProportion={_keepProportion}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -375,7 +404,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							<DragPointRightCenter
 								{...state}
 								id={id}
-								keepProportion={keepProportion}
+								keepProportion={_keepProportion}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
@@ -384,7 +413,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							<DragPointBottomCenter
 								{...state}
 								id={id}
-								keepProportion={keepProportion}
+								keepProportion={_keepProportion}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}

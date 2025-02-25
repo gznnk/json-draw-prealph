@@ -130,6 +130,8 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		const [isPointerDown, setIsPointerDown] = useState(false);
 		// ドラッグ中かのフラグ
 		const [isDragging, setIsDragging] = useState(false);
+		// 矢印キーによるドラッグ中かのフラグ
+		const [isArrowDragging, setIsArrowDragging] = useState(false);
 
 		// ドラッグ開始時の、このドラッグ領域の座標からのポインターの相対位置
 		const startX = useRef(0);
@@ -334,6 +336,10 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		// TODO: 以下コメント未整理
 
 		const handleKeyDown = (e: React.KeyboardEvent<SVGGElement>) => {
+			// ポインターダウン中は何もしない
+			if (isPointerDown) {
+				return;
+			}
 			const movePoint = (dx: number, dy: number) => {
 				let newPoint = {
 					x: state.point.x + dx,
@@ -369,6 +375,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				setState({
 					point: newPoint,
 				});
+				setIsArrowDragging(true);
 			};
 
 			switch (e.key) {
@@ -384,31 +391,82 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				case "ArrowDown":
 					movePoint(0, 1);
 					break;
+				case "Shift":
+					if (isArrowDragging) {
+						// 矢印キーによるドラッグ中にシフトキーが押された場合はドラッグを終了させる。
+						// ドラッグ終了イベントを発火させSvgCanvas側に座標の更新を通知し、座標を更新する
+						onDragEnd?.({
+							id,
+							old: {
+								point: state.point,
+								width: 0,
+								height: 0,
+							},
+							new: {
+								point: state.point,
+								width: 0,
+								height: 0,
+							},
+						});
+						// 矢印キーによるドラッグ終了とマーク
+						setIsArrowDragging(false);
+					}
+					break;
 				default:
 					break;
 			}
 		};
 
 		const handleKeyUp = (e: React.KeyboardEvent<SVGGElement>) => {
-			if (
-				e.key === "ArrowRight" ||
-				e.key === "ArrowLeft" ||
-				e.key === "ArrowUp" ||
-				e.key === "ArrowDown"
-			) {
-				onDragEnd?.({
-					id,
-					old: {
-						point: state.point,
-						width: 0,
-						height: 0,
-					},
-					new: {
-						point: state.point,
-						width: 0,
-						height: 0,
-					},
-				});
+			// ポインターダウン中は何もしない
+			if (isPointerDown) {
+				return;
+			}
+
+			if (isArrowDragging) {
+				if (e.key === "Shift") {
+					// 矢印キーによるドラッグ中にシフトキーが離された場合はドラッグ終了イベントを発火させ
+					// SvgCanvas側に座標の更新を通知し、一度座標を更新する
+					const dragEvent = {
+						id,
+						old: {
+							point: state.point,
+							width: 0,
+							height: 0,
+						},
+						new: {
+							point: state.point,
+							width: 0,
+							height: 0,
+						},
+					};
+					onDragEnd?.(dragEvent);
+					onDragStart?.(dragEvent);
+				}
+				if (
+					e.key === "ArrowRight" ||
+					e.key === "ArrowLeft" ||
+					e.key === "ArrowUp" ||
+					e.key === "ArrowDown"
+				) {
+					// 矢印キー離されたらドラッグ終了イベントを発火させSvgCanvas側に座標の更新を通知し、座標を更新する
+					onDragEnd?.({
+						id,
+						old: {
+							point: state.point,
+							width: 0,
+							height: 0,
+						},
+						new: {
+							point: state.point,
+							width: 0,
+							height: 0,
+						},
+					});
+
+					// 矢印キーによるドラッグ終了とマーク
+					setIsArrowDragging(false);
+				}
 			}
 		};
 

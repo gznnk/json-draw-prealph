@@ -73,7 +73,6 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 			(e: React.KeyboardEvent<SVGSVGElement>) => {
 				// キャンバスにフォーカスがない場合はイベントをキャンセルし、スクロールを無効化
 				if (e.target !== e.currentTarget) {
-					e.stopPropagation();
 					e.preventDefault();
 				}
 			},
