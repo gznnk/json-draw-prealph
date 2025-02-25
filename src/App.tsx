@@ -218,6 +218,49 @@ const testItems1 = [
 	},
 ] as Diagram[];
 
+const testItems2 = [
+	{
+		id: "12",
+		type: "line",
+		point: { x: 0, y: 100 },
+		width: 100,
+		height: 100,
+		stroke: "black",
+		strokeWidth: "1px",
+		keepProportion: false,
+		isSelected: false,
+		items: [
+			{
+				id: "12-1",
+				type: "linePoint",
+				point: { x: 0, y: 100 },
+				width: 0,
+				height: 0,
+				keepProportion: false,
+				isSelected: false,
+			},
+			{
+				id: "12-2",
+				type: "linePoint",
+				point: { x: 100, y: 100 },
+				width: 0,
+				height: 0,
+				keepProportion: false,
+				isSelected: false,
+			},
+			{
+				id: "12-3",
+				type: "linePoint",
+				point: { x: 200, y: 200 },
+				width: 0,
+				height: 0,
+				keepProportion: false,
+				isSelected: false,
+			},
+		],
+	},
+] as Diagram[];
+
 function App() {
 	// console.log("App render");
 
@@ -225,7 +268,7 @@ function App() {
 		state: [canvasState, _setCanvasState],
 		canvasProps,
 		canvasFunctions,
-	} = useSvgCanvas(testItems1);
+	} = useSvgCanvas(testItems2);
 
 	const handleAddRectangle = () => {
 		canvasFunctions.addItem({

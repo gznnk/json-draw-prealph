@@ -1,5 +1,8 @@
 // 図形に関する型定義
 
+// Reactのインポート
+import type React from "react";
+
 // SvgCanvas関連型定義をインポート
 import type { Point } from "./CoordinateTypes";
 import type {
@@ -15,7 +18,6 @@ import type {
 import Ellipse from "../components/diagram/Ellipse";
 import Group from "../components/diagram/Group";
 import Line from "../components/diagram/Line";
-import LinePoint from "../components/diagram/LinePoint";
 import Rectangle from "../components/diagram/Rectangle";
 
 /**
@@ -56,13 +58,9 @@ export type RectangleData = DiagramBaseData & {
 	stroke: string;
 	strokeWidth: string;
 };
+const DummyComponent: React.FC<DiagramBaseData> = () => null;
 
-type DiagramCombined =
-	| EllipseData
-	| GroupData
-	| LineData
-	| LinePointData
-	| RectangleData;
+type DiagramCombined = EllipseData | GroupData | LineData | RectangleData;
 
 export type Diagram = DiagramCombined & {
 	type: DiagramType;
@@ -101,6 +99,6 @@ export const DiagramTypeComponentMap: {
 	ellipse: Ellipse,
 	group: Group,
 	line: Line,
-	linePoint: LinePoint,
+	linePoint: DummyComponent,
 	rectangle: Rectangle,
 };

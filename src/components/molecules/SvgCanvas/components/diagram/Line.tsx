@@ -1,5 +1,6 @@
 import type React from "react";
 import {
+	useState,
 	useCallback,
 	useRef,
 	forwardRef,
@@ -19,7 +20,6 @@ import type {
 	DiagramBaseProps,
 	LineData,
 } from "../../types/DiagramTypes";
-import Group from "./Group";
 
 const createDValue = (
 	items: Diagram[],
@@ -61,11 +61,20 @@ const Line: React.FC<LineProps> = memo(
 			},
 			ref,
 		) => {
+			const [isDragging, setIsDragging] = useState(false);
+
 			const svgRef = useRef<SVGPathElement>({} as SVGPathElement);
 			const dragSvgRef = useRef<SVGPathElement>({} as SVGPathElement);
 			const groupRef = useRef<DiagramRef>({} as DiagramRef);
 
 			useImperativeHandle(ref, () => groupRef.current);
+
+			const handleChildDiagramDragStart = useCallback(
+				(e: DiagramDragEvent) => {
+					onDiagramDragStart?.(e);
+				},
+				[onDiagramDragStart],
+			);
 
 			const handleChildDiagramDrag = useCallback(
 				(e: DiagramDragEvent) => {
@@ -87,6 +96,13 @@ const Line: React.FC<LineProps> = memo(
 				[items, onDiagramDrag],
 			);
 
+			const handleChildDiagramDragEnd = useCallback(
+				(e: DiagramDragEvent) => {
+					onDiagramDragEnd?.(e);
+				},
+				[onDiagramDragEnd],
+			);
+
 			/**
 			 * ポインターダウンイベントハンドラ
 			 *
@@ -103,7 +119,15 @@ const Line: React.FC<LineProps> = memo(
 				[id, onDiagramSelect],
 			);
 
-			// ドラッグ用のPath要素のonDragイベントにて、ドラッグ中の移動量を計算し、描画用のPath要素に対してDOMを直接更新し、座標を更新
+			const handleDraggablePathDragStart = useCallback(
+				(e: DiagramDragEvent) => {
+					setIsDragging(true);
+					onDiagramDragStart?.(e);
+				},
+				[onDiagramDragStart],
+			);
+
+			//
 			const handleDraggablePathDrag = useCallback(
 				(e: DiagramDragEvent) => {
 					const dx = e.endPoint.x - e.startPoint.x;
@@ -138,6 +162,8 @@ const Line: React.FC<LineProps> = memo(
 							endPoint: { x, y },
 						});
 					}
+
+					setIsDragging(false);
 				},
 				[id, items, onDiagramDragEnd],
 			);
@@ -160,7 +186,7 @@ const Line: React.FC<LineProps> = memo(
 						point={point}
 						onPointerDown={handlePointerDown}
 						onClick={onDiagramClick}
-						onDragStart={onDiagramDragStart}
+						onDragStart={handleDraggablePathDragStart}
 						onDrag={handleDraggablePathDrag}
 						onDragEnd={handleDraggablePathDragEnd}
 					>
@@ -173,27 +199,20 @@ const Line: React.FC<LineProps> = memo(
 							ref={dragSvgRef}
 						/>
 					</Draggable>
-					<Group
-						id={id}
-						point={point}
-						width={width}
-						height={height}
-						keepProportion={keepProportion}
-						isSelected={isSelected}
-						onDiagramClick={onDiagramClick}
-						onDiagramResizeStart={onDiagramResizeStart}
-						onDiagramResizing={onDiagramResizing}
-						onDiagramResizeEnd={onDiagramResizeEnd}
-						onDiagramDragStart={onDiagramDragStart}
-						onDiagramDrag={handleChildDiagramDrag}
-						onDiagramDragEnd={onDiagramDragEnd}
-						onDiagramDragEndByGroup={onDiagramDragEndByGroup}
-						onDiagramSelect={onDiagramSelect}
-						items={items}
-						ref={(r: DiagramRef | null) => {
-							groupRef.current = r ?? {};
-						}}
-					/>
+					{isSelected &&
+						!isDragging &&
+						items.map((item) => {
+							return (
+								<DragPoint
+									key={item.id}
+									id={item.id}
+									point={item.point}
+									onDragStart={handleChildDiagramDragStart}
+									onDrag={handleChildDiagramDrag}
+									onDragEnd={handleChildDiagramDragEnd}
+								/>
+							);
+						})}
 				</>
 			);
 		},
