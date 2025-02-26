@@ -14,6 +14,7 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 	(
 		{
 			id,
+			type,
 			point,
 			direction,
 			allowXDecimal = false,
@@ -23,6 +24,9 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 			onDragStart,
 			onDrag,
 			onDragEnd,
+			onDragOver,
+			onDragLeave,
+			onDrop,
 			onHoverChange,
 			dragPositioningFunction,
 			color = "rgba(61, 90, 128, 0.8)",
@@ -40,6 +44,7 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 		return (
 			<Draggable
 				id={id}
+				type={type}
 				point={point}
 				direction={direction}
 				allowXDecimal={allowXDecimal}
@@ -51,6 +56,9 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 				onDragStart={onDragStart}
 				onDrag={onDrag}
 				onDragEnd={onDragEnd}
+				onDragOver={onDragOver}
+				onDragLeave={onDragLeave}
+				onDrop={onDrop}
 				onHoverChange={onHoverChange}
 				dragPositioningFunction={dragPositioningFunction}
 				ref={svgRef}

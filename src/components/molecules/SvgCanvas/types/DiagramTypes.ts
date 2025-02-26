@@ -7,6 +7,7 @@ import type React from "react";
 import type { Point } from "./CoordinateTypes";
 import type {
 	DiagramClickEvent,
+	DiagramDragDropEvent,
 	DiagramDragEvent,
 	DiagramHoverEvent,
 	DiagramResizeEvent,
@@ -25,6 +26,7 @@ import Rectangle from "../components/diagram/Rectangle";
  * 図形の種類
  */
 export type DiagramType =
+	| "connectPoint"
 	| "ellipse"
 	| "group"
 	| "line"
@@ -33,6 +35,7 @@ export type DiagramType =
 
 export type DiagramBaseData = {
 	id: string;
+	type?: DiagramType;
 	point: Point;
 	width: number;
 	height: number;
@@ -73,6 +76,7 @@ export type DiagramBaseProps = DiagramBaseData & {
 	onDiagramDrag?: (e: DiagramDragEvent) => void;
 	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
 	onDiagramDragEndByGroup?: (e: DiagramDragEvent) => void;
+	onDiagramDrop?: (e: DiagramDragDropEvent) => void;
 	onDiagramResizeStart?: (e: DiagramResizeEvent) => void;
 	onDiagramResizing?: (e: DiagramResizeEvent) => void;
 	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
@@ -98,6 +102,7 @@ export const DiagramTypeComponentMap: {
 	// biome-ignore lint/suspicious/noExplicitAny: 種々の図形の共通の型を作るのは困難なため
 	[key in DiagramType]: React.FC<any>;
 } = {
+	connectPoint: DummyComponent,
 	ellipse: Ellipse,
 	group: Group,
 	line: Line,

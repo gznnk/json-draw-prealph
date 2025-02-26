@@ -18,9 +18,11 @@ import { DragDirection } from "../../types/CoordinateTypes";
 import type {
 	DiagramClickEvent,
 	DiagramDragEvent,
+	DiagramDragDropEvent,
 	DiagramPointerEvent,
 	DiagramHoverEvent,
 } from "../../types/EventTypes";
+import type { DiagramType } from "../../types/DiagramTypes";
 
 /**
  * ドラッグ領域用のG要素のPropsの型定義
@@ -50,6 +52,7 @@ const DraggableG = styled.g<DraggableGProps>`
  * @type {Object} DraggableProps
  * @property {string} [key] キー
  * @property {string} [id] ID（子要素にも同じIDを設定すること。しない場合は正しく動作しなくなる）
+ * @property {DiagramType} [type] 図形の種類
  * @property {Point} [point] 座標
  * @property {DragDirection} [direction] ドラッグ方向
  * @property {boolean} [allowXDecimal] X座標の小数点許可フラグ
@@ -66,6 +69,9 @@ const DraggableG = styled.g<DraggableGProps>`
  * @property {(e: DiagramDragEvent) => void} [onDragStart] ドラッグ開始時のイベントハンドラ
  * @property {(e: DiagramDragEvent) => void} [onDrag] ドラッグ中のイベントハンドラ
  * @property {(e: DiagramDragEvent) => void} [onDragEnd] ドラッグ終了時のイベントハンドラ
+ * @property {(e: DiagramDragDropEvent) => void} [onDragOver] ドラッグオーバー時のイベントハンドラ
+ * @property {(e: DiagramDragDropEvent) => void} [onDragLeave] ドラッグリーブ時のイベントハンドラ
+ * @property {(e: DiagramDragDropEvent) => void} [onDrop] ドロップ時のイベントハンドラ
  * @property {(e: DiagramHoverEvent) => void} [onHoverChange] ホバー変更時のイベントハンドラ
  * @property {(point: Point) => Point} [dragPositioningFunction] ドラッグ位置変換関数
  * @property {React.ReactNode} [children] 子要素
@@ -73,6 +79,7 @@ const DraggableG = styled.g<DraggableGProps>`
 export type DraggableProps = {
 	key?: string;
 	id: string;
+	type?: DiagramType;
 	point: Point;
 	direction?: DragDirection;
 	allowXDecimal?: boolean;
@@ -89,6 +96,9 @@ export type DraggableProps = {
 	onDragStart?: (e: DiagramDragEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragEnd?: (e: DiagramDragEvent) => void;
+	onDragOver?: (e: DiagramDragDropEvent) => void;
+	onDragLeave?: (e: DiagramDragDropEvent) => void;
+	onDrop?: (e: DiagramDragDropEvent) => void;
 	onHoverChange?: (e: DiagramHoverEvent) => void;
 	dragPositioningFunction?: (point: Point) => Point;
 	children?: React.ReactNode;
@@ -113,6 +123,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			key,
 			id,
 			point,
+			type,
 			direction = DragDirection.All,
 			allowXDecimal = false,
 			allowYDecimal = false,
@@ -127,6 +138,9 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			onDragStart,
 			onDrag,
 			onDragEnd,
+			onDragOver,
+			onDragLeave,
+			onDrop,
 			onHoverChange,
 			dragPositioningFunction,
 			children,
@@ -141,6 +155,8 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		const [isDragging, setIsDragging] = useState(false);
 		// 矢印キーによるドラッグ中かのフラグ
 		const [isArrowDragging, setIsArrowDragging] = useState(false);
+		// ドラッグエンターしたかのフラグ
+		const [dragEntered, setDragEntered] = useState(false); // TODO refのほうがいいかも
 
 		// ドラッグ開始時の、このドラッグ領域の座標からのポインターの相対位置
 		const startX = useRef(0);
@@ -232,7 +248,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 
 				setIsPointerDown(true);
 
-				// ドラッグ開始時の、このドラッグ領域の座標からのポインターの相対位置を計算して保持
+				// ドラッグ開始時の、このドラッグ領域の座標からのポインターの相対位置を計算して保持 TODO: コメント間違ってる
 				startX.current = e.clientX - state.point.x;
 				startY.current = e.clientY - state.point.y;
 
@@ -259,11 +275,14 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				return;
 			}
 
+			// ドラッグ座標を取得
+			const dragPoint = getPointOnDrag(e);
+
 			// ドラッグ中のイベント情報を作成
 			const dragEvent = {
 				id,
 				startPoint: state.point,
-				endPoint: getPointOnDrag(e),
+				endPoint: dragPoint,
 			};
 
 			if (
@@ -290,6 +309,18 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			// ドラッグ中イベント発火
 			// 親側ではこのドラッグ領域の座標の更新は行わないが（行ってはダメ）、通知のために発火する
 			onDrag?.(dragEvent);
+
+			// 親子関係にない図形でハンドリングする用のドラッグ中イベント発火
+			gRef.current?.dispatchEvent(
+				new CustomEvent("DraggableDrag", {
+					bubbles: true,
+					detail: {
+						id,
+						point: dragPoint, // TODO: ずれてる、あとドラッグ前の座標もほしい
+						type: type,
+					},
+				}),
+			);
 		};
 
 		/**
@@ -300,12 +331,27 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		 */
 		const handlePointerUp = (e: React.PointerEvent<SVGElement>): void => {
 			if (isDragging) {
+				// ドラッグ座標を取得
+				const dragPoint = getPointOnDrag(e);
+
 				// ドラッグ中だった場合はドラッグ終了イベントを発火
 				onDragEnd?.({
 					id,
 					startPoint: state.point,
-					endPoint: getPointOnDrag(e),
+					endPoint: dragPoint,
 				});
+
+				// 親子関係にない図形でハンドリングする用のドラッグ終了イベント発火
+				gRef.current?.dispatchEvent(
+					new CustomEvent("DraggableDragEnd", {
+						bubbles: true,
+						detail: {
+							id,
+							point: dragPoint, // TODO: ずれてる、あとドラッグ前の座標もほしい
+							type,
+						},
+					}),
+				);
 			}
 
 			if (isPointerDown && !isDragging) {
@@ -460,6 +506,13 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			});
 		}, [onHoverChange, id]);
 
+		/**
+		 * ポインターがこのドラッグ領域上にあるかどうかを判定する
+		 * ポインターキャプチャー時は他の要素でポインター関連のイベントが発火しないため、自力で判定する必要がある
+		 *
+		 * @param {Point} pointerPoint ポインターの座標
+		 * @returns {boolean} ポインターがこのドラッグ領域上にあるかどうか
+		 */
 		const isPointerOver = useCallback(
 			(pointerPoint: Point) => {
 				// TODO: 複数あるときの対応
@@ -476,40 +529,88 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			[point],
 		);
 
-		// TODO: ここでいいのか？
+		// 全体周知用ドラッグイベントリスナー登録
 		useEffect(() => {
-			// TODO: 複数あるときの対応
-			const handleConnectPointDrag = (e: Event) => {
-				const customEvent = e as CustomEvent<{ id: string; point: Point }>;
-				onHoverChange?.({
-					id,
-					isHovered: isPointerOver(customEvent.detail.point),
-				});
-			};
+			let handleDraggableDrag: (e: Event) => void;
+			let handleDraggableDragEnd: (e: Event) => void;
 
-			const handleConnectPointDragEnd = (e: Event) => {
-				const customEvent = e as CustomEvent<{ id: string; point: Point }>;
-				if (isPointerOver(customEvent.detail.point)) {
-					alert("ConnectPointDragEnd:" + id);
+			if (onDragOver) {
+				handleDraggableDrag = (e: Event) => {
+					const customEvent = e as CustomEvent<{
+						id: string;
+						point: Point;
+						type: DiagramType;
+					}>;
+
+					if (isPointerOver(customEvent.detail.point)) {
+						setDragEntered(true);
+						onDragOver?.({
+							id,
+							point: customEvent.detail.point,
+							dropItem: {
+								id: customEvent.detail.id,
+								type: customEvent.detail.type,
+								point: customEvent.detail.point,
+							},
+						});
+					} else if (dragEntered) {
+						setDragEntered(false);
+						onDragLeave?.({
+							id,
+							point,
+							dropItem: {
+								id: customEvent.detail.id,
+								type: customEvent.detail.type,
+								point: customEvent.detail.point,
+							},
+						});
+					}
+				};
+				document?.addEventListener("DraggableDrag", handleDraggableDrag);
+			}
+
+			if (onDrop) {
+				handleDraggableDragEnd = (e: Event) => {
+					const customEvent = e as CustomEvent<{
+						id: string;
+						point: Point;
+						type: DiagramType;
+					}>;
+					if (isPointerOver(customEvent.detail.point)) {
+						onDrop?.({
+							id,
+							point,
+							dropItem: {
+								id: customEvent.detail.id,
+								type: customEvent.detail.type,
+								point: customEvent.detail.point,
+							},
+						});
+					}
+				};
+				document?.addEventListener("DraggableDragEnd", handleDraggableDragEnd);
+			}
+
+			return () => {
+				if (handleDraggableDrag) {
+					document?.removeEventListener("DraggableDrag", handleDraggableDrag);
+				}
+				if (handleDraggableDragEnd) {
+					document?.removeEventListener(
+						"DraggableDragEnd",
+						handleDraggableDragEnd,
+					);
 				}
 			};
-
-			document?.addEventListener("ConnectPointDrag", handleConnectPointDrag);
-			document?.addEventListener(
-				"ConnectPointDragEnd",
-				handleConnectPointDragEnd,
-			);
-			return () => {
-				document?.removeEventListener(
-					"ConnectPointDrag",
-					handleConnectPointDrag,
-				);
-				document?.removeEventListener(
-					"ConnectPointDragEnd",
-					handleConnectPointDragEnd,
-				);
-			};
-		}, [id, isPointerOver, onHoverChange]);
+		}, [
+			id,
+			point,
+			isPointerOver,
+			onDragOver,
+			onDragLeave,
+			onDrop,
+			dragEntered,
+		]);
 
 		return (
 			<DraggableG

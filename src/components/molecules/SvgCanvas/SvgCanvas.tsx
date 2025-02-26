@@ -11,6 +11,7 @@ import type {
 	DiagramDragEvent,
 	DiagramResizeEvent,
 	DiagramSelectEvent,
+	DiagramDragDropEvent,
 } from "./types/EventTypes";
 
 const ContainerDiv = styled.div`
@@ -27,6 +28,7 @@ type SvgCanvasProps = {
 	items: Array<Diagram>;
 	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
 	onDiagramDragEndByGroup?: (e: DiagramDragEvent) => void;
+	onDiagramDrop?: (e: DiagramDragDropEvent) => void;
 	onDiagramResizing?: (e: DiagramResizeEvent) => void;
 	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
@@ -38,6 +40,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		items,
 		onDiagramDragEnd,
 		onDiagramDragEndByGroup,
+		onDiagramDrop,
 		onDiagramResizing,
 		onDiagramResizeEnd,
 		onDiagramSelect,
@@ -49,6 +52,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				key: item.id,
 				onDiagramDragEnd,
 				onDiagramDragEndByGroup,
+				onDiagramDrop,
 				onDiagramResizing,
 				onDiagramResizeEnd,
 				onDiagramSelect: onDiagramSelect,

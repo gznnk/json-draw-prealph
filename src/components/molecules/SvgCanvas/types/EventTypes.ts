@@ -1,6 +1,7 @@
 // イベント型定義
 
 import type { Point } from "./CoordinateTypes";
+import type { DiagramType } from "./DiagramTypes";
 
 /**
  * 図形のポインターダウンイベント
@@ -17,6 +18,19 @@ export type DiagramDragEvent = {
 	id: string;
 	startPoint: Point;
 	endPoint: Point;
+};
+
+/**
+ * 図形のドラッグドロップイベント
+ */
+export type DiagramDragDropEvent = {
+	id: string;
+	point: Point;
+	dropItem: {
+		id: string;
+		type?: DiagramType;
+		point: Point;
+	};
 };
 
 /**

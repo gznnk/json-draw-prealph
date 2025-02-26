@@ -52,6 +52,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 		(
 			{
 				id,
+				type,
 				point,
 				width,
 				height,
@@ -283,6 +284,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				<>
 					<Draggable
 						id={id}
+						type={type}
 						point={state.point}
 						tabIndex={tabIndex}
 						onPointerDown={handlePointerDown}

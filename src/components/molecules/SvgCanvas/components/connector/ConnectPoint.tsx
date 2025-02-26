@@ -11,6 +11,7 @@ import type {
 	DiagramResizeEvent,
 	GroupDragEvent,
 	GroupResizeEvent,
+	DiagramDragDropEvent,
 	DiagramDragEvent,
 } from "../../types/EventTypes";
 
@@ -22,17 +23,19 @@ import DragPoint from "../core/DragPoint";
 
 type ConnectPointProps = {
 	id: string;
-	diagramId: string;
 	point: Point;
 	visible: boolean;
+	onDrop?: (e: DiagramDragDropEvent) => void;
 };
 
 const ConnectPoint: React.FC<ConnectPointProps> = ({
 	id,
-	diagramId,
 	point,
 	visible,
+	onDrop,
 }) => {
+	// TODO useCallback使う
+
 	// console.log("ConnectPoint rendered");
 	// ホバー状態の管理
 	const [isHovered, setIsHovered] = useState(false);
@@ -52,12 +55,6 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			"d",
 			`M ${point.x} ${point.y} L ${e.endPoint.x} ${e.endPoint.y}`,
 		);
-		dragPointRef.current?.dispatchEvent(
-			new CustomEvent("ConnectPointDrag", {
-				bubbles: true,
-				detail: { id, point: e.endPoint },
-			}),
-		);
 		// console.log(e);
 	};
 
@@ -69,13 +66,23 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			`translate(${point.x}, ${point.y})`,
 		);
 		//console.log(e);
+	};
 
-		dragPointRef.current?.dispatchEvent(
-			new CustomEvent("ConnectPointDragEnd", {
-				bubbles: true,
-				detail: { id, point: e.endPoint },
-			}),
-		);
+	const handleDragOver = (e: DiagramDragDropEvent) => {
+		if (e.dropItem.type === "connectPoint") {
+			setIsHovered(true);
+		}
+	};
+
+	const handleDragLeave = (e: DiagramDragDropEvent) => {
+		setIsHovered(false);
+	};
+
+	const handleDrop = (e: DiagramDragDropEvent) => {
+		if (e.dropItem.type === "connectPoint") {
+			onDrop?.(e);
+		}
+		setIsHovered(false);
 	};
 
 	/**
@@ -94,11 +101,15 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			<DragPoint
 				id={id}
 				point={point}
+				type="connectPoint"
 				color="rgba(120, 120, 1, 0.8)"
 				visible={visible || isHovered}
 				onDragStart={handleDragStart}
 				onDrag={handleDrag}
 				onDragEnd={handleDragEnd}
+				onDragOver={handleDragOver}
+				onDragLeave={handleDragLeave}
+				onDrop={handleDrop}
 				onHoverChange={handleHoverChange}
 				ref={dragPointRef}
 			/>

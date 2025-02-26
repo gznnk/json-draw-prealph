@@ -10,6 +10,7 @@ import type {
 	DiagramSelectEvent,
 	DiagramDragEvent,
 	DiagramResizeEvent,
+	DiagramDragDropEvent,
 } from "../types/EventTypes";
 
 // SvgCanvas関連関数をインポート
@@ -19,6 +20,23 @@ import { isGroupData } from "../SvgCanvasFunctions";
 import { getLogger } from "../../../../utils/Logger";
 
 const logger = getLogger("SvgCanvasHooks");
+
+const getDiagramById = (
+	diagrams: Diagram[],
+	id: string,
+): Diagram | undefined => {
+	for (const diagram of diagrams) {
+		if (diagram.id === id) {
+			return diagram;
+		}
+		if (isGroupData(diagram)) {
+			const ret = getDiagramById(diagram.items || [], id);
+			if (ret) {
+				return ret;
+			}
+		}
+	}
+};
 
 type SvgCanvasState = {
 	items: Diagram[];
@@ -65,6 +83,46 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		}));
 	}, []);
 
+	const onDiagramDrop = useCallback(
+		(e: DiagramDragDropEvent) => {
+			// alert("onDiagramDrop");
+			console.log(e);
+
+			if (e.dropItem.type === "connectPoint") {
+				const dropItem = getDiagramById(canvasState.items, e.dropItem.id);
+				const targetItem = getDiagramById(canvasState.items, e.id);
+				addItem({
+					type: "line",
+					point: dropItem?.point,
+					width: 100,
+					height: 100,
+					keepProportion: false,
+					items: [
+						{
+							id: "50",
+							type: "linePoint",
+							point: targetItem?.point,
+							width: 0,
+							height: 0,
+							keepProportion: false,
+							isSelected: false,
+						},
+						{
+							id: "51",
+							type: "linePoint",
+							point: dropItem?.point,
+							width: 0,
+							height: 0,
+							keepProportion: false,
+							isSelected: false,
+						},
+					],
+				});
+			}
+		},
+		[canvasState.items],
+	);
+
 	const onDiagramResizing = useCallback((e: DiagramResizeEvent) => {
 		logger.debug("onDiagramResizing", e);
 		// TODO: リサイズ中の処理
@@ -100,6 +158,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		...canvasState,
 		onDiagramDragEnd,
 		onDiagramDragEndByGroup: onDiagramDragEnd,
+		onDiagramDrop,
 		onDiagramResizing,
 		onDiagramResizeEnd,
 		onDiagramSelect,
