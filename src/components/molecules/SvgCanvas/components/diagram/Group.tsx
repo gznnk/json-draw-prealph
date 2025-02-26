@@ -577,8 +577,11 @@ const Group: React.FC<GroupProps> = memo(
 							diagramsFunctionsRef.current[item.id]?.onGroupResize?.(event);
 						}
 					}
+
+					// グループ自体のリサイズ中イベントを発火
+					onDiagramResizing?.(e);
 				},
-				[id, items, point, width, height],
+				[onDiagramResizing, id, items, point, width, height],
 			);
 
 			/**

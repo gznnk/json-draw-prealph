@@ -6,15 +6,20 @@ import {
 	useCallback,
 	useImperativeHandle,
 	useRef,
+	useState,
 } from "react";
 
 // SvgCanvas関連型定義をインポート
 import type { DiagramRef, RectangleData } from "../../types/DiagramTypes";
 import type {
+	DiagramHoverEvent,
 	DiagramResizeEvent,
 	GroupDragEvent,
 	GroupResizeEvent,
 } from "../../types/EventTypes";
+
+// SvgCanvas関連コンポーネントをインポート
+import ConnectPoint from "../connector/ConnectPoint";
 
 // RectangleBase関連コンポーネントをインポート
 import type { RectangleBaseProps } from "../core/RectangleBase";
@@ -55,10 +60,14 @@ const Rectangle: React.FC<RectangleProps> = memo(
 			},
 			ref,
 		) => {
+			const [isTransformimg, setIsTransforming] = useState(false);
+			// ホバー状態の管理
+			const [isHovered, setIsHovered] = useState(false);
+
 			const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 			const rectangleBaseRef = useRef<SVGGElement>({} as SVGGElement);
 
-			// 親グループのドラッグ・リサイズ時に、親グループ側から実行してもらう関数を公開
+			// グループのドラッグ・リサイズ時に、グループ側から実行してもらう関数を公開
 			useImperativeHandle(ref, () => ({
 				onGroupDrag: handleGroupDrag,
 				onGroupDragEnd: handleGroupDragEnd,
@@ -83,6 +92,8 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						"transform",
 						`translate(${newPoint.x}, ${newPoint.y})`,
 					);
+
+					setIsTransforming(true); // TODO
 				},
 				[point],
 			);
@@ -101,6 +112,8 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						startPoint: point,
 						endPoint: calcPointOnGroupDrag(e, point),
 					});
+
+					setIsTransforming(false);
 				},
 				[onDiagramDragEndByGroup, id, point],
 			);
@@ -131,6 +144,8 @@ const Rectangle: React.FC<RectangleProps> = memo(
 					svgRef?.current?.setAttribute("width", `${newArrangment.width}`);
 					svgRef?.current?.setAttribute("height", `${newArrangment.height}`);
 
+					setIsTransforming(true);
+
 					// グループのリサイズが契機で、かつDOMを直接更新しての変更なので、グループ側への変更通知はしない
 				},
 				[point, width, height],
@@ -148,6 +163,8 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						id,
 						...calcArrangmentOnGroupResize(e, point, width, height),
 					});
+
+					setIsTransforming(false);
 				},
 				[onDiagramResizeEnd, id, point, width, height],
 			);
@@ -165,42 +182,80 @@ const Rectangle: React.FC<RectangleProps> = memo(
 
 					// グループ側に変更中イベントを通知
 					onDiagramResizing?.(e);
+
+					setIsTransforming(true); // TODO
 				},
 				[onDiagramResizing],
 			);
 
+			/**
+			 * 短径領域の変更完了イベントハンドラ
+			 *
+			 * @param {DiagramResizeEvent} e 短径領域の変更完了イベント
+			 *
+			 */
+			const handleDiagramResizeEnd = useCallback(
+				(e: DiagramResizeEvent) => {
+					// 短形領域の変更完了イベントをそのまま親に伝番させる。
+					// 最終的にSvgCanvasまでイベントが伝番され、この図形のサイズ変更が行われる。
+					onDiagramResizeEnd?.(e);
+
+					setIsTransforming(false);
+				},
+				[onDiagramResizeEnd],
+			);
+
+			/**
+			 * ホバー状態変更イベントハンドラ
+			 *
+			 * @param {DiagramHoverEvent} e ホバー状態変更イベント
+			 * @returns {void}
+			 */
+			const handleDiagramHoverChange = useCallback((e: DiagramHoverEvent) => {
+				setIsHovered(e.isHovered);
+			}, []);
+
 			return (
-				<RectangleBase
-					id={id}
-					point={point}
-					width={width}
-					height={height}
-					tabIndex={tabIndex}
-					keepProportion={keepProportion}
-					isSelected={isSelected}
-					onDiagramClick={onDiagramClick}
-					onDiagramDragStart={onDiagramDragStart}
-					onDiagramDrag={onDiagramDrag}
-					onDiagramDragEnd={onDiagramDragEnd}
-					onDiagramResizeStart={onDiagramResizeStart}
-					onDiagramResizing={handleDiagramResizing}
-					onDiagramResizeEnd={onDiagramResizeEnd} // 短形領域の変更完了イベントはそのまま親に伝番させて、Propsの更新を親側にしてもらう
-					onDiagramSelect={onDiagramSelect}
-					ref={rectangleBaseRef}
-				>
-					<rect
+				<>
+					<RectangleBase
 						id={id}
-						x={0}
-						y={0}
+						point={point}
 						width={width}
 						height={height}
-						ref={svgRef}
-						fill={fill}
-						stroke={stroke}
-						strokeWidth={strokeWidth}
+						tabIndex={tabIndex}
+						keepProportion={keepProportion}
+						isSelected={isSelected}
+						onDiagramClick={onDiagramClick}
+						onDiagramDragStart={onDiagramDragStart}
+						onDiagramDrag={onDiagramDrag}
+						onDiagramDragEnd={onDiagramDragEnd}
+						onDiagramResizeStart={onDiagramResizeStart}
+						onDiagramResizing={handleDiagramResizing}
+						onDiagramResizeEnd={handleDiagramResizeEnd}
+						onDiagramSelect={onDiagramSelect}
+						onDiagramHoverChange={handleDiagramHoverChange}
+						ref={rectangleBaseRef}
+					>
+						<rect
+							id={id}
+							x={0}
+							y={0}
+							width={width}
+							height={height}
+							ref={svgRef}
+							fill={fill}
+							stroke={stroke}
+							strokeWidth={strokeWidth}
+						/>
+						{children}
+					</RectangleBase>
+					<ConnectPoint
+						id={`${id}-1`}
+						diagramId={id}
+						point={point}
+						visible={isHovered && !isTransformimg}
 					/>
-					{children}
-				</RectangleBase>
+				</>
 			);
 		},
 	),

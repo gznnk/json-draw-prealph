@@ -57,7 +57,7 @@ const Ellipse: React.FC<EllipseProps> = memo(
 			const svgRef = useRef<SVGEllipseElement>({} as SVGEllipseElement);
 			const rectangleBaseRef = useRef<SVGGElement>({} as SVGGElement);
 
-			// 親グループのドラッグ・リサイズ時に、親グループ側から実行してもらう関数を公開
+			// グループのドラッグ・リサイズ時に、グループ側から実行してもらう関数を公開
 			useImperativeHandle(ref, () => ({
 				onGroupDrag: handleGroupDrag,
 				onGroupDragEnd: handleGroupDragEnd,
@@ -175,6 +175,21 @@ const Ellipse: React.FC<EllipseProps> = memo(
 				[onDiagramResizing],
 			);
 
+			/**
+			 * 短径領域の変更完了イベントハンドラ
+			 *
+			 * @param {DiagramResizeEvent} e 短径領域の変更完了イベント
+			 *
+			 */
+			const handleDiagramResizeEnd = useCallback(
+				(e: DiagramResizeEvent) => {
+					// 短形領域の変更完了イベントをそのまま親に伝番させる。
+					// 最終的にSvgCanvasまでイベントが伝番され、この図形のサイズ変更が行われる。
+					onDiagramResizeEnd?.(e);
+				},
+				[onDiagramResizeEnd],
+			);
+
 			return (
 				<RectangleBase
 					id={id}
@@ -190,7 +205,7 @@ const Ellipse: React.FC<EllipseProps> = memo(
 					onDiagramDragEnd={onDiagramDragEnd}
 					onDiagramResizeStart={onDiagramResizeStart}
 					onDiagramResizing={handleDiagramResizing}
-					onDiagramResizeEnd={onDiagramResizeEnd} // 短形領域の変更完了イベントはそのまま親に伝番させて、Propsの更新を親側にしてもらう
+					onDiagramResizeEnd={handleDiagramResizeEnd}
 					onDiagramSelect={onDiagramSelect}
 					ref={rectangleBaseRef}
 				>

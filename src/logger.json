@@ -2,5 +2,5 @@
 	"root": "INFO",
 	"Group": "DEBUG",
 	"Line": "DEBUG",
-	"SvgCanvasHooks": "DEBUG"
+	"SvgCanvasHooks": "INFO"
 }

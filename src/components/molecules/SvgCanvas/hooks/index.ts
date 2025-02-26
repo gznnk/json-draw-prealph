@@ -65,7 +65,13 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		}));
 	}, []);
 
+	const onDiagramResizing = useCallback((e: DiagramResizeEvent) => {
+		logger.debug("onDiagramResizing", e);
+		// TODO: リサイズ中の処理
+	}, []);
+
 	const onDiagramResizeEnd = useCallback((e: DiagramResizeEvent) => {
+		logger.debug("onDiagramResizeEnd", e);
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyRecursive(prevState.items, (item) =>
@@ -94,6 +100,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		...canvasState,
 		onDiagramDragEnd,
 		onDiagramDragEndByGroup: onDiagramDragEnd,
+		onDiagramResizing,
 		onDiagramResizeEnd,
 		onDiagramSelect,
 	};

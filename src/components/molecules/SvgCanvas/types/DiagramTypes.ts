@@ -8,6 +8,7 @@ import type { Point } from "./CoordinateTypes";
 import type {
 	DiagramClickEvent,
 	DiagramDragEvent,
+	DiagramHoverEvent,
 	DiagramResizeEvent,
 	DiagramSelectEvent,
 	GroupDragEvent,
@@ -76,6 +77,7 @@ export type DiagramBaseProps = DiagramBaseData & {
 	onDiagramResizing?: (e: DiagramResizeEvent) => void;
 	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
+	onDiagramHoverChange?: (e: DiagramHoverEvent) => void;
 	ref?: React.Ref<DiagramRef>;
 };
 

@@ -19,6 +19,7 @@ import type {
 	DiagramClickEvent,
 	DiagramDragEvent,
 	DiagramPointerEvent,
+	DiagramHoverEvent,
 } from "../../types/EventTypes";
 
 /**
@@ -26,6 +27,7 @@ import type {
  */
 type DraggableGProps = {
 	cursor: string;
+	opacity?: number;
 	outline?: string;
 	outlineOffset?: string;
 };
@@ -35,6 +37,7 @@ type DraggableGProps = {
  */
 const DraggableG = styled.g<DraggableGProps>`
     cursor: ${({ cursor }) => cursor};
+	opacity: ${({ opacity }) => opacity};
     &:focus {
         outline: ${({ outline }) => outline};
         outline-offset: ${({ outlineOffset }) => outlineOffset};
@@ -52,6 +55,7 @@ const DraggableG = styled.g<DraggableGProps>`
  * @property {boolean} [allowXDecimal] X座標の小数点許可フラグ
  * @property {boolean} [allowYDecimal] Y座標の小数点許可フラグ
  * @property {string} [cursor] カーソル
+ * @property {boolean} [visible] 表示フラグ
  * @property {number} [tabIndex] タブインデックス
  * @property {string} [outline] アウトライン
  * @property {string} [outlineOffset] アウトラインオフセット
@@ -62,6 +66,7 @@ const DraggableG = styled.g<DraggableGProps>`
  * @property {(e: DiagramDragEvent) => void} [onDragStart] ドラッグ開始時のイベントハンドラ
  * @property {(e: DiagramDragEvent) => void} [onDrag] ドラッグ中のイベントハンドラ
  * @property {(e: DiagramDragEvent) => void} [onDragEnd] ドラッグ終了時のイベントハンドラ
+ * @property {(e: DiagramHoverEvent) => void} [onHoverChange] ホバー変更時のイベントハンドラ
  * @property {(point: Point) => Point} [dragPositioningFunction] ドラッグ位置変換関数
  * @property {React.ReactNode} [children] 子要素
  */
@@ -73,6 +78,7 @@ export type DraggableProps = {
 	allowXDecimal?: boolean;
 	allowYDecimal?: boolean;
 	cursor?: string;
+	visible?: boolean;
 	tabIndex?: number;
 	outline?: string;
 	outlineOffset?: string;
@@ -83,6 +89,7 @@ export type DraggableProps = {
 	onDragStart?: (e: DiagramDragEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragEnd?: (e: DiagramDragEvent) => void;
+	onHoverChange?: (e: DiagramHoverEvent) => void;
 	dragPositioningFunction?: (point: Point) => Point;
 	children?: React.ReactNode;
 };
@@ -110,6 +117,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			allowXDecimal = false,
 			allowYDecimal = false,
 			cursor = "move",
+			visible = true,
 			tabIndex = 0,
 			outline = "none",
 			outlineOffset = "0px",
@@ -119,6 +127,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			onDragStart,
 			onDrag,
 			onDragEnd,
+			onHoverChange,
 			dragPositioningFunction,
 			children,
 		},
@@ -425,12 +434,90 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 			}
 		};
 
+		/**
+		 * ポインターエンター時のイベントハンドラ
+		 *
+		 * @returns {void}
+		 */
+		const handlePointerEnter = useCallback(() => {
+			// ホバー時のイベント発火
+			onHoverChange?.({
+				id,
+				isHovered: true,
+			});
+		}, [onHoverChange, id]);
+
+		/**
+		 * ポインターリーブ時のイベントハンドラ
+		 *
+		 * @returns {void}
+		 */
+		const handlePointerLeave = useCallback(() => {
+			// ホバー解除時のイベント発火
+			onHoverChange?.({
+				id,
+				isHovered: false,
+			});
+		}, [onHoverChange, id]);
+
+		const isPointerOver = useCallback(
+			(pointerPoint: Point) => {
+				// TODO: 複数あるときの対応
+				const svgCanvas = document.querySelector("svg") as SVGSVGElement;
+				const svgPoint = svgCanvas.createSVGPoint();
+				svgPoint.x = pointerPoint.x - point.x;
+				svgPoint.y = pointerPoint.y - point.y;
+				const svg = gRef.current?.firstChild;
+				if (svg instanceof SVGGeometryElement) {
+					return svg.isPointInFill(svgPoint) || svg.isPointInStroke(svgPoint);
+				}
+				return false;
+			},
+			[point],
+		);
+
+		// TODO: ここでいいのか？
+		useEffect(() => {
+			// TODO: 複数あるときの対応
+			const handleConnectPointDrag = (e: Event) => {
+				const customEvent = e as CustomEvent<{ id: string; point: Point }>;
+				onHoverChange?.({
+					id,
+					isHovered: isPointerOver(customEvent.detail.point),
+				});
+			};
+
+			const handleConnectPointDragEnd = (e: Event) => {
+				const customEvent = e as CustomEvent<{ id: string; point: Point }>;
+				if (isPointerOver(customEvent.detail.point)) {
+					alert("ConnectPointDragEnd:" + id);
+				}
+			};
+
+			document?.addEventListener("ConnectPointDrag", handleConnectPointDrag);
+			document?.addEventListener(
+				"ConnectPointDragEnd",
+				handleConnectPointDragEnd,
+			);
+			return () => {
+				document?.removeEventListener(
+					"ConnectPointDrag",
+					handleConnectPointDrag,
+				);
+				document?.removeEventListener(
+					"ConnectPointDragEnd",
+					handleConnectPointDragEnd,
+				);
+			};
+		}, [id, isPointerOver, onHoverChange]);
+
 		return (
 			<DraggableG
 				key={key}
 				transform={`translate(${state.point.x}, ${state.point.y})`}
 				tabIndex={tabIndex}
 				cursor={cursor}
+				opacity={visible ? undefined : 0}
 				outline={outline}
 				outlineOffset={outlineOffset}
 				onPointerDown={handlePointerDown}
@@ -438,6 +525,8 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				onPointerUp={handlePointerUp}
 				onKeyDown={handleKeyDown}
 				onKeyUp={handleKeyUp}
+				onPointerEnter={handlePointerEnter}
+				onPointerLeave={handlePointerLeave}
 				ref={gRef}
 			>
 				{children}

@@ -66,6 +66,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				onDiagramResizing,
 				onDiagramResizeEnd,
 				onDiagramSelect,
+				onDiagramHoverChange,
 				children,
 			},
 			ref,
@@ -289,6 +290,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						onDragStart={handleDragStart}
 						onDrag={handleDrag}
 						onDragEnd={handleDragEnd}
+						onHoverChange={onDiagramHoverChange}
 						ref={draggableRef}
 					>
 						{children}

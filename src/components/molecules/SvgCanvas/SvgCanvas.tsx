@@ -27,6 +27,7 @@ type SvgCanvasProps = {
 	items: Array<Diagram>;
 	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
 	onDiagramDragEndByGroup?: (e: DiagramDragEvent) => void;
+	onDiagramResizing?: (e: DiagramResizeEvent) => void;
 	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
 };
@@ -37,25 +38,23 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		items,
 		onDiagramDragEnd,
 		onDiagramDragEndByGroup,
+		onDiagramResizing,
 		onDiagramResizeEnd,
 		onDiagramSelect,
 	}) => {
-		const createDiagram = (item: Diagram): React.ReactNode => {
+		const renderedItems = items.map((item) => {
 			const itemType = DiagramTypeComponentMap[item.type];
 			const props = {
 				...item,
 				key: item.id,
 				onDiagramDragEnd,
 				onDiagramDragEndByGroup,
+				onDiagramResizing,
 				onDiagramResizeEnd,
 				onDiagramSelect: onDiagramSelect,
 			};
 
 			return React.createElement(itemType, props);
-		};
-
-		const renderedItems = items.map((item) => {
-			return createDiagram(item);
 		});
 
 		const handlePointerDown = useCallback(

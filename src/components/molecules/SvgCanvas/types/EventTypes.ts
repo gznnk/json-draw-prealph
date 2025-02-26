@@ -63,6 +63,14 @@ export type DiagramClickEvent = {
 };
 
 /**
+ * 図形のホバーイベント
+ */
+export type DiagramHoverEvent = {
+	id: string;
+	isHovered: boolean;
+};
+
+/**
  * 図形の選択イベント
  */
 export type DiagramSelectEvent = {

@@ -19,9 +19,11 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 			allowXDecimal = false,
 			allowYDecimal = false,
 			cursor,
+			visible,
 			onDragStart,
 			onDrag,
 			onDragEnd,
+			onHoverChange,
 			dragPositioningFunction,
 			color = "rgba(61, 90, 128, 0.8)",
 			hidden = false,
@@ -43,11 +45,13 @@ const DragPoint = forwardRef<SVGGElement, DragPointProps>(
 				allowXDecimal={allowXDecimal}
 				allowYDecimal={allowYDecimal}
 				cursor={cursor}
+				visible={visible}
 				outline="1px dashed blue"
 				outlineOffset="4px"
 				onDragStart={onDragStart}
 				onDrag={onDrag}
 				onDragEnd={onDragEnd}
+				onHoverChange={onHoverChange}
 				dragPositioningFunction={dragPositioningFunction}
 				ref={svgRef}
 			>
