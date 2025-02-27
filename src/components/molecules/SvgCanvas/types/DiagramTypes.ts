@@ -7,6 +7,7 @@ import type React from "react";
 import type { Point } from "./CoordinateTypes";
 import type {
 	DiagramClickEvent,
+	DiagramConnectEvent,
 	DiagramDragDropEvent,
 	DiagramDragEvent,
 	DiagramHoverEvent,
@@ -26,12 +27,12 @@ import Rectangle from "../components/diagram/Rectangle";
  * 図形の種類
  */
 export type DiagramType =
-	| "connectPoint"
-	| "ellipse"
-	| "group"
-	| "line"
-	| "linePoint"
-	| "rectangle";
+	| "ConnectPoint"
+	| "Ellipse"
+	| "Group"
+	| "Line"
+	| "LinePoint"
+	| "Rectangle";
 
 export type DiagramBaseData = {
 	id: string;
@@ -46,8 +47,8 @@ export type DiagramBaseData = {
 
 export type ConnectPointData = {
 	id: string;
-	diagramId: string;
 	point: Point;
+	name: string;
 	connectLineId?: string;
 };
 
@@ -72,7 +73,12 @@ export type RectangleData = DiagramBaseData & {
 };
 const DummyComponent: React.FC<DiagramBaseData> = () => null;
 
-type DiagramCombined = EllipseData | GroupData | LineData | RectangleData;
+type DiagramCombined =
+	| EllipseData
+	| GroupData
+	| LineData
+	| LinePointData
+	| RectangleData;
 
 export type Diagram = DiagramCombined & {
 	type: DiagramType;
@@ -90,6 +96,7 @@ export type DiagramBaseProps = DiagramBaseData & {
 	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
 	onDiagramHoverChange?: (e: DiagramHoverEvent) => void;
+	onDiagramConnect?: (e: DiagramConnectEvent) => void;
 	ref?: React.Ref<DiagramRef>;
 };
 
@@ -110,10 +117,10 @@ export const DiagramTypeComponentMap: {
 	// biome-ignore lint/suspicious/noExplicitAny: 種々の図形の共通の型を作るのは困難なため
 	[key in DiagramType]: React.FC<any>;
 } = {
-	connectPoint: DummyComponent,
-	ellipse: Ellipse,
-	group: Group,
-	line: Line,
-	linePoint: DummyComponent,
-	rectangle: Rectangle,
+	ConnectPoint: DummyComponent,
+	Ellipse: Ellipse,
+	Group: Group,
+	Line: Line,
+	LinePoint: DummyComponent,
+	Rectangle: Rectangle,
 };

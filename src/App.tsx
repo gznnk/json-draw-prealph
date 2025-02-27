@@ -10,7 +10,7 @@ const logger = getLogger("App");
 const testItems1 = [
 	{
 		id: "1",
-		type: "rectangle",
+		type: "Rectangle",
 		point: { x: 0, y: 0 },
 		width: 100,
 		height: 100,
@@ -22,7 +22,7 @@ const testItems1 = [
 	},
 	{
 		id: "2",
-		type: "ellipse",
+		type: "Ellipse",
 		point: { x: 100, y: 100 },
 		width: 100,
 		height: 100,
@@ -34,7 +34,7 @@ const testItems1 = [
 	},
 	{
 		id: "g-1",
-		type: "group",
+		type: "Group",
 		point: { x: 200, y: 200 },
 		width: 400,
 		height: 400,
@@ -43,7 +43,7 @@ const testItems1 = [
 		items: [
 			{
 				id: "3",
-				type: "rectangle",
+				type: "Rectangle",
 				point: { x: 200, y: 200 },
 				width: 100,
 				height: 100,
@@ -55,7 +55,7 @@ const testItems1 = [
 			},
 			{
 				id: "4",
-				type: "ellipse",
+				type: "Ellipse",
 				point: { x: 300, y: 200 },
 				width: 100,
 				height: 100,
@@ -67,7 +67,7 @@ const testItems1 = [
 			},
 			{
 				id: "5",
-				type: "rectangle",
+				type: "Rectangle",
 				point: { x: 300, y: 300 },
 				width: 100,
 				height: 100,
@@ -79,7 +79,7 @@ const testItems1 = [
 			},
 			{
 				id: "6",
-				type: "ellipse",
+				type: "Ellipse",
 				point: { x: 200, y: 300 },
 				width: 100,
 				height: 100,
@@ -91,7 +91,7 @@ const testItems1 = [
 			},
 			{
 				id: "g-2",
-				type: "group",
+				type: "Group",
 				point: { x: 400, y: 400 },
 				width: 200,
 				height: 200,
@@ -103,7 +103,7 @@ const testItems1 = [
 				items: [
 					{
 						id: "7",
-						type: "rectangle",
+						type: "Rectangle",
 						point: { x: 400, y: 400 },
 						width: 100,
 						height: 100,
@@ -115,7 +115,7 @@ const testItems1 = [
 					},
 					{
 						id: "8",
-						type: "ellipse",
+						type: "Ellipse",
 						point: { x: 500, y: 400 },
 						width: 100,
 						height: 100,
@@ -127,7 +127,7 @@ const testItems1 = [
 					},
 					{
 						id: "9",
-						type: "rectangle",
+						type: "Rectangle",
 						point: { x: 500, y: 500 },
 						width: 100,
 						height: 100,
@@ -141,7 +141,7 @@ const testItems1 = [
 			},
 			{
 				id: "g-3",
-				type: "group",
+				type: "Group",
 				point: { x: 400, y: 200 },
 				width: 200,
 				height: 200,
@@ -153,7 +153,7 @@ const testItems1 = [
 				items: [
 					{
 						id: "10",
-						type: "rectangle",
+						type: "Rectangle",
 						point: { x: 400, y: 200 },
 						width: 100,
 						height: 100,
@@ -165,7 +165,7 @@ const testItems1 = [
 					},
 					{
 						id: "11",
-						type: "rectangle",
+						type: "Rectangle",
 						point: { x: 500, y: 300 },
 						width: 100,
 						height: 100,
@@ -192,7 +192,7 @@ const testItems1 = [
 		items: [
 			{
 				id: "12-1",
-				type: "linePoint",
+				type: "LinePoint",
 				point: { x: 0, y: 100 },
 				width: 0,
 				height: 0,
@@ -201,7 +201,7 @@ const testItems1 = [
 			},
 			{
 				id: "12-2",
-				type: "linePoint",
+				type: "LinePoint",
 				point: { x: 100, y: 100 },
 				width: 0,
 				height: 0,
@@ -210,7 +210,7 @@ const testItems1 = [
 			},
 			{
 				id: "12-3",
-				type: "linePoint",
+				type: "LinePoint",
 				point: { x: 200, y: 200 },
 				width: 0,
 				height: 0,
@@ -224,7 +224,7 @@ const testItems1 = [
 const testItems2 = [
 	{
 		id: "12",
-		type: "line",
+		type: "Line",
 		point: { x: 0, y: 100 },
 		width: 100,
 		height: 100,
@@ -235,7 +235,7 @@ const testItems2 = [
 		items: [
 			{
 				id: "12-1",
-				type: "linePoint",
+				type: "LinePoint",
 				point: { x: 0, y: 100 },
 				width: 0,
 				height: 0,
@@ -244,7 +244,7 @@ const testItems2 = [
 			},
 			{
 				id: "12-2",
-				type: "linePoint",
+				type: "LinePoint",
 				point: { x: 100, y: 100 },
 				width: 0,
 				height: 0,
@@ -253,7 +253,7 @@ const testItems2 = [
 			},
 			{
 				id: "12-3",
-				type: "linePoint",
+				type: "LinePoint",
 				point: { x: 200, y: 200 },
 				width: 0,
 				height: 0,
@@ -267,7 +267,7 @@ const testItems2 = [
 const testItems3 = [
 	{
 		id: "g-1",
-		type: "group",
+		type: "Group",
 		point: { x: 200, y: 200 },
 		width: 300,
 		height: 300,
@@ -276,7 +276,7 @@ const testItems3 = [
 		items: [
 			{
 				id: "3",
-				type: "rectangle",
+				type: "Rectangle",
 				point: { x: 200, y: 200 },
 				width: 100,
 				height: 100,
@@ -288,7 +288,7 @@ const testItems3 = [
 			},
 			{
 				id: "4",
-				type: "ellipse",
+				type: "Ellipse",
 				point: { x: 300, y: 200 },
 				width: 100,
 				height: 100,
@@ -300,7 +300,7 @@ const testItems3 = [
 			},
 			{
 				id: "5",
-				type: "rectangle",
+				type: "Rectangle",
 				point: { x: 300, y: 300 },
 				width: 100,
 				height: 100,
@@ -323,7 +323,7 @@ const testItems3 = [
 				items: [
 					{
 						id: "12-1",
-						type: "linePoint",
+						type: "LinePoint",
 						point: { x: 400, y: 400 },
 						width: 0,
 						height: 0,
@@ -332,7 +332,7 @@ const testItems3 = [
 					},
 					{
 						id: "12-2",
-						type: "linePoint",
+						type: "LinePoint",
 						point: { x: 400, y: 500 },
 						width: 0,
 						height: 0,
@@ -341,7 +341,7 @@ const testItems3 = [
 					},
 					{
 						id: "12-3",
-						type: "linePoint",
+						type: "LinePoint",
 						point: { x: 500, y: 500 },
 						width: 0,
 						height: 0,
@@ -357,7 +357,7 @@ const testItems3 = [
 const testItems4 = [
 	{
 		id: "1",
-		type: "rectangle",
+		type: "Rectangle",
 		point: { x: 200, y: 200 },
 		width: 100,
 		height: 100,
@@ -366,10 +366,17 @@ const testItems4 = [
 		strokeWidth: "1px",
 		keepProportion: false,
 		isSelected: false,
+		connectPoints: [
+			{
+				id: "1-1",
+				point: { x: 200, y: 200 },
+				name: "LeftTop",
+			},
+		],
 	},
 	{
 		id: "2",
-		type: "rectangle",
+		type: "Rectangle",
 		point: { x: 500, y: 500 },
 		width: 100,
 		height: 100,
@@ -378,6 +385,13 @@ const testItems4 = [
 		strokeWidth: "1px",
 		keepProportion: false,
 		isSelected: false,
+		connectPoints: [
+			{
+				id: "2-1",
+				point: { x: 500, y: 500 },
+				name: "LeftTop",
+			},
+		],
 	},
 ] as Diagram[];
 
@@ -390,35 +404,49 @@ function App() {
 
 	const handleAddRectangle = () => {
 		canvasFunctions.addItem({
-			type: "rectangle",
+			id: crypto.randomUUID(),
+			type: "Rectangle",
+			point: { x: 0, y: 0 },
 			width: 200,
 			height: 100,
+			keepProportion: false,
+			isSelected: false,
 		});
 	};
 
 	const handleAddEllipse = () => {
 		canvasFunctions.addItem({
-			type: "ellipse",
+			id: crypto.randomUUID(),
+			type: "Ellipse",
+			point: { x: 0, y: 0 },
 			width: 200,
 			height: 100,
+			keepProportion: false,
+			isSelected: false,
 		});
 	};
 
 	const handleAddSquare = () => {
 		canvasFunctions.addItem({
-			type: "rectangle",
+			id: crypto.randomUUID(),
+			type: "Rectangle",
+			point: { x: 0, y: 0 },
 			width: 100,
 			height: 100,
 			keepProportion: true,
+			isSelected: false,
 		});
 	};
 
 	const handleAddCircle = () => {
 		canvasFunctions.addItem({
-			type: "ellipse",
+			id: crypto.randomUUID(),
+			type: "Ellipse",
+			point: { x: 0, y: 0 },
 			width: 100,
 			height: 100,
 			keepProportion: true,
+			isSelected: false,
 		});
 	};
 
@@ -472,7 +500,7 @@ function App() {
 					}}
 				/> */}
 				<Input
-					value={canvasFunctions.getSelectedItem()?.width.toString() || ""}
+					value={canvasFunctions.getSelectedItem()?.width?.toString() || ""}
 					onChange={(e) => {
 						if (!canvasState.selectedItemId) return;
 						canvasFunctions.updateItem({

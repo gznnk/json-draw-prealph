@@ -36,7 +36,7 @@ export type DiagramDragDropEvent = {
 };
 
 /**
- * 図形の変更イベント
+ * 図形のリサイズイベント
  */
 export type DiagramResizeEvent = {
 	id: string;
@@ -91,4 +91,15 @@ export type DiagramHoverEvent = {
  */
 export type DiagramSelectEvent = {
 	id: string;
+};
+
+export type DiagramConnectEvent = {
+	startPoint: {
+		id: string;
+		// diagramId: string;
+	};
+	endPoint: {
+		id: string;
+		// diagramId: string;
+	};
 };

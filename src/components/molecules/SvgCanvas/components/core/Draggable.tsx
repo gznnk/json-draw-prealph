@@ -527,29 +527,27 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		 * @param {Point} clientPoint ポインターの座標
 		 * @returns {boolean} ポインターがこのドラッグ領域上にあるかどうか
 		 */
-		const isPointerOver = useCallback(
-			(clientPoint: Point) => {
-				const svgCanvas = gRef.current?.ownerSVGElement as SVGSVGElement;
-				const svgPoint = svgCanvas.createSVGPoint();
+		const isPointerOver = useCallback((clientPoint: Point) => {
+			const svgCanvas = gRef.current?.ownerSVGElement as SVGSVGElement;
+			const svgPoint = svgCanvas.createSVGPoint();
 
-				if (svgPoint) {
-					svgPoint.x = clientPoint.x - point.x;
-					svgPoint.y = clientPoint.y - point.y;
+			if (svgPoint) {
+				svgPoint.x = clientPoint.x;
+				svgPoint.y = clientPoint.y;
+				const svg = gRef.current?.firstChild;
+
+				if (svg instanceof SVGGeometryElement) {
 					const transformedPoint = svgPoint.matrixTransform(
-						svgCanvas.getScreenCTM()?.inverse(),
+						svg.getScreenCTM()?.inverse(),
 					);
-					const svg = gRef.current?.firstChild;
-					if (svg instanceof SVGGeometryElement) {
-						return (
-							svg.isPointInFill(transformedPoint) ||
-							svg.isPointInStroke(transformedPoint)
-						);
-					}
+					return (
+						svg.isPointInFill(transformedPoint) ||
+						svg.isPointInStroke(transformedPoint)
+					);
 				}
-				return false;
-			},
-			[point],
-		);
+			}
+			return false;
+		}, []);
 
 		// 全体周知用ドラッグイベントリスナー登録
 		useEffect(() => {

@@ -15,6 +15,7 @@ import type {
 	DiagramResizeEvent,
 	GroupDragEvent,
 	GroupResizeEvent,
+	DiagramConnectEvent,
 	DiagramDragDropEvent,
 	DiagramDragEvent,
 } from "../../types/EventTypes";
@@ -27,16 +28,15 @@ import DragPoint from "../core/DragPoint";
 
 type ConnectPointProps = ConnectPointData & {
 	visible: boolean;
-	onDrop?: (e: DiagramDragDropEvent) => void;
+	onConnect?: (e: DiagramConnectEvent) => void;
 };
 
 const ConnectPoint: React.FC<ConnectPointProps> = ({
-	diagramId,
+	id,
 	point,
 	visible,
+	onConnect,
 }) => {
-	// TODO useCallback使う
-
 	// console.log("ConnectPoint rendered");
 	// ホバー状態の管理
 	const [isHovered, setIsHovered] = useState(false);
@@ -45,8 +45,6 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 	const svgRef = useRef<SVGPathElement>({} as SVGPathElement);
 	const dragPointRef = useRef<SVGGElement>({} as SVGGElement);
-
-	const id = `connectPoint-${diagramId}`;
 
 	const handleDragStart = useCallback((_e: DiagramDragEvent) => {
 		setIsDragging(true);
@@ -75,7 +73,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 	);
 
 	const handleDragOver = useCallback((e: DiagramDragDropEvent) => {
-		if (e.dropItem.type === "connectPoint") {
+		if (e.dropItem.type === "ConnectPoint") {
 			setIsHovered(true);
 		}
 	}, []);
@@ -84,12 +82,24 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 		setIsHovered(false);
 	}, []);
 
-	const handleDrop = useCallback((e: DiagramDragDropEvent) => {
-		if (e.dropItem.type === "connectPoint") {
-			alert("connect");
-		}
-		setIsHovered(false);
-	}, []);
+	const handleDrop = useCallback(
+		(e: DiagramDragDropEvent) => {
+			if (e.dropItem.type === "ConnectPoint") {
+				onConnect?.({
+					startPoint: {
+						id: e.dropItem.id,
+						// diagramId: e.dropItem.type,
+					},
+					endPoint: {
+						id,
+						// diagramId,
+					},
+				});
+			}
+			setIsHovered(false);
+		},
+		[onConnect, id],
+	);
 
 	/**
 	 * ホバー状態変更イベントハンドラ
@@ -106,7 +116,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			<DragPoint
 				id={id}
 				point={point}
-				type="connectPoint"
+				type="ConnectPoint"
 				color="rgba(120, 120, 1, 0.8)"
 				visible={visible || isHovered}
 				onDragStart={handleDragStart}

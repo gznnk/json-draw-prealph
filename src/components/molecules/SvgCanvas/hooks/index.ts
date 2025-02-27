@@ -5,12 +5,18 @@ import { useState, useCallback } from "react";
 import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 
 // SvgCanvas関連型定義をインポート
-import type { Diagram, GroupData } from "../types/DiagramTypes";
+import type {
+	ConnectPointData,
+	Diagram,
+	LineData,
+	LinePointData,
+} from "../types/DiagramTypes";
 import type {
 	DiagramSelectEvent,
 	DiagramDragEvent,
 	DiagramResizeEvent,
 	DiagramDragDropEvent,
+	DiagramConnectEvent,
 } from "../types/EventTypes";
 
 // SvgCanvas関連関数をインポート
@@ -38,12 +44,33 @@ const getDiagramById = (
 	}
 };
 
+const getConnectPointById = (
+	diagrams: Diagram[],
+	id: string,
+): ConnectPointData | undefined => {
+	for (const diagram of diagrams) {
+		if (isGroupData(diagram)) {
+			const ret = getConnectPointById(diagram.items || [], id);
+			if (ret) {
+				return ret;
+			}
+		}
+		const ret = diagram.connectPoints?.find((cp) => cp.id === id);
+		if (ret) {
+			return ret;
+		}
+	}
+};
+
+const generateId = (): string => crypto.randomUUID();
+
 type SvgCanvasState = {
 	items: Diagram[];
 	selectedItemId?: string;
 };
 
-type AddItem = Omit<PartiallyRequired<Diagram, "type">, "id" | "isSelected">;
+// type AddItem = Omit<PartiallyRequired<Diagram, "type">, "id" | "isSelected">;
+type AddItem = Diagram;
 type UpdateItem = Omit<PartiallyRequired<Diagram, "id">, "type" | "isSelected">;
 
 const DEFAULT_ITEM_VALUE = {
@@ -83,42 +110,9 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		}));
 	}, []);
 
-	const onDiagramDrop = useCallback(
-		(e: DiagramDragDropEvent) => {
-			if (e.dropItem.type === "connectPoint") {
-				const dropItem = getDiagramById(canvasState.items, e.dropItem.id);
-				const targetItem = getDiagramById(canvasState.items, e.id);
-				addItem({
-					type: "line",
-					point: dropItem?.point,
-					width: 100,
-					height: 100,
-					keepProportion: false,
-					items: [
-						{
-							id: "50",
-							type: "linePoint",
-							point: targetItem?.point,
-							width: 0,
-							height: 0,
-							keepProportion: false,
-							isSelected: false,
-						},
-						{
-							id: "51",
-							type: "linePoint",
-							point: dropItem?.point,
-							width: 0,
-							height: 0,
-							keepProportion: false,
-							isSelected: false,
-						},
-					],
-				});
-			}
-		},
-		[canvasState.items],
-	);
+	const onDiagramDrop = useCallback((e: DiagramDragDropEvent) => {
+		// NOP
+	}, []);
 
 	const onDiagramResizing = useCallback((e: DiagramResizeEvent) => {
 		logger.debug("onDiagramResizing", e);
@@ -151,6 +145,44 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		});
 	}, []);
 
+	const onDiagramConnect = useCallback(
+		(e: DiagramConnectEvent) => {
+			// alert("connect");
+			const startItem = getConnectPointById(canvasState.items, e.startPoint.id);
+			const endItem = getConnectPointById(canvasState.items, e.endPoint.id);
+			addItem({
+				id: generateId(),
+				type: "Line",
+				point: startItem?.point ?? { x: 0, y: 0 },
+				width: 100,
+				height: 100,
+				keepProportion: false,
+				isSelected: false,
+				items: [
+					{
+						id: generateId(),
+						type: "LinePoint",
+						point: startItem?.point ?? { x: 0, y: 0 },
+						width: 0,
+						height: 0,
+						keepProportion: false,
+						isSelected: false,
+					},
+					{
+						id: generateId(),
+						type: "LinePoint",
+						point: endItem?.point ?? { x: 0, y: 0 },
+						width: 0,
+						height: 0,
+						keepProportion: false,
+						isSelected: false,
+					},
+				] as Diagram[],
+			});
+		},
+		[canvasState.items],
+	);
+
 	const canvasProps = {
 		...canvasState,
 		onDiagramDragEnd,
@@ -159,6 +191,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onDiagramResizing,
 		onDiagramResizeEnd,
 		onDiagramSelect,
+		onDiagramConnect,
 	};
 
 	const getSelectedItem = useCallback(() => {
@@ -168,8 +201,8 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				if (item.isSelected) {
 					selectedItem = item;
 				}
-				if (item.type === "group") {
-					findSelectedItem((item as GroupData).items ?? []);
+				if (isGroupData(item)) {
+					findSelectedItem(item.items ?? []);
 				}
 			}
 		};
@@ -177,15 +210,12 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		return selectedItem;
 	}, [canvasState.items]);
 
-	const addItem = useCallback((item: AddItem) => {
+	const addItem = useCallback((item: Diagram) => {
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: [
 				...prevState.items.map((item) => ({ ...item, isSelected: false })),
 				{
-					...DEFAULT_ITEM_VALUE,
-					id: String(prevState.items.length + 15),
-					isSelected: true,
 					...item,
 				},
 			],

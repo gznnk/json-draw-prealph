@@ -10,7 +10,6 @@ import React, {
 } from "react";
 
 // SvgCanvas関連型定義をインポート
-import type { Point } from "../../types/CoordinateTypes";
 import type { Diagram, DiagramRef, GroupData } from "../../types/DiagramTypes";
 import { DiagramTypeComponentMap } from "../../types/DiagramTypes";
 import type {
@@ -118,11 +117,13 @@ const calcGroupArrangmentOnChildDiagramResizeEvent = (
  * @property {(e: DiagramResizeEvent) => void} [onDiagramResizeStart] グループ・グループ内の図形のリサイズ開始時のイベントハンドラ
  * @property {(e: DiagramResizeEvent) => void} [onDiagramResizing] グループ・グループ内の図形のリサイズ中のイベントハンドラ
  * @property {(e: DiagramResizeEvent) => void} [onDiagramResizeEnd] グループ・グループ内の図形のリサイズ終了時のイベントハンドラ
- * @property {(e: DiagramDragEvent) => void} [onDiagramDragStart] グループ内の図形のドラッグ開始時のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグ時は存在しない）
- * @property {(e: DiagramDragEvent) => void} [onDiagramDrag] グループ内の図形のドラッグ中のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグ時は存在しない）
- * @property {(e: DiagramDragEvent) => void} [onDiagramDragEnd] グループ内の図形のドラッグ終了時のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグ時は存在しない）
+ * @property {(e: DiagramDragEvent) => void} [onDiagramDragStart] グループ内の図形のドラッグ開始時のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
+ * @property {(e: DiagramDragEvent) => void} [onDiagramDrag] グループ内の図形のドラッグ中のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
+ * @property {(e: DiagramDragEvent) => void} [onDiagramDragEnd] グループ内の図形のドラッグ終了時のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
+ * @property {(e: DiagramDragDropEvent) => void} [onDiagramDrop] グループ内の図形のドラッグ＆ドロップ時のイベントハンドラ
  * @property {(e: DiagramDragEvent) => void} [onDiagramDragEndByGroup] グループ全体の移動に伴うグループ内の図形のドラッグ終了時のイベントハンドラ
- * @property {(e: DiagramSelectEvent) => void} [onSelect] 選択時のイベントハンドラ
+ * @property {(e: DiagramSelectEvent) => void} [onDiagramSelect] 選択時のイベントハンドラ
+ * @property {(e: DiagramConnectEvent) => void} [onDiagramConnect] 図形の接続時のイベントハンドラ
  * @property {Diagram[]} [items] グループ内の図形リスト
  * @property {React.Ref<DiagramRef>} [ref] 親グループのドラッグ・リサイズ時に、親グループ側から実行してもらう関数への参照
  */
@@ -152,6 +153,7 @@ const Group: React.FC<GroupProps> = memo(
 				onDiagramDrop,
 				onDiagramDragEndByGroup,
 				onDiagramSelect,
+				onDiagramConnect,
 				items = [],
 			},
 			ref,
@@ -547,6 +549,7 @@ const Group: React.FC<GroupProps> = memo(
 					onDiagramResizing: onDiagramResizing,
 					onDiagramResizeEnd: handleChildDiagramResizeEnd,
 					onDiagramSelect: handleChildDiagramSelect,
+					onDiagramConnect: onDiagramConnect,
 					ref: (r: DiagramRef) => {
 						diagramsFunctionsRef.current[item.id] = r;
 					},

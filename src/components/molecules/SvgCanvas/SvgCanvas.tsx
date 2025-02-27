@@ -12,6 +12,7 @@ import type {
 	DiagramResizeEvent,
 	DiagramSelectEvent,
 	DiagramDragDropEvent,
+	DiagramConnectEvent,
 } from "./types/EventTypes";
 
 const ContainerDiv = styled.div`
@@ -32,6 +33,7 @@ type SvgCanvasProps = {
 	onDiagramResizing?: (e: DiagramResizeEvent) => void;
 	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
+	onDiagramConnect?: (e: DiagramConnectEvent) => void;
 };
 
 const SvgCanvas: React.FC<SvgCanvasProps> = memo(
@@ -44,6 +46,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		onDiagramResizing,
 		onDiagramResizeEnd,
 		onDiagramSelect,
+		onDiagramConnect,
 	}) => {
 		const renderedItems = items.map((item) => {
 			const itemType = DiagramTypeComponentMap[item.type];
@@ -55,7 +58,8 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				onDiagramDrop,
 				onDiagramResizing,
 				onDiagramResizeEnd,
-				onDiagramSelect: onDiagramSelect,
+				onDiagramSelect,
+				onDiagramConnect,
 			};
 
 			return React.createElement(itemType, props);

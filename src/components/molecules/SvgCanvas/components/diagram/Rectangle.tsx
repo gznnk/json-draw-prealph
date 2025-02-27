@@ -47,6 +47,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				keepProportion = false,
 				tabIndex = 0,
 				isSelected = false,
+				connectPoints,
 				onDiagramClick,
 				onDiagramDragStart,
 				onDiagramDrag,
@@ -56,7 +57,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				onDiagramResizing,
 				onDiagramResizeEnd,
 				onDiagramSelect,
-				children,
+				onDiagramConnect,
 			},
 			ref,
 		) => {
@@ -219,7 +220,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				<>
 					<RectangleBase
 						id={id}
-						type="rectangle"
+						type="Rectangle"
 						point={point}
 						width={width}
 						height={height}
@@ -248,14 +249,16 @@ const Rectangle: React.FC<RectangleProps> = memo(
 							stroke={stroke}
 							strokeWidth={strokeWidth}
 						/>
-						{children}
 					</RectangleBase>
-					<ConnectPoint
-						id={`${id}-connectPoint`}
-						diagramId={id}
-						point={point}
-						visible={isHovered && !isTransformimg}
-					/>
+					{connectPoints?.map((cp) => (
+						<ConnectPoint
+							key={cp.id}
+							id={cp.id}
+							point={cp.point}
+							visible={isHovered && !isTransformimg}
+							onConnect={onDiagramConnect}
+						/>
+					))}
 				</>
 			);
 		},
