@@ -7,25 +7,6 @@ import Draggable from "../core/Draggable";
 
 /**
  * ドラッグポイントコンポーネントのPropsの型定義
- *
- * @property {string} [id] ID
- * @property {DiagramType} [type] 図形の種類
- * @property {Point} [point] 座標
- * @property {DragDirection} [direction] ドラッグ方向
- * @property {boolean} [allowXDecimal] X座標の小数点許可フラグ
- * @property {boolean} [allowYDecimal] Y座標の小数点許可フラグ
- * @property {string} [cursor] カーソル
- * @property {boolean} [visible] 表示フラグ
- * @property {(e: DiagramDragEvent) => void} [onDragStart] ドラッグ開始時のイベントハンドラ
- * @property {(e: DiagramDragEvent) => void} [onDrag] ドラッグ中のイベントハンドラ
- * @property {(e: DiagramDragEvent) => void} [onDragEnd] ドラッグ終了時のイベントハンドラ
- * @property {(e: DiagramDragDropEvent) => void} [onDragOver] ドラッグオーバー時のイベントハンドラ
- * @property {(e: DiagramDragDropEvent) => void} [onDragLeave] ドラッグリーブ時のイベントハンドラ
- * @property {(e: DiagramDragDropEvent) => void} [onDrop] ドロップ時のイベントハンドラ
- * @property {(e: DiagramHoverEvent) => void} [onHoverChange] ホバー変更時のイベントハンドラ
- * @property {(point: Point) => Point} [dragPositioningFunction] ドラッグ位置変換関数
- * @property {string} [color] 色
- * @property {boolean} [hidden] 非表示フラグ
  */
 export type DragPointProps = DraggableProps & {
 	color?: string;
@@ -36,6 +17,25 @@ export type DragPointProps = DraggableProps & {
  * ドラッグポイントコンポーネント
  *
  * @param {DragPointProps} props ドラッグポイントのProps
+ * @param {string} [props.id] ID
+ * @param {DiagramType} [props.type] 図形の種類
+ * @param {Point} [props.point] 座標
+ * @param {DragDirection} [props.direction] ドラッグ方向
+ * @param {boolean} [props.allowXDecimal] X座標の小数点許可フラグ
+ * @param {boolean} [props.allowYDecimal] Y座標の小数点許可フラグ
+ * @param {string} [props.cursor] カーソル
+ * @param {boolean} [props.visible] 表示フラグ
+ * @param {string} [props.color] 色
+ * @param {boolean} [props.hidden] 非表示フラグ
+ * @param {(e: DiagramDragEvent) => void} [props.onDragStart] ドラッグ開始時のイベントハンドラ
+ * @param {(e: DiagramDragEvent) => void} [props.onDrag] ドラッグ中のイベントハンドラ
+ * @param {(e: DiagramDragEvent) => void} [props.onDragEnd] ドラッグ終了時のイベントハンドラ
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDragOver] ドラッグオーバー時のイベントハンドラ
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDragLeave] ドラッグリーブ時のイベントハンドラ
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDrop] ドロップ時のイベントハンドラ
+ * @param {(e: DiagramHoverEvent) => void} [props.onHoverChange] ホバー変更時のイベントハンドラ
+ * @param {(point: Point) => Point} [props.dragPositioningFunction] ドラッグ位置変換関数
+ * @param {React.Ref<SVGGElement>} ref ドラッグポイントのRef
  * @returns {JSX.Element} ドラッグポイントコンポーネント
  */
 const DragPoint = forwardRef<SVGGElement, DragPointProps>(

@@ -60,33 +60,6 @@ const DraggableG = styled.g<DraggableGProps>`
 
 /**
  * ドラッグ領域のPropsの型定義
- *
- * @type {Object} DraggableProps
- * @property {string} [key] キー
- * @property {string} [id] ID（子要素にも同じIDを設定すること。しない場合は正しく動作しなくなる）
- * @property {DiagramType} [type] 図形の種類
- * @property {Point} [point] 座標
- * @property {DragDirection} [direction] ドラッグ方向
- * @property {boolean} [allowXDecimal] X座標の小数点許可フラグ
- * @property {boolean} [allowYDecimal] Y座標の小数点許可フラグ
- * @property {string} [cursor] カーソル
- * @property {boolean} [visible] 表示フラグ
- * @property {number} [tabIndex] タブインデックス
- * @property {string} [outline] アウトライン
- * @property {string} [outlineOffset] アウトラインオフセット
- * @property {SVGGElement} [ref] ドラッグ領域用のG要素への参照
- * @property {(e: DiagramPointerEvent) => void} [onPointerDown] ポインター押下時のイベントハンドラ
- * @property {(e: DiagramPointerEvent) => void} [onPointerUp] ポインター離上時のイベントハンドラ
- * @property {(e: DiagramClickEvent) => void} [onClick] クリック時のイベントハンドラ
- * @property {(e: DiagramDragEvent) => void} [onDragStart] ドラッグ開始時のイベントハンドラ
- * @property {(e: DiagramDragEvent) => void} [onDrag] ドラッグ中のイベントハンドラ
- * @property {(e: DiagramDragEvent) => void} [onDragEnd] ドラッグ終了時のイベントハンドラ
- * @property {(e: DiagramDragDropEvent) => void} [onDragOver] ドラッグオーバー時のイベントハンドラ
- * @property {(e: DiagramDragDropEvent) => void} [onDragLeave] ドラッグリーブ時のイベントハンドラ
- * @property {(e: DiagramDragDropEvent) => void} [onDrop] ドロップ時のイベントハンドラ
- * @property {(e: DiagramHoverEvent) => void} [onHoverChange] ホバー変更時のイベントハンドラ
- * @property {(point: Point) => Point} [dragPositioningFunction] ドラッグ位置変換関数
- * @property {React.ReactNode} [children] 子要素
  */
 export type DraggableProps = {
 	key?: string;
@@ -127,6 +100,30 @@ export type DraggableProps = {
  * ドラッグ完了時にPropsで渡されたコールバック関数を呼び出すことで、SvgCanvas側に座標の更新を通知する。
  *
  * @param {DraggableProps} props ドラッグ領域のProps
+ * @param {string} [props.key] キー
+ * @param {string} props.id ID（子要素にも同じIDを設定すること。しない場合は正しく動作しなくなる）
+ * @param {DiagramType} [props.type] 図形の種類
+ * @param {Point} props.point 座標
+ * @param {DragDirection} [props.direction] ドラッグ方向
+ * @param {boolean} [props.allowXDecimal] X座標の小数点許可フラグ
+ * @param {boolean} [props.allowYDecimal] Y座標の小数点許可フラグ
+ * @param {string} [props.cursor] カーソル
+ * @param {boolean} [props.visible] 表示フラグ
+ * @param {number} [props.tabIndex] タブインデックス
+ * @param {string} [props.outline] アウトライン
+ * @param {string} [props.outlineOffset] アウトラインオフセット
+ * @param {(e: DiagramPointerEvent) => void} [props.onPointerDown] ポインター押下時のイベントハンドラ
+ * @param {(e: DiagramPointerEvent) => void} [props.onPointerUp] ポインター離上時のイベントハンドラ
+ * @param {(e: DiagramClickEvent) => void} [props.onClick] クリック時のイベントハンドラ
+ * @param {(e: DiagramDragEvent) => void} [props.onDragStart] ドラッグ開始時のイベントハンドラ
+ * @param {(e: DiagramDragEvent) => void} [props.onDrag] ドラッグ中のイベントハンドラ
+ * @param {(e: DiagramDragEvent) => void} [props.onDragEnd] ドラッグ終了時のイベントハンドラ
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDragOver] ドラッグオーバー時のイベントハンドラ
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDragLeave] ドラッグリーブ時のイベントハンドラ
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDrop] ドロップ時のイベントハンドラ
+ * @param {(e: DiagramHoverEvent) => void} [props.onHoverChange] ホバー変更時のイベントハンドラ
+ * @param {(point: Point) => Point} [props.dragPositioningFunction] ドラッグ位置変換関数
+ * @param {React.Ref<SVGGElement>} ref ドラッグ領域用のG要素への参照
  * @returns {JSX.Element} ドラッグ領域コンポーネント
  */
 const Draggable = forwardRef<SVGGElement, DraggableProps>(
