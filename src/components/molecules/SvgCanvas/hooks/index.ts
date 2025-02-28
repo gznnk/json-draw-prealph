@@ -161,6 +161,20 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		});
 	}, []);
 
+	const onDiagramDelete = useCallback(() => {
+		setCanvasState((prevState) => {
+			const items = applyRecursive(prevState.items, (item) => {
+				item.items = item.items?.filter((i) => !i.isSelected);
+				return item;
+			}).filter((item) => !item.isSelected);
+
+			return {
+				...prevState,
+				items,
+			};
+		});
+	}, []);
+
 	const onDiagramConnect = useCallback(
 		(e: DiagramConnectEvent) => {
 			// alert("connect");
@@ -219,6 +233,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onDiagramResizing,
 		onDiagramResizeEnd,
 		onDiagramSelect,
+		onDiagramDelete,
 		onDiagramConnect,
 		onConnectPointMove,
 	};

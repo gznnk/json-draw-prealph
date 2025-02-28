@@ -384,27 +384,17 @@ function App() {
 	} = useSvgCanvas(testItems4);
 
 	const handleAddRectangle = () => {
-		canvasFunctions.addItem({
-			id: crypto.randomUUID(),
-			type: "Rectangle",
-			point: { x: 0, y: 0 },
-			width: 200,
-			height: 100,
-			keepProportion: false,
-			isSelected: false,
-			items: [
-				{
-					id: crypto.randomUUID(),
-					type: "ConnectPoint",
-					point: { x: 0, y: 0 },
-					name: "leftTopPoint",
-					keepProportion: false,
-					isSelected: false,
-					width: 200,
-					height: 100,
-				},
-			],
-		});
+		canvasFunctions.addItem(
+			createRectangleData(
+				crypto.randomUUID(),
+				{ x: 50, y: 50 },
+				100,
+				100,
+				"transparent",
+				"black",
+				"1px",
+			) as Diagram,
+		);
 	};
 
 	const handleAddEllipse = () => {

@@ -35,6 +35,7 @@ type SvgCanvasProps = {
 	onDiagramResizing?: (e: DiagramResizeEvent) => void;
 	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
+	onDiagramDelete?: () => void;
 	onDiagramConnect?: (e: DiagramConnectEvent) => void;
 	onConnectPointMove?: (e: ConnectPointMoveEvent) => void;
 };
@@ -50,6 +51,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		onDiagramResizing,
 		onDiagramResizeEnd,
 		onDiagramSelect,
+		onDiagramDelete,
 		onDiagramConnect,
 		onConnectPointMove,
 	}) => {
@@ -83,12 +85,16 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 
 		const handleKeyDown = useCallback(
 			(e: React.KeyboardEvent<SVGSVGElement>) => {
+				if (e.key === "Delete") {
+					onDiagramDelete?.();
+				}
+
 				// キャンバスにフォーカスがない場合はイベントをキャンセルし、スクロールを無効化
 				if (e.target !== e.currentTarget) {
 					e.preventDefault();
 				}
 			},
-			[],
+			[onDiagramDelete],
 		);
 
 		return (
