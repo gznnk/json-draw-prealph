@@ -150,7 +150,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 			const items = applyRecursive(prevState.items, (item) =>
 				item.id === e.id
 					? { ...item, isSelected: true }
-					: { ...item, isSelected: false },
+					: { ...item, isSelected: e.isMultiSelect ? item.isSelected : false },
 			);
 
 			return {

@@ -1,5 +1,5 @@
 // Reactのインポート
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useRef } from "react";
 
 // ライブラリのインポート
 import styled from "@emotion/styled";
@@ -8,12 +8,12 @@ import styled from "@emotion/styled";
 import type { Diagram } from "./types/DiagramTypes";
 import { DiagramTypeComponentMap } from "./types/DiagramTypes";
 import type {
+	ConnectPointMoveEvent,
+	DiagramConnectEvent,
+	DiagramDragDropEvent,
 	DiagramDragEvent,
 	DiagramResizeEvent,
 	DiagramSelectEvent,
-	DiagramDragDropEvent,
-	DiagramConnectEvent,
-	ConnectPointMoveEvent,
 } from "./types/EventTypes";
 
 const ContainerDiv = styled.div`
@@ -55,6 +55,15 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		onDiagramConnect,
 		onConnectPointMove,
 	}) => {
+		const isCtrlDown = useRef(false);
+
+		const handleDiagramSelect = useCallback(
+			(e: DiagramSelectEvent) => {
+				onDiagramSelect?.({ id: e.id, isMultiSelect: isCtrlDown.current });
+			},
+			[onDiagramSelect],
+		);
+
 		const renderedItems = items.map((item) => {
 			const itemType = DiagramTypeComponentMap[item.type];
 			const props = {
@@ -66,7 +75,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				onDiagramDrop,
 				onDiagramResizing,
 				onDiagramResizeEnd,
-				onDiagramSelect,
+				onDiagramSelect: handleDiagramSelect,
 				onDiagramConnect,
 				onConnectPointMove,
 			};
@@ -85,6 +94,10 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 
 		const handleKeyDown = useCallback(
 			(e: React.KeyboardEvent<SVGSVGElement>) => {
+				if (e.key === "Control") {
+					isCtrlDown.current = true;
+				}
+
 				if (e.key === "Delete") {
 					onDiagramDelete?.();
 				}
@@ -97,6 +110,12 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 			[onDiagramDelete],
 		);
 
+		const handleKeyUp = useCallback((e: React.KeyboardEvent<SVGSVGElement>) => {
+			if (e.key === "Control") {
+				isCtrlDown.current = false;
+			}
+		}, []);
+
 		return (
 			<ContainerDiv>
 				<svg
@@ -104,6 +123,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 					height="120vh"
 					onPointerDown={handlePointerDown}
 					onKeyDown={handleKeyDown}
+					onKeyUp={handleKeyUp}
 				>
 					<title>{title}</title>
 					{renderedItems}

@@ -245,12 +245,14 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			 */
 			const handlePointerDown = useCallback(
 				(_e: DiagramPointerEvent) => {
-					// 図形選択イベントを発火
-					onDiagramSelect?.({
-						id,
-					});
+					if (!isSelected) {
+						// 図形選択イベントを発火
+						onDiagramSelect?.({
+							id,
+						});
+					}
 				},
-				[id, onDiagramSelect],
+				[id, isSelected, onDiagramSelect],
 			);
 
 			// シフトキーの状態を監視

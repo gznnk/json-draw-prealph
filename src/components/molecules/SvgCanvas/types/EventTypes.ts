@@ -91,6 +91,7 @@ export type DiagramHoverEvent = {
  */
 export type DiagramSelectEvent = {
 	id: string;
+	isMultiSelect?: boolean;
 };
 
 export type DiagramConnectEvent = {
