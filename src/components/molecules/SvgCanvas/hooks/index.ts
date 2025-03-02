@@ -15,6 +15,7 @@ import type {
 	DiagramSelectEvent,
 	DiagramDragEvent,
 	DiagramResizeEvent,
+	DiagramRotateEvent,
 	DiagramDragDropEvent,
 	DiagramConnectEvent,
 	ConnectPointMoveEvent,
@@ -145,6 +146,16 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		}));
 	}, []);
 
+	const onDiagramRotateEnd = useCallback((e: DiagramRotateEvent) => {
+		logger.debug("onDiagramRotateEnd", e);
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: applyRecursive(prevState.items, (item) =>
+				item.id === e.id ? { ...item, rotation: e.rotation } : item,
+			),
+		}));
+	}, []);
+
 	const onDiagramSelect = useCallback((e: DiagramSelectEvent) => {
 		setCanvasState((prevState) => {
 			const items = applyRecursive(prevState.items, (item) =>
@@ -232,6 +243,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onDiagramDrop,
 		onDiagramResizing,
 		onDiagramResizeEnd,
+		onDiagramRotateEnd,
 		onDiagramSelect,
 		onDiagramDelete,
 		onDiagramConnect,

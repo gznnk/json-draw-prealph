@@ -24,6 +24,7 @@ export type RectangleBaseArrangement = RectangleBaseDragPoints & {
 	point: Point;
 	width: number;
 	height: number;
+	rotation: number;
 };
 
 /**

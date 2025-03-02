@@ -7,6 +7,17 @@ import type {
 } from "../../../types/EventTypes";
 import type { RectangleBaseArrangement } from "./RectangleBaseTypes";
 
+// TODO: 場所
+const rotatePoint = (center: Point, x: number, y: number, rotation: number) => {
+	const rad = (rotation * Math.PI) / 180;
+	const dx = x - center.x;
+	const dy = y - center.y;
+	return {
+		x: center.x + dx * Math.cos(rad) - dy * Math.sin(rad),
+		y: center.y + dx * Math.sin(rad) + dy * Math.cos(rad),
+	};
+};
+
 /**
  * 与えられた2つの点（pointとdiagonalPoint）から矩形の配置情報を計算します。
  *
@@ -17,53 +28,45 @@ import type { RectangleBaseArrangement } from "./RectangleBaseTypes";
 export const calcArrangment = (
 	point: Point,
 	diagonalPoint: Point,
+	rotation = 0,
 ): RectangleBaseArrangement => {
 	const top = Math.round(Math.min(point.y, diagonalPoint.y));
 	const bottom = Math.round(Math.max(point.y, diagonalPoint.y));
 	const left = Math.round(Math.min(point.x, diagonalPoint.x));
 	const right = Math.round(Math.max(point.x, diagonalPoint.x));
 
-	const leftTopPoint = {
-		x: left,
-		y: top,
-	};
-
 	const newWidth = right - left;
 	const newHeight = bottom - top;
 
+	const centerX = left + newWidth / 2;
+	const centerY = top + newHeight / 2;
+	const center = { x: centerX, y: centerY };
+
+	const leftTopPoint = rotatePoint(center, left, top, rotation);
+	const leftBottomPoint = rotatePoint(center, left, bottom, rotation);
+	const rightTopPoint = rotatePoint(center, right, top, rotation);
+	const rightBottomPoint = rotatePoint(center, right, bottom, rotation);
+	const topCenterPoint = rotatePoint(center, centerX, top, rotation);
+	const leftCenterPoint = rotatePoint(center, left, centerY, rotation);
+	const rightCenterPoint = rotatePoint(center, right, centerY, rotation);
+	const bottomCenterPoint = rotatePoint(center, centerX, bottom, rotation);
+
 	const result: RectangleBaseArrangement = {
-		point: leftTopPoint,
+		point: {
+			x: left,
+			y: top,
+		},
 		width: newWidth,
 		height: newHeight,
+		rotation: rotation || 0,
 		leftTopPoint,
-		leftBottomPoint: {
-			x: left,
-			y: bottom,
-		},
-		rightTopPoint: {
-			x: right,
-			y: top,
-		},
-		rightBottomPoint: {
-			x: right,
-			y: bottom,
-		},
-		topCenterPoint: {
-			x: left + newWidth / 2,
-			y: top,
-		},
-		leftCenterPoint: {
-			x: left,
-			y: top + newHeight / 2,
-		},
-		rightCenterPoint: {
-			x: right,
-			y: top + newHeight / 2,
-		},
-		bottomCenterPoint: {
-			x: left + newWidth / 2,
-			y: bottom,
-		},
+		leftBottomPoint,
+		rightTopPoint,
+		rightBottomPoint,
+		topCenterPoint,
+		leftCenterPoint,
+		rightCenterPoint,
+		bottomCenterPoint,
 	};
 
 	return result;

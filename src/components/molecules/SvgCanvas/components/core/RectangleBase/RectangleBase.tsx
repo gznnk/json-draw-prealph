@@ -56,6 +56,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				point,
 				width,
 				height,
+				rotation,
 				keepProportion = false,
 				tabIndex = 0,
 				isSelected = false,
@@ -66,6 +67,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				onDiagramResizeStart,
 				onDiagramResizing,
 				onDiagramResizeEnd,
+				onDiagramRotateEnd,
 				onDiagramSelect,
 				onDiagramHoverChange,
 				children,
@@ -73,7 +75,11 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			ref,
 		) => {
 			const [state, setState] = useState<RectangleBaseState>({
-				...calcArrangment(point, { x: point.x + width, y: point.y + height }),
+				...calcArrangment(
+					point,
+					{ x: point.x + width, y: point.y + height },
+					rotation,
+				),
 				aspectRatio: width / height,
 				isDragging: false,
 			});
@@ -93,13 +99,17 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				setState((prevState) => ({
 					...prevState,
 					id: id,
-					...calcArrangment(point, {
-						x: point.x + width,
-						y: point.y + height,
-					}),
+					...calcArrangment(
+						point,
+						{
+							x: point.x + width,
+							y: point.y + height,
+						},
+						rotation,
+					),
 					aspectRatio: width / height,
 				}));
-			}, [id, point, width, height]);
+			}, [id, point, width, height, rotation]);
 
 			/**
 			 * ドラッグ開始イベントハンドラ
@@ -162,10 +172,14 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 					// ドラッグポイントの位置を更新
 					setState((prevState) => ({
 						...prevState,
-						...calcArrangment(e.endPoint, {
-							x: e.endPoint.x + prevState.width,
-							y: e.endPoint.y + prevState.height,
-						}),
+						...calcArrangment(
+							e.endPoint,
+							{
+								x: e.endPoint.x + prevState.width,
+								y: e.endPoint.y + prevState.height,
+							},
+							rotation,
+						),
 						isDragging: false,
 					}));
 				},
@@ -282,6 +296,10 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				};
 			}, [isSelected]);
 
+			const handleRotateLeft = () => {
+				onDiagramRotateEnd?.({ id, rotation: (rotation ?? 0) - 15 });
+			};
+
 			return (
 				<>
 					<Draggable
@@ -309,6 +327,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								stroke="blue"
 								strokeWidth="1px"
 								strokeDasharray="3,3"
+								transform={`rotate(${rotation} ${width / 2} ${height / 2})`}
 								pointerEvents={"none"}
 								ref={outlineRef}
 							/>
@@ -390,6 +409,17 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							/>
 						</>
 					)}
+					{/* Rotation buttons */}
+					<rect
+						x={point.x}
+						y={point.y}
+						width={20}
+						height={20}
+						fill="red"
+						onPointerDown={handleRotateLeft}
+					>
+						Rotate Left
+					</rect>
 				</>
 			);
 		},

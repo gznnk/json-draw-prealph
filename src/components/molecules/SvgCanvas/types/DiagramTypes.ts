@@ -12,6 +12,7 @@ import type {
 	DiagramDragEvent,
 	DiagramHoverEvent,
 	DiagramResizeEvent,
+	DiagramRotateEvent,
 	DiagramSelectEvent,
 	GroupDragEvent,
 	GroupResizeEvent,
@@ -39,8 +40,9 @@ export type DiagramBaseData = {
 	id: string;
 	type?: DiagramType;
 	point: Point;
-	width: number;
-	height: number;
+	width: number; // TODO: 場所
+	height: number; // TODO: 場所
+	rotation?: number; // TODO: 場所
 	keepProportion: boolean;
 	isSelected: boolean;
 	items?: Diagram[];
@@ -93,6 +95,8 @@ export type DiagramBaseProps = DiagramBaseData & {
 	onDiagramResizeStart?: (e: DiagramResizeEvent) => void;
 	onDiagramResizing?: (e: DiagramResizeEvent) => void;
 	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
+	onDiagramRotating?: (e: DiagramRotateEvent) => void;
+	onDiagramRotateEnd?: (e: DiagramRotateEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
 	onDiagramHoverChange?: (e: DiagramHoverEvent) => void;
 	onDiagramConnect?: (e: DiagramConnectEvent) => void;

@@ -45,6 +45,11 @@ export type DiagramResizeEvent = {
 	height: number;
 };
 
+export type DiagramRotateEvent = {
+	id: string;
+	rotation: number;
+};
+
 /**
  * グループのドラッグイベント
  */
