@@ -48,6 +48,8 @@ export type RectangleBaseData = DiagramBaseData & {
 	width: number;
 	height: number;
 	rotation: number;
+	scaleX: number;
+	scaleY: number;
 	keepProportion: boolean;
 };
 

@@ -83,6 +83,58 @@ export const radiansToDegrees = (radians: number): number => {
 };
 
 /**
+ * 座標を中心点の周りに回転させる関数
+ *
+ * @param {Point} point - 回転させる座標
+ * @param {Point} center - 回転の中心となる座標
+ * @param {number} theta - 回転角度（ラジアン）
+ * @returns {Point} 回転後の座標
+ */
+export const rotatePoint = (
+	point: Point,
+	center: Point,
+	theta: number,
+): Point => {
+	const cosTheta = Math.cos(theta);
+	const sinTheta = Math.sin(theta);
+	const dx = point.x - center.x;
+	const dy = point.y - center.y;
+
+	const x = center.x + (dx * cosTheta - dy * sinTheta);
+	const y = center.y + (dx * sinTheta + dy * cosTheta);
+
+	return { x, y };
+};
+
+// TODO いらない？
+/**
+ * すでに回転している四角形の幅と高さを計算する関数
+ *
+ * @param {Point} topLeft - 左上の座標
+ * @param {Point} bottomRight - 右下の座標
+ * @param {number} theta - 回転角度（ラジアン）
+ * @returns {{ width: number, height: number }} 四角形の幅と高さ
+ */
+export const calcRotatedRectangleDimensions = (
+	topLeft: Point,
+	bottomRight: Point,
+	theta: number,
+): { width: number; height: number } => {
+	const center: Point = {
+		x: (topLeft.x + bottomRight.x) / 2,
+		y: (topLeft.y + bottomRight.y) / 2,
+	};
+
+	const topLeftRotated = rotatePoint(topLeft, center, -theta);
+	const bottomRightRotated = rotatePoint(bottomRight, center, -theta);
+
+	const width = Math.abs(bottomRightRotated.x - topLeftRotated.x);
+	const height = Math.abs(bottomRightRotated.y - topLeftRotated.y);
+
+	return { width, height };
+};
+
+/**
  * 点にアフィン変換を適用する
  *
  * @param point - 変換対象の座標

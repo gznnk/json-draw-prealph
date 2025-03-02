@@ -35,11 +35,11 @@ export const calcRectangleVertices = (
 	const halfWidth = width / 2;
 	const halfHeight = height / 2;
 
-	const tx = point.x + halfWidth;
-	const ty = point.y + halfHeight;
+	const tx = point.x;
+	const ty = point.y;
 
 	const leftTopPoint = affineTransformation(
-		{ x: -halfWidth, y: -halfWidth },
+		{ x: -halfWidth, y: -halfHeight },
 		1,
 		1,
 		degreesToRadians(rotation),
@@ -48,7 +48,7 @@ export const calcRectangleVertices = (
 	);
 
 	const leftBottomPoint = affineTransformation(
-		{ x: -halfWidth, y: halfWidth },
+		{ x: -halfWidth, y: halfHeight },
 		1,
 		1,
 		degreesToRadians(rotation),
@@ -57,7 +57,7 @@ export const calcRectangleVertices = (
 	);
 
 	const rightTopPoint = affineTransformation(
-		{ x: halfWidth, y: -halfWidth },
+		{ x: halfWidth, y: -halfHeight },
 		1,
 		1,
 		degreesToRadians(rotation),
@@ -66,7 +66,7 @@ export const calcRectangleVertices = (
 	);
 
 	const rightBottomPoint = affineTransformation(
-		{ x: halfWidth, y: halfWidth },
+		{ x: halfWidth, y: halfHeight },
 		1,
 		1,
 		degreesToRadians(rotation),
@@ -75,7 +75,7 @@ export const calcRectangleVertices = (
 	);
 
 	const topCenterPoint = affineTransformation(
-		{ x: 0, y: -halfWidth },
+		{ x: 0, y: -halfHeight },
 		1,
 		1,
 		degreesToRadians(rotation),
@@ -102,7 +102,7 @@ export const calcRectangleVertices = (
 	);
 
 	const bottomCenterPoint = affineTransformation(
-		{ x: 0, y: halfWidth },
+		{ x: 0, y: halfHeight },
 		1,
 		1,
 		degreesToRadians(rotation),

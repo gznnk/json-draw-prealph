@@ -15,8 +15,24 @@ export type RectangleBaseVertices = {
 	bottomCenterPoint: Point;
 };
 
+export type RectangleTransformMatrix = {
+	sx: number;
+	sy: number;
+	theta: number;
+	tx: number;
+	ty: number;
+};
+
+export type RectangleBaseBox = {
+	point: Point;
+	width: number;
+	height: number;
+	scaleX: number;
+	scaleY: number;
+};
+
 /**
- * 矩形のドラッグポイントの位置
+ * 矩形のドラッグポイントの位置: 廃止
  */
 export type RectangleBaseDragPoints = {
 	leftTopPoint: Point;
@@ -30,7 +46,7 @@ export type RectangleBaseDragPoints = {
 };
 
 /**
- * 矩形の配置情報
+ * 矩形の配置情報 TODO: 廃止
  */
 export type RectangleBaseArrangement = RectangleBaseDragPoints & {
 	point: Point;
@@ -105,9 +121,14 @@ export type RectangleBaseDragPointProps = RectangleBaseArrangement & {
 	dragEndPointType?: DragPointType;
 	keepProportion: boolean;
 	aspectRatio?: number;
+	rotation?: number;
+	scaleX?: number;
+	scaleY?: number;
 	hidden?: boolean;
 	isSelected?: boolean;
-	onArrangmentChangeStart: (e: ArrangmentChangeStartEvent) => void;
-	onArrangmentChange: (e: ArrangmentChangeEvent) => void;
-	onArrangmentChangeEnd: (e: ArrangmentChangeEndEvent) => void;
+	onArrangmentChangeStart: (e: ArrangmentChangeStartEvent) => void; // TODO: 廃止
+	onArrangmentChange: (e: ArrangmentChangeEvent) => void; // TODO: 廃止
+	onArrangmentChangeEnd: (e: ArrangmentChangeEndEvent) => void; // TODO: 廃止
+
+	onResizeEnd?: (e: RectangleBaseBox) => void;
 };

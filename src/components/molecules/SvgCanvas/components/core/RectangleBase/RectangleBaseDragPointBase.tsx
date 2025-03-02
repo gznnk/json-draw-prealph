@@ -18,6 +18,8 @@ import DragPoint from "../DragPoint";
 import type {
 	DragPointType,
 	RectangleBaseArrangement,
+	RectangleTransformMatrix,
+	RectangleBaseBox,
 } from "./RectangleBaseTypes";
 
 export type RectangleBaseDragPointBaseProps = {
@@ -31,15 +33,18 @@ export type RectangleBaseDragPointBaseProps = {
 	draggingPointType?: DragPointType;
 	dragEndPointType?: DragPointType;
 	hidden?: boolean;
-	onArrangmentChangeStart: (e: { dragPointType: DragPointType }) => void;
-	onArrangmentChange: (e: { arrangment: RectangleBaseArrangement }) => void;
+	onArrangmentChangeStart: (e: { dragPointType: DragPointType }) => void; // TODO 廃止
+	onArrangmentChange: (e: { arrangment: RectangleBaseArrangement }) => void; // TODO 廃止
 	onArrangmentChangeEnd: (e: {
 		dragPointType: DragPointType;
 		arrangment: RectangleBaseArrangement;
-	}) => void;
+	}) => void; // TODO 廃止
+	onResizeEnd?: (e: RectangleBaseBox) => void;
+
 	dragPositioningFunction?: (point: Point) => Point;
-	calcArrangmentFunction: (e: DiagramDragEvent) => RectangleBaseArrangement;
-	judgeNewDragPointType: (
+	calcArrangmentFunction: (e: DiagramDragEvent) => RectangleBaseArrangement; // TODO 廃止
+	calcBoxFunction?: (e: DiagramDragEvent) => RectangleBaseBox;
+	judgeNewDragPointType?: (
 		newArrangement: RectangleBaseArrangement,
 	) => DragPointType;
 };
@@ -63,8 +68,11 @@ const RectangleBaseDragPointBase = forwardRef<
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
+			onResizeEnd,
 			dragPositioningFunction,
 			calcArrangmentFunction,
+
+			calcBoxFunction,
 			judgeNewDragPointType,
 		},
 		ref,
@@ -85,26 +93,27 @@ const RectangleBaseDragPointBase = forwardRef<
 			});
 		}, [onArrangmentChangeStart, dragPointType]);
 
-		const onDrag = useCallback(
-			(e: DiagramDragEvent) => {
-				onArrangmentChange({
-					arrangment: calcArrangmentFunction(e),
-				});
-			},
-			[calcArrangmentFunction, onArrangmentChange],
-		);
+		const onDrag = useCallback((e: DiagramDragEvent) => {
+			// onDragPointDrag?.(calcTransformMatrixFunction?.(e));
+			// onArrangmentChange({
+			// 	arrangment: calcArrangmentFunction(e),
+			// });
+		}, []);
 
 		const onDragEnd = useCallback(
 			(e: DiagramDragEvent) => {
-				const newArrangment = calcArrangmentFunction(e);
-				const newDataPoint = judgeNewDragPointType(newArrangment);
-
-				onArrangmentChangeEnd({
-					dragPointType: newDataPoint,
-					arrangment: newArrangment,
-				});
+				const box = calcBoxFunction?.(e);
+				if (box) {
+					onResizeEnd?.(box);
+				}
+				// const newArrangment = calcArrangmentFunction(e);
+				// const newDataPoint = judgeNewDragPointType(newArrangment);
+				// onArrangmentChangeEnd({
+				// 	dragPointType: newDataPoint,
+				// 	arrangment: newArrangment,
+				// });
 			},
-			[calcArrangmentFunction, judgeNewDragPointType, onArrangmentChangeEnd],
+			[calcBoxFunction, onResizeEnd],
 		);
 
 		if (draggingPointType && draggingPointType !== dragPointType) {

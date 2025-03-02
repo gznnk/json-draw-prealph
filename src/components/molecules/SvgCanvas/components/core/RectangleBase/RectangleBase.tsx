@@ -53,6 +53,7 @@ import {
 	calculateAngle,
 	calcNearestCircleIntersectionPoint,
 } from "../../../functions/Math";
+import { createSvgTransform } from "../../../functions/Svg";
 
 export type RectangleBaseProps = DiagramBaseProps &
 	RectangleBaseData & {
@@ -71,6 +72,8 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				width,
 				height,
 				rotation,
+				scaleX = 1,
+				scaleY = 1,
 				keepProportion = false,
 				tabIndex = 0,
 				isSelected = false,
@@ -303,17 +306,13 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				};
 			}, [isSelected]);
 
-			const handleRotateLeft = () => {
-				onDiagramRotateEnd?.({ id, rotation: (rotation ?? 0) + 15 });
-			};
-
 			const rotatePoint = affineTransformation(
 				{ x: width / 2 + 20, y: 0 },
 				1,
 				1,
 				degreesToRadians(rotation),
-				point.x + width / 2,
-				point.y + height / 2,
+				point.x,
+				point.y,
 			);
 
 			return (
@@ -335,8 +334,8 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						{isSelected && (
 							// アウトライン用の四角形
 							<rect
-								x={0}
-								y={0}
+								x={-width / 2}
+								y={-height / 2}
 								width={width}
 								height={height}
 								fill="transparent"
@@ -344,7 +343,13 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								strokeWidth="1px"
 								strokeDasharray="3,3"
 								pointerEvents={"none"}
-								transform={`rotate(${rotation}, ${width / 2}, ${height / 2})`}
+								transform={createSvgTransform(
+									scaleX,
+									scaleY,
+									degreesToRadians(rotation),
+									0,
+									0,
+								)}
 								ref={outlineRef}
 							/>
 						)}
@@ -358,11 +363,21 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								width={width}
 								height={height}
 								rotation={rotation}
+								scaleX={scaleX}
+								scaleY={scaleY}
 								id={id}
 								keepProportion={_keepProportion}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
+								onResizeEnd={(e) => {
+									onDiagramResizeEnd?.({
+										id,
+										point: e.point,
+										width: e.width,
+										height: e.height,
+									});
+								}}
 							/>
 							{/* 左下 */}
 							<DragPointLeftBottom
@@ -460,11 +475,7 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								id={`rotation-${id}`}
 								point={rotatePoint}
 								onDrag={(e) => {
-									const center = {
-										x: point.x + width / 2,
-										y: point.y + height / 2,
-									};
-									const angle = calculateAngle(center, e.endPoint);
+									const angle = calculateAngle(point, e.endPoint);
 									console.log(radiansToDegrees(angle));
 									// onDiagramRotateEnd?.({
 									// 	id,
@@ -472,15 +483,11 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 									// });
 									outlineRef.current?.setAttribute(
 										"transform",
-										`rotate(${radiansToDegrees(angle)}, ${width / 2}, ${height / 2})`,
+										createSvgTransform(1, 1, angle, 0, 0),
 									);
 								}}
 								onDragEnd={(e) => {
-									const center = {
-										x: point.x + width / 2,
-										y: point.y + height / 2,
-									};
-									const angle = calculateAngle(center, e.endPoint);
+									const angle = calculateAngle(point, e.endPoint);
 									onDiagramRotateEnd?.({
 										id,
 										rotation: radiansToDegrees(angle),
@@ -488,31 +495,14 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 								}}
 								dragPositioningFunction={(p: Point) => {
 									return calcNearestCircleIntersectionPoint(
-										{ x: point.x + width / 2, y: point.y + height / 2 },
+										{ x: point.x, y: point.y },
 										width / 2 + 20,
 										p,
 									);
 								}}
 							/>
-							<path
-								d={`M${point.x + width / 2} ${point.y + height / 2} L${rotatePoint.x} ${rotatePoint.y}`}
-								stroke="red"
-								strokeWidth="1"
-								pointerEvents="none"
-							/>
 						</>
 					)}
-					{/* Rotation buttons */}
-					<rect
-						x={point.x}
-						y={point.y}
-						width={20}
-						height={20}
-						fill="red"
-						onPointerDown={handleRotateLeft}
-					>
-						Rotate Left
-					</rect>
 				</>
 			);
 		},

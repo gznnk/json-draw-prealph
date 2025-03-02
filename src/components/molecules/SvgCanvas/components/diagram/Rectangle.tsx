@@ -43,6 +43,7 @@ import {
 	calcPointOnGroupDrag,
 } from "../core/RectangleBase/RectangleBaseFunctions";
 import { degreesToRadians } from "../../functions/Math";
+import { createSvgTransform } from "../../functions/Svg";
 
 export type RectangleProps = RectangleBaseProps & RectangleData;
 
@@ -55,6 +56,8 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				width,
 				height,
 				rotation = 0,
+				scaleX = 1,
+				scaleY = 1,
 				fill = "transparent",
 				stroke = "black",
 				strokeWidth = "1px",
@@ -339,6 +342,8 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						width={width}
 						height={height}
 						rotation={rotation}
+						scaleX={scaleX}
+						scaleY={scaleY}
 						tabIndex={tabIndex}
 						keepProportion={keepProportion}
 						isSelected={isSelected}
@@ -357,14 +362,20 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						<rect
 							key={`rect-${id}`}
 							id={id}
-							x={0}
-							y={0}
+							x={-width / 2}
+							y={-height / 2}
 							width={width}
 							height={height}
 							fill={fill}
 							stroke={stroke}
 							strokeWidth={strokeWidth}
-							transform={`rotate(${rotation}, ${width / 2}, ${height / 2})`}
+							transform={createSvgTransform(
+								scaleX,
+								scaleY,
+								degreesToRadians(rotation),
+								0,
+								0,
+							)}
 							ref={svgRef}
 						/>
 					</RectangleBase>
@@ -464,6 +475,8 @@ export const createRectangleData = (
 		width,
 		height,
 		rotation: degreesToRadians(0),
+		scaleX: 1,
+		scaleY: 1,
 		fill,
 		stroke,
 		strokeWidth,

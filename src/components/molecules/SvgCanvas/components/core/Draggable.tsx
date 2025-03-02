@@ -158,10 +158,10 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 	) => {
 		// このドラッグ領域の座標
 		const [state, setState] = useState({ point });
+		// ドラッグ中かのフラグ
+		const [isDragging, setIsDragging] = useState(false);
 		// このドラッグ領域でポインターが押されたかどうかのフラグ
 		const isPointerDown = useRef(false);
-		// ドラッグ中かのフラグ
-		const isDragging = useRef(false);
 		// 矢印キーによるドラッグ中かのフラグ
 		const isArrowDragging = useRef(false);
 		// ドラッグエンターしたかのフラグ
@@ -177,8 +177,10 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 
 		// Propsで渡された座標が変更された場合、Stateにも反映する
 		useEffect(() => {
-			setState({ point });
-		}, [point]);
+			if (!isDragging) {
+				setState({ point });
+			}
+		}, [point, isDragging]);
 
 		/**
 		 * 座標を調整する
@@ -299,16 +301,16 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				};
 
 				if (
-					!isDragging.current &&
+					!isDragging &&
 					(Math.abs(e.clientX - startClientPoint.current.x) > 3 ||
 						Math.abs(e.clientY - startClientPoint.current.y) > 3)
 				) {
 					// ドラッグ中でない場合、かつポインターの移動量が一定以上の場合はドラッグ開始とする
 					onDragStart?.(dragEvent);
-					isDragging.current = true;
+					setIsDragging(true);
 				}
 
-				if (!isDragging.current) {
+				if (!isDragging) {
 					// ドラッグ中でない場合は何もしない
 					return;
 				}
@@ -340,7 +342,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 					}),
 				);
 			},
-			[getPointOnDrag, onDragStart, onDrag, id, type, state.point],
+			[getPointOnDrag, onDragStart, onDrag, id, type, isDragging, state.point],
 		);
 
 		/**
@@ -351,7 +353,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 		 */
 		const handlePointerUp = useCallback(
 			(e: React.PointerEvent<SVGElement>): void => {
-				if (isDragging.current) {
+				if (isDragging) {
 					// ドラッグ座標を取得
 					const dragPoint = getPointOnDrag(e);
 
@@ -380,7 +382,7 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 					);
 				}
 
-				if (isPointerDown.current && !isDragging.current) {
+				if (isPointerDown.current && !isDragging) {
 					// ドラッグ後のポインターアップでなければ、クリックイベントを親側に通知する
 					onClick?.({
 						id,
@@ -393,10 +395,19 @@ const Draggable = forwardRef<SVGGElement, DraggableProps>(
 				});
 
 				// フラグのクリア
-				isDragging.current = false;
+				setIsDragging(false);
 				isPointerDown.current = false;
 			},
-			[getPointOnDrag, onDragEnd, onClick, onPointerUp, id, type, state.point],
+			[
+				getPointOnDrag,
+				onDragEnd,
+				onClick,
+				onPointerUp,
+				id,
+				type,
+				isDragging,
+				state.point,
+			],
 		);
 
 		/**
