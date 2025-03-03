@@ -39,6 +39,8 @@ export type RectangleBaseDragPointBaseProps = {
 		dragPointType: DragPointType;
 		arrangment: RectangleBaseArrangement;
 	}) => void; // TODO 廃止
+
+	onResizing?: (e: RectangleBaseBox) => void;
 	onResizeEnd?: (e: RectangleBaseBox) => void;
 
 	dragPositioningFunction?: (point: Point) => Point;
@@ -68,6 +70,7 @@ const RectangleBaseDragPointBase = forwardRef<
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
+			onResizing,
 			onResizeEnd,
 			dragPositioningFunction,
 			calcArrangmentFunction,
@@ -93,12 +96,15 @@ const RectangleBaseDragPointBase = forwardRef<
 			});
 		}, [onArrangmentChangeStart, dragPointType]);
 
-		const onDrag = useCallback((e: DiagramDragEvent) => {
-			// onDragPointDrag?.(calcTransformMatrixFunction?.(e));
-			// onArrangmentChange({
-			// 	arrangment: calcArrangmentFunction(e),
-			// });
-		}, []);
+		const onDrag = useCallback(
+			(e: DiagramDragEvent) => {
+				const box = calcBoxFunction?.(e);
+				if (box) {
+					onResizing?.(box);
+				}
+			},
+			[calcBoxFunction, onResizing],
+		);
 
 		const onDragEnd = useCallback(
 			(e: DiagramDragEvent) => {

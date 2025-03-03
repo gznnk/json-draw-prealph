@@ -6,10 +6,7 @@ import type { Point } from "../../../types/CoordinateTypes";
 import type { DiagramDragEvent } from "../../../types/EventTypes";
 
 // RectangleBase関連型定義をインポート
-import type {
-	RectangleBaseArrangement,
-	RectangleBaseDragPointProps,
-} from "./RectangleBaseTypes";
+import type { RectangleBaseDragPointProps } from "./RectangleBaseTypes";
 import { DragPointType } from "./RectangleBaseTypes";
 
 // RectangleBase関連コンポーネントをインポート
@@ -18,16 +15,10 @@ import RectangleBaseDragPointBase from "./RectangleBaseDragPointBase";
 // RectangleBase関連関数をインポート
 import {
 	calcArrangment,
-	calcRectangleVertices,
 	createLinerDragY2xFunction,
 } from "./RectangleBaseFunctions";
 
-import {
-	calculateDistance,
-	rotatePoint,
-	degreesToRadians,
-	calcRotatedRectangleDimensions,
-} from "../../../functions/Math";
+import { degreesToRadians, rotatePoint } from "../../../functions/Math";
 
 const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 	(
@@ -36,8 +27,6 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 			leftTopPoint,
 			rightBottomPoint,
 			rotation = 0,
-			scaleX = 1,
-			scaleY = 1,
 			draggingPointType,
 			dragEndPointType,
 			keepProportion,
@@ -46,6 +35,7 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 			onArrangmentChangeStart,
 			onArrangmentChange,
 			onArrangmentChangeEnd,
+			onResizing,
 			onResizeEnd,
 		},
 		ref,
@@ -74,18 +64,20 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 					-radians,
 				);
 
-				const newWidth = Math.abs(bottomRightRotated.x - topLeftRotated.x);
-				let newHeight = Math.abs(bottomRightRotated.y - topLeftRotated.y);
+				const newWidth = bottomRightRotated.x - topLeftRotated.x;
+				let newHeight: number;
 				if (keepProportion && aspectRatio) {
 					newHeight = newWidth / aspectRatio;
+				} else {
+					newHeight = bottomRightRotated.y - topLeftRotated.y;
 				}
 
 				return {
 					point: center,
-					width: newWidth,
-					height: newHeight,
-					scaleX: 1,
-					scaleY: 1,
+					width: Math.abs(newWidth),
+					height: Math.abs(newHeight),
+					scaleX: newWidth > 0 ? 1 : -1,
+					scaleY: newHeight > 0 ? 1 : -1,
 				};
 			},
 			[rightBottomPoint, rotation, keepProportion, aspectRatio],
@@ -109,6 +101,7 @@ const DragPointLeftTop = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 				onArrangmentChangeStart={onArrangmentChangeStart}
 				onArrangmentChange={onArrangmentChange}
 				onArrangmentChangeEnd={onArrangmentChangeEnd}
+				onResizing={onResizing}
 				onResizeEnd={onResizeEnd}
 				dragPositioningFunction={keepProportion ? linerDragFunction : undefined}
 				calcBoxFunction={calcBoxFunction}

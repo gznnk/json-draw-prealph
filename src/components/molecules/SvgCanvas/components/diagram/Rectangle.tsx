@@ -408,7 +408,7 @@ export const createRectangleData = (
 	stroke: string,
 	strokeWidth: string,
 ): RectangleData => {
-	const vertices = calcRectangleVertices(point, width, height, 0);
+	const vertices = calcRectangleVertices(point, width, height, 0, 1, 1);
 
 	const items: Diagram[] = [];
 	items.push({

@@ -6,6 +6,7 @@ import {
 	useCallback,
 	useEffect,
 	useImperativeHandle,
+	useMemo,
 	useRef,
 	useState,
 } from "react";
@@ -30,6 +31,7 @@ import type {
 	ArrangmentChangeEndEvent,
 	ArrangmentChangeEvent,
 	ArrangmentChangeStartEvent,
+	RectangleBaseBox,
 	RectangleBaseState,
 } from "./RectangleBaseTypes";
 
@@ -48,10 +50,10 @@ import { calcRectangleVertices } from "./RectangleBaseFunctions";
 
 import {
 	affineTransformation,
+	calcNearestCircleIntersectionPoint,
+	calculateAngle,
 	degreesToRadians,
 	radiansToDegrees,
-	calculateAngle,
-	calcNearestCircleIntersectionPoint,
 } from "../../../functions/Math";
 import { createSvgTransform } from "../../../functions/Svg";
 
@@ -92,13 +94,10 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 			ref,
 		) => {
 			const [state, setState] = useState<RectangleBaseState>({
-				...calcRectangleVertices(point, width, height, rotation),
 				aspectRatio: width / height,
 				isDragging: false,
 			});
 			const [isShiftKeyDown, setShiftKeyDown] = useState(false);
-
-			const _keepProportion = isShiftKeyDown || keepProportion;
 
 			const draggableRef = useRef<SVGGElement>({} as SVGGElement);
 			const outlineRef = useRef<SVGRectElement>({} as SVGRectElement);
@@ -112,10 +111,9 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				setState((prevState) => ({
 					...prevState,
 					id: id,
-					...calcRectangleVertices(point, width, height, rotation),
 					aspectRatio: width / height,
 				}));
-			}, [id, point, width, height, rotation]);
+			}, [id, width, height]);
 
 			/**
 			 * ドラッグ開始イベントハンドラ
@@ -182,6 +180,8 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 							width,
 							height,
 							rotation,
+							scaleX,
+							scaleY,
 						),
 						isDragging: false,
 					}));
@@ -241,24 +241,23 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 
 			const onArrangmentChangeEnd = useCallback(
 				(e: ArrangmentChangeEndEvent) => {
-					setState((prevState) => ({
-						...prevState,
-						...e.arrangment,
-						aspectRatio: _keepProportion
-							? prevState.aspectRatio
-							: e.arrangment.width / e.arrangment.height,
-						draggingPointType: undefined,
-						dragEndPointType: e.dragPointType,
-					}));
-
-					onDiagramResizeEnd?.({
-						id,
-						point: e.arrangment.leftTopPoint,
-						width: e.arrangment.width,
-						height: e.arrangment.height,
-					});
+					// setState((prevState) => ({
+					// 	...prevState,
+					// 	...e.arrangment,
+					// 	aspectRatio: _keepProportion
+					// 		? prevState.aspectRatio
+					// 		: e.arrangment.width / e.arrangment.height,
+					// 	draggingPointType: undefined,
+					// 	dragEndPointType: e.dragPointType,
+					// }));
+					// onDiagramResizeEnd?.({
+					// 	id,
+					// 	point: e.arrangment.leftTopPoint,
+					// 	width: e.arrangment.width,
+					// 	height: e.arrangment.height,
+					// });
 				},
-				[onDiagramResizeEnd, id, _keepProportion],
+				[],
 			);
 
 			/**
@@ -315,6 +314,57 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 				point.y,
 			);
 
+			const handleResizing = useCallback(
+				(e: RectangleBaseBox) => {
+					// TODO: x, yの計算がおかしい
+					//outlineRef.current?.setAttribute("x", `${-e.width + width / 2}`);
+					//outlineRef.current?.setAttribute("y", `${-e.height + height / 2}`);
+					outlineRef.current?.setAttribute("width", `${e.width}`);
+					outlineRef.current?.setAttribute("height", `${e.height}`);
+					outlineRef.current?.setAttribute(
+						"transform",
+						createSvgTransform(
+							e.scaleX,
+							e.scaleY,
+							degreesToRadians(rotation),
+							0,
+							0,
+						),
+					);
+				},
+				[width, height, rotation],
+			);
+
+			const handleResizeEnd = useCallback(
+				(e: RectangleBaseBox) => {
+					onDiagramResizeEnd?.({
+						id,
+						...e,
+					});
+				},
+				[onDiagramResizeEnd, id],
+			);
+
+			const vertices = useMemo(
+				() =>
+					calcRectangleVertices(point, width, height, rotation, scaleX, scaleY),
+				[point, width, height, rotation, scaleX, scaleY],
+			);
+
+			const dragPointProps = {
+				...vertices,
+				id,
+				point,
+				width,
+				height,
+				rotation,
+				scaleX,
+				scaleY,
+				keepProportion: isShiftKeyDown || keepProportion,
+				onResizing: handleResizing,
+				onResizeEnd: handleResizeEnd,
+			};
+
 			return (
 				<>
 					<Draggable
@@ -358,114 +408,56 @@ const RectangleBase: React.FC<RectangleBaseProps> = memo(
 						<>
 							{/* 左上 */}
 							<DragPointLeftTop
-								{...state}
-								point={point}
-								width={width}
-								height={height}
-								rotation={rotation}
-								scaleX={scaleX}
-								scaleY={scaleY}
-								id={id}
-								keepProportion={_keepProportion}
+								{...dragPointProps}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
-								onResizeEnd={(e) => {
-									onDiagramResizeEnd?.({
-										id,
-										point: e.point,
-										width: e.width,
-										height: e.height,
-									});
-								}}
 							/>
 							{/* 左下 */}
 							<DragPointLeftBottom
-								{...state}
-								point={point}
-								width={width}
-								height={height}
-								rotation={rotation}
-								id={id}
-								keepProportion={_keepProportion}
+								{...dragPointProps}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
 							/>
 							{/* 右上 */}
 							<DragPointRightTop
-								{...state}
-								point={point}
-								width={width}
-								height={height}
-								rotation={rotation}
-								id={id}
-								keepProportion={_keepProportion}
+								{...dragPointProps}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
 							/>
 							{/* 右下 */}
 							<DragPointRightBottom
-								{...state}
-								point={point}
-								width={width}
-								height={height}
-								rotation={rotation}
-								id={id}
-								keepProportion={_keepProportion}
+								{...dragPointProps}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
 							/>
 							{/* 上中央 */}
 							<DragPointTopCenter
-								{...state}
-								point={point}
-								width={width}
-								height={height}
-								rotation={rotation}
-								id={id}
-								keepProportion={_keepProportion}
+								{...dragPointProps}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
 							/>
 							{/* 左中央 */}
 							<DragPointLeftCenter
-								{...state}
-								point={point}
-								width={width}
-								height={height}
-								rotation={rotation}
-								id={id}
-								keepProportion={_keepProportion}
+								{...dragPointProps}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
 							/>
 							{/* 右中央 */}
 							<DragPointRightCenter
-								{...state}
-								point={point}
-								width={width}
-								height={height}
-								rotation={rotation}
-								id={id}
-								keepProportion={_keepProportion}
+								{...dragPointProps}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}
 							/>
 							{/* 下中央 */}
 							<DragPointBottomCenter
-								{...state}
-								point={point}
-								width={width}
-								height={height}
-								rotation={rotation}
-								id={id}
-								keepProportion={_keepProportion}
+								{...dragPointProps}
 								onArrangmentChangeStart={onArrangmentChangeStart}
 								onArrangmentChange={onArrangmentChange}
 								onArrangmentChangeEnd={onArrangmentChangeEnd}

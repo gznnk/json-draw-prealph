@@ -43,6 +43,8 @@ export type DiagramResizeEvent = {
 	point: Point;
 	width: number;
 	height: number;
+	scaleX?: number;
+	scaleY?: number;
 };
 
 export type DiagramRotateEvent = {

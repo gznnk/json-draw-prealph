@@ -76,7 +76,7 @@ export enum DragPointType {
 /**
  * 矩形の基底コンポーネントのState型定義
  */
-export type RectangleBaseState = RectangleBaseVertices & {
+export type RectangleBaseState = {
 	aspectRatio: number;
 	isDragging: boolean;
 	draggingPointType?: DragPointType;
@@ -130,5 +130,6 @@ export type RectangleBaseDragPointProps = RectangleBaseArrangement & {
 	onArrangmentChange: (e: ArrangmentChangeEvent) => void; // TODO: 廃止
 	onArrangmentChangeEnd: (e: ArrangmentChangeEndEvent) => void; // TODO: 廃止
 
+	onResizing?: (e: RectangleBaseBox) => void;
 	onResizeEnd?: (e: RectangleBaseBox) => void;
 };

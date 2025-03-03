@@ -31,6 +31,8 @@ export const calcRectangleVertices = (
 	width: number,
 	height: number,
 	rotation: number,
+	scaleX: number,
+	scaleY: number,
 ): RectangleBaseVertices => {
 	const halfWidth = width / 2;
 	const halfHeight = height / 2;
@@ -40,8 +42,8 @@ export const calcRectangleVertices = (
 
 	const leftTopPoint = affineTransformation(
 		{ x: -halfWidth, y: -halfHeight },
-		1,
-		1,
+		scaleX,
+		scaleY,
 		degreesToRadians(rotation),
 		tx,
 		ty,
@@ -49,8 +51,8 @@ export const calcRectangleVertices = (
 
 	const leftBottomPoint = affineTransformation(
 		{ x: -halfWidth, y: halfHeight },
-		1,
-		1,
+		scaleX,
+		scaleY,
 		degreesToRadians(rotation),
 		tx,
 		ty,
@@ -58,8 +60,8 @@ export const calcRectangleVertices = (
 
 	const rightTopPoint = affineTransformation(
 		{ x: halfWidth, y: -halfHeight },
-		1,
-		1,
+		scaleX,
+		scaleY,
 		degreesToRadians(rotation),
 		tx,
 		ty,
@@ -67,8 +69,8 @@ export const calcRectangleVertices = (
 
 	const rightBottomPoint = affineTransformation(
 		{ x: halfWidth, y: halfHeight },
-		1,
-		1,
+		scaleX,
+		scaleY,
 		degreesToRadians(rotation),
 		tx,
 		ty,
@@ -76,8 +78,8 @@ export const calcRectangleVertices = (
 
 	const topCenterPoint = affineTransformation(
 		{ x: 0, y: -halfHeight },
-		1,
-		1,
+		scaleX,
+		scaleY,
 		degreesToRadians(rotation),
 		tx,
 		ty,
@@ -85,8 +87,8 @@ export const calcRectangleVertices = (
 
 	const leftCenterPoint = affineTransformation(
 		{ x: -halfWidth, y: 0 },
-		1,
-		1,
+		scaleX,
+		scaleY,
 		degreesToRadians(rotation),
 		tx,
 		ty,
@@ -94,8 +96,8 @@ export const calcRectangleVertices = (
 
 	const rightCenterPoint = affineTransformation(
 		{ x: halfWidth, y: 0 },
-		1,
-		1,
+		scaleX,
+		scaleY,
 		degreesToRadians(rotation),
 		tx,
 		ty,
@@ -103,8 +105,8 @@ export const calcRectangleVertices = (
 
 	const bottomCenterPoint = affineTransformation(
 		{ x: 0, y: halfHeight },
-		1,
-		1,
+		scaleX,
+		scaleY,
 		degreesToRadians(rotation),
 		tx,
 		ty,
