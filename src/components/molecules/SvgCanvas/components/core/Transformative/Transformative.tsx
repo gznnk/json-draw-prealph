@@ -97,6 +97,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 		scaleX,
 		scaleY,
 		aspectRatio: width / height,
+		...calcRectangleVertices(point, width, height, rotation, scaleX, scaleY),
 	});
 
 	const vertices = calcRectangleVertices(
@@ -123,13 +124,10 @@ const Transformative: React.FC<TransformativeProps> = ({
 				);
 
 			// 各座標を逆アフィン変換
-			// console.log("e.endPoint", e.endPoint);
-			// console.log("vertices.rightBottomPoint", vertices.rightBottomPoint);
 			const inversedDragPoint = inverseAffine(e.endPoint);
-			const inversedRightBottom = inverseAffine(vertices.rightBottomPoint);
-
-			console.log("inversedDragPoint", inversedDragPoint);
-			console.log("inversedRightBottom", inversedRightBottom);
+			const inversedRightBottom = inverseAffine(
+				startBox.current.rightBottomPoint,
+			);
 
 			const newWidth = inversedRightBottom.x - inversedDragPoint.x;
 			let newHeight: number;
@@ -139,19 +137,10 @@ const Transformative: React.FC<TransformativeProps> = ({
 				newHeight = inversedRightBottom.y - inversedDragPoint.y;
 			}
 
-			const inversedCenterX = newWidth === 0 ? 0 : Math.abs(newWidth) / 2;
-			const inversedCenterY = newHeight === 0 ? 0 : Math.abs(newHeight) / 2;
-
-			// const center = affineTransformation(
-			// 	{ x: inversedCenterX, y: inversedCenterY },
-			// 	startBox.current.scaleX,
-			// 	startBox.current.scaleY,
-			// 	radians,
-			// 	startBox.current.point.x,
-			// 	startBox.current.point.y,
-			// );
-
-			const center = startBox.current.point;
+			const center = {
+				x: (startBox.current.rightBottomPoint.x + e.endPoint.x) / 2,
+				y: (startBox.current.rightBottomPoint.y + e.endPoint.y) / 2,
+			};
 
 			return {
 				point: center,
@@ -161,7 +150,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				scaleY: newHeight > 0 ? 1 : -1,
 			};
 		},
-		[vertices.rightBottomPoint, keepProportion],
+		[keepProportion],
 	);
 
 	const linerDragFunction = useCallback(
@@ -182,9 +171,10 @@ const Transformative: React.FC<TransformativeProps> = ({
 			scaleX,
 			scaleY,
 			aspectRatio: width / height,
+			...vertices,
 		};
 		console.log("startBox.current", startBox.current);
-	}, [point, width, height, rotation, scaleX, scaleY]);
+	}, [point, width, height, rotation, scaleX, scaleY, vertices]);
 
 	const dragPointProps = {
 		...vertices,
