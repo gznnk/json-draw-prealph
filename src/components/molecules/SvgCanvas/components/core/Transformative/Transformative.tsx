@@ -109,7 +109,20 @@ const Transformative: React.FC<TransformativeProps> = ({
 		scaleY,
 	);
 
-	const calcBoxFunction = useCallback(
+	const handleDragStart = useCallback(() => {
+		startBox.current = {
+			point,
+			width,
+			height,
+			rotation,
+			scaleX,
+			scaleY,
+			aspectRatio: width / height,
+			...vertices,
+		};
+	}, [point, width, height, rotation, scaleX, scaleY, vertices]);
+
+	const calcBoxFunctionLeftTop = useCallback(
 		(e: DiagramDragEvent) => {
 			const radians = degreesToRadians(startBox.current.rotation);
 
@@ -137,10 +150,18 @@ const Transformative: React.FC<TransformativeProps> = ({
 				newHeight = inversedRightBottom.y - inversedDragPoint.y;
 			}
 
-			const center = {
-				x: (startBox.current.rightBottomPoint.x + e.endPoint.x) / 2,
-				y: (startBox.current.rightBottomPoint.y + e.endPoint.y) / 2,
+			const inversedCenter = {
+				x: inversedRightBottom.x - (newWidth === 0 ? 0 : newWidth / 2),
+				y: inversedRightBottom.y - (newHeight === 0 ? 0 : newHeight / 2),
 			};
+			const center = affineTransformation(
+				inversedCenter,
+				1,
+				1,
+				radians,
+				startBox.current.point.x,
+				startBox.current.point.y,
+			);
 
 			return {
 				point: center,
@@ -153,7 +174,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 		[keepProportion],
 	);
 
-	const linerDragFunction = useCallback(
+	const linerDragFunctionLeftTop = useCallback(
 		(p: Point) =>
 			createLinerDragY2xFunction(
 				vertices.leftTopPoint,
@@ -161,31 +182,6 @@ const Transformative: React.FC<TransformativeProps> = ({
 			)(p),
 		[vertices.leftTopPoint, vertices.rightBottomPoint],
 	);
-
-	const handleDragStart = useCallback(() => {
-		startBox.current = {
-			point,
-			width,
-			height,
-			rotation,
-			scaleX,
-			scaleY,
-			aspectRatio: width / height,
-			...vertices,
-		};
-		console.log("startBox.current", startBox.current);
-	}, [point, width, height, rotation, scaleX, scaleY, vertices]);
-
-	const dragPointProps = {
-		...vertices,
-		point,
-		width,
-		height,
-		rotation,
-		scaleX,
-		scaleY,
-		onDragStart: handleDragStart,
-	};
 
 	const rp = affineTransformation(
 		{ x: width / 2 + 20, y: 0 },
@@ -200,28 +196,20 @@ const Transformative: React.FC<TransformativeProps> = ({
 		<>
 			<DragPoint
 				id={`${id}-leftTop`}
-				point={dragPointProps.leftTopPoint}
+				point={vertices.leftTopPoint}
 				onDragStart={handleDragStart}
 				onDrag={(e) => {
-					const box = calcBoxFunction(e);
+					const box = calcBoxFunctionLeftTop(e);
 					onTransform({
 						...box,
 						rotation,
 					});
 				}}
-				onDragEnd={(e) => {
-					// const box = calcBoxFunction(e);
-					// onTransform({
-					// 	...box,
-					// 	rotation,
-					// });
-				}}
-				dragPositioningFunction={keepProportion ? linerDragFunction : undefined}
+				dragPositioningFunction={
+					keepProportion ? linerDragFunctionLeftTop : undefined
+				}
 			/>
-			<DragPoint
-				id={`${id}-rightbottom`}
-				point={dragPointProps.rightBottomPoint}
-			/>
+			<DragPoint id={`${id}-rightbottom`} point={vertices.rightBottomPoint} />
 			{/* 回転 */}
 			<DragPoint
 				id={`rotation-${id}`}
