@@ -115,16 +115,21 @@ const Transformative: React.FC<TransformativeProps> = ({
 			const inverseAffine = (p: Point) =>
 				inverseAffineTransformation(
 					p,
-					startBox.current.scaleX,
-					startBox.current.scaleY,
+					1,
+					1,
 					radians,
 					startBox.current.point.x,
 					startBox.current.point.y,
 				);
 
 			// 各座標を逆アフィン変換
+			// console.log("e.endPoint", e.endPoint);
+			// console.log("vertices.rightBottomPoint", vertices.rightBottomPoint);
 			const inversedDragPoint = inverseAffine(e.endPoint);
 			const inversedRightBottom = inverseAffine(vertices.rightBottomPoint);
+
+			console.log("inversedDragPoint", inversedDragPoint);
+			console.log("inversedRightBottom", inversedRightBottom);
 
 			const newWidth = inversedRightBottom.x - inversedDragPoint.x;
 			let newHeight: number;
@@ -134,14 +139,17 @@ const Transformative: React.FC<TransformativeProps> = ({
 				newHeight = inversedRightBottom.y - inversedDragPoint.y;
 			}
 
-			// const center = {
-			// 	x:
-			// 		startBox.current.point.x -
-			// 		Math.abs(Math.abs(newWidth) - startBox.current.width) / 2,
-			// 	y:
-			// 		startBox.current.point.y -
-			// 		Math.abs(Math.abs(newHeight) - startBox.current.height) / 2,
-			// };
+			const inversedCenterX = newWidth === 0 ? 0 : Math.abs(newWidth) / 2;
+			const inversedCenterY = newHeight === 0 ? 0 : Math.abs(newHeight) / 2;
+
+			// const center = affineTransformation(
+			// 	{ x: inversedCenterX, y: inversedCenterY },
+			// 	startBox.current.scaleX,
+			// 	startBox.current.scaleY,
+			// 	radians,
+			// 	startBox.current.point.x,
+			// 	startBox.current.point.y,
+			// );
 
 			const center = startBox.current.point;
 
@@ -175,6 +183,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			scaleY,
 			aspectRatio: width / height,
 		};
+		console.log("startBox.current", startBox.current);
 	}, [point, width, height, rotation, scaleX, scaleY]);
 
 	const dragPointProps = {
