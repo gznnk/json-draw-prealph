@@ -34,6 +34,7 @@ import {
 	createLinerDragY2xFunction,
 	createLinerDragX2yFunction,
 } from "../RectangleBase/RectangleBaseFunctions";
+
 import {
 	degreesToRadians,
 	rotatePoint,
@@ -109,6 +110,48 @@ const Transformative: React.FC<TransformativeProps> = ({
 		scaleY,
 	);
 
+	const radians = useMemo(() => degreesToRadians(rotation), [rotation]);
+
+	const affineTransformationOnDrag = useCallback(
+		(p: Point) =>
+			affineTransformation(
+				p,
+				1,
+				1,
+				radians,
+				startBox.current.point.x,
+				startBox.current.point.y,
+			),
+		[radians],
+	);
+
+	const inverseAffineTransformationOnDrag = useCallback(
+		(p: Point) =>
+			inverseAffineTransformation(
+				p,
+				1,
+				1,
+				radians,
+				startBox.current.point.x,
+				startBox.current.point.y,
+			),
+		[radians],
+	);
+
+	const triggerTransform = useCallback(
+		(centerPoint: Point, newWidth: number, newHeight: number) => {
+			onTransform({
+				point: centerPoint,
+				width: Math.abs(newWidth),
+				height: Math.abs(newHeight),
+				scaleX: newWidth > 0 ? 1 : -1,
+				scaleY: newHeight > 0 ? 1 : -1,
+				rotation,
+			});
+		},
+		[onTransform, rotation],
+	);
+
 	const handleDragStart = useCallback(() => {
 		startBox.current = {
 			point,
@@ -122,30 +165,19 @@ const Transformative: React.FC<TransformativeProps> = ({
 		};
 	}, [point, width, height, rotation, scaleX, scaleY, vertices]);
 
-	const calcBoxFunctionLeftTop = useCallback(
+	// --- LeftTop Start --- //
+	const handleDragLeftTop = useCallback(
 		(e: DiagramDragEvent) => {
-			const radians = degreesToRadians(startBox.current.rotation);
-
-			const inverseAffine = (p: Point) =>
-				inverseAffineTransformation(
-					p,
-					1,
-					1,
-					radians,
-					startBox.current.point.x,
-					startBox.current.point.y,
-				);
-
-			// 各座標を逆アフィン変換
-			const inversedDragPoint = inverseAffine(e.endPoint);
-			const inversedRightBottom = inverseAffine(
+			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
+			const inversedRightBottom = inverseAffineTransformationOnDrag(
 				startBox.current.rightBottomPoint,
 			);
 
 			const newWidth = inversedRightBottom.x - inversedDragPoint.x;
 			let newHeight: number;
 			if (keepProportion && startBox.current.aspectRatio) {
-				newHeight = newWidth / startBox.current.aspectRatio;
+				newHeight =
+					newWidth === 0 ? 0 : newWidth / startBox.current.aspectRatio;
 			} else {
 				newHeight = inversedRightBottom.y - inversedDragPoint.y;
 			}
@@ -154,34 +186,72 @@ const Transformative: React.FC<TransformativeProps> = ({
 				x: inversedRightBottom.x - (newWidth === 0 ? 0 : newWidth / 2),
 				y: inversedRightBottom.y - (newHeight === 0 ? 0 : newHeight / 2),
 			};
-			const center = affineTransformation(
-				inversedCenter,
-				1,
-				1,
-				radians,
-				startBox.current.point.x,
-				startBox.current.point.y,
-			);
+			const center = affineTransformationOnDrag(inversedCenter);
 
-			return {
-				point: center,
-				width: Math.abs(newWidth),
-				height: Math.abs(newHeight),
-				scaleX: newWidth > 0 ? 1 : -1,
-				scaleY: newHeight > 0 ? 1 : -1,
-			};
+			triggerTransform(center, newWidth, newHeight);
 		},
-		[keepProportion],
+		[
+			triggerTransform,
+			affineTransformationOnDrag,
+			inverseAffineTransformationOnDrag,
+			keepProportion,
+		],
 	);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const linerDragFunctionLeftTop = useCallback(
 		(p: Point) =>
 			createLinerDragY2xFunction(
-				vertices.leftTopPoint,
-				vertices.rightBottomPoint,
+				startBox.current.leftTopPoint,
+				startBox.current.rightBottomPoint,
 			)(p),
-		[vertices.leftTopPoint, vertices.rightBottomPoint],
+		[startBox.current.leftTopPoint, startBox.current.rightBottomPoint],
 	);
+	// --- LeftTop End --- //
+
+	// --- RightBottom Start --- //
+	const handleDragRightBottom = useCallback(
+		(e: DiagramDragEvent) => {
+			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
+			const inversedLeftTop = inverseAffineTransformationOnDrag(
+				startBox.current.leftTopPoint,
+			);
+
+			const newWidth = inversedDragPoint.x - inversedLeftTop.x;
+			let newHeight: number;
+			if (keepProportion && startBox.current.aspectRatio) {
+				newHeight =
+					newWidth === 0 ? 0 : newWidth / startBox.current.aspectRatio;
+			} else {
+				newHeight = inversedDragPoint.y - inversedLeftTop.y;
+			}
+
+			const inversedCenter = {
+				x: inversedLeftTop.x + (newWidth === 0 ? 0 : newWidth / 2),
+				y: inversedLeftTop.y + (newHeight === 0 ? 0 : newHeight / 2),
+			};
+			const center = affineTransformationOnDrag(inversedCenter);
+
+			triggerTransform(center, newWidth, newHeight);
+		},
+		[
+			triggerTransform,
+			affineTransformationOnDrag,
+			inverseAffineTransformationOnDrag,
+			keepProportion,
+		],
+	);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	const linerDragFunctionRightBottom = useCallback(
+		(p: Point) =>
+			createLinerDragY2xFunction(
+				startBox.current.rightBottomPoint,
+				startBox.current.leftTopPoint,
+			)(p),
+		[startBox.current.rightBottomPoint, startBox.current.leftTopPoint],
+	);
+	// --- RightBottom End --- //
 
 	const rp = affineTransformation(
 		{ x: width / 2 + 20, y: 0 },
@@ -198,18 +268,20 @@ const Transformative: React.FC<TransformativeProps> = ({
 				id={`${id}-leftTop`}
 				point={vertices.leftTopPoint}
 				onDragStart={handleDragStart}
-				onDrag={(e) => {
-					const box = calcBoxFunctionLeftTop(e);
-					onTransform({
-						...box,
-						rotation,
-					});
-				}}
+				onDrag={handleDragLeftTop}
 				dragPositioningFunction={
 					keepProportion ? linerDragFunctionLeftTop : undefined
 				}
 			/>
-			<DragPoint id={`${id}-rightbottom`} point={vertices.rightBottomPoint} />
+			<DragPoint
+				id={`${id}-rightBottom`}
+				point={vertices.rightBottomPoint}
+				onDragStart={handleDragStart}
+				onDrag={handleDragRightBottom}
+				dragPositioningFunction={
+					keepProportion ? linerDragFunctionRightBottom : undefined
+				}
+			/>
 			{/* 回転 */}
 			<DragPoint
 				id={`rotation-${id}`}
