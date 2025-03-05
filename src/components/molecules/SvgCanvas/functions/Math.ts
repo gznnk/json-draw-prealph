@@ -1,6 +1,16 @@
 type Point = { x: number; y: number }; // TODO
 
 /**
+ * Nandであれば0に変換する
+ *
+ * @param value - 変換対象の数値
+ * @returns {number} 変換後の数値
+ */
+export const nanToZero = (value: number): number => {
+	return Number.isNaN(value) ? 0 : value;
+};
+
+/**
  * ２点間のユークリッド距離を算出する
  *
  * @param {Point} p1 - 1つ目の点の座標

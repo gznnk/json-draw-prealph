@@ -404,6 +404,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						scaleX={scaleX}
 						scaleY={scaleY}
 						keepProportion={keepProportion}
+						isSelected={isSelected}
 						onTransform={(e) => {
 							onDiagramResizeEnd?.({
 								id,

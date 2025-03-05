@@ -260,7 +260,7 @@ export const createLinerDragY2xFunction = (p1: Point, p2: Point) => {
 
 	return (p: Point) => {
 		return {
-			x: (p.y - b) / a,
+			x: Number.isFinite(a) ? (p.y - b) / a : p1.x,
 			y: p.y,
 		};
 	};
