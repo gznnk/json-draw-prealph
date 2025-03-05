@@ -301,7 +301,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			)(p),
 		[],
 	);
-	// --- TopBottom End --- //
+	// --- RightBottom End --- //
 
 	// --- TopCenter Start --- //
 	const handleDragTopCenter = useCallback(
@@ -343,7 +343,49 @@ const Transformative: React.FC<TransformativeProps> = ({
 			)(p),
 		[],
 	);
-	// --- LeftTop End --- //
+	// --- TopCenter End --- //
+
+	// --- BottomCenter Start --- //
+	const handleDragBottomCenter = useCallback(
+		(e: DiagramDragEvent) => {
+			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
+			const inversedTopCenter = inverseAffineTransformationOnDrag(
+				startBox.current.topCenterPoint,
+			);
+
+			let newWidth: number;
+			const newHeight = inversedDragPoint.y - inversedTopCenter.y;
+			if (keepProportion && startBox.current.aspectRatio) {
+				newWidth = nanToZero(newHeight * startBox.current.aspectRatio);
+			} else {
+				newWidth = startBox.current.width;
+			}
+
+			const inversedCenter = {
+				x: inversedTopCenter.x,
+				y: inversedTopCenter.y + (newHeight === 0 ? 0 : newHeight / 2),
+			};
+			const center = affineTransformationOnDrag(inversedCenter);
+
+			triggerTransform(center, newWidth, newHeight);
+		},
+		[
+			triggerTransform,
+			affineTransformationOnDrag,
+			inverseAffineTransformationOnDrag,
+			keepProportion,
+		],
+	);
+
+	const linerDragFunctionBottomCenter = useCallback(
+		(p: Point) =>
+			createLinerDragY2xFunction(
+				startBox.current.bottomCenterPoint,
+				startBox.current.topCenterPoint,
+			)(p),
+		[],
+	);
+	// --- BottomCenter End --- //
 
 	const rp = affineTransformation(
 		{ x: width / 2 + 20, y: 0 },
@@ -426,6 +468,14 @@ const Transformative: React.FC<TransformativeProps> = ({
 				onDragStart={handleDragStart}
 				onDrag={handleDragTopCenter}
 				dragPositioningFunction={linerDragFunctionTopCenter}
+			/>
+			{/* 下中央 */}
+			<DragPoint
+				id={`${id}-bottomCenter`}
+				point={vertices.bottomCenterPoint}
+				onDragStart={handleDragStart}
+				onDrag={handleDragBottomCenter}
+				dragPositioningFunction={linerDragFunctionBottomCenter}
 			/>
 			{/* 回転 */}
 			<DragPoint

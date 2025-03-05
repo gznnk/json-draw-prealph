@@ -395,7 +395,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						{...draggableProps}
 					/>
 					<Transformative
-						id={id}
+						id={`${id}-transformative`}
 						type="Rectangle"
 						point={point}
 						width={width}
