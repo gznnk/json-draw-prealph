@@ -387,6 +387,48 @@ const Transformative: React.FC<TransformativeProps> = ({
 	);
 	// --- LeftCenter End --- //
 
+	// --- RightCenter Start --- //
+	const handleDragRightCenter = useCallback(
+		(e: DiagramDragEvent) => {
+			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
+			const inversedLeftCenter = inverseAffineTransformationOnDrag(
+				startBox.current.leftCenterPoint,
+			);
+
+			const newWidth = inversedDragPoint.x - inversedLeftCenter.x;
+			let newHeight: number;
+			if (keepProportion && startBox.current.aspectRatio) {
+				newHeight = nanToZero(newWidth / startBox.current.aspectRatio);
+			} else {
+				newHeight = startBox.current.height;
+			}
+
+			const inversedCenter = {
+				x: inversedLeftCenter.x + (newWidth === 0 ? 0 : newWidth / 2),
+				y: inversedLeftCenter.y,
+			};
+			const center = affineTransformationOnDrag(inversedCenter);
+
+			triggerTransform(center, newWidth, newHeight);
+		},
+		[
+			triggerTransform,
+			affineTransformationOnDrag,
+			inverseAffineTransformationOnDrag,
+			keepProportion,
+		],
+	);
+
+	const linerDragFunctionRightCenter = useCallback(
+		(p: Point) =>
+			createLinerDragX2yFunction(
+				startBox.current.leftCenterPoint,
+				startBox.current.rightCenterPoint,
+			)(p),
+		[],
+	);
+	// --- RightCenter End --- //
+
 	// --- BottomCenter Start --- //
 	const handleDragBottomCenter = useCallback(
 		(e: DiagramDragEvent) => {
@@ -518,6 +560,14 @@ const Transformative: React.FC<TransformativeProps> = ({
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftCenter}
 				dragPositioningFunction={linerDragFunctionLeftCenter}
+			/>
+			{/* 右中央 */}
+			<DragPoint
+				id={`${id}-rightCenter`}
+				point={vertices.rightCenterPoint}
+				onDragStart={handleDragStart}
+				onDrag={handleDragRightCenter}
+				dragPositioningFunction={linerDragFunctionRightCenter}
 			/>
 			{/* 下中央 */}
 			<DragPoint

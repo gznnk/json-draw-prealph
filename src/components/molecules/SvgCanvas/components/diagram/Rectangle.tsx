@@ -79,19 +79,12 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				onDiagramResizeStart,
 				onDiagramResizing,
 				onDiagramResizeEnd,
-				onDiagramRotateEnd,
 				onDiagramSelect,
 				onDiagramConnect,
 				onConnectPointMove,
 			},
 			ref,
 		) => {
-			// このドラッグ領域の座標 TODO: 内部でもちたくない
-			const [state, setState] = useState({ point });
-			useEffect(() => {
-				setState({ point });
-			}, [point]);
-
 			const [isTransformimg, setIsTransforming] = useState(false);
 			// ホバー状態の管理
 			const [isHovered, setIsHovered] = useState(false);
@@ -255,8 +248,6 @@ const Rectangle: React.FC<RectangleProps> = memo(
 			 */
 			const handleDiagramDrag = useCallback(
 				(e: DiagramDragEvent) => {
-					setState({ point: e.endPoint });
-
 					updateConnectPoints(e.endPoint, {
 						x: e.endPoint.x + width,
 						y: e.endPoint.y + height,
@@ -264,7 +255,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 
 					onDiagramDragEnd?.(e);
 				},
-				[onDiagramDrag, updateConnectPoints, width, height],
+				[onDiagramDragEnd, updateConnectPoints, width, height],
 			);
 
 			/**
@@ -279,61 +270,6 @@ const Rectangle: React.FC<RectangleProps> = memo(
 					setIsTransforming(false);
 				},
 				[onDiagramDragEnd],
-			);
-
-			/**
-			 * 四角形のドラッグ開始イベントハンドラ
-			 *
-			 * @param {DiagramResizeEvent} e 四角形のドラッグ開始イベント
-			 * @returns {void}
-			 */
-			const handleDiagramResizeStart = useCallback(
-				(e: DiagramResizeEvent) => {
-					setIsTransforming(true);
-					onDiagramResizeStart?.(e);
-				},
-				[onDiagramResizeStart],
-			);
-
-			/**
-			 * 四角形のリサイズ中イベントハンドラ
-			 *
-			 * @param {DiagramResizeEvent} e 四角形のリサイズ中イベント
-			 */
-			const handleDiagramResizing = useCallback(
-				(e: DiagramResizeEvent) => {
-					setIsTransforming(true); // TODO
-
-					// 描画処理負荷軽減のため、DOMを直接操作
-					svgRef.current?.setAttribute("width", `${e.width}`);
-					svgRef.current?.setAttribute("height", `${e.height}`);
-
-					updateConnectPoints(e.point, {
-						x: e.point.x + e.width,
-						y: e.point.y + e.height,
-					});
-
-					// グループ側に変更中イベントを通知
-					onDiagramResizing?.(e);
-				},
-				[onDiagramResizing, updateConnectPoints],
-			);
-
-			/**
-			 * 四角形のリサイズ完了イベントハンドラ
-			 *
-			 * @param {DiagramResizeEvent} e 四角形のリサイズ完了イベント
-			 *
-			 */
-			const handleDiagramResizeEnd = useCallback(
-				(e: DiagramResizeEvent) => {
-					// 短形領域の変更完了イベントをそのまま親に伝番させる。
-					// 最終的にSvgCanvasまでイベントが伝番され、この図形のサイズ変更が行われる。
-					onDiagramResizeEnd?.(e);
-
-					setIsTransforming(false);
-				},
-				[onDiagramResizeEnd],
 			);
 
 			/**
@@ -417,54 +353,6 @@ const Rectangle: React.FC<RectangleProps> = memo(
 							});
 						}}
 					/>
-
-					{/* 
-					<RectangleBase
-						key={`rect-base-${id}`}
-						id={id}
-						type="Rectangle"
-						point={point}
-						width={width}
-						height={height}
-						rotation={rotation}
-						scaleX={scaleX}
-						scaleY={scaleY}
-						tabIndex={tabIndex}
-						keepProportion={keepProportion}
-						isSelected={isSelected}
-						onDiagramClick={onDiagramClick}
-						onDiagramDragStart={handleDiagramDragStart}
-						onDiagramDrag={handleDiagramDrag}
-						onDiagramDragEnd={handleDiagramDragEnd}
-						onDiagramResizeStart={handleDiagramResizeStart}
-						onDiagramResizing={handleDiagramResizing}
-						onDiagramResizeEnd={handleDiagramResizeEnd}
-						onDiagramRotateEnd={onDiagramRotateEnd}
-						onDiagramSelect={onDiagramSelect}
-						onDiagramHoverChange={handleDiagramHoverChange}
-						ref={rectangleBaseRef}
-					>
-						<rect
-							key={`rect-${id}`}
-							id={id}
-							x={-width / 2}
-							y={-height / 2}
-							width={width}
-							height={height}
-							fill={fill}
-							stroke={stroke}
-							strokeWidth={strokeWidth}
-							transform={createSvgTransform(
-								scaleX,
-								scaleY,
-								degreesToRadians(rotation),
-								0,
-								0,
-							)}
-							ref={svgRef}
-						/>
-					</RectangleBase>
-					*/}
 					{!isSelected &&
 						false &&
 						(items as ConnectPointData[])?.map((cp) => (
