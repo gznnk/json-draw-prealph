@@ -209,6 +209,50 @@ const Transformative: React.FC<TransformativeProps> = ({
 	);
 	// --- LeftTop End --- //
 
+	// --- LeftBottom Start --- //
+	const handleDragLeftBottom = useCallback(
+		(e: DiagramDragEvent) => {
+			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
+			const inversedRightTop = inverseAffineTransformationOnDrag(
+				startBox.current.rightTopPoint,
+			);
+
+			const newWidth = inversedRightTop.x - inversedDragPoint.x;
+			let newHeight: number;
+			if (keepProportion && startBox.current.aspectRatio) {
+				newHeight =
+					newWidth === 0 ? 0 : newWidth / startBox.current.aspectRatio;
+			} else {
+				newHeight = inversedDragPoint.y - inversedRightTop.y;
+			}
+
+			const inversedCenter = {
+				x: inversedRightTop.x - (newWidth === 0 ? 0 : newWidth / 2),
+				y: inversedRightTop.y + (newHeight === 0 ? 0 : newHeight / 2),
+			};
+			const center = affineTransformationOnDrag(inversedCenter);
+
+			triggerTransform(center, newWidth, newHeight);
+		},
+		[
+			triggerTransform,
+			affineTransformationOnDrag,
+			inverseAffineTransformationOnDrag,
+			keepProportion,
+		],
+	);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	const linerDragFunctionLeftBottom = useCallback(
+		(p: Point) =>
+			createLinerDragY2xFunction(
+				startBox.current.rightTopPoint,
+				startBox.current.leftBottomPoint,
+			)(p),
+		[startBox.current.rightTopPoint, startBox.current.leftBottomPoint],
+	);
+	// --- LeftTop Bottom --- //
+
 	// --- RightTop Start --- //
 	const handleDragRightTop = useCallback(
 		(e: DiagramDragEvent) => {
@@ -315,6 +359,15 @@ const Transformative: React.FC<TransformativeProps> = ({
 				onDrag={handleDragLeftTop}
 				dragPositioningFunction={
 					keepProportion ? linerDragFunctionLeftTop : undefined
+				}
+			/>
+			<DragPoint
+				id={`${id}-leftBottom`}
+				point={vertices.leftBottomPoint}
+				onDragStart={handleDragStart}
+				onDrag={handleDragLeftBottom}
+				dragPositioningFunction={
+					keepProportion ? linerDragFunctionLeftBottom : undefined
 				}
 			/>
 			<DragPoint
