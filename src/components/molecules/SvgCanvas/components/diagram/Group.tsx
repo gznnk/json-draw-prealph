@@ -363,8 +363,13 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 
 				for (const item of startItems) {
 					// 変形前のグループ内の相対位置を取得
-					const dx = item.point.x - e.startShape.point.x;
-					const dy = item.point.y - e.startShape.point.y;
+					const inversedItemCenter = rotatePoint(
+						item.point,
+						e.startShape.point,
+						degreesToRadians(-e.startShape.rotation),
+					);
+					const dx = inversedItemCenter.x - e.startShape.point.x;
+					const dy = inversedItemCenter.y - e.startShape.point.y;
 
 					const newDx = dx * groupScaleX;
 					const newDy = dy * groupScaleY;
@@ -373,18 +378,15 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 						x: e.endShape.point.x + newDx,
 						y: e.endShape.point.y + newDy,
 					};
+					newCenter = rotatePoint(
+						newCenter,
+						e.endShape.point,
+						degreesToRadians(e.endShape.rotation),
+					);
 
 					if (isRectangleBaseData(item)) {
 						const rotationDiff = e.endShape.rotation - e.startShape.rotation;
 						const newRotation = item.rotation + rotationDiff;
-
-						if (rotationDiff !== 0) {
-							newCenter = rotatePoint(
-								newCenter,
-								e.startShape.point,
-								degreesToRadians(rotationDiff),
-							);
-						}
 
 						onTransform?.({
 							id: item.id,
