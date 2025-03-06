@@ -18,14 +18,15 @@ import type {
 	DiagramSelectEvent,
 	GroupDragEvent,
 	GroupResizeEvent,
+	DiagramTransformEvent,
 } from "../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
 import type { RectangleBaseProps } from "../core/RectangleBase";
-import RectangleBase from "../core/RectangleBase";
+import Transformative from "../core/Transformative";
 
 // SvgCanvas関連関数をインポート
-import { isGroupData } from "../../SvgCanvasFunctions";
+import { isRectangleBaseData, isGroupData } from "../../SvgCanvasFunctions";
 
 // RectangleBase関連関数をインポート
 import {
@@ -139,6 +140,9 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 			point,
 			width,
 			height,
+			rotation = 0,
+			scaleX = 1,
+			scaleY = 1,
 			keepProportion = false,
 			tabIndex = 0,
 			isSelected = false,
@@ -153,9 +157,6 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 		},
 		ref,
 	) => {
-		useEffect(() => {
-			logger.debug("Group rendered");
-		}, []);
 		logger.debug("Group items", items);
 
 		// グループ全体のドラッグ中かどうかのフラグ（このグループが選択中でかつドラッグ中の場合のみtrueにする）
@@ -164,18 +165,10 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 		// このグループが選択中でかつ再度グループ内の図形でポインター押下された場合のみtrueにする
 		const [isSequentialSelection, setIsSequentialSelection] = useState(false);
 
-		const [startItems, setStartItems] = useState<Diagram[]>(items);
-
-		// useEffect(() => {
-		// 	// グループから選択が外れたら連続選択フラグも解除
-		// 	if (!isDragging) {
-		// 		setStartItems(JSON.parse(JSON.stringify(items)));
-		// 	}
-		// }, [isDragging, items]);
+		const [startItems, setStartItems] = useState<Diagram[]>(items); // TODO refで
+		const startBox = useRef({ x: point.x, y: point.y, width, height });
 
 		// --- 以下、図形選択関連処理 ---
-
-		// console.log("Group", items);
 
 		/**
 		 * グループ内の図形の選択イベントハンドラ
@@ -249,9 +242,6 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 		 */
 		const handleChildDiagramDragStart = useCallback(
 			(e: DiagramDragEvent) => {
-				console.log("handleChildDiagramDragStart", e);
-				//console.log("handleChildDiagramDragStart 1", items);
-
 				logger.debug("handleChildDiagramDragStart items", items);
 
 				if (isSelected) {
@@ -262,15 +252,13 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 				// ドラッグ開始イベントをそのまま伝番させる
 				onDiagramDragStart?.(e);
 
-				//console.log("handleChildDiagramDragStart 2", items);
+				startBox.current = { x: point.x, y: point.y, width, height };
 
-				// startItems.current = JSON.parse(JSON.stringify(items));
 				setStartItems(items);
-				logger.debug("startItems", startItems);
 
-				//console.log("startItems.current", startItems.current);
+				logger.debug("startItems", startItems);
 			},
-			[onDiagramDragStart, isSelected, items],
+			[onDiagramDragStart, isSelected, items, startItems],
 		);
 
 		/**
@@ -286,7 +274,6 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 					return;
 				}
 
-				// TODO: アフィン変換
 				const dx = e.endPoint.x - e.startPoint.x;
 				const dy = e.endPoint.y - e.startPoint.y;
 
@@ -305,6 +292,18 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 					});
 					// TODO: 再帰的にグループ内の図形のドラッグを行う
 				}
+
+				onDiagramDrag?.({
+					id: id,
+					startPoint: {
+						x: startBox.current.x,
+						y: startBox.current.y,
+					},
+					endPoint: {
+						x: startBox.current.x + dx,
+						y: startBox.current.y + dy,
+					},
+				});
 			},
 			[onDiagramDrag, isDragging, startItems],
 		);
@@ -313,6 +312,8 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 			(e: DiagramDragEvent) => {
 				onDiagramDragEnd?.(e);
 				setIsDragging(false);
+
+				// TODO: グループのサイズ変更
 			},
 			[onDiagramDragEnd],
 		);
@@ -334,7 +335,83 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 			return React.createElement(itemType, props);
 		});
 
-		return <>{children}</>;
+		const handleTransformStart = useCallback(() => {
+			logger.debug("handleTransformStart", items);
+			startBox.current = { x: point.x, y: point.y, width, height };
+			setStartItems(items);
+		}, [items]);
+
+		const handleTransform = useCallback(
+			(e: DiagramTransformEvent) => {
+				onTransform?.(e);
+
+				// TODO: グループ内の図形のサイズ変更
+
+				// グループの拡縮を計算
+				const groupScaleX = e.endShape.width / e.startShape.width;
+				const groupScaleY = e.endShape.height / e.startShape.height;
+
+				for (const item of startItems) {
+					// 変形前のグループ内の相対位置を取得
+					const dx = item.point.x - e.startShape.point.x;
+					const dy = item.point.y - e.startShape.point.y;
+
+					const newDx = dx * groupScaleX;
+					const newDy = dy * groupScaleY;
+
+					if (isRectangleBaseData(item)) {
+						const newRotation =
+							item.rotation + (e.endShape.rotation - e.startShape.rotation);
+
+						onTransform?.({
+							id: item.id,
+							startShape: {
+								point: item.point,
+								width: item.width,
+								height: item.height,
+								rotation: item.rotation,
+								scaleX: item.scaleX,
+								scaleY: item.scaleY,
+							},
+							endShape: {
+								point: {
+									x: e.endShape.point.x + newDx,
+									y: e.endShape.point.y + newDy,
+								},
+								width: item.width * groupScaleX,
+								height: item.height * groupScaleY,
+								rotation: newRotation,
+								scaleX: e.endShape.scaleX,
+								scaleY: e.endShape.scaleY,
+							},
+						});
+					}
+
+					// TODO: 再帰的にグループ内の図形のドラッグを行う
+				}
+			},
+			[onTransform, startItems],
+		);
+
+		return (
+			<>
+				{children}
+				<Transformative
+					diagramId={id}
+					type="Group"
+					point={point}
+					width={width}
+					height={height}
+					rotation={rotation}
+					scaleX={scaleX}
+					scaleY={scaleY}
+					keepProportion={keepProportion}
+					isSelected={isSelected}
+					onTransformStart={handleTransformStart}
+					onTransform={handleTransform}
+				/>
+			</>
+		);
 	},
 );
 

@@ -6,6 +6,7 @@ import type { Diagram } from "./components/molecules/SvgCanvas/types/DiagramType
 import { createRectangleData } from "./components/molecules/SvgCanvas/components/diagram/Rectangle";
 
 import { getLogger } from "./utils/Logger";
+import { radiansToDegrees } from "./components/molecules/SvgCanvas/functions/Math";
 const logger = getLogger("App");
 
 const testItems1 = [
@@ -383,6 +384,9 @@ const testItems5 = [
 		point: { x: 200, y: 200 },
 		width: 200,
 		height: 200,
+		rotation: radiansToDegrees(0),
+		scaleX: 1,
+		scaleY: 1,
 		keepProportion: true,
 		isSelected: false,
 		items: [
@@ -392,6 +396,9 @@ const testItems5 = [
 				point: { x: 150, y: 150 },
 				width: 100,
 				height: 100,
+				rotation: radiansToDegrees(0),
+				scaleX: 1,
+				scaleY: 1,
 				fill: "transparent",
 				stroke: "black",
 				strokeWidth: "1px",
@@ -404,6 +411,9 @@ const testItems5 = [
 				point: { x: 150, y: 250 },
 				width: 100,
 				height: 100,
+				rotation: radiansToDegrees(0),
+				scaleX: 1,
+				scaleY: 1,
 				fill: "transparent",
 				stroke: "black",
 				strokeWidth: "1px",
@@ -416,6 +426,9 @@ const testItems5 = [
 				point: { x: 250, y: 250 },
 				width: 100,
 				height: 100,
+				rotation: radiansToDegrees(0),
+				scaleX: 1,
+				scaleY: 1,
 				fill: "transparent",
 				stroke: "black",
 				strokeWidth: "1px",

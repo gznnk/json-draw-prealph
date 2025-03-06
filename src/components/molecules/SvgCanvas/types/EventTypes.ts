@@ -3,14 +3,32 @@
 import type { Point } from "./CoordinateTypes";
 import type { DiagramType } from "./DiagramTypes";
 
+export type DiagramTransformStartEvent = {
+	id: string;
+};
+
 export type DiagramTransformEvent = {
 	id: string;
-	point: Point;
-	width: number;
-	height: number;
-	rotation: number;
-	scaleX: number;
-	scaleY: number;
+	startShape: {
+		point: Point;
+		width: number;
+		height: number;
+		rotation: number;
+		scaleX: number;
+		scaleY: number;
+	};
+	endShape: {
+		point: Point;
+		width: number;
+		height: number;
+		rotation: number;
+		scaleX: number;
+		scaleY: number;
+	};
+};
+
+export type DiagramTransformEndEvent = {
+	id: string;
 };
 
 // --------------------------------------------------

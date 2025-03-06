@@ -15,6 +15,9 @@ import type {
 	GroupResizeEvent,
 	GroupDragEvent,
 	DiagramDragEvent,
+	DiagramTransformStartEvent,
+	DiagramTransformEvent,
+	DiagramTransformEndEvent,
 } from "../../types/EventTypes";
 
 // RectangleBase関連コンポーネントをインポート
@@ -60,7 +63,11 @@ const Ellipse: React.FC<EllipseProps> = memo(
 				onDiagramResizeStart,
 				onDiagramResizing,
 				onDiagramResizeEnd,
+
 				onDiagramSelect,
+				onTransformStart,
+				onTransform,
+				onTransformEnd,
 			},
 			ref,
 		) => {
@@ -265,6 +272,27 @@ const Ellipse: React.FC<EllipseProps> = memo(
 				onDragEnd: handleDiagramDragEnd,
 			});
 
+			const handleTransformStart = useCallback(
+				(e: DiagramTransformStartEvent) => {
+					onTransformStart?.(e);
+				},
+				[onTransformStart],
+			);
+
+			const handleTransform = useCallback(
+				(e: DiagramTransformEvent) => {
+					onTransform?.(e);
+				},
+				[onTransform],
+			);
+
+			const handleTransformEnd = useCallback(
+				(e: DiagramTransformEndEvent) => {
+					onTransformEnd?.(e);
+				},
+				[onTransformEnd],
+			);
+
 			return (
 				<>
 					<ellipse
@@ -288,7 +316,7 @@ const Ellipse: React.FC<EllipseProps> = memo(
 						{...draggableProps}
 					/>
 					<Transformative
-						id={`${id}-transformative`}
+						diagramId={`${id}-transformative`}
 						type="Ellipse"
 						point={point}
 						width={width}
@@ -298,18 +326,9 @@ const Ellipse: React.FC<EllipseProps> = memo(
 						scaleY={scaleY}
 						keepProportion={keepProportion}
 						isSelected={isSelected}
-						onTransform={(e) => {
-							// TODO
-							onDiagramResizeEnd?.({
-								id,
-								point: e.point,
-								width: e.width,
-								height: e.height,
-								rotation: e.rotation,
-								scaleX: e.scaleX,
-								scaleY: e.scaleY,
-							});
-						}}
+						onTransformStart={handleTransformStart}
+						onTransform={handleTransform}
+						onTransformEnd={handleTransformEnd}
 					/>
 				</>
 			);

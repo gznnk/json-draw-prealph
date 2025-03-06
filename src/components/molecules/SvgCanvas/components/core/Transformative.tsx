@@ -6,7 +6,9 @@ import type { Point } from "../../types/CoordinateTypes";
 import type { DiagramType } from "../../types/DiagramTypes";
 import type {
 	DiagramDragEvent,
+	DiagramTransformStartEvent,
 	DiagramTransformEvent,
+	DiagramTransformEndEvent,
 } from "../../types/EventTypes";
 
 import DragPoint from "./DragPoint";
@@ -39,7 +41,9 @@ type TransformativeProps = {
 	scaleY: number;
 	keepProportion: boolean;
 	isSelected: boolean;
+	onTransformStart?: (e: DiagramTransformStartEvent) => void; // TODO: 必須にする
 	onTransform: (e: DiagramTransformEvent) => void;
+	onTransformEnd?: (e: DiagramTransformEndEvent) => void; // TODO: 必須にする
 };
 
 const Transformative: React.FC<TransformativeProps> = ({
@@ -52,12 +56,15 @@ const Transformative: React.FC<TransformativeProps> = ({
 	scaleY,
 	keepProportion,
 	isSelected,
+	onTransformStart,
 	onTransform,
+	onTransformEnd,
 }) => {
 	const [isShiftKeyDown, setShiftKeyDown] = useState(false);
 
 	const doKeepProportion = keepProportion || isShiftKeyDown;
 
+	// TODO: startShapeに名前を変更
 	const startBox = useRef({
 		point,
 		width,
@@ -110,18 +117,26 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(centerPoint: Point, newWidth: number, newHeight: number) => {
 			onTransform({
 				id: diagramId,
-				point: centerPoint,
-				width: Math.abs(newWidth),
-				height: Math.abs(newHeight),
-				scaleX: newWidth > 0 ? 1 : -1,
-				scaleY: newHeight > 0 ? 1 : -1,
-				rotation,
+				startShape: {
+					...startBox.current,
+				},
+				endShape: {
+					point: centerPoint,
+					width: Math.abs(newWidth),
+					height: Math.abs(newHeight),
+					scaleX: newWidth > 0 ? 1 : -1,
+					scaleY: newHeight > 0 ? 1 : -1,
+					rotation,
+				},
 			});
 		},
 		[onTransform, diagramId, rotation],
 	);
 
 	const handleDragStart = useCallback(() => {
+		onTransformStart?.({
+			id: diagramId,
+		});
 		startBox.current = {
 			point,
 			width,
@@ -132,7 +147,17 @@ const Transformative: React.FC<TransformativeProps> = ({
 			aspectRatio: width / height,
 			...vertices,
 		};
-	}, [point, width, height, rotation, scaleX, scaleY, vertices]);
+	}, [
+		onTransformStart,
+		diagramId,
+		point,
+		width,
+		height,
+		rotation,
+		scaleX,
+		scaleY,
+		vertices,
+	]);
 
 	// --- LeftTop Start --- //
 	const handleDragLeftTop = useCallback(
@@ -470,6 +495,12 @@ const Transformative: React.FC<TransformativeProps> = ({
 	);
 	// --- BottomCenter End --- //
 
+	const handleDragEnd = useCallback(() => {
+		onTransformEnd?.({
+			id: diagramId,
+		});
+	}, [onTransformEnd, diagramId]);
+
 	// シフトキーの状態を監視
 	useEffect(() => {
 		let handleKeyDown: (e: KeyboardEvent) => void;
@@ -538,6 +569,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.leftTopPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftTop}
+				onDragEnd={handleDragEnd}
 				dragPositioningFunction={
 					doKeepProportion ? linerDragFunctionLeftTop : undefined
 				}
@@ -548,6 +580,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.leftBottomPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftBottom}
+				onDragEnd={handleDragEnd}
 				dragPositioningFunction={
 					doKeepProportion ? linerDragFunctionLeftBottom : undefined
 				}
@@ -558,6 +591,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.rightTopPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightTop}
+				onDragEnd={handleDragEnd}
 				dragPositioningFunction={
 					doKeepProportion ? linerDragFunctionRightTop : undefined
 				}
@@ -568,6 +602,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.rightBottomPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightBottom}
+				onDragEnd={handleDragEnd}
 				dragPositioningFunction={
 					doKeepProportion ? linerDragFunctionRightBottom : undefined
 				}
@@ -578,6 +613,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.topCenterPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragTopCenter}
+				onDragEnd={handleDragEnd}
 				dragPositioningFunction={linerDragFunctionTopCenter}
 			/>
 			{/* 左中央 */}
@@ -586,6 +622,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.leftCenterPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftCenter}
+				onDragEnd={handleDragEnd}
 				dragPositioningFunction={linerDragFunctionLeftCenter}
 			/>
 			{/* 右中央 */}
@@ -594,6 +631,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.rightCenterPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightCenter}
+				onDragEnd={handleDragEnd}
 				dragPositioningFunction={linerDragFunctionRightCenter}
 			/>
 			{/* 下中央 */}
@@ -602,37 +640,33 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.bottomCenterPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragBottomCenter}
+				onDragEnd={handleDragEnd}
 				dragPositioningFunction={linerDragFunctionBottomCenter}
 			/>
 			{/* 回転 */}
 			<DragPoint
 				id={`rotation-${diagramId}`}
 				point={rp}
+				onDragStart={handleDragStart}
 				onDrag={(e) => {
 					const angle = calculateAngle(point, e.endPoint);
 					console.log(radiansToDegrees(angle));
 					onTransform({
 						id: diagramId,
-						point,
-						width,
-						height,
-						scaleX,
-						scaleY,
-						rotation: radiansToDegrees(angle),
+						startShape: {
+							...startBox.current,
+						},
+						endShape: {
+							point,
+							width,
+							height,
+							scaleX,
+							scaleY,
+							rotation: radiansToDegrees(angle),
+						},
 					});
 				}}
-				onDragEnd={(e) => {
-					const angle = calculateAngle(point, e.endPoint);
-					onTransform({
-						id: diagramId,
-						point,
-						width,
-						height,
-						scaleX,
-						scaleY,
-						rotation: radiansToDegrees(angle),
-					});
-				}}
+				onDragEnd={handleDragEnd}
 				dragPositioningFunction={(p: Point) => {
 					return calcNearestCircleIntersectionPoint(
 						{ x: point.x, y: point.y },

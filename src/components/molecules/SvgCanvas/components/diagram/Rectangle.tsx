@@ -20,7 +20,9 @@ import type {
 import type {
 	DiagramHoverEvent,
 	DiagramDragEvent,
+	DiagramTransformStartEvent,
 	DiagramTransformEvent,
+	DiagramTransformEndEvent,
 } from "../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
@@ -70,7 +72,9 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				tabIndex = 0,
 				isSelected = false,
 				items,
+				onTransformStart,
 				onTransform,
+				onTransformEnd,
 				// --------------------------------------------------
 				onDiagramClick,
 				onDiagramDragStart,
@@ -174,11 +178,25 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				[onDiagramDragEnd],
 			);
 
+			const handleTransformStart = useCallback(
+				(e: DiagramTransformStartEvent) => {
+					onTransformStart?.(e);
+				},
+				[onTransformStart],
+			);
+
 			const handleTransform = useCallback(
 				(e: DiagramTransformEvent) => {
 					onTransform?.(e);
 				},
 				[onTransform],
+			);
+
+			const handleTransformEnd = useCallback(
+				(e: DiagramTransformEndEvent) => {
+					onTransformEnd?.(e);
+				},
+				[onTransformEnd],
 			);
 
 			/**
@@ -252,7 +270,9 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						scaleY={scaleY}
 						keepProportion={keepProportion}
 						isSelected={isSelected}
+						onTransformStart={handleTransformStart}
 						onTransform={handleTransform}
+						onTransformEnd={handleTransformEnd}
 					/>
 					{!isSelected &&
 						false &&
