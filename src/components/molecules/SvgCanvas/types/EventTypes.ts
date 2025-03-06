@@ -3,6 +3,17 @@
 import type { Point } from "./CoordinateTypes";
 import type { DiagramType } from "./DiagramTypes";
 
+export type DiagramTransformEvent = {
+	id: string;
+	point: Point;
+	width: number;
+	height: number;
+	rotation: number;
+	scaleX: number;
+	scaleY: number;
+};
+
+// --------------------------------------------------
 /**
  * 図形のポインターダウンイベント
  */

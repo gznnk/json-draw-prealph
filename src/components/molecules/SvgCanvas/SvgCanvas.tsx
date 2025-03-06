@@ -15,7 +15,14 @@ import type {
 	DiagramResizeEvent,
 	DiagramSelectEvent,
 	DiagramRotateEvent,
+	DiagramTransformEvent,
 } from "./types/EventTypes";
+
+// ユーティリティをインポート
+import { getLogger } from "../../../utils/Logger";
+
+// ロガーを取得
+const logger = getLogger("SvgCanvas");
 
 import DragPoint from "./components/core/DragPoint";
 
@@ -31,6 +38,8 @@ const ContainerDiv = styled.div`
 type SvgCanvasProps = {
 	title?: string;
 	items: Array<Diagram>;
+	onTransform?: (e: DiagramTransformEvent) => void;
+	// --------------------------------------------------
 	onDiagramDrag?: (e: DiagramDragEvent) => void;
 	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
 	onDiagramDragEndByGroup?: (e: DiagramDragEvent) => void;
@@ -48,6 +57,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 	({
 		title,
 		items,
+		onTransform,
 		onDiagramDrag,
 		onDiagramDragEnd,
 		onDiagramDragEndByGroup,
@@ -69,11 +79,14 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 			[onDiagramSelect],
 		);
 
+		logger.debug("SvgCanvas items", items);
+
 		const renderedItems = items.map((item) => {
 			const itemType = DiagramTypeComponentMap[item.type];
 			const props = {
 				...item,
 				key: item.id,
+				onTransform,
 				onDiagramDrag,
 				onDiagramDragEnd,
 				onDiagramDragEndByGroup,
@@ -121,6 +134,8 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				isCtrlDown.current = false;
 			}
 		}, []);
+
+		// console.log(items);
 
 		return (
 			<ContainerDiv>

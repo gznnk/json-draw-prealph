@@ -4,7 +4,10 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { Point } from "../../types/CoordinateTypes";
 import type { DiagramType } from "../../types/DiagramTypes";
-import type { DiagramDragEvent } from "../../types/EventTypes";
+import type {
+	DiagramDragEvent,
+	DiagramTransformEvent,
+} from "../../types/EventTypes";
 
 import DragPoint from "./DragPoint";
 
@@ -25,17 +28,8 @@ import {
 } from "../../functions/Math";
 import { createSvgTransform } from "../../functions/Svg";
 
-type TransformEvent = {
-	point: Point;
-	width: number;
-	height: number;
-	rotation: number;
-	scaleX: number;
-	scaleY: number;
-};
-
 type TransformativeProps = {
-	id: string;
+	diagramId: string;
 	type: DiagramType;
 	point: Point;
 	width: number;
@@ -45,11 +39,11 @@ type TransformativeProps = {
 	scaleY: number;
 	keepProportion: boolean;
 	isSelected: boolean;
-	onTransform: (e: TransformEvent) => void;
+	onTransform: (e: DiagramTransformEvent) => void;
 };
 
 const Transformative: React.FC<TransformativeProps> = ({
-	id,
+	diagramId,
 	point,
 	width,
 	height,
@@ -115,6 +109,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 	const triggerTransform = useCallback(
 		(centerPoint: Point, newWidth: number, newHeight: number) => {
 			onTransform({
+				id: diagramId,
 				point: centerPoint,
 				width: Math.abs(newWidth),
 				height: Math.abs(newHeight),
@@ -123,7 +118,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				rotation,
 			});
 		},
-		[onTransform, rotation],
+		[onTransform, diagramId, rotation],
 	);
 
 	const handleDragStart = useCallback(() => {
@@ -167,7 +162,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			triggerTransform,
 			affineTransformationOnDrag,
 			inverseAffineTransformationOnDrag,
-			keepProportion,
+			doKeepProportion,
 		],
 	);
 
@@ -539,7 +534,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			/>
 			{/* 左上 */}
 			<DragPoint
-				id={`${id}-leftTop`}
+				id={`${diagramId}-leftTop`}
 				point={vertices.leftTopPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftTop}
@@ -549,7 +544,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			/>
 			{/* 左下 */}
 			<DragPoint
-				id={`${id}-leftBottom`}
+				id={`${diagramId}-leftBottom`}
 				point={vertices.leftBottomPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftBottom}
@@ -559,7 +554,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			/>
 			{/* 右上 */}
 			<DragPoint
-				id={`${id}-rightTop`}
+				id={`${diagramId}-rightTop`}
 				point={vertices.rightTopPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightTop}
@@ -569,7 +564,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			/>
 			{/* 右下 */}
 			<DragPoint
-				id={`${id}-rightBottom`}
+				id={`${diagramId}-rightBottom`}
 				point={vertices.rightBottomPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightBottom}
@@ -579,7 +574,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			/>
 			{/* 上中央 */}
 			<DragPoint
-				id={`${id}-topCenter`}
+				id={`${diagramId}-topCenter`}
 				point={vertices.topCenterPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragTopCenter}
@@ -587,7 +582,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			/>
 			{/* 左中央 */}
 			<DragPoint
-				id={`${id}-leftCenter`}
+				id={`${diagramId}-leftCenter`}
 				point={vertices.leftCenterPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftCenter}
@@ -595,7 +590,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			/>
 			{/* 右中央 */}
 			<DragPoint
-				id={`${id}-rightCenter`}
+				id={`${diagramId}-rightCenter`}
 				point={vertices.rightCenterPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightCenter}
@@ -603,7 +598,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			/>
 			{/* 下中央 */}
 			<DragPoint
-				id={`${id}-bottomCenter`}
+				id={`${diagramId}-bottomCenter`}
 				point={vertices.bottomCenterPoint}
 				onDragStart={handleDragStart}
 				onDrag={handleDragBottomCenter}
@@ -611,12 +606,13 @@ const Transformative: React.FC<TransformativeProps> = ({
 			/>
 			{/* 回転 */}
 			<DragPoint
-				id={`rotation-${id}`}
+				id={`rotation-${diagramId}`}
 				point={rp}
 				onDrag={(e) => {
 					const angle = calculateAngle(point, e.endPoint);
 					console.log(radiansToDegrees(angle));
 					onTransform({
+						id: diagramId,
 						point,
 						width,
 						height,
@@ -628,6 +624,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				onDragEnd={(e) => {
 					const angle = calculateAngle(point, e.endPoint);
 					onTransform({
+						id: diagramId,
 						point,
 						width,
 						height,

@@ -221,9 +221,9 @@ const Ellipse: React.FC<EllipseProps> = memo(
 			 */
 			const handleDiagramDrag = useCallback(
 				(e: DiagramDragEvent) => {
-					onDiagramDragEnd?.(e);
+					onDiagramDrag?.(e);
 				},
-				[onDiagramDragEnd],
+				[onDiagramDrag],
 			);
 
 			/**
@@ -259,6 +259,7 @@ const Ellipse: React.FC<EllipseProps> = memo(
 				point,
 				ref: svgRef,
 				onPointerDown: handlePointerDown,
+				onClick: onDiagramClick,
 				onDragStart: handleDiagramDragStart,
 				onDrag: handleDiagramDrag,
 				onDragEnd: handleDiagramDragEnd,

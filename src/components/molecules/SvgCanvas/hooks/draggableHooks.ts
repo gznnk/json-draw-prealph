@@ -14,6 +14,12 @@ import type {
 	DiagramPointerEvent,
 } from "../types/EventTypes";
 
+// ユーティリティをインポート
+import { getLogger } from "../../../../utils/Logger";
+
+// ロガーを取得
+const logger = getLogger("draggableHooks");
+
 /**
  * 全体通知用ドラッグイベントの型定義
  */
@@ -195,6 +201,9 @@ export const useDraggable = (props: DraggableProps) => {
 				return;
 			}
 
+			logger.debug("handlePointerMove", e);
+			logger.debug("handlePointerMove startPoint", startPoint.current);
+
 			// ドラッグ座標を取得
 			const dragPoint = getPointOnDrag(e);
 
@@ -222,6 +231,8 @@ export const useDraggable = (props: DraggableProps) => {
 
 			// ドラッグ中イベント発火
 			onDrag?.(dragEvent);
+
+			logger.debug("handlePointerMove dragEvent", dragEvent);
 
 			// 親子関係にない図形でハンドリングする用のドラッグ中イベント発火
 			ref.current?.dispatchEvent(

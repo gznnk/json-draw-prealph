@@ -1,6 +1,9 @@
 {
 	"root": "INFO",
-	"Group": "DEBUG",
-	"Line": "DEBUG",
-	"SvgCanvasHooks": "INFO"
+	"Group": "INFO",
+	"Line": "INFO",
+	"Rectangle": "INFO",
+	"SvgCanvas": "INFO",
+	"SvgCanvasHooks": "INFO",
+	"draggableHooks": "INFO"
 }

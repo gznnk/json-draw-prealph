@@ -20,9 +20,7 @@ import type {
 import type {
 	DiagramHoverEvent,
 	DiagramDragEvent,
-	GroupDragEvent,
-	GroupResizeEvent,
-	DiagramPointerEvent,
+	DiagramTransformEvent,
 } from "../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
@@ -42,11 +40,15 @@ import type { RectangleBaseProps } from "../core/RectangleBase";
 import {
 	calcRectangleVertices,
 	calcArrangment,
-	calcArrangmentOnGroupResize,
-	calcPointOnGroupDrag,
 } from "../core/RectangleBase/RectangleBaseFunctions";
 import { degreesToRadians } from "../../functions/Math";
 import { createSvgTransform } from "../../functions/Svg";
+
+// ユーティリティをインポート
+import { getLogger } from "../../../../../utils/Logger";
+
+// ロガーを取得
+const logger = getLogger("Rectangle");
 
 export type RectangleProps = RectangleBaseProps & RectangleData;
 
@@ -68,6 +70,8 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				tabIndex = 0,
 				isSelected = false,
 				items,
+				onTransform,
+				// --------------------------------------------------
 				onDiagramClick,
 				onDiagramDragStart,
 				onDiagramDrag,
@@ -87,109 +91,6 @@ const Rectangle: React.FC<RectangleProps> = memo(
 			const [isHovered, setIsHovered] = useState(false);
 
 			const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
-			const rectangleBaseRef = useRef<SVGGElement>({} as SVGGElement);
-
-			// グループのドラッグ・リサイズ時に、グループ側から実行してもらう関数を公開
-			useImperativeHandle(ref, () => ({
-				onGroupDrag: handleGroupDrag,
-				onGroupDragEnd: handleGroupDragEnd,
-				onGroupResize: onGroupResize,
-				onGroupResizeEnd: onGroupResizeEnd,
-			}));
-
-			/**
-			 * グループのドラッグ中イベントハンドラ
-			 *
-			 * @param {GroupDragEvent} e グループのドラッグ中イベント
-			 * @returns {void}
-			 */
-			const handleGroupDrag = useCallback(
-				(e: GroupDragEvent) => {
-					setIsTransforming(true); // TODO
-
-					// グループのドラッグに伴うこの図形の座標を計算
-					const newPoint = calcPointOnGroupDrag(e, point);
-
-					// 描画処理負荷軽減のため、DOMを直接操作
-					// 短径領域の移動をDOMの直接操作で実施
-					rectangleBaseRef.current?.setAttribute(
-						"transform",
-						`translate(${newPoint.x}, ${newPoint.y})`,
-					);
-				},
-				[point],
-			);
-
-			/**
-			 * グループのドラッグ完了イベントハンドラ
-			 *
-			 * @param {GroupDragEvent} e グループのドラッグ完了イベント
-			 * @returns {void}
-			 */
-			const handleGroupDragEnd = useCallback(
-				(e: GroupDragEvent) => {
-					// グループのドラッグ完了に伴うこの図形の位置変更をグループ側に通知し、SvgCanvasまで変更を伝番してもらう
-					onDiagramDragEndByGroup?.({
-						id,
-						startPoint: point,
-						endPoint: calcPointOnGroupDrag(e, point),
-					});
-
-					setIsTransforming(false);
-				},
-				[onDiagramDragEndByGroup, id, point],
-			);
-
-			/**
-			 * グループのリサイズ中イベントハンドラ
-			 *
-			 * @param {GroupResizeEvent} e グループのリサイズ中イベント
-			 */
-			const onGroupResize = useCallback(
-				(e: GroupResizeEvent) => {
-					// グループのリサイズに伴うこの図形のリサイズ後の座標とサイズを計算
-					const newArrangment = calcArrangmentOnGroupResize(
-						e,
-						point,
-						width,
-						height,
-					);
-
-					// 描画処理負荷軽減のため、DOMを直接操作
-					// 短径領域の移動をDOMの直接操作で実施
-					rectangleBaseRef.current?.setAttribute(
-						"transform",
-						`translate(${newArrangment.point.x}, ${newArrangment.point.y})`,
-					);
-
-					// 四角形のリサイズをDOMの直接操作で実施
-					svgRef?.current?.setAttribute("width", `${newArrangment.width}`);
-					svgRef?.current?.setAttribute("height", `${newArrangment.height}`);
-
-					setIsTransforming(true);
-
-					// グループのリサイズが契機で、かつDOMを直接更新しての変更なので、グループ側への変更通知はしない
-				},
-				[point, width, height],
-			);
-
-			/**
-			 * グループのリサイズ完了イベントハンドラ
-			 *
-			 * @param {GroupResizeEvent} e グループのリサイズ完了イベント
-			 */
-			const onGroupResizeEnd = useCallback(
-				(e: GroupResizeEvent) => {
-					// グループのリサイズに伴うこの図形のサイズ変更を親に通知し、SvgCanvasまで変更を伝番してもらう
-					onDiagramResizeEnd?.({
-						id,
-						...calcArrangmentOnGroupResize(e, point, width, height),
-					});
-
-					setIsTransforming(false);
-				},
-				[onDiagramResizeEnd, id, point, width, height],
-			);
 
 			/**
 			 * 接続ポイントの位置を更新
@@ -233,6 +134,8 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				(e: DiagramDragEvent) => {
 					setIsTransforming(true);
 					onDiagramDragStart?.(e);
+
+					logger.debug("handleDiagramDragStart", e);
 				},
 				[onDiagramDragStart],
 			);
@@ -245,14 +148,16 @@ const Rectangle: React.FC<RectangleProps> = memo(
 			 */
 			const handleDiagramDrag = useCallback(
 				(e: DiagramDragEvent) => {
-					updateConnectPoints(e.endPoint, {
-						x: e.endPoint.x + width,
-						y: e.endPoint.y + height,
-					});
+					// updateConnectPoints(e.endPoint, {
+					// 	x: e.endPoint.x + width,
+					// 	y: e.endPoint.y + height,
+					// });
 
-					onDiagramDragEnd?.(e);
+					logger.debug("handleDiagramDrag", e);
+
+					onDiagramDrag?.(e);
 				},
-				[onDiagramDragEnd, updateConnectPoints, width, height],
+				[onDiagramDrag, updateConnectPoints, width, height],
 			);
 
 			/**
@@ -267,6 +172,13 @@ const Rectangle: React.FC<RectangleProps> = memo(
 					setIsTransforming(false);
 				},
 				[onDiagramDragEnd],
+			);
+
+			const handleTransform = useCallback(
+				(e: DiagramTransformEvent) => {
+					onTransform?.(e);
+				},
+				[onTransform],
 			);
 
 			/**
@@ -299,6 +211,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 				point,
 				ref: svgRef,
 				onPointerDown: handlePointerDown,
+				onClick: onDiagramClick,
 				onDragStart: handleDiagramDragStart,
 				onDrag: handleDiagramDrag,
 				onDragEnd: handleDiagramDragEnd,
@@ -329,7 +242,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						{...draggableProps}
 					/>
 					<Transformative
-						id={`${id}-transformative`}
+						diagramId={id}
 						type="Rectangle"
 						point={point}
 						width={width}
@@ -339,18 +252,7 @@ const Rectangle: React.FC<RectangleProps> = memo(
 						scaleY={scaleY}
 						keepProportion={keepProportion}
 						isSelected={isSelected}
-						onTransform={(e) => {
-							// TODO
-							onDiagramResizeEnd?.({
-								id,
-								point: e.point,
-								width: e.width,
-								height: e.height,
-								rotation: e.rotation,
-								scaleX: e.scaleX,
-								scaleY: e.scaleY,
-							});
-						}}
+						onTransform={handleTransform}
 					/>
 					{!isSelected &&
 						false &&

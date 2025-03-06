@@ -19,6 +19,7 @@ import type {
 	DiagramDragDropEvent,
 	DiagramConnectEvent,
 	ConnectPointMoveEvent,
+	DiagramTransformEvent,
 } from "../types/EventTypes";
 
 // SvgCanvas関連関数をインポート
@@ -108,13 +109,22 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		items: initialItems,
 	});
 
+	const onTransform = useCallback((e: DiagramTransformEvent) => {
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: applyRecursive(prevState.items, (item) =>
+				item.id === e.id ? { ...item, ...e } : item,
+			),
+		}));
+	}, []);
+
 	const onDiagramDrag = useCallback((e: DiagramDragEvent) => {
-		// setCanvasState((prevState) => ({
-		// 	...prevState,
-		// 	items: applyRecursive(prevState.items, (item) =>
-		// 		item.id === e.id ? { ...item, point: e.endPoint } : item,
-		// 	),
-		// }));
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: applyRecursive(prevState.items, (item) =>
+				item.id === e.id ? { ...item, point: e.endPoint } : item,
+			),
+		}));
 	}, []);
 
 	const onDiagramDragEnd = useCallback((e: DiagramDragEvent) => {
@@ -248,6 +258,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onDiagramDelete,
 		onDiagramConnect,
 		onConnectPointMove,
+		onTransform,
 	};
 
 	const getSelectedItem = useCallback(() => {

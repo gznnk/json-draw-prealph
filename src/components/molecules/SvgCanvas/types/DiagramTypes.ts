@@ -17,6 +17,7 @@ import type {
 	GroupDragEvent,
 	GroupResizeEvent,
 	ConnectPointMoveEvent,
+	DiagramTransformEvent,
 } from "./EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
@@ -93,6 +94,8 @@ export type Diagram = DiagramCombined & {
 };
 
 export type DiagramBaseProps = DiagramBaseData & {
+	onTransform?: (e: DiagramTransformEvent) => void;
+	// --------------------------------------------------
 	onDiagramClick?: (e: DiagramClickEvent) => void;
 	onDiagramDragStart?: (e: DiagramDragEvent) => void;
 	onDiagramDrag?: (e: DiagramDragEvent) => void;
