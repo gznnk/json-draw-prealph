@@ -20,7 +20,7 @@ import RectangleBaseDragPointBase from "./RectangleBaseDragPointBase";
 // RectangleBase関連関数をインポート
 import {
 	calcArrangment,
-	createLinerDragY2xFunction,
+	createLinerY2xFunction,
 } from "./RectangleBaseFunctions";
 
 // RectangleBase関連定数をインポート
@@ -83,8 +83,7 @@ const DragPointTopCenter = forwardRef<SVGGElement, RectangleBaseDragPointProps>(
 		);
 
 		const linerDragFunction = useCallback(
-			(p: Point) =>
-				createLinerDragY2xFunction(leftBottomPoint, topCenterPoint)(p),
+			(p: Point) => createLinerY2xFunction(leftBottomPoint, topCenterPoint)(p),
 			[leftBottomPoint, topCenterPoint],
 		);
 

@@ -14,10 +14,7 @@ import type { Diagram, DiagramRef, GroupData } from "../../types/DiagramTypes";
 import { DiagramTypeComponentMap } from "../../types/DiagramTypes";
 import type {
 	DiagramDragEvent,
-	DiagramResizeEvent,
 	DiagramSelectEvent,
-	GroupDragEvent,
-	GroupResizeEvent,
 	DiagramTransformEvent,
 	DiagramTransformEndEvent,
 } from "../../types/EventTypes";
@@ -409,6 +406,7 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 				onDiagramDragEnd?.(e);
 				setIsDragging(false);
 
+				// TODO: 素早くやるとずれる
 				transformGroupOutline();
 			},
 			[onDiagramDragEnd, transformGroupOutline],

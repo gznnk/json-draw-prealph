@@ -1,19 +1,10 @@
 // Reactのインポート
 import type React from "react";
-import {
-	forwardRef,
-	memo,
-	useCallback,
-	useImperativeHandle,
-	useRef,
-} from "react";
+import { forwardRef, memo, useCallback, useRef } from "react";
 
 // SvgCanvas関連型定義をインポート
 import type { EllipseData, DiagramRef } from "../../types/DiagramTypes";
 import type {
-	DiagramResizeEvent,
-	GroupResizeEvent,
-	GroupDragEvent,
 	DiagramDragEvent,
 	DiagramTransformStartEvent,
 	DiagramTransformEvent,
@@ -22,12 +13,6 @@ import type {
 
 // RectangleBase関連コンポーネントをインポート
 import type { RectangleBaseProps } from "../core/RectangleBase";
-
-// RectangleBase関連関数をインポート
-import {
-	calcArrangmentOnGroupResize,
-	calcPointOnGroupDrag,
-} from "../core/RectangleBase/RectangleBaseFunctions";
 
 // SvgCanvas関連カスタムフックをインポート
 import { useDraggable } from "../../hooks/draggableHooks";
@@ -156,26 +141,28 @@ const Ellipse: React.FC<EllipseProps> = memo(
 
 			return (
 				<>
-					<ellipse
-						id={id}
-						cx={0}
-						cy={0}
-						rx={width / 2}
-						ry={height / 2}
-						fill={fill}
-						stroke={stroke}
-						strokeWidth={strokeWidth}
-						transform={createSvgTransform(
-							scaleX,
-							scaleY,
-							degreesToRadians(rotation),
-							point.x,
-							point.y,
-						)}
-						tabIndex={0}
-						ref={svgRef}
-						{...draggableProps}
-					/>
+					<g transform="translate(0.5,0.5)">
+						<ellipse
+							id={id}
+							cx={0}
+							cy={0}
+							rx={width / 2}
+							ry={height / 2}
+							fill={fill}
+							stroke={stroke}
+							strokeWidth={strokeWidth}
+							transform={createSvgTransform(
+								scaleX,
+								scaleY,
+								degreesToRadians(rotation),
+								point.x,
+								point.y,
+							)}
+							tabIndex={0}
+							ref={svgRef}
+							{...draggableProps}
+						/>
+					</g>
 					<Transformative
 						diagramId={id}
 						type="Ellipse"

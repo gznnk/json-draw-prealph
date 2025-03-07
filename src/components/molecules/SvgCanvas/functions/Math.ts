@@ -1,4 +1,4 @@
-type Point = { x: number; y: number }; // TODO
+import type { Point, RectangleVertices } from "../types/CoordinateTypes";
 
 /**
  * Nandであれば0に変換する
@@ -234,4 +234,151 @@ export const inverseAffineTransformation = (
 	];
 
 	return { x: originalVector[0], y: originalVector[1] };
+};
+
+/**
+ * 2点間の直線の方程式を基に、Y座標からX座標を計算する関数を生成します。
+ *
+ * @param p1 - 直線上の最初の点
+ * @param p2 - 直線上の2番目の点
+ * @returns Y座標を入力としてX座標を計算する関数
+ */
+export const createLinerY2xFunction = (p1: Point, p2: Point) => {
+	const a = (p2.y - p1.y) / (p2.x - p1.x);
+	const b = p1.y - a * p1.x;
+
+	return (p: Point) => {
+		return {
+			x: Number.isFinite(a) ? (p.y - b) / a : p1.x,
+			y: p.y,
+		};
+	};
+};
+
+/**
+ * 2点間の直線の方程式を基に、X座標からY座標を計算する関数を生成します。
+ *
+ * @param p1 - 直線上の最初の点
+ * @param p2 - 直線上の2番目の点
+ * @returns X座標を入力としてY座標を計算する関数
+ */
+export const createLinerX2yFunction = (p1: Point, p2: Point) => {
+	const a = (p2.y - p1.y) / (p2.x - p1.x);
+	const b = p1.y - a * p1.x;
+
+	return (p: Point) => {
+		return {
+			x: p.x,
+			y: Number.isFinite(a) ? a * p.x + b : p1.y,
+		};
+	};
+};
+
+/**
+ * 矩形の頂点を計算する
+ *
+ * @param point - 短径の中心座標
+ * @param width	- 短径の幅
+ * @param height - 短径の高さ
+ * @param rotation - 短径の回転角度
+ * @param scaleX - 短径のX軸方向の拡大率
+ * @param scaleY - 短径のY軸方向の拡大率
+ * @returns 矩形の頂点座標
+ */
+export const calcRectangleVertices = (
+	point: Point,
+	width: number,
+	height: number,
+	rotation: number,
+	scaleX: number,
+	scaleY: number,
+): RectangleVertices => {
+	const halfWidth = width / 2;
+	const halfHeight = height / 2;
+
+	const tx = point.x;
+	const ty = point.y;
+
+	const leftTopPoint = affineTransformation(
+		{ x: -halfWidth, y: -halfHeight },
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		tx,
+		ty,
+	);
+
+	const leftBottomPoint = affineTransformation(
+		{ x: -halfWidth, y: halfHeight },
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		tx,
+		ty,
+	);
+
+	const rightTopPoint = affineTransformation(
+		{ x: halfWidth, y: -halfHeight },
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		tx,
+		ty,
+	);
+
+	const rightBottomPoint = affineTransformation(
+		{ x: halfWidth, y: halfHeight },
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		tx,
+		ty,
+	);
+
+	const topCenterPoint = affineTransformation(
+		{ x: 0, y: -halfHeight },
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		tx,
+		ty,
+	);
+
+	const leftCenterPoint = affineTransformation(
+		{ x: -halfWidth, y: 0 },
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		tx,
+		ty,
+	);
+
+	const rightCenterPoint = affineTransformation(
+		{ x: halfWidth, y: 0 },
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		tx,
+		ty,
+	);
+
+	const bottomCenterPoint = affineTransformation(
+		{ x: 0, y: halfHeight },
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		tx,
+		ty,
+	);
+
+	return {
+		leftTopPoint,
+		leftBottomPoint,
+		rightTopPoint,
+		rightBottomPoint,
+		topCenterPoint,
+		leftCenterPoint,
+		rightCenterPoint,
+		bottomCenterPoint,
+	};
 };

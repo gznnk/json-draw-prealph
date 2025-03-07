@@ -55,6 +55,29 @@ export type DraggableProps = {
 	dragPositioningFunction?: (point: Point) => Point;
 };
 
+/**
+ * ドラッグ可能な領域を作成するカスタムフック
+ *
+ * @param {DraggableProps} props ドラッグ領域のProps
+ * @param {string} props.id ID（ドラッグ可能にする要素にも同じIDを設定すること。しない場合は正しく動作しなくなる）
+ * @param {DiagramType} [props.type] 図形の種類
+ * @param {Point} props.point 座標
+ * @param {DragDirection} [props.direction] ドラッグ方向
+ * @param {boolean} [props.allowXDecimal] X座標の小数点許可フラグ
+ * @param {boolean} [props.allowYDecimal] Y座標の小数点許可フラグ
+ * @param {React.RefObject<SVGElement>} props.ref ドラッグ可能にする要素の参照
+ * @param {(e: DiagramPointerEvent) => void} [props.onPointerDown] ポインター押下時のイベントハンドラ
+ * @param {(e: DiagramPointerEvent) => void} [props.onPointerUp] ポインター離上時のイベントハンドラ
+ * @param {(e: DiagramClickEvent) => void} [props.onClick] クリック時のイベントハンドラ
+ * @param {(e: DiagramDragEvent) => void} [props.onDragStart] ドラッグ開始時のイベントハンドラ
+ * @param {(e: DiagramDragEvent) => void} [props.onDrag] ドラッグ中のイベントハンドラ
+ * @param {(e: DiagramDragEvent) => void} [props.onDragEnd] ドラッグ終了時のイベントハンドラ
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDragOver] ドラッグオーバー時のイベントハンドラ
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDragLeave] ドラッグリーブ時のイベントハンドラ
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDrop] ドロップ時のイベントハンドラ
+ * @param {(e: DiagramHoverEvent) => void} [props.onHoverChange] ホバー変更時のイベントハンドラ
+ * @param {(point: Point) => Point} [props.dragPositioningFunction] ドラッグ位置変換関数
+ */
 export const useDraggable = (props: DraggableProps) => {
 	const {
 		id,

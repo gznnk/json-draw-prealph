@@ -20,7 +20,7 @@ import RectangleBaseDragPointBase from "./RectangleBaseDragPointBase";
 // RectangleBase関連関数をインポート
 import {
 	calcArrangment,
-	createLinerDragX2yFunction,
+	createLinerX2yFunction,
 } from "./RectangleBaseFunctions";
 
 // RectangleBase関連定数をインポート
@@ -86,8 +86,7 @@ const DragPointRightCenter = forwardRef<
 		);
 
 		const linerDragFunction = useCallback(
-			(p: Point) =>
-				createLinerDragX2yFunction(leftTopPoint, rightCenterPoint)(p),
+			(p: Point) => createLinerX2yFunction(leftTopPoint, rightCenterPoint)(p),
 			[leftTopPoint, rightCenterPoint],
 		);
 

@@ -2,27 +2,27 @@
 import type React from "react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+// SvgCanvas関連型定義をインポート
 import type { Point } from "../../types/CoordinateTypes";
 import type { DiagramType } from "../../types/DiagramTypes";
 import type {
 	DiagramDragEvent,
-	DiagramTransformStartEvent,
-	DiagramTransformEvent,
 	DiagramTransformEndEvent,
+	DiagramTransformEvent,
+	DiagramTransformStartEvent,
 } from "../../types/EventTypes";
 
+// SvgCanvas関連コンポーネントをインポート
 import DragPoint from "./DragPoint";
 
-import {
-	calcRectangleVertices,
-	createLinerDragX2yFunction,
-	createLinerDragY2xFunction,
-} from "./RectangleBase/RectangleBaseFunctions";
-
+// SvgCanvas関連関数をインポート
 import {
 	affineTransformation,
 	calcNearestCircleIntersectionPoint,
+	calcRectangleVertices,
 	calculateAngle,
+	createLinerX2yFunction,
+	createLinerY2xFunction,
 	degreesToRadians,
 	inverseAffineTransformation,
 	nanToZero,
@@ -64,8 +64,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const doKeepProportion = keepProportion || isShiftKeyDown;
 
-	// TODO: startShapeに名前を変更
-	const startBox = useRef({
+	const startShape = useRef({
 		point,
 		width,
 		height,
@@ -94,8 +93,8 @@ const Transformative: React.FC<TransformativeProps> = ({
 				1,
 				1,
 				radians,
-				startBox.current.point.x,
-				startBox.current.point.y,
+				startShape.current.point.x,
+				startShape.current.point.y,
 			),
 		[radians],
 	);
@@ -107,8 +106,8 @@ const Transformative: React.FC<TransformativeProps> = ({
 				1,
 				1,
 				radians,
-				startBox.current.point.x,
-				startBox.current.point.y,
+				startShape.current.point.x,
+				startShape.current.point.y,
 			),
 		[radians],
 	);
@@ -118,7 +117,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			onTransform({
 				id: diagramId,
 				startShape: {
-					...startBox.current,
+					...startShape.current,
 				},
 				endShape: {
 					point: centerPoint,
@@ -137,7 +136,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 		onTransformStart?.({
 			id: diagramId,
 		});
-		startBox.current = {
+		startShape.current = {
 			point,
 			width,
 			height,
@@ -164,13 +163,13 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(e: DiagramDragEvent) => {
 			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
 			const inversedRightBottom = inverseAffineTransformationOnDrag(
-				startBox.current.rightBottomPoint,
+				startShape.current.rightBottomPoint,
 			);
 
 			const newWidth = inversedRightBottom.x - inversedDragPoint.x;
 			let newHeight: number;
-			if (doKeepProportion && startBox.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startBox.current.aspectRatio);
+			if (doKeepProportion && startShape.current.aspectRatio) {
+				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
 			} else {
 				newHeight = inversedRightBottom.y - inversedDragPoint.y;
 			}
@@ -193,9 +192,9 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionLeftTop = useCallback(
 		(p: Point) =>
-			createLinerDragY2xFunction(
-				startBox.current.leftTopPoint,
-				startBox.current.rightBottomPoint,
+			createLinerY2xFunction(
+				startShape.current.leftTopPoint,
+				startShape.current.rightBottomPoint,
 			)(p),
 		[],
 	);
@@ -206,13 +205,13 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(e: DiagramDragEvent) => {
 			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
 			const inversedRightTop = inverseAffineTransformationOnDrag(
-				startBox.current.rightTopPoint,
+				startShape.current.rightTopPoint,
 			);
 
 			const newWidth = inversedRightTop.x - inversedDragPoint.x;
 			let newHeight: number;
-			if (doKeepProportion && startBox.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startBox.current.aspectRatio);
+			if (doKeepProportion && startShape.current.aspectRatio) {
+				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
 			} else {
 				newHeight = inversedDragPoint.y - inversedRightTop.y;
 			}
@@ -235,9 +234,9 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionLeftBottom = useCallback(
 		(p: Point) =>
-			createLinerDragY2xFunction(
-				startBox.current.rightTopPoint,
-				startBox.current.leftBottomPoint,
+			createLinerY2xFunction(
+				startShape.current.rightTopPoint,
+				startShape.current.leftBottomPoint,
 			)(p),
 		[],
 	);
@@ -248,13 +247,13 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(e: DiagramDragEvent) => {
 			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
 			const inversedLeftBottom = inverseAffineTransformationOnDrag(
-				startBox.current.leftBottomPoint,
+				startShape.current.leftBottomPoint,
 			);
 
 			const newWidth = inversedDragPoint.x - inversedLeftBottom.x;
 			let newHeight: number;
-			if (doKeepProportion && startBox.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startBox.current.aspectRatio);
+			if (doKeepProportion && startShape.current.aspectRatio) {
+				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
 			} else {
 				newHeight = inversedLeftBottom.y - inversedDragPoint.y;
 			}
@@ -277,9 +276,9 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionRightTop = useCallback(
 		(p: Point) =>
-			createLinerDragY2xFunction(
-				startBox.current.rightTopPoint,
-				startBox.current.leftBottomPoint,
+			createLinerY2xFunction(
+				startShape.current.rightTopPoint,
+				startShape.current.leftBottomPoint,
 			)(p),
 		[],
 	);
@@ -290,13 +289,13 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(e: DiagramDragEvent) => {
 			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
 			const inversedLeftTop = inverseAffineTransformationOnDrag(
-				startBox.current.leftTopPoint,
+				startShape.current.leftTopPoint,
 			);
 
 			const newWidth = inversedDragPoint.x - inversedLeftTop.x;
 			let newHeight: number;
-			if (doKeepProportion && startBox.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startBox.current.aspectRatio);
+			if (doKeepProportion && startShape.current.aspectRatio) {
+				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
 			} else {
 				newHeight = inversedDragPoint.y - inversedLeftTop.y;
 			}
@@ -319,9 +318,9 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionRightBottom = useCallback(
 		(p: Point) =>
-			createLinerDragY2xFunction(
-				startBox.current.rightBottomPoint,
-				startBox.current.leftTopPoint,
+			createLinerY2xFunction(
+				startShape.current.rightBottomPoint,
+				startShape.current.leftTopPoint,
 			)(p),
 		[],
 	);
@@ -332,15 +331,15 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(e: DiagramDragEvent) => {
 			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
 			const inversedBottomCenter = inverseAffineTransformationOnDrag(
-				startBox.current.bottomCenterPoint,
+				startShape.current.bottomCenterPoint,
 			);
 
 			let newWidth: number;
 			const newHeight = inversedBottomCenter.y - inversedDragPoint.y;
-			if (doKeepProportion && startBox.current.aspectRatio) {
-				newWidth = nanToZero(newHeight * startBox.current.aspectRatio);
+			if (doKeepProportion && startShape.current.aspectRatio) {
+				newWidth = nanToZero(newHeight * startShape.current.aspectRatio);
 			} else {
-				newWidth = startBox.current.width;
+				newWidth = startShape.current.width;
 			}
 
 			const inversedCenter = {
@@ -361,9 +360,9 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionTopCenter = useCallback(
 		(p: Point) =>
-			createLinerDragY2xFunction(
-				startBox.current.bottomCenterPoint,
-				startBox.current.topCenterPoint,
+			createLinerY2xFunction(
+				startShape.current.bottomCenterPoint,
+				startShape.current.topCenterPoint,
 			)(p),
 		[],
 	);
@@ -374,15 +373,15 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(e: DiagramDragEvent) => {
 			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
 			const inversedRightCenter = inverseAffineTransformationOnDrag(
-				startBox.current.rightCenterPoint,
+				startShape.current.rightCenterPoint,
 			);
 
 			const newWidth = inversedRightCenter.x - inversedDragPoint.x;
 			let newHeight: number;
-			if (doKeepProportion && startBox.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startBox.current.aspectRatio);
+			if (doKeepProportion && startShape.current.aspectRatio) {
+				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
 			} else {
-				newHeight = startBox.current.height;
+				newHeight = startShape.current.height;
 			}
 
 			const inversedCenter = {
@@ -403,9 +402,9 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionLeftCenter = useCallback(
 		(p: Point) =>
-			createLinerDragX2yFunction(
-				startBox.current.leftCenterPoint,
-				startBox.current.rightCenterPoint,
+			createLinerX2yFunction(
+				startShape.current.leftCenterPoint,
+				startShape.current.rightCenterPoint,
 			)(p),
 		[],
 	);
@@ -416,15 +415,15 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(e: DiagramDragEvent) => {
 			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
 			const inversedLeftCenter = inverseAffineTransformationOnDrag(
-				startBox.current.leftCenterPoint,
+				startShape.current.leftCenterPoint,
 			);
 
 			const newWidth = inversedDragPoint.x - inversedLeftCenter.x;
 			let newHeight: number;
-			if (doKeepProportion && startBox.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startBox.current.aspectRatio);
+			if (doKeepProportion && startShape.current.aspectRatio) {
+				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
 			} else {
-				newHeight = startBox.current.height;
+				newHeight = startShape.current.height;
 			}
 
 			const inversedCenter = {
@@ -445,9 +444,9 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionRightCenter = useCallback(
 		(p: Point) =>
-			createLinerDragX2yFunction(
-				startBox.current.leftCenterPoint,
-				startBox.current.rightCenterPoint,
+			createLinerX2yFunction(
+				startShape.current.leftCenterPoint,
+				startShape.current.rightCenterPoint,
 			)(p),
 		[],
 	);
@@ -458,15 +457,15 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(e: DiagramDragEvent) => {
 			const inversedDragPoint = inverseAffineTransformationOnDrag(e.endPoint);
 			const inversedTopCenter = inverseAffineTransformationOnDrag(
-				startBox.current.topCenterPoint,
+				startShape.current.topCenterPoint,
 			);
 
 			let newWidth: number;
 			const newHeight = inversedDragPoint.y - inversedTopCenter.y;
-			if (doKeepProportion && startBox.current.aspectRatio) {
-				newWidth = nanToZero(newHeight * startBox.current.aspectRatio);
+			if (doKeepProportion && startShape.current.aspectRatio) {
+				newWidth = nanToZero(newHeight * startShape.current.aspectRatio);
 			} else {
-				newWidth = startBox.current.width;
+				newWidth = startShape.current.width;
 			}
 
 			const inversedCenter = {
@@ -487,9 +486,9 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionBottomCenter = useCallback(
 		(p: Point) =>
-			createLinerDragY2xFunction(
-				startBox.current.bottomCenterPoint,
-				startBox.current.topCenterPoint,
+			createLinerY2xFunction(
+				startShape.current.bottomCenterPoint,
+				startShape.current.topCenterPoint,
 			)(p),
 		[],
 	);
@@ -545,24 +544,26 @@ const Transformative: React.FC<TransformativeProps> = ({
 	return (
 		<>
 			{/* アウトライン */}
-			<rect
-				x={-width / 2}
-				y={-height / 2}
-				width={width}
-				height={height}
-				fill="transparent"
-				stroke="blue"
-				strokeWidth="1px"
-				strokeDasharray="3,3"
-				pointerEvents={"none"}
-				transform={createSvgTransform(
-					scaleX,
-					scaleY,
-					radians,
-					point.x,
-					point.y,
-				)}
-			/>
+			<g transform="translate(0.5,0.5)">
+				<rect
+					x={-width / 2}
+					y={-height / 2}
+					width={width}
+					height={height}
+					fill="transparent"
+					stroke="blue"
+					strokeWidth="1px"
+					strokeDasharray="3,3"
+					pointerEvents={"none"}
+					transform={createSvgTransform(
+						scaleX,
+						scaleY,
+						radians,
+						point.x,
+						point.y,
+					)}
+				/>
+			</g>
 			{/* 左上 */}
 			<DragPoint
 				id={`${diagramId}-leftTop`}
@@ -654,7 +655,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 					onTransform({
 						id: diagramId,
 						startShape: {
-							...startBox.current,
+							...startShape.current,
 						},
 						endShape: {
 							point,

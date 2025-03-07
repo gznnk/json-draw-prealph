@@ -8,6 +8,7 @@ export type Point = {
 	y: number;
 };
 
+// TODO: いらない？
 /**
  * ドラッグ方向の型定義
  */
@@ -16,3 +17,17 @@ export enum DragDirection {
 	Horizontal = "horizontal",
 	Vertical = "vertical",
 }
+
+/**
+ * 矩形の頂点の型定義
+ */
+export type RectangleVertices = {
+	leftTopPoint: Point;
+	leftBottomPoint: Point;
+	rightTopPoint: Point;
+	rightBottomPoint: Point;
+	topCenterPoint: Point;
+	leftCenterPoint: Point;
+	rightCenterPoint: Point;
+	bottomCenterPoint: Point;
+};
