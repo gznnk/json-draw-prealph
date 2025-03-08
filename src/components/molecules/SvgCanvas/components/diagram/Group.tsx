@@ -403,9 +403,11 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 					items: moveRecursive(startItems, dx, dy),
 				};
 
+				// console.log("event", event);
+
 				onGroupDataChange?.(event);
 			},
-			[onDiagramDrag, isDragging, startItems, id],
+			[onDiagramDrag, isDragging, startItems, id, onGroupDataChange],
 		);
 
 		const handleChildDiagramDragEnd = useCallback(
@@ -433,6 +435,7 @@ const Group: React.FC<GroupProps> = forwardRef<DiagramRef, GroupProps>(
 				...item,
 				key: item.id,
 				onTransform: onTransform,
+				onGroupDataChange: onGroupDataChange,
 				onTransformEnd: handleChildDiagramTransfromEnd,
 				onDiagramClick: handleChildDiagramClick,
 				onDiagramDragStart: handleChildDiagramDragStart,

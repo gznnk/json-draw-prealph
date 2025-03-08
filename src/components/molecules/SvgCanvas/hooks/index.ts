@@ -152,7 +152,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	}, []);
 
 	const onGroupDataChange = useCallback((e: GroupDataChangeEvent) => {
-		console.log("onGroupDataChange", e);
+		// console.log("onGroupDataChange", e);
 
 		setCanvasState((prevState) => ({
 			...prevState,
@@ -160,6 +160,17 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				item.id === e.id ? deepMerge(item, e) : item,
 			),
 		}));
+
+		// setCanvasState((prevState) => ({
+		// 	...prevState,
+		// 	items: applyRecursive(prevState.items, (item) => {
+		// 		console.log("", item.id);
+		// 		if (item.id === e.id) {
+		// 			return deepMerge(item, e);
+		// 		}
+		// 		return item;
+		// 	}),
+		// }));
 	}, []);
 
 	const onDiagramDrag = useCallback((e: DiagramDragEvent) => {
@@ -348,6 +359,8 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		addItem,
 		updateItem,
 	};
+
+	console.log("canvasState", canvasState);
 
 	return {
 		state: [canvasState, setCanvasState],
