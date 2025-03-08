@@ -360,7 +360,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		updateItem,
 	};
 
-	console.log("canvasState", canvasState);
+	// console.log("canvasState", canvasState);
 
 	return {
 		state: [canvasState, setCanvasState],
