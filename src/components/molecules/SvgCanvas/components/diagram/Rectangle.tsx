@@ -31,10 +31,10 @@ import { calcRectangleVertices, degreesToRadians } from "../../functions/Math";
 import { createSvgTransform } from "../../functions/Svg";
 
 // ユーティリティをインポート
-import { getLogger } from "../../../../../utils/Logger";
+// import { getLogger } from "../../../../../utils/Logger";
 
 // ロガーを取得
-const logger = getLogger("Rectangle");
+// const logger = getLogger("Rectangle");
 
 export type RectangleProps = DiagramBaseProps &
 	TransformativeProps &
@@ -54,17 +54,16 @@ const Rectangle: React.FC<RectangleProps> = ({
 	keepProportion = false,
 	isSelected = false,
 	items,
-	onTransformStart,
-	onTransform,
-	onTransformEnd,
-	// --------------------------------------------------
-	onDiagramClick,
 	onDiagramDragStart,
 	onDiagramDrag,
 	onDiagramDragEnd,
+	onDiagramClick,
 	onDiagramSelect,
 	onDiagramConnect,
 	onConnectPointMove,
+	onTransformStart,
+	onTransform,
+	onTransformEnd,
 }) => {
 	const [isTransformimg, setIsTransforming] = useState(false);
 	// ホバー状態の管理

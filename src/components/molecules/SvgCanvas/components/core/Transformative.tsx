@@ -12,9 +12,9 @@ import type {
 } from "../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import DragPoint from "./DragPoint";
-import { useDraggable } from "../../hooks/draggableHooks";
 import type { DraggableProps } from "../../hooks/draggableHooks";
+import { useDraggable } from "../../hooks/draggableHooks";
+import DragPoint from "./DragPoint";
 
 // SvgCanvas関連関数をインポート
 import {
@@ -42,9 +42,9 @@ type TransformativeProps = {
 	scaleY: number;
 	keepProportion: boolean;
 	isSelected: boolean;
-	onTransformStart?: (e: DiagramTransformStartEvent) => void; // TODO: 必須にする
-	onTransform: (e: DiagramTransformEvent) => void;
-	onTransformEnd?: (e: DiagramTransformEvent) => void; // TODO: 必須にする
+	onTransformStart?: (e: DiagramTransformStartEvent) => void;
+	onTransform?: (e: DiagramTransformEvent) => void;
+	onTransformEnd?: (e: DiagramTransformEvent) => void;
 };
 
 const Transformative: React.FC<TransformativeProps> = ({
@@ -135,7 +135,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 			lastTransformEvent.current = event;
 
-			onTransform(event);
+			onTransform?.(event);
 		},
 		[onTransform, diagramId, rotation],
 	);
@@ -562,7 +562,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				},
 			};
 			lastTransformEvent.current = event;
-			onTransform(event);
+			onTransform?.(event);
 		},
 		[onTransform, diagramId, point, width, height, scaleX, scaleY],
 	);

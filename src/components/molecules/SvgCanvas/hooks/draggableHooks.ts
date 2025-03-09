@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
 import type { Point } from "../types/CoordinateTypes";
-import { DragDirection } from "../types/CoordinateTypes";
 import type { DiagramType } from "../types/DiagramTypes";
 import type {
 	DiagramClickEvent,
@@ -15,10 +14,10 @@ import type {
 } from "../types/EventTypes";
 
 // ユーティリティをインポート
-import { getLogger } from "../../../../utils/Logger";
+// import { getLogger } from "../../../../utils/Logger";
 
 // ロガーを取得
-const logger = getLogger("draggableHooks");
+// const logger = getLogger("draggableHooks");
 
 /**
  * 全体通知用ドラッグイベントの型定義
@@ -38,7 +37,6 @@ export type DraggableProps = {
 	id: string;
 	type?: DiagramType;
 	point: Point;
-	direction?: DragDirection;
 	allowXDecimal?: boolean;
 	allowYDecimal?: boolean;
 	ref: React.RefObject<SVGElement>;
@@ -62,7 +60,6 @@ export type DraggableProps = {
  * @param {string} props.id ID（ドラッグ可能にする要素にも同じIDを設定すること。しない場合は正しく動作しなくなる）
  * @param {DiagramType} [props.type] 図形の種類
  * @param {Point} props.point 座標
- * @param {DragDirection} [props.direction] ドラッグ方向
  * @param {boolean} [props.allowXDecimal] X座標の小数点許可フラグ
  * @param {boolean} [props.allowYDecimal] Y座標の小数点許可フラグ
  * @param {React.RefObject<SVGElement>} props.ref ドラッグ可能にする要素の参照
@@ -83,7 +80,6 @@ export const useDraggable = (props: DraggableProps) => {
 		id,
 		point,
 		type,
-		direction = DragDirection.All,
 		allowXDecimal = true,
 		allowYDecimal = true,
 		ref,
@@ -154,13 +150,7 @@ export const useDraggable = (props: DraggableProps) => {
 			let x = startPoint.current.x + (e.clientX - startClientPoint.current.x);
 			let y = startPoint.current.y + (e.clientY - startClientPoint.current.y);
 
-			if (direction === DragDirection.Horizontal) {
-				// 水平移動の場合はY座標を固定
-				y = startPoint.current.y;
-			} else if (direction === DragDirection.Vertical) {
-				// 垂直移動の場合はX座標を固定
-				x = startPoint.current.x;
-			} else if (dragPositioningFunction) {
+			if (dragPositioningFunction) {
 				// ドラッグ位置変換関数が指定されている場合は、その関数を適用
 				const p = dragPositioningFunction({
 					x,
@@ -176,7 +166,7 @@ export const useDraggable = (props: DraggableProps) => {
 				y,
 			});
 		},
-		[dragPositioningFunction, adjustCoordinates, direction],
+		[dragPositioningFunction, adjustCoordinates],
 	);
 
 	/**
@@ -224,9 +214,6 @@ export const useDraggable = (props: DraggableProps) => {
 				return;
 			}
 
-			logger.debug("handlePointerMove", e);
-			logger.debug("handlePointerMove startPoint", startPoint.current);
-
 			// ドラッグ座標を取得
 			const dragPoint = getPointOnDrag(e);
 
@@ -254,8 +241,6 @@ export const useDraggable = (props: DraggableProps) => {
 
 			// ドラッグ中イベント発火
 			onDrag?.(dragEvent);
-
-			logger.debug("handlePointerMove dragEvent", dragEvent);
 
 			// 親子関係にない図形でハンドリングする用のドラッグ中イベント発火
 			ref.current?.dispatchEvent(
@@ -367,11 +352,7 @@ export const useDraggable = (props: DraggableProps) => {
 					y: point.y + dy,
 				};
 
-				if (direction === DragDirection.Horizontal) {
-					newPoint.y = startPoint.current.y;
-				} else if (direction === DragDirection.Vertical) {
-					newPoint.x = startPoint.current.x;
-				} else if (dragPositioningFunction) {
+				if (dragPositioningFunction) {
 					newPoint = dragPositioningFunction({ ...newPoint });
 				}
 
@@ -432,7 +413,6 @@ export const useDraggable = (props: DraggableProps) => {
 			onDrag,
 			onDragEnd,
 			id,
-			direction,
 			point,
 		],
 	);

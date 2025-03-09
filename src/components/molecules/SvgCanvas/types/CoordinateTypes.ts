@@ -8,16 +8,6 @@ export type Point = {
 	y: number;
 };
 
-// TODO: いらない？
-/**
- * ドラッグ方向の型定義
- */
-export enum DragDirection {
-	All = "all",
-	Horizontal = "horizontal",
-	Vertical = "vertical",
-}
-
 /**
  * 矩形の頂点の型定義
  */

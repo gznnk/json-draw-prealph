@@ -48,6 +48,9 @@ export type DiagramType =
 	| "Rectangle"
 	| "Triangle";
 
+/**
+ * 図形の基本データ
+ */
 export type DiagramBaseData = {
 	id: string;
 	type?: DiagramType;
@@ -56,6 +59,9 @@ export type DiagramBaseData = {
 	items?: Diagram[];
 };
 
+/**
+ * 変形可能な図形のデータ
+ */
 export type TransformativeData = DiagramBaseData & {
 	width: number;
 	height: number;
@@ -65,39 +71,72 @@ export type TransformativeData = DiagramBaseData & {
 	keepProportion: boolean;
 };
 
+/**
+ * 接続ポイントのデータ
+ */
 export type ConnectPointData = DiagramBaseData & {
 	name: string;
 };
 
+/**
+ * 楕円のデータ
+ */
 export type EllipseData = TransformativeData & {
 	fill: string;
 	stroke: string;
 	strokeWidth: string;
 };
+
+/**
+ * 折れ線の頂点のデータ
+ */
 export type LinePointData = DiagramBaseData & {
 	isActive?: boolean;
 };
+
+/**
+ * 折れ線のデータ
+ */
 export type LineData = TransformativeData & {
 	fill?: string;
 	stroke: string;
 	strokeWidth: string;
+	items: Diagram[];
 };
+
+/**
+ * グループのデータ
+ */
 export type GroupData = TransformativeData & {
 	items: Diagram[];
 };
+
+/**
+ * 矩形のデータ
+ */
 export type RectangleData = TransformativeData & {
 	fill: string;
 	stroke: string;
 	strokeWidth: string;
 };
+
+/**
+ * 三角形のデータ TODO: 三角形いる？
+ */
 export type TriangleData = TransformativeData & {
 	fill: string;
 	stroke: string;
 	strokeWidth: string;
 };
 
+/**
+ * ダミー図形コンポーネント
+ */
 const DummyComponent: React.FC<DiagramBaseData> = () => null;
 
+/**
+ * 全図形のデータを統合した型
+ */
 type DiagramCombined =
 	| ConnectPointData
 	| EllipseData
@@ -106,30 +145,35 @@ type DiagramCombined =
 	| LinePointData
 	| RectangleData;
 
+/**
+ * 図形の型
+ */
 export type Diagram = DiagramCombined & {
 	type: DiagramType;
 };
 
-// TODO: 整理
+/**
+ * 図形のプロパティ
+ */
 export type DiagramBaseProps = DiagramBaseData & {
-	onTransformStart?: (e: DiagramTransformStartEvent) => void;
-	onTransform: (e: DiagramTransformEvent) => void;
-	onTransformEnd?: (e: DiagramTransformEvent) => void;
-	onDiagramClick?: (e: DiagramClickEvent) => void;
 	onDiagramDragStart?: (e: DiagramDragEvent) => void;
 	onDiagramDrag?: (e: DiagramDragEvent) => void;
 	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
 	onDiagramDrop?: (e: DiagramDragDropEvent) => void;
+	onDiagramClick?: (e: DiagramClickEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
 	onDiagramHoverChange?: (e: DiagramHoverEvent) => void;
 	onDiagramConnect?: (e: DiagramConnectEvent) => void;
 	onConnectPointMove?: (e: ConnectPointMoveEvent) => void;
 };
 
+/**
+ * 変形可能な図形のプロパティ
+ */
 export type TransformativeProps = TransformativeData & {
-	onTransformStart?: (e: DiagramTransformStartEvent) => void; // TODO: 必須にする
-	onTransform: (e: DiagramTransformEvent) => void;
-	onTransformEnd?: (e: DiagramTransformEvent) => void; // TODO: 必須にする
+	onTransformStart?: (e: DiagramTransformStartEvent) => void;
+	onTransform?: (e: DiagramTransformEvent) => void;
+	onTransformEnd?: (e: DiagramTransformEvent) => void;
 };
 
 /**

@@ -13,6 +13,7 @@ import type {
 	DiagramBaseProps,
 	LineData,
 	LinePointData,
+	TransformativeProps,
 } from "../../types/DiagramTypes";
 import type {
 	DiagramClickEvent,
@@ -39,6 +40,7 @@ const createDValue = (items: Diagram[]) => {
 };
 
 export type LineProps = DiagramBaseProps &
+	TransformativeProps &
 	LineData & {
 		onGroupDataChange?: (e: GroupDataChangeEvent) => void; // TODO: 共通化
 	};
