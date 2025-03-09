@@ -41,11 +41,11 @@ const Triangle: React.FC<TriangleProps> = ({
 	strokeWidth = "1px",
 	keepProportion = false,
 	isSelected = false,
-	onDiagramClick,
-	onDiagramDragStart,
-	onDiagramDrag,
-	onDiagramDragEnd,
-	onDiagramSelect,
+	onClick,
+	onDragStart,
+	onDrag,
+	onDragEnd,
+	onSelect,
 	onTransformStart,
 	onTransform,
 	onTransformEnd,
@@ -58,11 +58,11 @@ const Triangle: React.FC<TriangleProps> = ({
 	 * @param {DiagramDragEvent} e 四角形のドラッグ開始イベント
 	 * @returns {void}
 	 */
-	const handleDiagramDragStart = useCallback(
+	const handleDragStart = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDragStart?.(e);
+			onDragStart?.(e);
 		},
-		[onDiagramDragStart],
+		[onDragStart],
 	);
 
 	/**
@@ -71,11 +71,11 @@ const Triangle: React.FC<TriangleProps> = ({
 	 * @param {DiagramDragEvent} e 四角形のドラッグ中イベント
 	 * @returns {void}
 	 */
-	const handleDiagramDrag = useCallback(
+	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDrag?.(e);
+			onDrag?.(e);
 		},
-		[onDiagramDrag],
+		[onDrag],
 	);
 
 	/**
@@ -84,11 +84,11 @@ const Triangle: React.FC<TriangleProps> = ({
 	 * @param {DiagramDragEvent} e 四角形のドラッグ完了イベント
 	 * @returns {void}
 	 */
-	const handleDiagramDragEnd = useCallback(
+	const handleDragEnd = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDragEnd?.(e);
+			onDragEnd?.(e);
 		},
-		[onDiagramDragEnd],
+		[onDragEnd],
 	);
 
 	/**
@@ -99,11 +99,11 @@ const Triangle: React.FC<TriangleProps> = ({
 	const handlePointerDown = useCallback(() => {
 		if (!isSelected) {
 			// 図形選択イベントを発火
-			onDiagramSelect?.({
+			onSelect?.({
 				id,
 			});
 		}
-	}, [id, isSelected, onDiagramSelect]);
+	}, [id, isSelected, onSelect]);
 
 	const draggableProps = useDraggable({
 		id,
@@ -111,10 +111,10 @@ const Triangle: React.FC<TriangleProps> = ({
 		point,
 		ref: svgRef,
 		onPointerDown: handlePointerDown,
-		onClick: onDiagramClick,
-		onDragStart: handleDiagramDragStart,
-		onDrag: handleDiagramDrag,
-		onDragEnd: handleDiagramDragEnd,
+		onClick: onClick,
+		onDragStart: handleDragStart,
+		onDrag: handleDrag,
+		onDragEnd: handleDragEnd,
 	});
 
 	const handleTransformStart = useCallback(

@@ -54,12 +54,12 @@ const Rectangle: React.FC<RectangleProps> = ({
 	keepProportion = false,
 	isSelected = false,
 	items,
-	onDiagramDragStart,
-	onDiagramDrag,
-	onDiagramDragEnd,
-	onDiagramClick,
-	onDiagramSelect,
-	onDiagramConnect,
+	onDragStart,
+	onDrag,
+	onDragEnd,
+	onClick,
+	onSelect,
+	onConnect,
 	onConnectPointMove,
 	onTransformStart,
 	onTransform,
@@ -112,12 +112,12 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 * @param {DiagramDragEvent} e 四角形のドラッグ開始イベント
 	 * @returns {void}
 	 */
-	const handleDiagramDragStart = useCallback(
+	const handleDragStart = useCallback(
 		(e: DiagramDragEvent) => {
 			setIsTransforming(true);
-			onDiagramDragStart?.(e);
+			onDragStart?.(e);
 		},
-		[onDiagramDragStart],
+		[onDragStart],
 	);
 
 	/**
@@ -126,7 +126,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 * @param {DiagramDragEvent} e 四角形のドラッグ中イベント
 	 * @returns {void}
 	 */
-	const handleDiagramDrag = useCallback(
+	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
 			updateConnectPoints({
 				point: e.endPoint,
@@ -137,17 +137,9 @@ const Rectangle: React.FC<RectangleProps> = ({
 				scaleY,
 			});
 
-			onDiagramDrag?.(e);
+			onDrag?.(e);
 		},
-		[
-			onDiagramDrag,
-			updateConnectPoints,
-			width,
-			height,
-			rotation,
-			scaleX,
-			scaleY,
-		],
+		[onDrag, updateConnectPoints, width, height, rotation, scaleX, scaleY],
 	);
 
 	/**
@@ -156,12 +148,12 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 * @param {DiagramDragEvent} e 四角形のドラッグ完了イベント
 	 * @returns {void}
 	 */
-	const handleDiagramDragEnd = useCallback(
+	const handleDragEnd = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDragEnd?.(e);
+			onDragEnd?.(e);
 			setIsTransforming(false);
 		},
-		[onDiagramDragEnd],
+		[onDragEnd],
 	);
 
 	const handleTransformStart = useCallback(
@@ -196,11 +188,11 @@ const Rectangle: React.FC<RectangleProps> = ({
 	const handlePointerDown = useCallback(() => {
 		if (!isSelected) {
 			// 図形選択イベントを発火
-			onDiagramSelect?.({
+			onSelect?.({
 				id,
 			});
 		}
-	}, [id, isSelected, onDiagramSelect]);
+	}, [id, isSelected, onSelect]);
 
 	/**
 	 * ホバー状態変更イベントハンドラ
@@ -208,7 +200,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 * @param {DiagramHoverEvent} e ホバー状態変更イベント
 	 * @returns {void}
 	 */
-	const handleDiagramHoverChange = useCallback((e: DiagramHoverEvent) => {
+	const handleHoverChange = useCallback((e: DiagramHoverEvent) => {
 		setIsHovered(e.isHovered);
 	}, []);
 
@@ -218,11 +210,11 @@ const Rectangle: React.FC<RectangleProps> = ({
 		point,
 		ref: svgRef,
 		onPointerDown: handlePointerDown,
-		onClick: onDiagramClick,
-		onDragStart: handleDiagramDragStart,
-		onDrag: handleDiagramDrag,
-		onDragEnd: handleDiagramDragEnd,
-		onHoverChange: handleDiagramHoverChange,
+		onClick: onClick,
+		onDragStart: handleDragStart,
+		onDrag: handleDrag,
+		onDragEnd: handleDragEnd,
+		onHoverChange: handleHoverChange,
 	});
 
 	return (
@@ -274,7 +266,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 						point={cp.point}
 						isSelected={false}
 						visible={isHovered && !isTransformimg}
-						onConnect={onDiagramConnect}
+						onConnect={onConnect}
 					/>
 				))}
 		</>

@@ -39,11 +39,11 @@ const Ellipse: React.FC<EllipseProps> = ({
 	strokeWidth = "1px",
 	keepProportion = false,
 	isSelected = false,
-	onDiagramDragStart,
-	onDiagramDrag,
-	onDiagramDragEnd,
-	onDiagramClick,
-	onDiagramSelect,
+	onDragStart,
+	onDrag,
+	onDragEnd,
+	onClick,
+	onSelect,
 	onTransformStart,
 	onTransform,
 	onTransformEnd,
@@ -56,11 +56,11 @@ const Ellipse: React.FC<EllipseProps> = ({
 	 * @param {DiagramDragEvent} e 四角形のドラッグ開始イベント
 	 * @returns {void}
 	 */
-	const handleDiagramDragStart = useCallback(
+	const handleDragStart = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDragStart?.(e);
+			onDragStart?.(e);
 		},
-		[onDiagramDragStart],
+		[onDragStart],
 	);
 
 	/**
@@ -69,11 +69,11 @@ const Ellipse: React.FC<EllipseProps> = ({
 	 * @param {DiagramDragEvent} e 四角形のドラッグ中イベント
 	 * @returns {void}
 	 */
-	const handleDiagramDrag = useCallback(
+	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDrag?.(e);
+			onDrag?.(e);
 		},
-		[onDiagramDrag],
+		[onDrag],
 	);
 
 	/**
@@ -82,11 +82,11 @@ const Ellipse: React.FC<EllipseProps> = ({
 	 * @param {DiagramDragEvent} e 四角形のドラッグ完了イベント
 	 * @returns {void}
 	 */
-	const handleDiagramDragEnd = useCallback(
+	const handleDragEnd = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDragEnd?.(e);
+			onDragEnd?.(e);
 		},
-		[onDiagramDragEnd],
+		[onDragEnd],
 	);
 
 	/**
@@ -97,11 +97,11 @@ const Ellipse: React.FC<EllipseProps> = ({
 	const handlePointerDown = useCallback(() => {
 		if (!isSelected) {
 			// 図形選択イベントを発火
-			onDiagramSelect?.({
+			onSelect?.({
 				id,
 			});
 		}
-	}, [id, isSelected, onDiagramSelect]);
+	}, [id, isSelected, onSelect]);
 
 	const draggableProps = useDraggable({
 		id,
@@ -109,10 +109,10 @@ const Ellipse: React.FC<EllipseProps> = ({
 		point,
 		ref: svgRef,
 		onPointerDown: handlePointerDown,
-		onClick: onDiagramClick,
-		onDragStart: handleDiagramDragStart,
-		onDrag: handleDiagramDrag,
-		onDragEnd: handleDiagramDragEnd,
+		onClick: onClick,
+		onDragStart: handleDragStart,
+		onDrag: handleDrag,
+		onDragEnd: handleDragEnd,
 	});
 
 	const handleTransformStart = useCallback(

@@ -37,17 +37,13 @@ type SvgCanvasProps = {
 	items: Array<Diagram>;
 	onTransform?: (e: DiagramTransformEvent) => void;
 	onGroupDataChange?: (e: GroupDataChangeEvent) => void;
-	// --------------------------------------------------
-	onDiagramDrag?: (e: DiagramDragEvent) => void;
-	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
-	onDiagramDragEndByGroup?: (e: DiagramDragEvent) => void;
-	onDiagramDrop?: (e: DiagramDragDropEvent) => void;
-	onDiagramResizing?: (e: DiagramResizeEvent) => void;
-	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
-	onDiagramRotateEnd?: (e: DiagramRotateEvent) => void;
-	onDiagramSelect?: (e: DiagramSelectEvent) => void;
-	onDiagramDelete?: () => void;
-	onDiagramConnect?: (e: DiagramConnectEvent) => void;
+	onDrag?: (e: DiagramDragEvent) => void;
+	onDragEnd?: (e: DiagramDragEvent) => void;
+	onDragEndByGroup?: (e: DiagramDragEvent) => void;
+	onDrop?: (e: DiagramDragDropEvent) => void;
+	onSelect?: (e: DiagramSelectEvent) => void;
+	onDelete?: () => void;
+	onConnect?: (e: DiagramConnectEvent) => void;
 	onConnectPointMove?: (e: ConnectPointMoveEvent) => void;
 };
 
@@ -57,25 +53,22 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		items,
 		onTransform,
 		onGroupDataChange,
-		onDiagramDrag,
-		onDiagramDragEnd,
-		onDiagramDragEndByGroup,
-		onDiagramDrop,
-		onDiagramResizing,
-		onDiagramResizeEnd,
-		onDiagramRotateEnd,
-		onDiagramSelect,
-		onDiagramDelete,
-		onDiagramConnect,
+		onDrag,
+		onDragEnd,
+		onDragEndByGroup,
+		onDrop,
+		onSelect,
+		onDelete,
+		onConnect,
 		onConnectPointMove,
 	}) => {
 		const isCtrlDown = useRef(false);
 
-		const handleDiagramSelect = useCallback(
+		const handleSelect = useCallback(
 			(e: DiagramSelectEvent) => {
-				onDiagramSelect?.({ id: e.id, isMultiSelect: isCtrlDown.current });
+				onSelect?.({ id: e.id, isMultiSelect: isCtrlDown.current });
 			},
-			[onDiagramSelect],
+			[onSelect],
 		);
 
 		logger.debug("SvgCanvas items", items);
@@ -87,15 +80,12 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				key: item.id,
 				onTransform,
 				onGroupDataChange,
-				onDiagramDrag,
-				onDiagramDragEnd,
-				onDiagramDragEndByGroup,
-				onDiagramDrop,
-				onDiagramResizing,
-				onDiagramResizeEnd,
-				onDiagramRotateEnd,
-				onDiagramSelect: handleDiagramSelect,
-				onDiagramConnect,
+				onDrag,
+				onDragEnd,
+				onDragEndByGroup,
+				onDrop,
+				onSelect: handleSelect,
+				onConnect,
 				onConnectPointMove,
 			};
 
@@ -105,10 +95,10 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 		const handlePointerDown = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
 				if (e.target === e.currentTarget) {
-					onDiagramSelect?.({ id: "dummy" });
+					onSelect?.({ id: "dummy" });
 				}
 			},
-			[onDiagramSelect],
+			[onSelect],
 		);
 
 		const handleKeyDown = useCallback(
@@ -118,7 +108,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				}
 
 				if (e.key === "Delete") {
-					onDiagramDelete?.();
+					onDelete?.();
 				}
 
 				// キャンバスにフォーカスがない場合はイベントをキャンセルし、スクロールを無効化
@@ -126,7 +116,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 					e.preventDefault();
 				}
 			},
-			[onDiagramDelete],
+			[onDelete],
 		);
 
 		const handleKeyUp = useCallback((e: React.KeyboardEvent<SVGSVGElement>) => {

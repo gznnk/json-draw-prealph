@@ -206,17 +206,14 @@ const calcGroupBoxOfNoRotation = (
  * @property {number} [height] 高さ
  * @property {boolean} [keepProportion] アスペクト比を保持するかどうか
  * @property {boolean} [isSelected] 選択されているかどうか
- * @property {(e: DiagramClickEvent) => void} [onDiagramClick] グループ内の図形のクリック時のイベントハンドラ
- * @property {(e: DiagramResizeEvent) => void} [onDiagramResizeStart] グループ・グループ内の図形のリサイズ開始時のイベントハンドラ
- * @property {(e: DiagramResizeEvent) => void} [onDiagramResizing] グループ・グループ内の図形のリサイズ中のイベントハンドラ
- * @property {(e: DiagramResizeEvent) => void} [onDiagramResizeEnd] グループ・グループ内の図形のリサイズ終了時のイベントハンドラ
- * @property {(e: DiagramDragEvent) => void} [onDiagramDragStart] グループ内の図形のドラッグ開始時のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
- * @property {(e: DiagramDragEvent) => void} [onDiagramDrag] グループ内の図形のドラッグ中のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
- * @property {(e: DiagramDragEvent) => void} [onDiagramDragEnd] グループ内の図形のドラッグ終了時のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
- * @property {(e: DiagramDragDropEvent) => void} [onDiagramDrop] グループ内の図形のドラッグ＆ドロップ時のイベントハンドラ
- * @property {(e: DiagramDragEvent) => void} [onDiagramDragEndByGroup] グループ全体の移動に伴うグループ内の図形のドラッグ終了時のイベントハンドラ
- * @property {(e: DiagramSelectEvent) => void} [onDiagramSelect] 選択時のイベントハンドラ
- * @property {(e: DiagramConnectEvent) => void} [onDiagramConnect] 図形の接続時のイベントハンドラ
+ * @property {(e: DiagramClickEvent) => void} [onClick] グループ内の図形のクリック時のイベントハンドラ
+ * @property {(e: DiagramDragEvent) => void} [onDragStart] グループ内の図形のドラッグ開始時のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
+ * @property {(e: DiagramDragEvent) => void} [onDrag] グループ内の図形のドラッグ中のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
+ * @property {(e: DiagramDragEvent) => void} [onDragEnd] グループ内の図形のドラッグ終了時のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
+ * @property {(e: DiagramDragDropEvent) => void} [onDrop] グループ内の図形のドラッグ＆ドロップ時のイベントハンドラ
+ * @property {(e: DiagramDragEvent) => void} [onDragEndByGroup] グループ全体の移動に伴うグループ内の図形のドラッグ終了時のイベントハンドラ
+ * @property {(e: DiagramSelectEvent) => void} [onSelect] 選択時のイベントハンドラ
+ * @property {(e: DiagramConnectEvent) => void} [onConnect] 図形の接続時のイベントハンドラ
  * @property {Diagram[]} [items] グループ内の図形リスト
  * @property {React.Ref<DiagramRef>} [ref] 親グループのドラッグ・リサイズ時に、親グループ側から実行してもらう関数への参照
  */
@@ -242,11 +239,11 @@ const Group: React.FC<GroupProps> = ({
 	isSelected = false,
 	isTransformActive = true,
 	onTransform,
-	onDiagramClick,
-	onDiagramDragStart,
-	onDiagramDrag,
-	onDiagramDragEnd,
-	onDiagramSelect,
+	onClick,
+	onDragStart,
+	onDrag,
+	onDragEnd,
+	onSelect,
 	onGroupDataChange,
 	items = [],
 }) => {
@@ -276,12 +273,12 @@ const Group: React.FC<GroupProps> = ({
 				// グループ内の図形が選択されていない場合は、このグループの選択イベントを発火させる。
 				// これにより、グループ内の図形が選択されていないグループのうち、最も上位のグループのイベントが
 				// SvgCanvasまで伝番され、そのグループが選択状態になる。
-				onDiagramSelect?.({
+				onSelect?.({
 					id,
 				});
 			} else if (selectedChild.id !== e.id) {
 				// グループ内の図形が選択されていて、かつグループ内の別の図形が選択された場合、その図形を選択状態にする
-				onDiagramSelect?.(e);
+				onSelect?.(e);
 			}
 
 			if (isSelected) {
@@ -290,7 +287,7 @@ const Group: React.FC<GroupProps> = ({
 				setIsSequentialSelection(true);
 			}
 		},
-		[onDiagramSelect, id, isSelected, items],
+		[onSelect, id, isSelected, items],
 	);
 
 	/**
@@ -304,19 +301,19 @@ const Group: React.FC<GroupProps> = ({
 			if (isSequentialSelection) {
 				// グループ連続選択時のクリック（ポインターアップ）時であれば、そのグループ内の図形を選択状態にする。
 				// これにより、グループがネストしている場合は、選択の階層が１つずつ下がっていき、最終的にクリックされた図形が選択される。
-				onDiagramSelect?.(e);
+				onSelect?.(e);
 				setIsSequentialSelection(false);
 			} else {
 				// グループ連続選択時でない場合は、このグループのクリックイベントを発火させる。
 				// これにより、連続選択でないグループのうち、最も上位のグループのクリックイベントが
 				// 連続選択されたグループまで伝番し、そのグループの連続選択時の処理（当該分岐のtrue側）が実行され、
 				// その直下のグループが選択状態になる。
-				onDiagramClick?.({
+				onClick?.({
 					id,
 				});
 			}
 		},
-		[onDiagramSelect, onDiagramClick, isSequentialSelection, id],
+		[onSelect, onClick, isSequentialSelection, id],
 	);
 
 	useEffect(() => {
@@ -378,13 +375,13 @@ const Group: React.FC<GroupProps> = ({
 			}
 
 			// ドラッグ開始イベントをそのまま伝番させる
-			onDiagramDragStart?.(e);
+			onDragStart?.(e);
 
 			// ドラッグ開始時のグループの形状を記憶
 			startItems.current = items;
 			startBox.current = { x: point.x, y: point.y, width, height };
 		},
-		[onDiagramDragStart, point, width, height, isSelected, items],
+		[onDragStart, point, width, height, isSelected, items],
 	);
 
 	/**
@@ -396,7 +393,7 @@ const Group: React.FC<GroupProps> = ({
 		(e: DiagramDragEvent) => {
 			if (!isDragging) {
 				// グループのドラッグでなければ、ドラッグイベントをそのまま伝番
-				onDiagramDrag?.(e);
+				onDrag?.(e);
 				return;
 			}
 
@@ -434,12 +431,12 @@ const Group: React.FC<GroupProps> = ({
 
 			onGroupDataChange?.(event);
 		},
-		[onDiagramDrag, onGroupDataChange, id, isDragging],
+		[onDrag, onGroupDataChange, id, isDragging],
 	);
 
 	const handleChildDiagramDragEnd = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDragEnd?.(e);
+			onDragEnd?.(e);
 			setIsDragging(false);
 
 			// アウトラインの更新
@@ -451,7 +448,7 @@ const Group: React.FC<GroupProps> = ({
 				});
 			}
 		},
-		[onDiagramDragEnd, transformGroupOutline, items],
+		[onDragEnd, transformGroupOutline, items],
 	);
 
 	const handleChildDiagramTransfrom = useCallback(
@@ -578,14 +575,14 @@ const Group: React.FC<GroupProps> = ({
 		const props = {
 			...item,
 			key: item.id,
-			onDiagramClick: handleChildDiagramClick,
-			onDiagramDragStart: handleChildDiagramDragStart,
-			onDiagramDrag: handleChildDiagramDrag,
-			onDiagramDragEnd: handleChildDiagramDragEnd,
+			onClick: handleChildDiagramClick,
+			onDragStart: handleChildDiagramDragStart,
+			onDrag: handleChildDiagramDrag,
+			onDragEnd: handleChildDiagramDragEnd,
 			onTransform: handleChildDiagramTransfrom,
 			onTransformEnd: handleChildDiagramTransfromEnd,
 			onGroupDataChange: handleChildGroupDataChange,
-			onDiagramSelect: handleChildDiagramSelect,
+			onSelect: handleChildDiagramSelect,
 		};
 
 		return React.createElement(itemType, props);

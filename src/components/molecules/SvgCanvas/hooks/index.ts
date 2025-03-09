@@ -14,8 +14,6 @@ import type {
 import type {
 	DiagramSelectEvent,
 	DiagramDragEvent,
-	DiagramResizeEvent,
-	DiagramRotateEvent,
 	DiagramDragDropEvent,
 	DiagramConnectEvent,
 	ConnectPointMoveEvent,
@@ -173,7 +171,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		// }));
 	}, []);
 
-	const onDiagramDrag = useCallback((e: DiagramDragEvent) => {
+	const onDrag = useCallback((e: DiagramDragEvent) => {
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyRecursive(prevState.items, (item) =>
@@ -182,8 +180,8 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		}));
 	}, []);
 
-	const onDiagramDragEnd = useCallback((e: DiagramDragEvent) => {
-		logger.debug("onDiagramDragEnd", e);
+	const onDragEnd = useCallback((e: DiagramDragEvent) => {
+		logger.debug("onDragEnd", e);
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyRecursive(prevState.items, (item) =>
@@ -192,36 +190,11 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		}));
 	}, []);
 
-	const onDiagramDrop = useCallback((e: DiagramDragDropEvent) => {
+	const onDrop = useCallback((e: DiagramDragDropEvent) => {
 		// NOP
 	}, []);
 
-	const onDiagramResizing = useCallback((e: DiagramResizeEvent) => {
-		logger.debug("onDiagramResizing", e);
-		// TODO: リサイズ中の処理
-	}, []);
-
-	const onDiagramResizeEnd = useCallback((e: DiagramResizeEvent) => {
-		logger.debug("onDiagramResizeEnd", e);
-		setCanvasState((prevState) => ({
-			...prevState,
-			items: applyRecursive(prevState.items, (item) =>
-				item.id === e.id ? { ...item, ...e } : item,
-			),
-		}));
-	}, []);
-
-	const onDiagramRotateEnd = useCallback((e: DiagramRotateEvent) => {
-		logger.debug("onDiagramRotateEnd", e);
-		setCanvasState((prevState) => ({
-			...prevState,
-			items: applyRecursive(prevState.items, (item) =>
-				item.id === e.id ? { ...item, rotation: e.rotation } : item,
-			),
-		}));
-	}, []);
-
-	const onDiagramSelect = useCallback((e: DiagramSelectEvent) => {
+	const onSelect = useCallback((e: DiagramSelectEvent) => {
 		setCanvasState((prevState) => {
 			const items = applyRecursive(prevState.items, (item) =>
 				item.id === e.id
@@ -237,7 +210,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		});
 	}, []);
 
-	const onDiagramDelete = useCallback(() => {
+	const onDelete = useCallback(() => {
 		setCanvasState((prevState) => {
 			const items = applyRecursive(prevState.items, (item) => {
 				item.items = item.items?.filter((i) => !i.isSelected);
@@ -251,7 +224,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		});
 	}, []);
 
-	const onDiagramConnect = useCallback(
+	const onConnect = useCallback(
 		(e: DiagramConnectEvent) => {
 			// alert("connect");
 			const startItem = getDiagramById(canvasState.items, e.startPoint.id);
@@ -302,16 +275,13 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 
 	const canvasProps = {
 		...canvasState,
-		onDiagramDrag,
-		onDiagramDragEnd,
-		onDiagramDragEndByGroup: onDiagramDragEnd,
-		onDiagramDrop,
-		onDiagramResizing,
-		onDiagramResizeEnd,
-		onDiagramRotateEnd,
-		onDiagramSelect,
-		onDiagramDelete,
-		onDiagramConnect,
+		onDrag,
+		onDragEnd,
+		onDragEndByGroup: onDragEnd,
+		onDrop,
+		onSelect,
+		onDelete,
+		onConnect,
 		onConnectPointMove,
 		onTransform,
 		onGroupDataChange,

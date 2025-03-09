@@ -156,14 +156,14 @@ export type Diagram = DiagramCombined & {
  * 図形のプロパティ
  */
 export type DiagramBaseProps = DiagramBaseData & {
-	onDiagramDragStart?: (e: DiagramDragEvent) => void;
-	onDiagramDrag?: (e: DiagramDragEvent) => void;
-	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
-	onDiagramDrop?: (e: DiagramDragDropEvent) => void;
-	onDiagramClick?: (e: DiagramClickEvent) => void;
-	onDiagramSelect?: (e: DiagramSelectEvent) => void;
-	onDiagramHoverChange?: (e: DiagramHoverEvent) => void;
-	onDiagramConnect?: (e: DiagramConnectEvent) => void;
+	onDragStart?: (e: DiagramDragEvent) => void;
+	onDrag?: (e: DiagramDragEvent) => void;
+	onDragEnd?: (e: DiagramDragEvent) => void;
+	onDrop?: (e: DiagramDragDropEvent) => void;
+	onClick?: (e: DiagramClickEvent) => void;
+	onSelect?: (e: DiagramSelectEvent) => void;
+	onHoverChange?: (e: DiagramHoverEvent) => void;
+	onConnect?: (e: DiagramConnectEvent) => void;
 	onConnectPointMove?: (e: ConnectPointMoveEvent) => void;
 };
 

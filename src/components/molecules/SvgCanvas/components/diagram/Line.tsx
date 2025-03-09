@@ -57,11 +57,11 @@ const Line: React.FC<LineProps> = ({
 	stroke = "black",
 	strokeWidth = "1px",
 	isSelected = false,
-	onDiagramClick,
-	onDiagramDragStart,
-	onDiagramDrag,
-	onDiagramDragEnd,
-	onDiagramSelect,
+	onClick,
+	onDragStart,
+	onDrag,
+	onDragEnd,
+	onSelect,
 	onTransform,
 	onGroupDataChange,
 	items = [],
@@ -82,7 +82,7 @@ const Line: React.FC<LineProps> = ({
 	const handlePointerDown = useCallback(
 		(e: DiagramPointerEvent) => {
 			// 図形選択イベントを発火
-			onDiagramSelect?.({
+			onSelect?.({
 				id,
 			});
 
@@ -90,7 +90,7 @@ const Line: React.FC<LineProps> = ({
 				setIsSequentialSelection(true);
 			}
 		},
-		[onDiagramSelect, id, isSelected],
+		[onSelect, id, isSelected],
 	);
 
 	/**
@@ -104,11 +104,11 @@ const Line: React.FC<LineProps> = ({
 			if (isSequentialSelection) {
 				setIsTransformMode(!isTransformMode);
 			}
-			onDiagramClick?.({
+			onClick?.({
 				id,
 			});
 		},
-		[onDiagramClick, id, isSequentialSelection, isTransformMode],
+		[onClick, id, isSequentialSelection, isTransformMode],
 	);
 
 	useEffect(() => {
@@ -130,9 +130,9 @@ const Line: React.FC<LineProps> = ({
 			startItems.current = items;
 
 			setIsDragging(true);
-			onDiagramDragStart?.(e);
+			onDragStart?.(e);
 		},
-		[onDiagramDragStart, items],
+		[onDragStart, items],
 	);
 
 	/**
@@ -191,9 +191,9 @@ const Line: React.FC<LineProps> = ({
 	 */
 	const handleLinePointDragStart = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDragStart?.(e);
+			onDragStart?.(e);
 		},
-		[onDiagramDragStart],
+		[onDragStart],
 	);
 
 	/**
@@ -204,9 +204,9 @@ const Line: React.FC<LineProps> = ({
 	 */
 	const handleLinePointDrag = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDrag?.(e);
+			onDrag?.(e);
 		},
-		[onDiagramDrag],
+		[onDrag],
 	);
 
 	/**
@@ -217,9 +217,9 @@ const Line: React.FC<LineProps> = ({
 	 */
 	const handleLinePointDragEnd = useCallback(
 		(e: DiagramDragEvent) => {
-			onDiagramDragEnd?.(e);
+			onDragEnd?.(e);
 		},
-		[onDiagramDragEnd],
+		[onDragEnd],
 	);
 
 	// 線分のd属性値を生成
@@ -260,9 +260,9 @@ const Line: React.FC<LineProps> = ({
 					keepProportion={false}
 					items={linePoints}
 					isTransformActive={isTransformMode}
-					onDiagramDragStart={handleLinePointDragStart}
-					onDiagramDrag={handleLinePointDrag}
-					onDiagramDragEnd={handleLinePointDragEnd}
+					onDragStart={handleLinePointDragStart}
+					onDrag={handleLinePointDrag}
+					onDragEnd={handleLinePointDragEnd}
 					onTransform={onTransform}
 					onGroupDataChange={onGroupDataChange}
 				/>
@@ -276,14 +276,7 @@ export default memo(Line);
 type LinePointProps = DiagramBaseProps & LinePointData;
 
 export const LinePoint: React.FC<LinePointProps> = memo(
-	({
-		id,
-		point,
-		isActive = true,
-		onDiagramDragStart,
-		onDiagramDrag,
-		onDiagramDragEnd,
-	}) => {
+	({ id, point, isActive = true, onDragStart, onDrag, onDragEnd }) => {
 		if (!isActive) {
 			return null;
 		}
@@ -292,9 +285,9 @@ export const LinePoint: React.FC<LinePointProps> = memo(
 			<DragPoint
 				id={id}
 				point={point}
-				onDragStart={onDiagramDragStart}
-				onDrag={onDiagramDrag}
-				onDragEnd={onDiagramDragEnd}
+				onDragStart={onDragStart}
+				onDrag={onDrag}
+				onDragEnd={onDragEnd}
 			/>
 		);
 	},
