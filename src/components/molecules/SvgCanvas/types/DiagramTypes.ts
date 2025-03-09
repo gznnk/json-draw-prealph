@@ -22,6 +22,7 @@ import Ellipse from "../components/diagram/Ellipse";
 import Group from "../components/diagram/Group";
 import Line, { LinePoint } from "../components/diagram/Line";
 import Rectangle from "../components/diagram/Rectangle";
+import Triangle from "../components/diagram/Triangle";
 
 /**
  * 図形の種類
@@ -32,7 +33,8 @@ export type DiagramType =
 	| "Group"
 	| "Line"
 	| "LinePoint"
-	| "Rectangle";
+	| "Rectangle"
+	| "Triangle";
 
 export type DiagramBaseData = {
 	id: string;
@@ -72,6 +74,11 @@ export type GroupData = TransformativeData & {
 	items: Diagram[];
 };
 export type RectangleData = TransformativeData & {
+	fill: string;
+	stroke: string;
+	strokeWidth: string;
+};
+export type TriangleData = TransformativeData & {
 	fill: string;
 	stroke: string;
 	strokeWidth: string;
@@ -126,4 +133,5 @@ export const DiagramTypeComponentMap: {
 	Line: Line,
 	LinePoint: LinePoint,
 	Rectangle: Rectangle,
+	Triangle: Triangle,
 };

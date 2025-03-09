@@ -310,6 +310,20 @@ const testItems2 = [
 
 const testItems3 = [
 	{
+		id: "x",
+		type: "Triangle",
+		point: { x: 600, y: 600 },
+		width: 100,
+		height: 100,
+		rotation: radiansToDegrees(0),
+		scaleX: 1,
+		scaleY: 1,
+		fill: "transparent",
+		stroke: "black",
+		strokeWidth: "1px",
+		keepProportion: false,
+	},
+	{
 		id: "g-1",
 		type: "Group",
 		point: { x: 250, y: 250 },

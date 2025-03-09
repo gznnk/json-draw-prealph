@@ -12,9 +12,7 @@ import type {
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
 	DiagramDragEvent,
-	DiagramResizeEvent,
 	DiagramSelectEvent,
-	DiagramRotateEvent,
 	DiagramTransformEvent,
 	GroupDataChangeEvent,
 } from "./types/EventTypes";
