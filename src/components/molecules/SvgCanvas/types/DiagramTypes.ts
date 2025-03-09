@@ -6,25 +6,21 @@ import type React from "react";
 // SvgCanvas関連型定義をインポート
 import type { Point } from "./CoordinateTypes";
 import type {
+	ConnectPointMoveEvent,
 	DiagramClickEvent,
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
 	DiagramDragEvent,
 	DiagramHoverEvent,
-	DiagramResizeEvent,
-	DiagramRotateEvent,
 	DiagramSelectEvent,
-	GroupDragEvent,
-	GroupResizeEvent,
-	ConnectPointMoveEvent,
-	DiagramTransformStartEvent,
 	DiagramTransformEvent,
+	DiagramTransformStartEvent,
 } from "./EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
 import Ellipse from "../components/diagram/Ellipse";
 import Group from "../components/diagram/Group";
-import Line from "../components/diagram/Line";
+import Line, { LinePoint } from "../components/diagram/Line";
 import Rectangle from "../components/diagram/Rectangle";
 
 /**
@@ -64,12 +60,13 @@ export type EllipseData = TransformativeData & {
 	stroke: string;
 	strokeWidth: string;
 };
-export type LinePointData = DiagramBaseData;
-export type LineData = DiagramBaseData & {
+export type LinePointData = DiagramBaseData & {
+	isActive?: boolean;
+};
+export type LineData = TransformativeData & {
 	fill?: string;
 	stroke: string;
 	strokeWidth: string;
-	items: Diagram[];
 };
 export type GroupData = TransformativeData & {
 	items: Diagram[];
@@ -97,41 +94,23 @@ export type Diagram = DiagramCombined & {
 // TODO: 整理
 export type DiagramBaseProps = DiagramBaseData & {
 	onTransformStart?: (e: DiagramTransformStartEvent) => void;
-	onTransform?: (e: DiagramTransformEvent) => void;
+	onTransform: (e: DiagramTransformEvent) => void;
 	onTransformEnd?: (e: DiagramTransformEvent) => void;
-	// --------------------------------------------------
 	onDiagramClick?: (e: DiagramClickEvent) => void;
 	onDiagramDragStart?: (e: DiagramDragEvent) => void;
 	onDiagramDrag?: (e: DiagramDragEvent) => void;
 	onDiagramDragEnd?: (e: DiagramDragEvent) => void;
-	onDiagramDragEndByGroup?: (e: DiagramDragEvent) => void;
 	onDiagramDrop?: (e: DiagramDragDropEvent) => void;
-	onDiagramResizeStart?: (e: DiagramResizeEvent) => void;
-	onDiagramResizing?: (e: DiagramResizeEvent) => void;
-	onDiagramResizeEnd?: (e: DiagramResizeEvent) => void;
-	onDiagramRotating?: (e: DiagramRotateEvent) => void;
-	onDiagramRotateEnd?: (e: DiagramRotateEvent) => void;
 	onDiagramSelect?: (e: DiagramSelectEvent) => void;
 	onDiagramHoverChange?: (e: DiagramHoverEvent) => void;
 	onDiagramConnect?: (e: DiagramConnectEvent) => void;
 	onConnectPointMove?: (e: ConnectPointMoveEvent) => void;
-	ref?: React.Ref<DiagramRef>;
 };
 
 export type TransformativeProps = TransformativeData & {
 	onTransformStart?: (e: DiagramTransformStartEvent) => void; // TODO: 必須にする
 	onTransform: (e: DiagramTransformEvent) => void;
 	onTransformEnd?: (e: DiagramTransformEvent) => void; // TODO: 必須にする
-};
-
-/**
- * グループ内の図形への参照
- */
-export type DiagramRef = {
-	onGroupDrag?: (e: GroupDragEvent) => void;
-	onGroupDragEnd?: (e: GroupDragEvent) => void;
-	onGroupResize?: (e: GroupResizeEvent) => void;
-	onGroupResizeEnd?: (e: GroupResizeEvent) => void;
 };
 
 /**
@@ -145,6 +124,6 @@ export const DiagramTypeComponentMap: {
 	Ellipse: Ellipse,
 	Group: Group,
 	Line: Line,
-	LinePoint: DummyComponent,
+	LinePoint: LinePoint,
 	Rectangle: Rectangle,
 };

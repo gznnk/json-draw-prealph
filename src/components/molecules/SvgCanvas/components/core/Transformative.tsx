@@ -743,11 +743,17 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 export default memo(Transformative);
 
+/**
+ * 辺ドラッグ用の線のプロパティ
+ */
 type DragLineProps = Omit<DraggableProps, "ref"> & {
 	startPoint: Point;
 	endPoint: Point;
 };
 
+/**
+ * 辺ドラッグ用の線コンポーネント
+ */
 const DragLine: React.FC<DragLineProps> = memo(
 	({
 		id,

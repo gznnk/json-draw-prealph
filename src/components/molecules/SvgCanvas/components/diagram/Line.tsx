@@ -1,9 +1,10 @@
 // Reactのインポート
 import type React from "react";
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // SvgCanvas関連コンポーネントをインポート
 import DragPoint from "../core/DragPoint";
+import Group from "./Group";
 
 // SvgCanvas関連型定義をインポート
 import type { Point } from "../../types/CoordinateTypes";
@@ -11,10 +12,13 @@ import type {
 	Diagram,
 	DiagramBaseProps,
 	LineData,
+	LinePointData,
 } from "../../types/DiagramTypes";
 import type {
+	DiagramClickEvent,
 	DiagramDragEvent,
 	DiagramPointerEvent,
+	GroupDataChangeEvent,
 } from "../../types/EventTypes";
 
 // SvgCanvas関連カスタムフックをインポート
@@ -34,11 +38,19 @@ const createDValue = (items: Diagram[]) => {
 	return d;
 };
 
-export type LineProps = DiagramBaseProps & LineData;
+export type LineProps = DiagramBaseProps &
+	LineData & {
+		onGroupDataChange?: (e: GroupDataChangeEvent) => void; // TODO: 共通化
+	};
 
 const Line: React.FC<LineProps> = ({
 	id,
 	point,
+	width,
+	height,
+	rotation,
+	scaleX,
+	scaleY,
 	fill = "none",
 	stroke = "black",
 	strokeWidth = "1px",
@@ -48,54 +60,69 @@ const Line: React.FC<LineProps> = ({
 	onDiagramDrag,
 	onDiagramDragEnd,
 	onDiagramSelect,
+	onTransform,
+	onGroupDataChange,
 	items = [],
 }) => {
 	const [isDragging, setIsDragging] = useState(false);
+	const [isSequentialSelection, setIsSequentialSelection] = useState(false);
+	const [isTransformMode, setIsTransformMode] = useState(false);
 
 	const startItems = useRef<Diagram[]>(items);
-
-	const svgRef = useRef<SVGPathElement>({} as SVGPathElement);
 	const dragSvgRef = useRef<SVGPathElement>({} as SVGPathElement);
 
 	/**
-	 * ドラッグポイントのドラッグ開始イベントハンドラ
+	 * ポインターダウンイベントハンドラ
+	 *
+	 * @param {DiagramPointerEvent} e ポインターイベント
+	 * @returns {void}
+	 */
+	const handlePointerDown = useCallback(
+		(e: DiagramPointerEvent) => {
+			// 図形選択イベントを発火
+			onDiagramSelect?.({
+				id,
+			});
+
+			if (isSelected) {
+				setIsSequentialSelection(true);
+			}
+		},
+		[onDiagramSelect, id, isSelected],
+	);
+
+	/**
+	 * 図形クリックイベントハンドラ
+	 *
+	 * @param {DiagramClickEvent} e クリックイベント
+	 * @returns {void}
+	 */
+	const handleClick = useCallback(
+		(e: DiagramClickEvent) => {
+			if (isSequentialSelection) {
+				setIsTransformMode(!isTransformMode);
+			}
+			onDiagramClick?.({
+				id,
+			});
+		},
+		[onDiagramClick, id, isSequentialSelection, isTransformMode],
+	);
+
+	useEffect(() => {
+		// グループから選択が外れたら連続選択フラグも解除
+		if (!isSelected) {
+			setIsSequentialSelection(false);
+			setIsTransformMode(false);
+		}
+	}, [isSelected]);
+
+	/**
+	 * 線分のドラッグ開始イベントハンドラ
 	 *
 	 * @param {DiagramDragEvent} e ドラッグ開始イベント
 	 * @returns {void}
 	 */
-	const handleDragPointDragStart = useCallback(
-		(e: DiagramDragEvent) => {
-			onDiagramDragStart?.(e);
-		},
-		[onDiagramDragStart],
-	);
-
-	/**
-	 * ドラッグポイントのドラッグ中イベントハンドラ
-	 *
-	 * @param {DiagramDragEvent} e ドラッグ中イベント
-	 * @returns {void}
-	 */
-	const handleDragPointDrag = useCallback(
-		(e: DiagramDragEvent) => {
-			onDiagramDrag?.(e);
-		},
-		[onDiagramDrag],
-	);
-
-	/**
-	 * ドラッグポイントのドラッグ完了イベントハンドラ
-	 *
-	 * @param {DiagramDragEvent} e ドラッグ完了イベント
-	 * @returns {void}
-	 */
-	const handleDragPointDragEnd = useCallback(
-		(e: DiagramDragEvent) => {
-			onDiagramDragEnd?.(e);
-		},
-		[onDiagramDragEnd],
-	);
-
 	const handleDragStart = useCallback(
 		(e: DiagramDragEvent) => {
 			startItems.current = items;
@@ -114,76 +141,33 @@ const Line: React.FC<LineProps> = ({
 	 */
 	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
-			// TODO: GroupChangeEventでやる
-
 			const dx = e.endPoint.x - e.startPoint.x;
 			const dy = e.endPoint.y - e.startPoint.y;
-			for (const item of startItems.current) {
+
+			const newItems = startItems.current.map((item) => {
 				const x = item.point.x + dx;
 				const y = item.point.y + dy;
-				onDiagramDrag?.({
-					id: item.id,
-					startPoint: item.point,
-					endPoint: { x, y },
-				});
-			}
+				return { ...item, point: { x, y } };
+			});
 
-			onDiagramDrag?.(e);
+			onGroupDataChange?.({
+				id,
+				point: e.endPoint,
+				items: newItems,
+			});
 		},
-		[onDiagramDrag],
+		[onGroupDataChange, id],
 	);
 
 	/**
 	 * 線分のドラッグ完了イベントハンドラ
 	 *
-	 * @param {DiagramDragEvent} e ドラッグ完了イベント
+	 * @param {DiagramDragEvent} _e ドラッグ完了イベント
 	 * @returns {void}
 	 */
-	const handleDragEnd = useCallback(
-		(e: DiagramDragEvent) => {
-			// const dx = e.endPoint.x - e.startPoint.x;
-			// const dy = e.endPoint.y - e.startPoint.y;
-			// for (const item of items) {
-			// 	const x = item.point.x + dx;
-			// 	const y = item.point.y + dy;
-			// 	onDiagramDragEnd?.({
-			// 		id: item.id,
-			// 		startPoint: item.point,
-			// 		endPoint: { x, y },
-			// 	});
-			// }
-
-			// onDiagramDragEnd?.({
-			// 	id,
-			// 	startPoint: e.startPoint,
-			// 	endPoint: e.endPoint,
-			// });
-
-			// TODO: 最後のイベントで再トリガー
-
-			setIsDragging(false);
-		},
-		[id, items, onDiagramDragEnd],
-	);
-
-	/**
-	 * ポインターダウンイベントハンドラ
-	 *
-	 * @param {DiagramPointerEvent} _e ポインターイベント
-	 * @returns {void}
-	 */
-	const handlePointerDown = useCallback(
-		(_e: DiagramPointerEvent) => {
-			// 図形選択イベントを発火
-			onDiagramSelect?.({
-				id,
-			});
-		},
-		[id, onDiagramSelect],
-	);
-
-	// 描画用のパスのd属性値を生成
-	const d = createDValue(items);
+	const handleDragEnd = useCallback((_e: DiagramDragEvent) => {
+		setIsDragging(false);
+	}, []);
 
 	const draggableProps = useDraggable({
 		id,
@@ -191,22 +175,65 @@ const Line: React.FC<LineProps> = ({
 		point,
 		ref: dragSvgRef,
 		onPointerDown: handlePointerDown,
-		onClick: onDiagramClick,
+		onClick: handleClick,
 		onDragStart: handleDragStart,
 		onDrag: handleDrag,
 		onDragEnd: handleDragEnd,
 	});
 
+	/**
+	 * ドラッグポイントのドラッグ開始イベントハンドラ
+	 *
+	 * @param {DiagramDragEvent} e ドラッグ開始イベント
+	 * @returns {void}
+	 */
+	const handleLinePointDragStart = useCallback(
+		(e: DiagramDragEvent) => {
+			onDiagramDragStart?.(e);
+		},
+		[onDiagramDragStart],
+	);
+
+	/**
+	 * ドラッグポイントのドラッグ中イベントハンドラ
+	 *
+	 * @param {DiagramDragEvent} e ドラッグ中イベント
+	 * @returns {void}
+	 */
+	const handleLinePointDrag = useCallback(
+		(e: DiagramDragEvent) => {
+			onDiagramDrag?.(e);
+		},
+		[onDiagramDrag],
+	);
+
+	/**
+	 * ドラッグポイントのドラッグ完了イベントハンドラ
+	 *
+	 * @param {DiagramDragEvent} e ドラッグ完了イベント
+	 * @returns {void}
+	 */
+	const handleLinePointDragEnd = useCallback(
+		(e: DiagramDragEvent) => {
+			onDiagramDragEnd?.(e);
+		},
+		[onDiagramDragEnd],
+	);
+
+	// 線分のd属性値を生成
+	const d = createDValue(items);
+
+	const linePoints = items.map((item) => ({
+		...item,
+		isActive: !isTransformMode,
+	}));
+
 	return (
 		<>
 			{/* 描画用のパス */}
-			<path
-				d={d}
-				fill={fill}
-				stroke={stroke}
-				strokeWidth={strokeWidth}
-				ref={svgRef}
-			/>
+			<g transform="translate(0.5,0.5)">
+				<path d={d} fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+			</g>
 			{/* ドラッグ用のパス */}
 			<path
 				id={id}
@@ -217,23 +244,56 @@ const Line: React.FC<LineProps> = ({
 				ref={dragSvgRef}
 				{...draggableProps}
 			/>
-			{/* ドラッグポイント */}
-			{isSelected &&
-				!isDragging &&
-				items.map((item) => {
-					return (
-						<DragPoint
-							key={item.id}
-							id={item.id}
-							point={item.point}
-							onDragStart={handleDragPointDragStart}
-							onDrag={handleDragPointDrag}
-							onDragEnd={handleDragPointDragEnd}
-						/>
-					);
-				})}
+			{/* 変形用グループ */}
+			{isSelected && (
+				<Group
+					id={id}
+					point={point}
+					isSelected={isTransformMode}
+					width={width}
+					height={height}
+					rotation={rotation}
+					scaleX={scaleX}
+					scaleY={scaleY}
+					keepProportion={false}
+					items={linePoints}
+					isTransformActive={isTransformMode}
+					onDiagramDragStart={handleLinePointDragStart}
+					onDiagramDrag={handleLinePointDrag}
+					onDiagramDragEnd={handleLinePointDragEnd}
+					onTransform={onTransform}
+					onGroupDataChange={onGroupDataChange}
+				/>
+			)}
 		</>
 	);
 };
 
 export default memo(Line);
+
+type LinePointProps = DiagramBaseProps & LinePointData;
+
+export const LinePoint: React.FC<LinePointProps> = memo(
+	({
+		id,
+		point,
+		isActive = true,
+		onDiagramDragStart,
+		onDiagramDrag,
+		onDiagramDragEnd,
+	}) => {
+		if (!isActive) {
+			return null;
+		}
+
+		return (
+			<DragPoint
+				id={id}
+				point={point}
+				onDragStart={onDiagramDragStart}
+				onDrag={onDiagramDrag}
+				onDragEnd={onDiagramDragEnd}
+			/>
+		);
+	},
+);

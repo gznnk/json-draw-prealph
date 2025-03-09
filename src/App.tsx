@@ -369,7 +369,7 @@ const testItems3 = [
 			{
 				id: "12",
 				type: "Line",
-				point: { x: 300, y: 300 },
+				point: { x: 350, y: 350 },
 				width: 100,
 				height: 100,
 				rotation: radiansToDegrees(0),

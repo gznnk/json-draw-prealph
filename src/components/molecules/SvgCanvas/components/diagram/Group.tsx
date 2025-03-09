@@ -51,6 +51,13 @@ const getSelectedChildDiagram = (diagrams: Diagram[]): Diagram | undefined => {
 	}
 };
 
+/**
+ * 指定したIDの図形を、配下のグループも含めて再帰的に取得する
+ *
+ * @param diagrams - 図形リスト
+ * @param id - ID
+ * @returns 指定したIDの図形
+ */
 const getChildDiagramById = (
 	diagrams: Diagram[],
 	id: string,
@@ -216,7 +223,8 @@ const calcGroupBoxOfNoRotation = (
 export type GroupProps = DiagramBaseProps &
 	TransformativeProps &
 	GroupData & {
-		onGroupDataChange?: (e: GroupDataChangeEvent) => void;
+		isTransformActive?: boolean;
+		onGroupDataChange?: (e: GroupDataChangeEvent) => void; // TODO: 共通化
 	};
 
 /**
@@ -232,6 +240,7 @@ const Group: React.FC<GroupProps> = ({
 	scaleY = 1,
 	keepProportion = false,
 	isSelected = false,
+	isTransformActive = true,
 	onTransform,
 	onDiagramClick,
 	onDiagramDragStart,
@@ -585,21 +594,23 @@ const Group: React.FC<GroupProps> = ({
 	return (
 		<>
 			{children}
-			<Transformative
-				diagramId={id}
-				type="Group"
-				point={point}
-				width={width}
-				height={height}
-				rotation={rotation}
-				scaleX={scaleX}
-				scaleY={scaleY}
-				keepProportion={keepProportion}
-				isSelected={isSelected}
-				onTransformStart={handleTransformStart}
-				onTransform={handleTransform}
-				onTransformEnd={handleTransformEnd}
-			/>
+			{isTransformActive && (
+				<Transformative
+					diagramId={id}
+					type="Group"
+					point={point}
+					width={width}
+					height={height}
+					rotation={rotation}
+					scaleX={scaleX}
+					scaleY={scaleY}
+					keepProportion={keepProportion}
+					isSelected={isSelected}
+					onTransformStart={handleTransformStart}
+					onTransform={handleTransform}
+					onTransformEnd={handleTransformEnd}
+				/>
+			)}
 		</>
 	);
 };

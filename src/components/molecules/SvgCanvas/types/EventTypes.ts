@@ -72,50 +72,6 @@ export type DiagramDragDropEvent = {
 };
 
 /**
- * 図形のリサイズイベント
- */
-export type DiagramResizeEvent = {
-	id: string;
-	point: Point;
-	width: number;
-	height: number;
-	rotation?: number;
-	scaleX?: number;
-	scaleY?: number;
-};
-
-export type DiagramRotateEvent = {
-	id: string;
-	rotation: number;
-};
-
-/**
- * グループのドラッグイベント
- */
-export type GroupDragEvent = {
-	id: string;
-	startPoint: Point;
-	endPoint: Point;
-};
-
-/**
- * グループのリサイズイベント
- */
-export type GroupResizeEvent = {
-	id: string;
-	startSize: {
-		point: Point;
-		width: number;
-		height: number;
-	};
-	endSize: {
-		point: Point;
-		width: number;
-		height: number;
-	};
-};
-
-/**
  * 図形のクリックイベント
  */
 export type DiagramClickEvent = {
