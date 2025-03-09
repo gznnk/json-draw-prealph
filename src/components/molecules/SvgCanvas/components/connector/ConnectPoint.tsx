@@ -63,11 +63,11 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 	const handleDragEnd = useCallback(
 		(_e: DiagramDragEvent) => {
 			setIsDragging(false);
-			svgRef?.current?.removeAttribute("d");
-			dragPointRef.current.setAttribute(
-				"transform",
-				`translate(${point.x}, ${point.y})`,
-			);
+			// svgRef?.current?.removeAttribute("d");
+			// dragPointRef.current.setAttribute(
+			// 	"transform",
+			// 	`translate(${point.x}, ${point.y})`,
+			// );
 		},
 		[point],
 	);
@@ -126,7 +126,6 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				onDragLeave={handleDragLeave}
 				onDrop={handleDrop}
 				onHoverChange={handleHoverChange}
-				ref={dragPointRef}
 			/>
 			{isDragging && <path stroke="black" strokeWidth={1} ref={svgRef} />}
 		</>

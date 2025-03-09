@@ -522,7 +522,7 @@ export const useDraggable = (props: DraggableProps) => {
 			if (svgPoint) {
 				svgPoint.x = clientPoint.x;
 				svgPoint.y = clientPoint.y;
-				const svg = ref.current?.firstChild;
+				const svg = ref.current;
 
 				if (svg instanceof SVGGeometryElement) {
 					const transformedPoint = svgPoint.matrixTransform(

@@ -11,6 +11,7 @@ import type { DraggableProps } from "../../hooks/draggableHooks";
  */
 export type DragPointProps = Omit<DraggableProps, "ref"> & {
 	color?: string;
+	visible?: boolean;
 	cursor?: string;
 	hidden?: boolean;
 };
@@ -55,6 +56,7 @@ const DragPoint: React.FC<DragPointProps> = ({
 	onDrop,
 	onHoverChange,
 	dragPositioningFunction,
+	visible = true,
 	color = "rgba(61, 90, 128, 0.8)",
 	hidden = false,
 }) => {
@@ -91,6 +93,7 @@ const DragPoint: React.FC<DragPointProps> = ({
 			fill={color}
 			cursor={cursor}
 			tabIndex={0}
+			style={{ opacity: visible ? 1 : 0 }}
 			ref={svgRef}
 			{...draggableProps}
 		/>

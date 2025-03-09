@@ -3,12 +3,13 @@ import type React from "react";
 import { memo, useCallback, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
-import type { Point } from "../../types/CoordinateTypes";
+import type { Point, RectangleVertices } from "../../types/CoordinateTypes";
 import type {
 	ConnectPointData,
 	Diagram,
 	DiagramBaseProps,
 	RectangleData,
+	Shape,
 	TransformativeProps,
 } from "../../types/DiagramTypes";
 import type {
@@ -28,12 +29,6 @@ import { useDraggable } from "../../hooks/draggableHooks";
 // SvgCanvas関連関数をインポート
 import { calcRectangleVertices, degreesToRadians } from "../../functions/Math";
 import { createSvgTransform } from "../../functions/Svg";
-
-// RectangleBase関連型定義をインポート
-import type { RectangleBaseDragPoints } from "../core/RectangleBase/RectangleBaseTypes";
-
-// RectangleBase関連関数をインポート
-import { calcArrangment } from "../core/RectangleBase/RectangleBaseFunctions";
 
 // ユーティリティをインポート
 import { getLogger } from "../../../../../utils/Logger";
@@ -85,16 +80,19 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 * @returns {void}
 	 */
 	const updateConnectPoints = useCallback(
-		(originalPoint: Point, diagonalPoint: Point) => {
-			const newArrangement = calcArrangment(
-				originalPoint,
-				diagonalPoint,
-				rotation,
+		(shape: Shape) => {
+			const vertices = calcRectangleVertices(
+				shape.point,
+				shape.width,
+				shape.height,
+				shape.rotation,
+				shape.scaleX,
+				shape.scaleY,
 			);
 
 			for (const cp of (items as ConnectPointData[]) ?? []) {
-				const cPoint = (newArrangement as RectangleBaseDragPoints)[
-					cp.name as keyof RectangleBaseDragPoints
+				const cPoint = (vertices as RectangleVertices)[
+					cp.name as keyof RectangleVertices
 				];
 
 				onConnectPointMove?.({
@@ -106,7 +104,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 				});
 			}
 		},
-		[onConnectPointMove, rotation, items],
+		[onConnectPointMove, items],
 	);
 
 	/**
@@ -119,8 +117,6 @@ const Rectangle: React.FC<RectangleProps> = ({
 		(e: DiagramDragEvent) => {
 			setIsTransforming(true);
 			onDiagramDragStart?.(e);
-
-			logger.debug("handleDiagramDragStart", e);
 		},
 		[onDiagramDragStart],
 	);
@@ -133,16 +129,26 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 */
 	const handleDiagramDrag = useCallback(
 		(e: DiagramDragEvent) => {
-			// updateConnectPoints(e.endPoint, {
-			// 	x: e.endPoint.x + width,
-			// 	y: e.endPoint.y + height,
-			// });
-
-			logger.debug("handleDiagramDrag", e);
+			updateConnectPoints({
+				point: e.endPoint,
+				width,
+				height,
+				rotation,
+				scaleX,
+				scaleY,
+			});
 
 			onDiagramDrag?.(e);
 		},
-		[onDiagramDrag, updateConnectPoints, width, height],
+		[
+			onDiagramDrag,
+			updateConnectPoints,
+			width,
+			height,
+			rotation,
+			scaleX,
+			scaleY,
+		],
 	);
 
 	/**
@@ -162,6 +168,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 	const handleTransformStart = useCallback(
 		(e: DiagramTransformStartEvent) => {
 			onTransformStart?.(e);
+			setIsTransforming(true);
 		},
 		[onTransformStart],
 	);
@@ -169,13 +176,15 @@ const Rectangle: React.FC<RectangleProps> = ({
 	const handleTransform = useCallback(
 		(e: DiagramTransformEvent) => {
 			onTransform?.(e);
+			updateConnectPoints(e.endShape);
 		},
-		[onTransform],
+		[onTransform, updateConnectPoints],
 	);
 
 	const handleTransformEnd = useCallback(
 		(e: DiagramTransformEvent) => {
 			onTransformEnd?.(e);
+			setIsTransforming(false);
 		},
 		[onTransformEnd],
 	);
@@ -258,7 +267,6 @@ const Rectangle: React.FC<RectangleProps> = ({
 				onTransformEnd={handleTransformEnd}
 			/>
 			{!isSelected &&
-				false &&
 				(items as ConnectPointData[])?.map((cp) => (
 					<ConnectPoint
 						key={cp.id}

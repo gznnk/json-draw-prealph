@@ -25,6 +25,18 @@ import Rectangle from "../components/diagram/Rectangle";
 import Triangle from "../components/diagram/Triangle";
 
 /**
+ * 図形の形状
+ */
+export type Shape = {
+	point: Point;
+	width: number;
+	height: number;
+	rotation: number;
+	scaleX: number;
+	scaleY: number;
+};
+
+/**
  * 図形の種類
  */
 export type DiagramType =
