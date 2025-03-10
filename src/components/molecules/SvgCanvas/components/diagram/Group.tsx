@@ -491,8 +491,14 @@ const Group: React.FC<GroupProps> = ({
 						e.startShape.point,
 						degreesToRadians(-e.startShape.rotation),
 					);
-					const dx = inversedItemCenter.x - e.startShape.point.x;
-					const dy = inversedItemCenter.y - e.startShape.point.y;
+					const dx =
+						(inversedItemCenter.x - e.startShape.point.x) *
+						e.startShape.scaleX *
+						e.endShape.scaleX;
+					const dy =
+						(inversedItemCenter.y - e.startShape.point.y) *
+						e.startShape.scaleY *
+						e.endShape.scaleY;
 
 					const newDx = dx * groupScaleX;
 					const newDy = dy * groupScaleY;

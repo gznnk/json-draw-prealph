@@ -310,20 +310,6 @@ const testItems2 = [
 
 const testItems3 = [
 	{
-		id: "x",
-		type: "Triangle",
-		point: { x: 600, y: 600 },
-		width: 100,
-		height: 100,
-		rotation: radiansToDegrees(0),
-		scaleX: 1,
-		scaleY: 1,
-		fill: "transparent",
-		stroke: "black",
-		strokeWidth: "1px",
-		keepProportion: false,
-	},
-	{
 		id: "g-1",
 		type: "Group",
 		point: { x: 250, y: 250 },
@@ -364,6 +350,20 @@ const testItems3 = [
 				strokeWidth: "1px",
 				keepProportion: false,
 				isSelected: false,
+			},
+			{
+				id: "x",
+				type: "Triangle",
+				point: { x: 350, y: 150 },
+				width: 100,
+				height: 100,
+				rotation: radiansToDegrees(0),
+				scaleX: 1,
+				scaleY: 1,
+				fill: "transparent",
+				stroke: "black",
+				strokeWidth: "1px",
+				keepProportion: false,
 			},
 			{
 				id: "5",
@@ -515,7 +515,7 @@ function App() {
 		state: [canvasState, _setCanvasState],
 		canvasProps,
 		canvasFunctions,
-	} = useSvgCanvas(testItems1);
+	} = useSvgCanvas(testItems3);
 
 	const handleAddRectangle = () => {
 		canvasFunctions.addItem(
@@ -606,6 +606,9 @@ function App() {
 				<div>{`y:${canvasFunctions.getSelectedItem()?.point.y}`}</div>
 				<div>{`width:${canvasFunctions.getSelectedItem()?.width}`}</div>
 				<div>{`height:${canvasFunctions.getSelectedItem()?.height}`}</div>
+				<div>{`rotation:${canvasFunctions.getSelectedItem()?.rotation}`}</div>
+				<div>{`scaleX:${canvasFunctions.getSelectedItem()?.scaleX}`}</div>
+				<div>{`scaleY:${canvasFunctions.getSelectedItem()?.scaleY}`}</div>
 				{/* <Input
 					value={canvasFunctions.getSelectedItem()?.fill || ""}
 					onChange={(e) => {

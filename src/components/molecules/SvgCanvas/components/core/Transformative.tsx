@@ -190,7 +190,10 @@ const Transformative: React.FC<TransformativeProps> = ({
 			const newWidth = inversedRightBottom.x - inversedDragPoint.x;
 			let newHeight: number;
 			if (doKeepProportion && startShape.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
+				newHeight =
+					nanToZero(newWidth / startShape.current.aspectRatio) *
+					startShape.current.scaleX *
+					startShape.current.scaleY;
 			} else {
 				newHeight = inversedRightBottom.y - inversedDragPoint.y;
 			}
@@ -232,7 +235,10 @@ const Transformative: React.FC<TransformativeProps> = ({
 			const newWidth = inversedRightTop.x - inversedDragPoint.x;
 			let newHeight: number;
 			if (doKeepProportion && startShape.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
+				newHeight =
+					nanToZero(newWidth / startShape.current.aspectRatio) *
+					startShape.current.scaleX *
+					startShape.current.scaleY;
 			} else {
 				newHeight = inversedDragPoint.y - inversedRightTop.y;
 			}
@@ -274,7 +280,10 @@ const Transformative: React.FC<TransformativeProps> = ({
 			const newWidth = inversedDragPoint.x - inversedLeftBottom.x;
 			let newHeight: number;
 			if (doKeepProportion && startShape.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
+				newHeight =
+					nanToZero(newWidth / startShape.current.aspectRatio) *
+					startShape.current.scaleX *
+					startShape.current.scaleY;
 			} else {
 				newHeight = inversedLeftBottom.y - inversedDragPoint.y;
 			}
@@ -316,7 +325,10 @@ const Transformative: React.FC<TransformativeProps> = ({
 			const newWidth = inversedDragPoint.x - inversedLeftTop.x;
 			let newHeight: number;
 			if (doKeepProportion && startShape.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
+				newHeight =
+					nanToZero(newWidth / startShape.current.aspectRatio) *
+					startShape.current.scaleX *
+					startShape.current.scaleY;
 			} else {
 				newHeight = inversedDragPoint.y - inversedLeftTop.y;
 			}
@@ -358,9 +370,12 @@ const Transformative: React.FC<TransformativeProps> = ({
 			let newWidth: number;
 			const newHeight = inversedBottomCenter.y - inversedDragPoint.y;
 			if (doKeepProportion && startShape.current.aspectRatio) {
-				newWidth = nanToZero(newHeight * startShape.current.aspectRatio);
+				newWidth =
+					nanToZero(newHeight * startShape.current.aspectRatio) *
+					startShape.current.scaleX *
+					startShape.current.scaleY;
 			} else {
-				newWidth = startShape.current.width;
+				newWidth = startShape.current.width * startShape.current.scaleX;
 			}
 
 			const inversedCenter = {
@@ -405,9 +420,12 @@ const Transformative: React.FC<TransformativeProps> = ({
 			const newWidth = inversedRightCenter.x - inversedDragPoint.x;
 			let newHeight: number;
 			if (doKeepProportion && startShape.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
+				newHeight =
+					nanToZero(newWidth / startShape.current.aspectRatio) *
+					startShape.current.scaleX *
+					startShape.current.scaleY;
 			} else {
-				newHeight = startShape.current.height;
+				newHeight = startShape.current.height * startShape.current.scaleY;
 			}
 
 			const inversedCenter = {
@@ -452,9 +470,12 @@ const Transformative: React.FC<TransformativeProps> = ({
 			const newWidth = inversedDragPoint.x - inversedLeftCenter.x;
 			let newHeight: number;
 			if (doKeepProportion && startShape.current.aspectRatio) {
-				newHeight = nanToZero(newWidth / startShape.current.aspectRatio);
+				newHeight =
+					nanToZero(newWidth / startShape.current.aspectRatio) *
+					startShape.current.scaleX *
+					startShape.current.scaleY;
 			} else {
-				newHeight = startShape.current.height;
+				newHeight = startShape.current.height * startShape.current.scaleY;
 			}
 
 			const inversedCenter = {
@@ -499,9 +520,12 @@ const Transformative: React.FC<TransformativeProps> = ({
 			let newWidth: number;
 			const newHeight = inversedDragPoint.y - inversedTopCenter.y;
 			if (doKeepProportion && startShape.current.aspectRatio) {
-				newWidth = nanToZero(newHeight * startShape.current.aspectRatio);
+				newWidth =
+					nanToZero(newHeight * startShape.current.aspectRatio) *
+					startShape.current.scaleX *
+					startShape.current.scaleY;
 			} else {
-				newWidth = startShape.current.width;
+				newWidth = startShape.current.width * startShape.current.scaleX;
 			}
 
 			const inversedCenter = {
@@ -531,7 +555,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 						startShape.current.bottomCenterPoint,
 						startShape.current.topCenterPoint,
 					)(p),
-		[],
+		[isSwapped],
 	);
 	// --- BottomCenter End --- //
 

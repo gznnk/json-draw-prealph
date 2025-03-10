@@ -140,7 +140,7 @@ const Triangle: React.FC<TriangleProps> = ({
 
 	const halfWidth = width / 2;
 	const halfHeight = height / 2;
-	const d = `M ${0} ${-halfHeight} L ${halfWidth} ${halfHeight} L ${-halfWidth} ${+halfHeight} Z`;
+	const d = `M ${width / 3} ${-halfHeight} L ${halfWidth} ${halfHeight} L ${-halfWidth} ${+halfHeight} Z`;
 
 	return (
 		<>
