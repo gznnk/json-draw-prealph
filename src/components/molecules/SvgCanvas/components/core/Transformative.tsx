@@ -72,9 +72,6 @@ const Transformative: React.FC<TransformativeProps> = ({
 	onTransformEnd,
 }) => {
 	const [isShiftKeyDown, setShiftKeyDown] = useState(false);
-	const lastTransformEvent = useRef<DiagramTransformEvent>(
-		{} as DiagramTransformEvent,
-	);
 
 	const doKeepProportion = keepProportion || isShiftKeyDown;
 
@@ -130,7 +127,12 @@ const Transformative: React.FC<TransformativeProps> = ({
 	);
 
 	const triggerTransform = useCallback(
-		(centerPoint: Point, newWidth: number, newHeight: number) => {
+		(
+			centerPoint: Point,
+			newWidth: number,
+			newHeight: number,
+			dragEventType: "dragStart" | "drag" | "dragEnd",
+		) => {
 			const event = {
 				id: diagramId,
 				startShape: {
@@ -146,11 +148,13 @@ const Transformative: React.FC<TransformativeProps> = ({
 				},
 			};
 
-			lastTransformEvent.current = event;
-
-			onTransform?.(event);
+			if (dragEventType === "dragEnd") {
+				onTransformEnd?.(event);
+			} else if (dragEventType === "drag") {
+				onTransform?.(event);
+			}
 		},
-		[onTransform, diagramId, rotation],
+		[onTransform, onTransformEnd, diagramId, rotation],
 	);
 
 	const handleDragStart = useCallback(() => {
@@ -204,7 +208,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			};
 			const center = affineTransformationOnDrag(inversedCenter);
 
-			triggerTransform(center, newWidth, newHeight);
+			triggerTransform(center, newWidth, newHeight, e.type);
 		},
 		[
 			triggerTransform,
@@ -249,7 +253,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			};
 			const center = affineTransformationOnDrag(inversedCenter);
 
-			triggerTransform(center, newWidth, newHeight);
+			triggerTransform(center, newWidth, newHeight, e.type);
 		},
 		[
 			triggerTransform,
@@ -294,7 +298,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			};
 			const center = affineTransformationOnDrag(inversedCenter);
 
-			triggerTransform(center, newWidth, newHeight);
+			triggerTransform(center, newWidth, newHeight, e.type);
 		},
 		[
 			triggerTransform,
@@ -339,7 +343,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			};
 			const center = affineTransformationOnDrag(inversedCenter);
 
-			triggerTransform(center, newWidth, newHeight);
+			triggerTransform(center, newWidth, newHeight, e.type);
 		},
 		[
 			triggerTransform,
@@ -384,7 +388,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			};
 			const center = affineTransformationOnDrag(inversedCenter);
 
-			triggerTransform(center, newWidth, newHeight);
+			triggerTransform(center, newWidth, newHeight, e.type);
 		},
 		[
 			triggerTransform,
@@ -434,7 +438,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			};
 			const center = affineTransformationOnDrag(inversedCenter);
 
-			triggerTransform(center, newWidth, newHeight);
+			triggerTransform(center, newWidth, newHeight, e.type);
 		},
 		[
 			triggerTransform,
@@ -484,7 +488,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			};
 			const center = affineTransformationOnDrag(inversedCenter);
 
-			triggerTransform(center, newWidth, newHeight);
+			triggerTransform(center, newWidth, newHeight, e.type);
 		},
 		[
 			triggerTransform,
@@ -534,7 +538,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			};
 			const center = affineTransformationOnDrag(inversedCenter);
 
-			triggerTransform(center, newWidth, newHeight);
+			triggerTransform(center, newWidth, newHeight, e.type);
 		},
 		[
 			triggerTransform,
@@ -558,11 +562,6 @@ const Transformative: React.FC<TransformativeProps> = ({
 		[isSwapped],
 	);
 	// --- BottomCenter End --- //
-
-	const handleDragEnd = useCallback(() => {
-		onTransformEnd?.(lastTransformEvent.current);
-		lastTransformEvent.current = {} as DiagramTransformEvent;
-	}, [onTransformEnd]);
 
 	// シフトキーの状態を監視
 	useEffect(() => {
@@ -626,10 +625,23 @@ const Transformative: React.FC<TransformativeProps> = ({
 					rotation: radiansToDegrees(angle + rotatePointAngle),
 				},
 			};
-			lastTransformEvent.current = event;
-			onTransform?.(event);
+
+			if (e.type === "dragEnd") {
+				onTransformEnd?.(event);
+			} else {
+				onTransform?.(event);
+			}
 		},
-		[onTransform, diagramId, point, width, height, scaleX, scaleY],
+		[
+			onTransform,
+			onTransformEnd,
+			diagramId,
+			point,
+			width,
+			height,
+			scaleX,
+			scaleY,
+		],
 	);
 
 	const dragFunctionRotationPoint = useCallback(
@@ -692,7 +704,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.topCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragTopCenter}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragTopCenter}
 				dragPositioningFunction={linerDragFunctionTopCenter}
 			/>
 			{/* 左辺 */}
@@ -704,7 +716,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.leftCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftCenter}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragLeftCenter}
 				dragPositioningFunction={linerDragFunctionLeftCenter}
 			/>
 			{/* 右辺 */}
@@ -716,7 +728,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.rightCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightCenter}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragRightCenter}
 				dragPositioningFunction={linerDragFunctionRightCenter}
 			/>
 			{/* 下辺 */}
@@ -728,7 +740,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.bottomCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragBottomCenter}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragBottomCenter}
 				dragPositioningFunction={linerDragFunctionBottomCenter}
 			/>
 			{/* 左上 */}
@@ -738,7 +750,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.leftTop}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftTop}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragLeftTop}
 				dragPositioningFunction={
 					doKeepProportion ? linerDragFunctionLeftTop : undefined
 				}
@@ -750,7 +762,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.leftBottom}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftBottom}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragLeftBottom}
 				dragPositioningFunction={
 					doKeepProportion ? linerDragFunctionLeftBottom : undefined
 				}
@@ -762,7 +774,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.rightTop}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightTop}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragRightTop}
 				dragPositioningFunction={
 					doKeepProportion ? linerDragFunctionRightTop : undefined
 				}
@@ -774,7 +786,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.rightBottom}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightBottom}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragRightBottom}
 				dragPositioningFunction={
 					doKeepProportion ? linerDragFunctionRightBottom : undefined
 				}
@@ -786,7 +798,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.topCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragTopCenter}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragTopCenter}
 				dragPositioningFunction={linerDragFunctionTopCenter}
 			/>
 			{/* 左中央 */}
@@ -796,7 +808,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.leftCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftCenter}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragLeftCenter}
 				dragPositioningFunction={linerDragFunctionLeftCenter}
 			/>
 			{/* 右中央 */}
@@ -806,7 +818,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.rightCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightCenter}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragRightCenter}
 				dragPositioningFunction={linerDragFunctionRightCenter}
 			/>
 			{/* 下中央 */}
@@ -816,7 +828,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				cursor={cursors.bottomCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragBottomCenter}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragBottomCenter}
 				dragPositioningFunction={linerDragFunctionBottomCenter}
 			/>
 			{/* 回転 */}
@@ -826,7 +838,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				rotation={rotation}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRotationPoint}
-				onDragEnd={handleDragEnd}
+				onDragEnd={handleDragRotationPoint}
 				dragPositioningFunction={dragFunctionRotationPoint}
 			/>
 		</>

@@ -436,19 +436,21 @@ const Group: React.FC<GroupProps> = ({
 
 	const handleChildDiagramDragEnd = useCallback(
 		(e: DiagramDragEvent) => {
+			if (!isDragging) {
+				// グループのドラッグでなければ、子図形のドラッグに伴うアウトラインの更新を行う
+				const changeItem = getChildDiagramById(items, e.id);
+				if (changeItem) {
+					transformGroupOutline({
+						...changeItem,
+						point: e.endPoint,
+					});
+				}
+			}
+
 			onDragEnd?.(e);
 			setIsDragging(false);
-
-			// アウトラインの更新
-			const changeItem = getChildDiagramById(items, e.id);
-			if (changeItem) {
-				transformGroupOutline({
-					...changeItem,
-					point: e.endPoint,
-				});
-			}
 		},
-		[onDragEnd, transformGroupOutline, items],
+		[onDragEnd, transformGroupOutline, items, isDragging],
 	);
 
 	const handleChildDiagramTransfrom = useCallback(
@@ -551,13 +553,9 @@ const Group: React.FC<GroupProps> = ({
 		[onGroupDataChange, id],
 	);
 
-	const handleTransformEnd = useCallback(
-		(_e: DiagramTransformEvent) => {
-			// アウトラインの更新
-			transformGroupOutline();
-		},
-		[transformGroupOutline],
-	);
+	const handleTransformEnd = useCallback((_e: DiagramTransformEvent) => {
+		// TODO: 伝番させる
+	}, []);
 
 	const handleChildGroupDataChange = useCallback(
 		(e: GroupDataChangeEvent) => {

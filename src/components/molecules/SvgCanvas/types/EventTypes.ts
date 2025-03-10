@@ -3,16 +3,25 @@
 import type { Point } from "./CoordinateTypes";
 import type { Diagram, DiagramType, Shape } from "./DiagramTypes";
 
+// TODO: まとめる？
+/**
+ * 図形の変更開始イベント
+ */
 export type DiagramTransformStartEvent = {
 	id: string;
 };
 
+/**
+ * 図形の変形イベント
+ */
 export type DiagramTransformEvent = {
 	id: string;
+	// type: "transform" | "transformEnd";
 	startShape: Shape;
 	endShape: Shape;
 };
 
+// TODO: なんかいい名前
 export type GroupDataChangeEvent = {
 	id: string;
 	point?: Point;
@@ -24,7 +33,6 @@ export type GroupDataChangeEvent = {
 	items?: Diagram[];
 };
 
-// --------------------------------------------------
 /**
  * 図形のポインターダウンイベント
  */
@@ -37,6 +45,7 @@ export type DiagramPointerEvent = {
  */
 export type DiagramDragEvent = {
 	id: string;
+	type: "dragStart" | "drag" | "dragEnd";
 	startPoint: Point;
 	endPoint: Point;
 };

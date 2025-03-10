@@ -220,9 +220,10 @@ export const useDraggable = (props: DraggableProps) => {
 			// ドラッグ中のイベント情報を作成
 			const dragEvent = {
 				id,
+				type: "drag",
 				startPoint: startPoint.current,
 				endPoint: dragPoint,
-			};
+			} as DiagramDragEvent;
 
 			if (
 				!isDragging &&
@@ -230,7 +231,10 @@ export const useDraggable = (props: DraggableProps) => {
 					Math.abs(e.clientY - startClientPoint.current.y) > 3)
 			) {
 				// ドラッグ中でない場合、かつポインターの移動量が一定以上の場合はドラッグ開始とする
-				onDragStart?.(dragEvent);
+				onDragStart?.({
+					...dragEvent,
+					type: "dragStart",
+				});
 				setIsDragging(true);
 			}
 
@@ -277,6 +281,7 @@ export const useDraggable = (props: DraggableProps) => {
 				// ドラッグ中だった場合はドラッグ終了イベントを発火
 				onDragEnd?.({
 					id,
+					type: "dragEnd",
 					startPoint: startPoint.current,
 					endPoint: dragPoint,
 				});
@@ -360,14 +365,18 @@ export const useDraggable = (props: DraggableProps) => {
 
 				const dragEvent = {
 					id,
+					type: "drag",
 					startPoint: startPoint.current,
 					endPoint: newPoint,
-				};
+				} as DiagramDragEvent;
 
 				if (!isArrowDragging.current) {
 					startPoint.current = point;
 
-					onDragStart?.(dragEvent);
+					onDragStart?.({
+						...dragEvent,
+						type: "dragStart",
+					});
 				}
 
 				isArrowDragging.current = true;
@@ -394,6 +403,7 @@ export const useDraggable = (props: DraggableProps) => {
 						// ドラッグ終了イベントを発火させSvgCanvas側に座標の更新を通知し、座標を更新する。
 						onDragEnd?.({
 							id,
+							type: "dragEnd",
 							startPoint: point,
 							endPoint: point,
 						});
@@ -433,16 +443,20 @@ export const useDraggable = (props: DraggableProps) => {
 			// 矢印キー移動完了時のイベント情報を作成
 			const dragEvent = {
 				id,
+				type: "dragEnd",
 				startPoint: point,
 				endPoint: point,
-			};
+			} as DiagramDragEvent;
 
 			if (isArrowDragging.current) {
 				if (e.key === "Shift") {
 					// 矢印キーによるドラッグ中にシフトキーが離された場合はドラッグ終了イベントを発火させ
 					// SvgCanvas側に座標の更新を通知し、一度座標を更新する
 					onDragEnd?.(dragEvent);
-					onDragStart?.(dragEvent);
+					onDragStart?.({
+						...dragEvent,
+						type: "dragStart",
+					});
 				}
 				if (
 					e.key === "ArrowRight" ||
