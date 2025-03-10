@@ -22,7 +22,7 @@ import { useDraggable } from "../../hooks/draggableHooks";
 
 // SvgCanvas関連関数をインポート
 import { degreesToRadians } from "../../functions/Math";
-import { createSvgTransform } from "../../functions/Svg";
+import { createSvgTransform } from "../../functions/Diagram";
 
 export type EllipseProps = DiagramBaseProps & TransformativeProps & EllipseData;
 

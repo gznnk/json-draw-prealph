@@ -30,6 +30,44 @@ export const createSvgTransform = (
 	return `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`;
 };
 
+export const getCursorFromAngle = (angle: number): string => {
+	// angleに360度を加算して0度以上にする
+	const _angle = (angle + 360) % 360;
+
+	if (-22.5 <= _angle && _angle < 22.5) {
+		return "n-resize";
+	}
+	if (22.5 <= _angle && _angle < 67.5) {
+		return "ne-resize";
+	}
+	if (67.5 <= _angle && _angle < 112.5) {
+		return "e-resize";
+	}
+	if (112.5 <= _angle && _angle < 157.5) {
+		return "se-resize";
+	}
+	if (157.5 <= _angle && _angle < 202.5) {
+		return "s-resize";
+	}
+	if (202.5 <= _angle && _angle < 247.5) {
+		return "sw-resize";
+	}
+	if (247.5 <= _angle && _angle < 292.5) {
+		return "w-resize";
+	}
+	if (292.5 <= _angle && _angle < 337.5) {
+		return "nw-resize";
+	}
+	return "n-resize";
+};
+
+/**
+ * 点を描画する（開発用）
+ *
+ * @param id - ID
+ * @param point - 座標
+ * @param color - 色
+ */
 export const drawPoint = (id: string, point: Point, color = "red") => {
 	const svg = document.getElementsByTagName("svg")[0];
 	const elm = svg.getElementById(id);
@@ -51,6 +89,16 @@ export const drawPoint = (id: string, point: Point, color = "red") => {
 	}
 };
 
+/**
+ * 短径を描画する（開発用）
+ *
+ * @param id - ID
+ * @param p1 - 点1
+ * @param p2 - 点2
+ * @param p3 - 点3
+ * @param p4 - 点4
+ * @param color - 色
+ */
 export const drawRect = (
 	id: string,
 	p1: Point,

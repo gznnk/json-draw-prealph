@@ -28,7 +28,7 @@ import { useDraggable } from "../../hooks/draggableHooks";
 
 // SvgCanvas関連関数をインポート
 import { calcRectangleVertices, degreesToRadians } from "../../functions/Math";
-import { createSvgTransform } from "../../functions/Svg";
+import { createSvgTransform } from "../../functions/Diagram";
 
 // ユーティリティをインポート
 // import { getLogger } from "../../../../../utils/Logger";
@@ -275,6 +275,9 @@ const Rectangle: React.FC<RectangleProps> = ({
 
 export default memo(Rectangle);
 
+/**
+ * 短径データ作成
+ */
 export const createRectangleData = (
 	id: string,
 	point: Point,

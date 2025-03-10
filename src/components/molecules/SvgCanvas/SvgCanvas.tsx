@@ -32,6 +32,12 @@ const ContainerDiv = styled.div`
 	overflow: auto;
 `;
 
+const Svg = styled.svg`
+	* {
+		outline: none;
+	}
+`;
+
 type SvgCanvasProps = {
 	title?: string;
 	items: Array<Diagram>;
@@ -129,7 +135,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 
 		return (
 			<ContainerDiv>
-				<svg
+				<Svg
 					width="120vw"
 					height="120vh"
 					onPointerDown={handlePointerDown}
@@ -138,7 +144,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = memo(
 				>
 					<title>{title}</title>
 					{renderedItems}
-				</svg>
+				</Svg>
 			</ContainerDiv>
 		);
 	},

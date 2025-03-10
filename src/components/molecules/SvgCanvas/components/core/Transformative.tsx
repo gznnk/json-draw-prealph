@@ -29,8 +29,14 @@ import {
 	nanToZero,
 	radiansToDegrees,
 } from "../../functions/Math";
-import { createSvgTransform } from "../../functions/Svg";
+import {
+	createSvgTransform,
+	getCursorFromAngle,
+} from "../../functions/Diagram";
 
+/**
+ * 変形コンポーネントのプロパティ
+ */
 type TransformativeProps = {
 	diagramId: string;
 	type: DiagramType;
@@ -47,6 +53,9 @@ type TransformativeProps = {
 	onTransformEnd?: (e: DiagramTransformEvent) => void;
 };
 
+/**
+ * 変形コンポーネント
+ */
 const Transformative: React.FC<TransformativeProps> = ({
 	diagramId,
 	point,
@@ -535,13 +544,17 @@ const Transformative: React.FC<TransformativeProps> = ({
 	}, [isSelected]);
 
 	// 回転
-	const rotationPoint = affineTransformation(
-		{ x: width / 2 + 20, y: 0 },
-		1,
-		1,
-		degreesToRadians(rotation),
-		point.x,
-		point.y,
+	const rotationPoint = useMemo(
+		() =>
+			affineTransformation(
+				{ x: width / 2 + 15, y: -(height / 2 + 15) },
+				1,
+				1,
+				degreesToRadians(rotation),
+				point.x,
+				point.y,
+			),
+		[width, height, rotation, point],
 	);
 
 	const handleDragRotationPoint = useCallback(
@@ -558,7 +571,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 					height,
 					scaleX,
 					scaleY,
-					rotation: radiansToDegrees(angle),
+					rotation: radiansToDegrees(angle) + 45,
 				},
 			};
 			lastTransformEvent.current = event;
@@ -571,11 +584,25 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(p: Point) =>
 			calcNearestCircleIntersectionPoint(
 				{ x: point.x, y: point.y },
-				width / 2 + 20,
+				width / 2 + 15,
 				p,
 			),
 		[point, width],
 	);
+
+	// TODO: 変形中は計算しないほうがよい
+	const cursors = useMemo(() => {
+		return {
+			topCenter: getCursorFromAngle(rotation),
+			rightTop: getCursorFromAngle(rotation + 45),
+			rightCenter: getCursorFromAngle(rotation + 90),
+			rightBottom: getCursorFromAngle(rotation + 135),
+			bottomCenter: getCursorFromAngle(rotation + 180),
+			leftBottom: getCursorFromAngle(rotation + 225),
+			leftCenter: getCursorFromAngle(rotation + 270),
+			leftTop: getCursorFromAngle(rotation + 315),
+		};
+	}, [rotation]);
 
 	if (!isSelected) {
 		return null;
@@ -591,7 +618,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 					width={width}
 					height={height}
 					fill="transparent"
-					stroke="blue"
+					stroke="rgb(100, 149, 237)"
 					strokeWidth="1px"
 					strokeDasharray="3,3"
 					pointerEvents={"none"}
@@ -610,6 +637,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.topCenterPoint}
 				startPoint={vertices.leftTopPoint}
 				endPoint={vertices.rightTopPoint}
+				cursor={cursors.topCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragTopCenter}
 				onDragEnd={handleDragEnd}
@@ -621,6 +649,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.leftCenterPoint}
 				startPoint={vertices.leftTopPoint}
 				endPoint={vertices.leftBottomPoint}
+				cursor={cursors.leftCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftCenter}
 				onDragEnd={handleDragEnd}
@@ -632,6 +661,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.rightCenterPoint}
 				startPoint={vertices.rightTopPoint}
 				endPoint={vertices.rightBottomPoint}
+				cursor={cursors.rightCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightCenter}
 				onDragEnd={handleDragEnd}
@@ -643,6 +673,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 				point={vertices.bottomCenterPoint}
 				startPoint={vertices.leftBottomPoint}
 				endPoint={vertices.rightBottomPoint}
+				cursor={cursors.bottomCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragBottomCenter}
 				onDragEnd={handleDragEnd}
@@ -652,6 +683,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			<DragPoint
 				id={`${diagramId}-leftTop`}
 				point={vertices.leftTopPoint}
+				cursor={cursors.leftTop}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftTop}
 				onDragEnd={handleDragEnd}
@@ -663,6 +695,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			<DragPoint
 				id={`${diagramId}-leftBottom`}
 				point={vertices.leftBottomPoint}
+				cursor={cursors.leftBottom}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftBottom}
 				onDragEnd={handleDragEnd}
@@ -674,6 +707,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			<DragPoint
 				id={`${diagramId}-rightTop`}
 				point={vertices.rightTopPoint}
+				cursor={cursors.rightTop}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightTop}
 				onDragEnd={handleDragEnd}
@@ -685,6 +719,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			<DragPoint
 				id={`${diagramId}-rightBottom`}
 				point={vertices.rightBottomPoint}
+				cursor={cursors.rightBottom}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightBottom}
 				onDragEnd={handleDragEnd}
@@ -696,6 +731,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			<DragPoint
 				id={`${diagramId}-topCenter`}
 				point={vertices.topCenterPoint}
+				cursor={cursors.topCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragTopCenter}
 				onDragEnd={handleDragEnd}
@@ -705,6 +741,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			<DragPoint
 				id={`${diagramId}-leftCenter`}
 				point={vertices.leftCenterPoint}
+				cursor={cursors.leftCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragLeftCenter}
 				onDragEnd={handleDragEnd}
@@ -714,6 +751,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			<DragPoint
 				id={`${diagramId}-rightCenter`}
 				point={vertices.rightCenterPoint}
+				cursor={cursors.rightCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRightCenter}
 				onDragEnd={handleDragEnd}
@@ -723,6 +761,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 			<DragPoint
 				id={`${diagramId}-bottomCenter`}
 				point={vertices.bottomCenterPoint}
+				cursor={cursors.bottomCenter}
 				onDragStart={handleDragStart}
 				onDrag={handleDragBottomCenter}
 				onDragEnd={handleDragEnd}
@@ -749,6 +788,7 @@ export default memo(Transformative);
 type DragLineProps = Omit<DraggableProps, "ref"> & {
 	startPoint: Point;
 	endPoint: Point;
+	cursor: string;
 };
 
 /**
@@ -760,6 +800,7 @@ const DragLine: React.FC<DragLineProps> = memo(
 		point,
 		startPoint,
 		endPoint,
+		cursor,
 		onDragStart,
 		onDrag,
 		onDragEnd,
@@ -786,6 +827,7 @@ const DragLine: React.FC<DragLineProps> = memo(
 				y2={endPoint.y}
 				stroke="transparent"
 				strokeWidth={3}
+				cursor={cursor}
 				ref={svgRef}
 				{...draggableProps}
 			/>

@@ -10,9 +10,10 @@ import type { DraggableProps } from "../../hooks/draggableHooks";
  * ドラッグポイントコンポーネントのPropsの型定義
  */
 export type DragPointProps = Omit<DraggableProps, "ref"> & {
+	radius?: number;
 	color?: string;
-	visible?: boolean;
 	cursor?: string;
+	visible?: boolean;
 	hidden?: boolean;
 };
 
@@ -23,7 +24,6 @@ export type DragPointProps = Omit<DraggableProps, "ref"> & {
  * @param {string} [props.id] ID
  * @param {DiagramType} [props.type] 図形の種類
  * @param {Point} [props.point] 座標
- * @param {DragDirection} [props.direction] ドラッグ方向
  * @param {boolean} [props.allowXDecimal] X座標の小数点許可フラグ
  * @param {boolean} [props.allowYDecimal] Y座標の小数点許可フラグ
  * @param {string} [props.cursor] カーソル
@@ -44,10 +44,8 @@ const DragPoint: React.FC<DragPointProps> = ({
 	id,
 	type,
 	point,
-	direction,
 	allowXDecimal = false,
 	allowYDecimal = false,
-	cursor,
 	onDragStart,
 	onDrag,
 	onDragEnd,
@@ -56,8 +54,10 @@ const DragPoint: React.FC<DragPointProps> = ({
 	onDrop,
 	onHoverChange,
 	dragPositioningFunction,
+	radius = 5,
+	color = "rgba(100, 149, 237, 0.8)",
+	cursor,
 	visible = true,
-	color = "rgba(61, 90, 128, 0.8)",
 	hidden = false,
 }) => {
 	const svgRef = useRef<SVGCircleElement>({} as SVGCircleElement);
@@ -66,7 +66,6 @@ const DragPoint: React.FC<DragPointProps> = ({
 		id,
 		type,
 		point,
-		direction,
 		allowXDecimal,
 		allowYDecimal,
 		ref: svgRef,
@@ -89,7 +88,7 @@ const DragPoint: React.FC<DragPointProps> = ({
 			id={id}
 			cx={point.x}
 			cy={point.y}
-			r="5"
+			r={radius}
 			fill={color}
 			cursor={cursor}
 			tabIndex={0}
