@@ -225,7 +225,7 @@ const testItems1 = [
 	},
 	{
 		id: "12",
-		type: "Line",
+		type: "Path",
 		point: { x: 0, y: 100 },
 		width: 100,
 		height: 100,
@@ -236,7 +236,7 @@ const testItems1 = [
 		items: [
 			{
 				id: "12-1",
-				type: "LinePoint",
+				type: "PathPoint",
 				point: { x: 0, y: 100 },
 				width: 0,
 				height: 0,
@@ -245,7 +245,7 @@ const testItems1 = [
 			},
 			{
 				id: "12-2",
-				type: "LinePoint",
+				type: "PathPoint",
 				point: { x: 100, y: 100 },
 				width: 0,
 				height: 0,
@@ -254,7 +254,7 @@ const testItems1 = [
 			},
 			{
 				id: "12-3",
-				type: "LinePoint",
+				type: "PathPoint",
 				point: { x: 200, y: 200 },
 				width: 0,
 				height: 0,
@@ -268,7 +268,7 @@ const testItems1 = [
 const testItems2 = [
 	{
 		id: "12",
-		type: "Line",
+		type: "Path",
 		point: { x: 0, y: 100 },
 		width: 100,
 		height: 100,
@@ -279,7 +279,7 @@ const testItems2 = [
 		items: [
 			{
 				id: "12-1",
-				type: "LinePoint",
+				type: "PathPoint",
 				point: { x: 0, y: 100 },
 				width: 0,
 				height: 0,
@@ -288,7 +288,7 @@ const testItems2 = [
 			},
 			{
 				id: "12-2",
-				type: "LinePoint",
+				type: "PathPoint",
 				point: { x: 100, y: 100 },
 				width: 0,
 				height: 0,
@@ -297,7 +297,7 @@ const testItems2 = [
 			},
 			{
 				id: "12-3",
-				type: "LinePoint",
+				type: "PathPoint",
 				point: { x: 200, y: 200 },
 				width: 0,
 				height: 0,
@@ -382,7 +382,7 @@ const testItems3 = [
 			},
 			{
 				id: "12",
-				type: "Line",
+				type: "Path",
 				point: { x: 350, y: 350 },
 				width: 100,
 				height: 100,
@@ -396,7 +396,7 @@ const testItems3 = [
 				items: [
 					{
 						id: "12-1",
-						type: "LinePoint",
+						type: "PathPoint",
 						point: { x: 300, y: 300 },
 						width: 0,
 						height: 0,
@@ -405,7 +405,7 @@ const testItems3 = [
 					},
 					{
 						id: "12-2",
-						type: "LinePoint",
+						type: "PathPoint",
 						point: { x: 300, y: 400 },
 						width: 0,
 						height: 0,
@@ -414,7 +414,7 @@ const testItems3 = [
 					},
 					{
 						id: "12-3",
-						type: "LinePoint",
+						type: "PathPoint",
 						point: { x: 400, y: 400 },
 						width: 0,
 						height: 0,

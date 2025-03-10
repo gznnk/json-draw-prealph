@@ -8,8 +8,8 @@ import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 import type {
 	ConnectPointData,
 	Diagram,
-	LineData,
-	LinePointData,
+	PathData,
+	PathPointData,
 } from "../types/DiagramTypes";
 import type {
 	DiagramSelectEvent,
@@ -224,43 +224,27 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		});
 	}, []);
 
-	const onConnect = useCallback(
-		(e: DiagramConnectEvent) => {
-			// alert("connect");
-			const startItem = getDiagramById(canvasState.items, e.startPoint.id);
-			const endItem = getDiagramById(canvasState.items, e.endPoint.id);
-			addItem({
-				id: generateId(),
-				type: "Line",
-				point: startItem?.point ?? { x: 0, y: 0 },
-				width: 100,
-				height: 100,
-				keepProportion: false,
+	const onConnect = useCallback((e: DiagramConnectEvent) => {
+		// alert("connect");
+		// const startItem = getDiagramById(canvasState.items, e.startPoint.id);
+		// const endItem = getDiagramById(canvasState.items, e.endPoint.id);
+		console.log("onConnect", e);
+
+		addItem({
+			id: generateId(),
+			type: "Path",
+			point: e.points[0].point,
+			width: 100,
+			height: 100,
+			keepProportion: false,
+			isSelected: false,
+			items: e.points.map((p) => ({
+				type: "PathPoint",
+				...p,
 				isSelected: false,
-				items: [
-					{
-						id: e.startPoint.id,
-						type: "LinePoint",
-						point: startItem?.point ?? { x: 0, y: 0 },
-						width: 0,
-						height: 0,
-						keepProportion: false,
-						isSelected: false,
-					},
-					{
-						id: e.endPoint.id,
-						type: "LinePoint",
-						point: endItem?.point ?? { x: 0, y: 0 },
-						width: 0,
-						height: 0,
-						keepProportion: false,
-						isSelected: false,
-					},
-				] as Diagram[],
-			});
-		},
-		[canvasState.items],
-	);
+			})) as Diagram[],
+		});
+	}, []);
 
 	const onConnectPointMove = useCallback((e: ConnectPointMoveEvent) => {
 		//console.log("move");

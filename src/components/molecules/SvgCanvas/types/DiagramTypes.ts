@@ -20,7 +20,7 @@ import type {
 // SvgCanvas関連コンポーネントをインポート
 import Ellipse from "../components/diagram/Ellipse";
 import Group from "../components/diagram/Group";
-import Line, { LinePoint } from "../components/diagram/Line";
+import Path, { PathPoint } from "../components/diagram/Path";
 import Rectangle from "../components/diagram/Rectangle";
 import Triangle from "../components/diagram/Triangle";
 
@@ -43,8 +43,8 @@ export type DiagramType =
 	| "ConnectPoint"
 	| "Ellipse"
 	| "Group"
-	| "Line"
-	| "LinePoint"
+	| "Path"
+	| "PathPoint"
 	| "Rectangle"
 	| "Triangle";
 
@@ -88,16 +88,16 @@ export type EllipseData = TransformativeData & {
 };
 
 /**
- * 折れ線の頂点のデータ
+ * パスの頂点のデータ
  */
-export type LinePointData = DiagramBaseData & {
+export type PathPointData = DiagramBaseData & {
 	isActive?: boolean;
 };
 
 /**
- * 折れ線のデータ
+ * パスのデータ
  */
-export type LineData = TransformativeData & {
+export type PathData = TransformativeData & {
 	fill?: string;
 	stroke: string;
 	strokeWidth: string;
@@ -141,8 +141,8 @@ type DiagramCombined =
 	| ConnectPointData
 	| EllipseData
 	| GroupData
-	| LineData
-	| LinePointData
+	| PathData
+	| PathPointData
 	| RectangleData;
 
 /**
@@ -186,8 +186,8 @@ export const DiagramTypeComponentMap: {
 	ConnectPoint: DummyComponent,
 	Ellipse: Ellipse,
 	Group: Group,
-	Line: Line,
-	LinePoint: LinePoint,
+	Path: Path,
+	PathPoint: PathPoint,
 	Rectangle: Rectangle,
 	Triangle: Triangle,
 };

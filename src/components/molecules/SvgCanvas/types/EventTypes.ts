@@ -1,7 +1,12 @@
 // イベント型定義
 
 import type { Point } from "./CoordinateTypes";
-import type { Diagram, DiagramType, Shape } from "./DiagramTypes";
+import type {
+	Diagram,
+	DiagramType,
+	PathPointData,
+	Shape,
+} from "./DiagramTypes";
 
 // TODO: まとめる？
 /**
@@ -90,14 +95,7 @@ export type DiagramSelectEvent = {
 };
 
 export type DiagramConnectEvent = {
-	startPoint: {
-		id: string;
-		// diagramId: string;
-	};
-	endPoint: {
-		id: string;
-		// diagramId: string;
-	};
+	points: PathPointData[];
 };
 
 export type ConnectPointMoveEvent = {

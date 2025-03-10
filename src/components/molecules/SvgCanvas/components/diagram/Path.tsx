@@ -11,8 +11,8 @@ import type { Point } from "../../types/CoordinateTypes";
 import type {
 	Diagram,
 	DiagramBaseProps,
-	LineData,
-	LinePointData,
+	PathData,
+	PathPointData,
 	TransformativeProps,
 } from "../../types/DiagramTypes";
 import type {
@@ -28,7 +28,7 @@ import { useDraggable } from "../../hooks/draggableHooks";
 // ユーティリティをインポート
 // import { getLogger } from "../../../../../utils/Logger";
 
-// const logger = getLogger("Line");
+// const logger = getLogger("Path");
 
 const createDValue = (items: Diagram[]) => {
 	let d = "";
@@ -39,13 +39,13 @@ const createDValue = (items: Diagram[]) => {
 	return d;
 };
 
-export type LineProps = DiagramBaseProps &
+export type PathProps = DiagramBaseProps &
 	TransformativeProps &
-	LineData & {
+	PathData & {
 		onGroupDataChange?: (e: GroupDataChangeEvent) => void; // TODO: 共通化
 	};
 
-const Line: React.FC<LineProps> = ({
+const Path: React.FC<PathProps> = ({
 	id,
 	point,
 	width,
@@ -173,7 +173,7 @@ const Line: React.FC<LineProps> = ({
 
 	const draggableProps = useDraggable({
 		id,
-		type: "Line",
+		type: "Path",
 		point,
 		ref: dragSvgRef,
 		onPointerDown: handlePointerDown,
@@ -272,11 +272,11 @@ const Line: React.FC<LineProps> = ({
 	);
 };
 
-export default memo(Line);
+export default memo(Path);
 
-type LinePointProps = DiagramBaseProps & LinePointData;
+type PathPointProps = DiagramBaseProps & PathPointData;
 
-export const LinePoint: React.FC<LinePointProps> = memo(
+export const PathPoint: React.FC<PathPointProps> = memo(
 	({ id, point, isActive = true, onDragStart, onDrag, onDragEnd }) => {
 		if (!isActive) {
 			return null;

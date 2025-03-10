@@ -1,30 +1,38 @@
 // Reactのインポート
 import type React from "react";
-import { memo, useState, useRef, useCallback, useEffect } from "react";
+import { memo, useState, useMemo, useCallback, useEffect, useRef } from "react";
 
 // SvgCanvas関連型定義をインポート
 import type { Point } from "../../types/CoordinateTypes";
 // SvgCanvas関連型定義をインポート
 import type {
-	DiagramRef,
-	RectangleData,
+	PathPointData,
 	ConnectPointData,
+	Diagram,
 } from "../../types/DiagramTypes";
 import type {
 	DiagramHoverEvent,
-	DiagramResizeEvent,
-	GroupDragEvent,
-	GroupResizeEvent,
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
 	DiagramDragEvent,
 } from "../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import type { DraggableProps } from "../core/Draggable";
-import Draggable from "../core/Draggable";
-
+import Path from "../diagram/Path";
 import DragPoint from "../core/DragPoint";
+
+const createPathPointId = (id: string, index: number) => `${id}-pp-${index}`;
+
+const createPathPointData = (id: string, point: Point): PathPointData => ({
+	id,
+	point,
+	isSelected: false,
+});
+
+type ConnectionEvent = {
+	id: string;
+	point: Point;
+};
 
 type ConnectPointProps = ConnectPointData & {
 	visible: boolean;
@@ -37,14 +45,28 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 	visible,
 	onConnect,
 }) => {
-	// console.log("ConnectPoint rendered");
+	// console.log("ConnectPoint rendered")
 	// ホバー状態の管理
 	const [isHovered, setIsHovered] = useState(false);
 	// ドラッグ状態の管理
 	const [isDragging, setIsDragging] = useState(false);
 
-	const svgRef = useRef<SVGPathElement | null>(null);
-	const dragPointRef = useRef<SVGGElement>({} as SVGGElement);
+	const pathPointNames = useMemo(
+		() => ({
+			p1: createPathPointId(id, 1),
+			p2: createPathPointId(id, 2),
+			p3: createPathPointId(id, 3),
+			p4: createPathPointId(id, 4),
+		}),
+		[id],
+	);
+
+	const [pathPoints, setPathPoints] = useState<PathPointData[]>([
+		createPathPointData(pathPointNames.p1, point),
+		createPathPointData(pathPointNames.p2, point),
+		createPathPointData(pathPointNames.p3, point),
+		createPathPointData(pathPointNames.p4, point),
+	]);
 
 	const handleDragStart = useCallback((_e: DiagramDragEvent) => {
 		setIsDragging(true);
@@ -52,22 +74,42 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
-			svgRef?.current?.setAttribute(
-				"d",
-				`M ${point.x} ${point.y} L ${e.endPoint.x} ${e.endPoint.y}`,
+			setPathPoints((prev) =>
+				prev.map((item) => {
+					if (item.id === pathPointNames.p1) {
+						return item;
+					}
+					if (item.id === pathPointNames.p2) {
+						return {
+							...item,
+							point: { x: point.x, y: (point.y + e.endPoint.y) / 2 },
+						};
+					}
+					if (item.id === pathPointNames.p3) {
+						return {
+							...item,
+							point: { x: e.endPoint.x, y: (point.y + e.endPoint.y) / 2 },
+						};
+					}
+					if (item.id === pathPointNames.p4) {
+						return { ...item, point: e.endPoint };
+					}
+					return item;
+				}),
 			);
 		},
-		[point],
+		[point, pathPointNames],
 	);
 
 	const handleDragEnd = useCallback(
 		(_e: DiagramDragEvent) => {
+			setPathPoints((prevState) =>
+				prevState.map((item) => ({
+					...item,
+					point: point,
+				})),
+			);
 			setIsDragging(false);
-			// svgRef?.current?.removeAttribute("d");
-			// dragPointRef.current.setAttribute(
-			// 	"transform",
-			// 	`translate(${point.x}, ${point.y})`,
-			// );
 		},
 		[point],
 	);
@@ -84,21 +126,17 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 	const handleDrop = useCallback(
 		(e: DiagramDragDropEvent) => {
+			// ドロップされたときの処理
 			if (e.dropItem.type === "ConnectPoint") {
-				onConnect?.({
-					startPoint: {
-						id: e.dropItem.id,
-						// diagramId: e.dropItem.type,
-					},
-					endPoint: {
-						id,
-						// diagramId,
-					},
-				});
+				document.dispatchEvent(
+					new CustomEvent("Connection", {
+						detail: { id, point },
+					}),
+				);
 			}
 			setIsHovered(false);
 		},
-		[onConnect, id],
+		[id, point],
 	);
 
 	/**
@@ -110,6 +148,50 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 	const handleHoverChange = useCallback((e: DiagramHoverEvent) => {
 		setIsHovered(e.isHovered);
 	}, []);
+
+	// 接続中、切断イベントのリスナー登録
+	useEffect(() => {
+		let handleConnection: (e: Event) => void;
+		if (isDragging) {
+			handleConnection = (e: Event) => {
+				const customEvent = e as CustomEvent<ConnectionEvent>;
+				if (customEvent.detail.id !== id) {
+					console.log("connecting event", customEvent.detail.id);
+
+					const points: PathPointData[] = [];
+					points.push({
+						id,
+						point,
+						isSelected: false,
+					});
+					for (let i = 1; i < pathPoints.length - 1; i++) {
+						points.push({
+							id: pathPoints[i].id,
+							point: pathPoints[i].point,
+							isSelected: false,
+						});
+					}
+					points.push({
+						id: customEvent.detail.id,
+						point: customEvent.detail.point,
+						isSelected: false,
+					});
+
+					onConnect?.({
+						points,
+					});
+				}
+			};
+
+			document.addEventListener("Connection", handleConnection);
+		}
+
+		return () => {
+			if (handleConnection) {
+				document.removeEventListener("Connection", handleConnection);
+			}
+		};
+	}, [onConnect, id, point, isDragging, pathPoints]);
 
 	return (
 		<>
@@ -128,7 +210,23 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				onDrop={handleDrop}
 				onHoverChange={handleHoverChange}
 			/>
-			{isDragging && <path stroke="black" strokeWidth={1} ref={svgRef} />}
+			{isDragging && (
+				<Path
+					id={`${id}-path`}
+					point={{ x: 0, y: 0 }}
+					width={0}
+					height={0}
+					rotation={0}
+					scaleX={1}
+					scaleY={1}
+					fill="none"
+					stroke="black"
+					strokeWidth="1px"
+					keepProportion={false}
+					isSelected={false}
+					items={pathPoints as Diagram[]}
+				/>
+			)}
 		</>
 	);
 };
