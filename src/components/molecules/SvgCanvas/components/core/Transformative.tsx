@@ -15,8 +15,13 @@ import type {
 import type { DraggableProps } from "../../hooks/draggableHooks";
 import { useDraggable } from "../../hooks/draggableHooks";
 import DragPoint from "./DragPoint";
+import RotatePoint from "./RotatePoint";
 
 // SvgCanvas関連関数をインポート
+import {
+	createSvgTransform,
+	getCursorFromAngle,
+} from "../../functions/Diagram";
 import {
 	affineTransformation,
 	calcNearestCircleIntersectionPoint,
@@ -29,10 +34,6 @@ import {
 	nanToZero,
 	radiansToDegrees,
 } from "../../functions/Math";
-import {
-	createSvgTransform,
-	getCursorFromAngle,
-} from "../../functions/Diagram";
 
 /**
  * 変形コンポーネントのプロパティ
@@ -768,9 +769,10 @@ const Transformative: React.FC<TransformativeProps> = ({
 				dragPositioningFunction={linerDragFunctionBottomCenter}
 			/>
 			{/* 回転 */}
-			<DragPoint
+			<RotatePoint
 				id={`rotation-${diagramId}`}
 				point={rotationPoint}
+				rotation={rotation}
 				onDragStart={handleDragStart}
 				onDrag={handleDragRotationPoint}
 				onDragEnd={handleDragEnd}

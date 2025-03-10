@@ -230,6 +230,8 @@ const Rectangle: React.FC<RectangleProps> = ({
 					fill={fill}
 					stroke={stroke}
 					strokeWidth={strokeWidth}
+					tabIndex={0}
+					cursor="move"
 					transform={createSvgTransform(
 						scaleX,
 						scaleY,
@@ -237,7 +239,6 @@ const Rectangle: React.FC<RectangleProps> = ({
 						point.x,
 						point.y,
 					)}
-					tabIndex={0}
 					ref={svgRef}
 					{...draggableProps}
 				/>

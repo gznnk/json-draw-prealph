@@ -148,6 +148,8 @@ const Ellipse: React.FC<EllipseProps> = ({
 					fill={fill}
 					stroke={stroke}
 					strokeWidth={strokeWidth}
+					tabIndex={0}
+					cursor="move"
 					transform={createSvgTransform(
 						scaleX,
 						scaleY,
@@ -155,7 +157,6 @@ const Ellipse: React.FC<EllipseProps> = ({
 						point.x,
 						point.y,
 					)}
-					tabIndex={0}
 					ref={svgRef}
 					{...draggableProps}
 				/>
