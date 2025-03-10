@@ -99,6 +99,9 @@ const Transformative: React.FC<TransformativeProps> = ({
 	);
 
 	const radians = useMemo(() => degreesToRadians(rotation), [rotation]);
+	const isSwapped = useMemo(() => {
+		return (rotation + 405) % 180 > 90;
+	}, [rotation]);
 
 	const affineTransformationOnDrag = useCallback(
 		(p: Point) =>
@@ -378,11 +381,16 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionTopCenter = useCallback(
 		(p: Point) =>
-			createLinerY2xFunction(
-				startShape.current.bottomCenterPoint,
-				startShape.current.topCenterPoint,
-			)(p),
-		[],
+			!isSwapped
+				? createLinerY2xFunction(
+						startShape.current.bottomCenterPoint,
+						startShape.current.topCenterPoint,
+					)(p)
+				: createLinerX2yFunction(
+						startShape.current.bottomCenterPoint,
+						startShape.current.topCenterPoint,
+					)(p),
+		[isSwapped],
 	);
 	// --- TopCenter End --- //
 
@@ -420,11 +428,16 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionLeftCenter = useCallback(
 		(p: Point) =>
-			createLinerX2yFunction(
-				startShape.current.leftCenterPoint,
-				startShape.current.rightCenterPoint,
-			)(p),
-		[],
+			!isSwapped
+				? createLinerX2yFunction(
+						startShape.current.leftCenterPoint,
+						startShape.current.rightCenterPoint,
+					)(p)
+				: createLinerY2xFunction(
+						startShape.current.leftCenterPoint,
+						startShape.current.rightCenterPoint,
+					)(p),
+		[isSwapped],
 	);
 	// --- LeftCenter End --- //
 
@@ -462,11 +475,16 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionRightCenter = useCallback(
 		(p: Point) =>
-			createLinerX2yFunction(
-				startShape.current.leftCenterPoint,
-				startShape.current.rightCenterPoint,
-			)(p),
-		[],
+			!isSwapped
+				? createLinerX2yFunction(
+						startShape.current.leftCenterPoint,
+						startShape.current.rightCenterPoint,
+					)(p)
+				: createLinerY2xFunction(
+						startShape.current.leftCenterPoint,
+						startShape.current.rightCenterPoint,
+					)(p),
+		[isSwapped],
 	);
 	// --- RightCenter End --- //
 
@@ -504,10 +522,15 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const linerDragFunctionBottomCenter = useCallback(
 		(p: Point) =>
-			createLinerY2xFunction(
-				startShape.current.bottomCenterPoint,
-				startShape.current.topCenterPoint,
-			)(p),
+			!isSwapped
+				? createLinerY2xFunction(
+						startShape.current.bottomCenterPoint,
+						startShape.current.topCenterPoint,
+					)(p)
+				: createLinerX2yFunction(
+						startShape.current.bottomCenterPoint,
+						startShape.current.topCenterPoint,
+					)(p),
 		[],
 	);
 	// --- BottomCenter End --- //
