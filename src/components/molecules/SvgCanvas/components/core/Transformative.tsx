@@ -584,6 +584,10 @@ const Transformative: React.FC<TransformativeProps> = ({
 	const handleDragRotationPoint = useCallback(
 		(e: DiagramDragEvent) => {
 			const angle = calculateAngle(point, e.endPoint);
+			const rotatePointAngle = calculateAngle(point, {
+				x: point.x + width,
+				y: point.y + height,
+			});
 			const event = {
 				id: diagramId,
 				startShape: {
@@ -595,7 +599,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 					height,
 					scaleX,
 					scaleY,
-					rotation: radiansToDegrees(angle) + 45,
+					rotation: radiansToDegrees(angle + rotatePointAngle),
 				},
 			};
 			lastTransformEvent.current = event;
