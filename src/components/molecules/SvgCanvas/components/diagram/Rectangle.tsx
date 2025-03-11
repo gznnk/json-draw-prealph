@@ -28,11 +28,7 @@ import { useDraggable } from "../../hooks/draggableHooks";
 
 // SvgCanvas関連関数をインポート
 import { createSvgTransform } from "../../functions/Diagram";
-import {
-	calcRectangleVertices,
-	degreesToRadians,
-	isSteepAngle,
-} from "../../functions/Math";
+import { calcRectangleVertices, degreesToRadians } from "../../functions/Math";
 
 // ユーティリティをインポート
 // import { getLogger } from "../../../../../utils/Logger";
@@ -74,10 +70,6 @@ const Rectangle: React.FC<RectangleProps> = ({
 	const [isHovered, setIsHovered] = useState(false);
 
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
-
-	const radians = useMemo(() => degreesToRadians(rotation), [rotation]);
-
-	const isSteep = useMemo(() => isSteepAngle(radians), [radians]);
 
 	/**
 	 * 接続ポイントの位置を更新
@@ -218,9 +210,12 @@ const Rectangle: React.FC<RectangleProps> = ({
 		onHoverChange: handleHoverChange,
 	});
 
-	const rectTransform = useMemo(
-		() => createSvgTransform(scaleX, scaleY, radians, point.x, point.y),
-		[radians, scaleX, scaleY, point.x, point.y],
+	const rectTransform = createSvgTransform(
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		point.x,
+		point.y,
 	);
 
 	return (

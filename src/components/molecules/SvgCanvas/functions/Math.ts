@@ -46,6 +46,37 @@ export const calculateDistance = (p1: Point, p2: Point): number => {
 };
 
 /**
+ * ２点のうち、指定した点に近い方の点を返す
+ *
+ * @param p - 指定した点
+ * @param a - 1つ目の点の座標
+ * @param b - 2つ目の点の座標
+ * @returns - 近い方の点
+ */
+export const closerPoint = (p: Point, a: Point, b: Point): Point => {
+	const distanceA = calculateDistance(p, a);
+	const distanceB = calculateDistance(p, b);
+
+	return distanceA < distanceB ? a : b;
+};
+
+// TODO いらんかも
+/**
+ * aがbよりもpに近いかどうかを判定する
+ *
+ * @param p - 指定した点
+ * @param a - 1つ目の点の座標
+ * @param b - 2つ目の点の座標
+ * @returns - 指定した点に近い方の点かどうか
+ */
+export const isCloserPoint = (a: Point, b: Point, p: Point): boolean => {
+	const distanceA = calculateDistance(p, a);
+	const distanceB = calculateDistance(p, b);
+
+	return distanceA < distanceB;
+};
+
+/**
  * ２点間の角度を算出する
  *
  * @param {Point} p1 - 1つ目の点の座標
@@ -66,10 +97,30 @@ export const calculateAngle = (p1: Point, p2: Point): number => {
  * @returns 急勾配かどうか
  */
 export const isSteepAngle = (angle: number): boolean => {
-	return Math.abs(angle) > Math.PI / 4 && Math.abs(angle) < (Math.PI * 3) / 4;
+	return Math.abs(angle) >= Math.PI / 4 && Math.abs(angle) <= (Math.PI * 3) / 4;
 };
 
-// TODO いらない？
+/**
+ * 与えられた角度が上向きかどうかを判定する
+ *
+ * @param angle 角度（ラジアン）
+ * @returns 上向きかどうか
+ */
+export const isUpAngle = (angle: number) => {
+	return 0 <= angle;
+};
+
+/**
+ * 与えられた角度が右向きかどうかを判定する
+ *
+ * @param angle 角度（ラジアン）
+ * @returns 右向きかどうか
+ */
+export const isRightAngle = (angle: number) => {
+	return !(-Math.PI / 2 < angle && angle < Math.PI / 2);
+};
+
+// TODO いらんかも
 /**
  * 2点を結ぶ直線が急勾配（45～135度、225～315度）かどうかを判定する
  *
@@ -112,10 +163,7 @@ export const calcNearestCircleIntersectionPoint = (
 	const intersection2: Point = { x: center.x - a, y: center.y - b };
 
 	// 任意の点に近い方の交点を返す
-	const dist1 = calculateDistance(intersection1, point);
-	const dist2 = calculateDistance(intersection2, point);
-
-	return dist1 < dist2 ? intersection1 : intersection2;
+	return closerPoint(point, intersection1, intersection2);
 };
 
 /**

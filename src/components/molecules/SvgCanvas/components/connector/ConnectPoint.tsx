@@ -26,8 +26,13 @@ import {
 	calcRectangleOuterBox,
 	closer,
 	isPointInShape,
-	isSteepLine,
 	signNonZero,
+	calculateAngle,
+	isSteepAngle,
+	isUpAngle,
+	isRightAngle,
+	radiansToDegrees,
+	degreesToRadians,
 } from "../../functions/Math";
 
 import { drawPoint } from "../../functions/Diagram";
@@ -89,6 +94,26 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 	const [pathPoints, setPathPoints] = useState<PathPointData[]>([]);
 
+	const angle = degreesToRadians(
+		Math.round(radiansToDegrees(calculateAngle(point, ownerShape.point))),
+	); // 誤差を丸める
+
+	// console.log("0", isSteepAngle(0));
+	// console.log("45", isSteepAngle(Math.PI / 4));
+	// console.log("90", isSteepAngle(Math.PI / 2));
+	// console.log("135", isSteepAngle((Math.PI * 3) / 4));
+	// console.log("180", isSteepAngle(Math.PI));
+
+	const isSteep = isSteepAngle(angle);
+	const isUp = isUpAngle(angle);
+	const isRight = isRightAngle(angle);
+
+	console.log("radians", id, angle);
+	console.log("angle", id, radiansToDegrees(angle));
+	console.log("isSteep", id, isSteep);
+	console.log("isUp", id, isUp);
+	console.log("isRight", id, isRight);
+
 	const calcPathPoints = useCallback(
 		(dragPoint: Point) => {
 			const newPoints: PathPointData[] = [];
@@ -108,14 +133,14 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				newPoints.push(createPathPointData(pathPointIds.p1, point));
 				newPoints.push(
 					createPathPointData(pathPointIds.p2, {
-						x: point.x,
-						y: (point.y + endPoint.y) / 2,
+						x: isSteep ? point.x : (point.x + endPoint.x) / 2,
+						y: isSteep ? (point.y + endPoint.y) / 2 : point.y,
 					}),
 				);
 				newPoints.push(
 					createPathPointData(pathPointIds.p3, {
-						x: endPoint.x,
-						y: (point.y + endPoint.y) / 2,
+						x: isSteep ? endPoint.x : (point.x + endPoint.x) / 2,
+						y: isSteep ? (point.y + endPoint.y) / 2 : endPoint.y,
 					}),
 				);
 				newPoints.push(createPathPointData(pathPointIds.p4, endPoint));
@@ -126,25 +151,53 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				// });
 
 				// p1-p2間の線が図形を横断してないかチェック
-				const p2AcrossShape = isPointInShape(
-					{
-						x: newPoints[1].point.x,
-						y: point.y + signNonZero(newPoints[1].point.y - point.y) * 2,
-					},
-					ownerShape,
-				);
+				let p2AcrossShape = false;
+				if (isSteep) {
+					p2AcrossShape =
+						isUp !== isUpAngle(calculateAngle(newPoints[1].point, point));
+				} else {
+					p2AcrossShape =
+						isRight !== isRightAngle(calculateAngle(newPoints[1].point, point));
+				}
+
+				// isCloserPoint(point, newPoints[1].point, ownerShape.point);
 				if (p2AcrossShape) {
 					// 横断している場合は、p2を反対方向に移動
-					const p2y =
-						point.y - signNonZero(newPoints[1].point.y - point.y) * 20;
-					newPoints[1].point.y = p2y;
-					// p3のy位置をp2と同じにする
-					newPoints[2].point.y = p2y;
+					if (isSteep) {
+						const p2y =
+							point.y - signNonZero(newPoints[1].point.y - point.y) * 20; // TODO: 20は適当な値
+						newPoints[1].point.y = p2y;
+						// p3のy位置をp2と同じにする
+						newPoints[2].point.y = p2y;
+					} else {
+						const p2x =
+							point.x - signNonZero(newPoints[1].point.x - point.x) * 20; // TODO: 20は適当な値
+						newPoints[1].point.x = p2x;
+						// p3のx位置をp2と同じにする
+						newPoints[2].point.x = p2x;
+					}
 				}
 
 				// 接続中の図形がある場合
 				if (connectingPoint.current?.ownerShape) {
+					// TODO: こっからまだできてない
 					// p3-p4間の線が接続先の図形を横断していないかチェック
+					const connectingPointAngle = degreesToRadians(
+						Math.round(
+							radiansToDegrees(
+								calculateAngle(
+									connectingPoint.current.ownerShape.point,
+									connectingPoint.current.point,
+								),
+							),
+						),
+					);
+					const isConnectingPointSteep = isSteepAngle(connectingPointAngle);
+					const isConnectingPointUpper = signNonZero(connectingPointAngle);
+					const isConnectingPointRight = signNonZero(
+						connectingPointAngle - Math.PI / 2,
+					);
+
 					const p3AcrossShape = isPointInShape(
 						{
 							x: newPoints[2].point.x,
@@ -204,7 +257,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 			return newPoints;
 		},
-		[point, pathPointIds],
+		[point, ownerShape, isSteep, isUp, isRight, pathPointIds],
 	);
 
 	const handleDragStart = useCallback((_e: DiagramDragEvent) => {
@@ -254,6 +307,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			setIsHovered(false);
 			// 接続が切れた時の処理
 			if (e.dropItem.type === "ConnectPoint") {
+				// 接続元に情報を送信
 				document.dispatchEvent(
 					new CustomEvent("Connection", {
 						detail: { id, type: "disconnect", point },
@@ -268,6 +322,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 		(e: DiagramDragDropEvent) => {
 			// ドロップされたときの処理
 			if (e.dropItem.type === "ConnectPoint") {
+				// 接続元に情報を送信
 				document.dispatchEvent(
 					new CustomEvent("Connection", {
 						detail: { id, type: "connect", point, ownerShape },
@@ -297,18 +352,25 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				const customEvent = e as CustomEvent<ConnectionEvent>;
 				if (customEvent.detail.id !== id) {
 					if (customEvent.detail.type === "connecting") {
-						console.log("connecting", customEvent.detail.id);
-
+						// 接続が始まった時の処理
+						// 接続中のポイントを保持
 						connectingPoint.current = {
 							...customEvent.detail,
 						};
 
+						// 接続中のポイントと線がつながるよう、パスポイントを再計算
 						setPathPoints(calcPathPoints(customEvent.detail.point));
-					} else if (customEvent.detail.type === "disconnect") {
-						// 切断
+					}
+
+					if (customEvent.detail.type === "disconnect") {
+						// 切断時の処理
+						// 接続中のポイントを解除
 						connectingPoint.current = undefined;
-					} else if (customEvent.detail.type === "connect") {
-						console.log("connect", customEvent.detail.id);
+					}
+
+					if (customEvent.detail.type === "connect") {
+						// 接続完了時の処理
+						// 接続ラインのデータを生成してイベント発火
 						const points: PathPointData[] = [];
 						points.push({
 							id,
