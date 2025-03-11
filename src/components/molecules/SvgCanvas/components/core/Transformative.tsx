@@ -32,6 +32,7 @@ import {
 	inverseAffineTransformation,
 	nanToZero,
 	radiansToDegrees,
+	signNonZero,
 } from "../../functions/Math";
 
 /**
@@ -141,8 +142,8 @@ const Transformative: React.FC<TransformativeProps> = ({
 					point: centerPoint,
 					width: Math.abs(newWidth),
 					height: Math.abs(newHeight),
-					scaleX: newWidth > 0 ? 1 : -1,
-					scaleY: newHeight > 0 ? 1 : -1,
+					scaleX: signNonZero(newWidth),
+					scaleY: signNonZero(newHeight),
 					rotation,
 				},
 			};

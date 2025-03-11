@@ -119,12 +119,15 @@ const Path: React.FC<PathProps> = ({
 	 */
 	const handleDragStart = useCallback(
 		(e: DiagramDragEvent) => {
-			startItems.current = items;
+			if (isSelected) {
+				setIsDragging(true);
+			}
 
-			setIsDragging(true);
 			onDragStart?.(e);
+
+			startItems.current = items;
 		},
-		[onDragStart, items],
+		[onDragStart, isSelected, items],
 	);
 
 	/**
@@ -132,6 +135,11 @@ const Path: React.FC<PathProps> = ({
 	 */
 	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
+			if (!isDragging) {
+				onDrag?.(e);
+				return;
+			}
+
 			const dx = e.endPoint.x - e.startPoint.x;
 			const dy = e.endPoint.y - e.startPoint.y;
 
@@ -147,7 +155,7 @@ const Path: React.FC<PathProps> = ({
 				items: newItems,
 			});
 		},
-		[onGroupDataChange, id],
+		[onDrag, onGroupDataChange, id, isDragging],
 	);
 
 	/**

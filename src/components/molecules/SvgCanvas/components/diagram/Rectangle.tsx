@@ -266,6 +266,14 @@ const Rectangle: React.FC<RectangleProps> = ({
 						name={cp.name}
 						point={cp.point}
 						isSelected={false}
+						ownerShape={{
+							point,
+							width,
+							height,
+							rotation,
+							scaleX,
+							scaleY,
+						}}
 						visible={isHovered && !isTransformimg}
 						onConnect={onConnect}
 					/>

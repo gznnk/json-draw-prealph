@@ -75,7 +75,7 @@ export type TransformativeData = DiagramBaseData & {
  * 接続ポイントのデータ
  */
 export type ConnectPointData = DiagramBaseData & {
-	name: string;
+	name: string; // TODO: 今んとこ使ってない
 };
 
 /**

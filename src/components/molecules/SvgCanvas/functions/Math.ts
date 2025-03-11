@@ -1,4 +1,5 @@
 import type { Point, RectangleVertices } from "../types/CoordinateTypes";
+import type { Shape } from "../types/DiagramTypes";
 
 /**
  * Nandであれば0に変換する
@@ -8,6 +9,16 @@ import type { Point, RectangleVertices } from "../types/CoordinateTypes";
  */
 export const nanToZero = (value: number): number => {
 	return Number.isNaN(value) ? 0 : value;
+};
+
+/**
+ * 数値が0以上なら1、0未満なら-1を返す
+ *
+ * @param value - 数値
+ * @returns - 結果
+ */
+export const signNonZero = (value: number): number => {
+	return value >= 0 ? 1 : -1;
 };
 
 /**
@@ -381,4 +392,52 @@ export const calcRectangleVertices = (
 		rightCenterPoint,
 		bottomCenterPoint,
 	};
+};
+
+/**
+ * 短径内に座標が含まれるかどうかを判定する
+ *
+ * @param point - 判定する座標
+ * @param shape - 短径のShape
+ * @returns 短径内に座標が含まれるかどうか
+ */
+export const isPointInShape = (point: Point, shape: Shape): boolean => {
+	const { point: center, width, height, rotation, scaleX, scaleY } = shape;
+
+	const radians = degreesToRadians(rotation);
+
+	const inversedCenter = inverseAffineTransformation(
+		center,
+		scaleX,
+		scaleY,
+		radians,
+		center.x,
+		center.y,
+	);
+
+	const inversedPoint = inverseAffineTransformation(
+		point,
+		scaleX,
+		scaleY,
+		radians,
+		center.x,
+		center.y,
+	);
+
+	const halfWidth = width / 2;
+	const halfHeight = height / 2;
+
+	const left = inversedCenter.x - halfWidth;
+	const right = inversedCenter.x + halfWidth;
+	const top = inversedCenter.y - halfHeight;
+	const bottom = inversedCenter.y + halfHeight;
+
+	// 短径の内部にあるかどうかを判定
+	const isInside =
+		left <= inversedPoint.x &&
+		inversedPoint.x <= right &&
+		top <= inversedPoint.y &&
+		inversedPoint.y <= bottom;
+
+	return isInside;
 };

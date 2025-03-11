@@ -4,11 +4,11 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
 import type { Point } from "../../types/CoordinateTypes";
-// SvgCanvas関連型定義をインポート
 import type {
 	ConnectPointData,
 	Diagram,
 	PathPointData,
+	Shape,
 } from "../../types/DiagramTypes";
 import type {
 	DiagramConnectEvent,
@@ -20,6 +20,9 @@ import type {
 // SvgCanvas関連コンポーネントをインポート
 import DragPoint from "../core/DragPoint";
 import Path from "../diagram/Path";
+
+// SvgCanvas関連関数をインポート
+import { isPointInShape, signNonZero } from "../../functions/Math";
 
 const createPathPointId = (id: string, index: number) => `${id}-pp-${index}`;
 
@@ -33,9 +36,17 @@ type ConnectionEvent = {
 	id: string;
 	type: "connecting" | "connect" | "disconnect";
 	point: Point;
+	ownerShape: Shape;
+};
+
+type ConnectingPoint = {
+	id: string;
+	point: Point;
+	ownerShape: Shape;
 };
 
 type ConnectPointProps = ConnectPointData & {
+	ownerShape: Shape;
 	visible: boolean;
 	onConnect?: (e: DiagramConnectEvent) => void;
 };
@@ -43,6 +54,7 @@ type ConnectPointProps = ConnectPointData & {
 const ConnectPoint: React.FC<ConnectPointProps> = ({
 	id,
 	point,
+	ownerShape,
 	visible,
 	onConnect,
 }) => {
@@ -52,7 +64,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 	// ドラッグ状態の管理
 	const [isDragging, setIsDragging] = useState(false);
 
-	const isConnecting = useRef(false);
+	const connectingPoint = useRef<ConnectingPoint | undefined>(undefined);
 
 	const pathPointNames = useMemo(
 		() => ({
@@ -64,12 +76,79 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 		[id],
 	);
 
-	const [pathPoints, setPathPoints] = useState<PathPointData[]>([
-		createPathPointData(pathPointNames.p1, point),
-		createPathPointData(pathPointNames.p2, point),
-		createPathPointData(pathPointNames.p3, point),
-		createPathPointData(pathPointNames.p4, point),
-	]);
+	const [pathPoints, setPathPoints] = useState<PathPointData[]>([]);
+
+	const calcPathPoints = useCallback(
+		(dragPoint: Point) => {
+			const newPoints: PathPointData[] = [];
+
+			const endPoint = connectingPoint.current
+				? connectingPoint.current.point
+				: dragPoint;
+
+			if (point.x === endPoint.x || point.y === endPoint.y) {
+				// console.log("straight line");
+				newPoints.push(createPathPointData(pathPointNames.p1, point));
+				newPoints.push(createPathPointData(pathPointNames.p2, endPoint));
+			} else {
+				newPoints.push(createPathPointData(pathPointNames.p1, point));
+				newPoints.push(
+					createPathPointData(pathPointNames.p2, {
+						x: point.x,
+						y: (point.y + endPoint.y) / 2,
+					}),
+				);
+				newPoints.push(
+					createPathPointData(pathPointNames.p3, {
+						x: endPoint.x,
+						y: (point.y + endPoint.y) / 2,
+					}),
+				);
+				newPoints.push(createPathPointData(pathPointNames.p4, endPoint));
+
+				console.log(
+					"p1 in shape",
+					isPointInShape(newPoints[0].point, ownerShape),
+				);
+				console.log(
+					"p2 in shape",
+					isPointInShape(newPoints[1].point, ownerShape),
+				);
+				console.log(
+					"p3 in shape",
+					isPointInShape(newPoints[2].point, ownerShape),
+				);
+				console.log(
+					"p4 in shape",
+					isPointInShape(newPoints[3].point, ownerShape),
+				);
+
+				const p2InShape = isPointInShape(newPoints[1].point, ownerShape);
+				if (p2InShape) {
+					const p2y =
+						point.y - signNonZero(newPoints[1].point.y - point.y) * 20;
+					newPoints[1].point.y = p2y;
+					newPoints[2].point.y = p2y;
+				}
+
+				if (connectingPoint.current?.ownerShape) {
+					const p3InShape = isPointInShape(
+						newPoints[2].point,
+						connectingPoint.current?.ownerShape,
+					);
+					if (p3InShape) {
+						const p3y =
+							endPoint.y - signNonZero(newPoints[2].point.y - endPoint.y) * 20;
+						newPoints[2].point.y = p3y;
+						newPoints[1].point.y = p3y;
+					}
+				}
+			}
+
+			return newPoints;
+		},
+		[point, pathPointNames],
+	);
 
 	const handleDragStart = useCallback((_e: DiagramDragEvent) => {
 		setIsDragging(true);
@@ -77,34 +156,12 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
-			if (isConnecting.current) {
+			if (connectingPoint.current) {
 				return;
 			}
-			setPathPoints((prev) =>
-				prev.map((item) => {
-					if (item.id === pathPointNames.p1) {
-						return item;
-					}
-					if (item.id === pathPointNames.p2) {
-						return {
-							...item,
-							point: { x: point.x, y: (point.y + e.endPoint.y) / 2 },
-						};
-					}
-					if (item.id === pathPointNames.p3) {
-						return {
-							...item,
-							point: { x: e.endPoint.x, y: (point.y + e.endPoint.y) / 2 },
-						};
-					}
-					if (item.id === pathPointNames.p4) {
-						return { ...item, point: e.endPoint };
-					}
-					return item;
-				}),
-			);
+			setPathPoints(calcPathPoints(e.endPoint));
 		},
-		[point, pathPointNames],
+		[calcPathPoints],
 	);
 
 	const handleDragEnd = useCallback(
@@ -127,12 +184,12 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				// 接続中の処理
 				document.dispatchEvent(
 					new CustomEvent("Connection", {
-						detail: { id, type: "connecting", point },
+						detail: { id, type: "connecting", point, ownerShape },
 					}),
 				);
 			}
 		},
-		[id, point],
+		[id, point, ownerShape],
 	);
 
 	const handleDragLeave = useCallback(
@@ -156,13 +213,13 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			if (e.dropItem.type === "ConnectPoint") {
 				document.dispatchEvent(
 					new CustomEvent("Connection", {
-						detail: { id, type: "connect", point },
+						detail: { id, type: "connect", point, ownerShape },
 					}),
 				);
 			}
 			setIsHovered(false);
 		},
-		[id, point],
+		[id, point, ownerShape],
 	);
 
 	/**
@@ -185,41 +242,14 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 					if (customEvent.detail.type === "connecting") {
 						console.log("connecting", customEvent.detail.id);
 
-						isConnecting.current = true;
+						connectingPoint.current = {
+							...customEvent.detail,
+						};
 
-						// TODO: パスポイントの制御処理の共通化
-						setPathPoints((prev) =>
-							prev.map((item) => {
-								if (item.id === pathPointNames.p1) {
-									return item;
-								}
-								if (item.id === pathPointNames.p2) {
-									return {
-										...item,
-										point: {
-											x: point.x,
-											y: (point.y + customEvent.detail.point.y) / 2,
-										},
-									};
-								}
-								if (item.id === pathPointNames.p3) {
-									return {
-										...item,
-										point: {
-											x: customEvent.detail.point.x,
-											y: (point.y + customEvent.detail.point.y) / 2,
-										},
-									};
-								}
-								if (item.id === pathPointNames.p4) {
-									return { ...item, point: customEvent.detail.point };
-								}
-								return item;
-							}),
-						);
+						setPathPoints(calcPathPoints(customEvent.detail.point));
 					} else if (customEvent.detail.type === "disconnect") {
 						// 切断
-						isConnecting.current = false;
+						connectingPoint.current = undefined;
 					} else if (customEvent.detail.type === "connect") {
 						console.log("connect", customEvent.detail.id);
 						const points: PathPointData[] = [];
@@ -256,7 +286,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				document.removeEventListener("Connection", handleConnection);
 			}
 		};
-	}, [onConnect, id, point, isDragging, pathPoints, pathPointNames]);
+	}, [onConnect, id, point, isDragging, pathPoints, calcPathPoints]);
 
 	return (
 		<>
