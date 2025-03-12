@@ -80,7 +80,7 @@ export const closerPoint = (p: Point, a: Point, b: Point): Point => {
  * @param b - 2つ目の点の座標
  * @returns - 指定した点に近い方の点かどうか
  */
-export const isCloserPoint = (a: Point, b: Point, p: Point): boolean => {
+export const isCloserPoint = (p: Point, a: Point, b: Point): boolean => {
 	const distanceA = calcDistance(p, a);
 	const distanceB = calcDistance(p, b);
 
@@ -490,6 +490,71 @@ export const calcRectangleOuterBox = (shape: Shape): Box => {
 	};
 };
 
+/**
+ * 線分がボックスと交差しているか判定する
+ *
+ * @param p1 - 線分の始点
+ * @param p2 - 線分の終点
+ * @param box - 判定対象のボックス
+ * @returns 交差していれば true, そうでなければ false
+ */
+export const isIntersecting = (p1: Point, p2: Point, box: Box): boolean => {
+	const boxEdges: [Point, Point][] = [
+		[
+			{ x: box.left, y: box.top },
+			{ x: box.right, y: box.top },
+		], // 上辺
+		[
+			{ x: box.right, y: box.top },
+			{ x: box.right, y: box.bottom },
+		], // 右辺
+		[
+			{ x: box.right, y: box.bottom },
+			{ x: box.left, y: box.bottom },
+		], // 下辺
+		[
+			{ x: box.left, y: box.bottom },
+			{ x: box.left, y: box.top },
+		], // 左辺
+	];
+
+	return boxEdges.some(([q1, q2]) => lineIntersects(p1, p2, q1, q2));
+};
+
+/**
+ * 2つの線分が交差しているか判定する
+ *
+ * @param p1 - 1つ目の線分の始点
+ * @param p2 - 1つ目の線分の終点
+ * @param q1 - 2つ目の線分の始点
+ * @param q2 - 2つ目の線分の終点
+ * @returns 交差していれば true, そうでなければ false
+ */
+export const lineIntersects = (
+	p1: Point,
+	p2: Point,
+	q1: Point,
+	q2: Point,
+): boolean => {
+	const crossProduct = (p: Point, q: Point): number => p.x * q.y - p.y * q.x;
+	const subtract = (p: Point, q: Point): Point => ({
+		x: p.x - q.x,
+		y: p.y - q.y,
+	});
+
+	const r = subtract(p2, p1);
+	const s = subtract(q2, q1);
+	const denominator = crossProduct(r, s);
+
+	if (denominator === 0) return false; // 平行な場合
+
+	const u = crossProduct(subtract(q1, p1), r) / denominator;
+	const t = crossProduct(subtract(q1, p1), s) / denominator;
+
+	return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+};
+
+// TODO: いらんかも
 /**
  * 短径内に座標が含まれるかどうかを判定する
  *
