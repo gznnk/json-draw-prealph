@@ -21,6 +21,17 @@ export const signNonZero = (value: number): number => {
 	return value >= 0 ? 1 : -1;
 };
 
+// TODO いらんかも
+/**
+ * 数値がtrueなら1、falseなら-1を返す
+ *
+ * @param value - 数値
+ * @returns - 結果
+ */
+export const boolSign = (value: boolean): number => {
+	return value ? 1 : -1;
+};
+
 /**
  * ２つの数値のうち、指定した数値に近い方を返す
  *
@@ -40,7 +51,7 @@ export const closer = (value: number, a: number, b: number): number => {
  * @param {Point} p2 - 2つ目の点の座標
  * @returns {number} ２点間の距離
  */
-export const calculateDistance = (p1: Point, p2: Point): number => {
+export const calcDistance = (p1: Point, p2: Point): number => {
 	const distance = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
 	return distance;
 };
@@ -54,8 +65,8 @@ export const calculateDistance = (p1: Point, p2: Point): number => {
  * @returns - 近い方の点
  */
 export const closerPoint = (p: Point, a: Point, b: Point): Point => {
-	const distanceA = calculateDistance(p, a);
-	const distanceB = calculateDistance(p, b);
+	const distanceA = calcDistance(p, a);
+	const distanceB = calcDistance(p, b);
 
 	return distanceA < distanceB ? a : b;
 };
@@ -70,67 +81,31 @@ export const closerPoint = (p: Point, a: Point, b: Point): Point => {
  * @returns - 指定した点に近い方の点かどうか
  */
 export const isCloserPoint = (a: Point, b: Point, p: Point): boolean => {
-	const distanceA = calculateDistance(p, a);
-	const distanceB = calculateDistance(p, b);
+	const distanceA = calcDistance(p, a);
+	const distanceB = calcDistance(p, b);
 
 	return distanceA < distanceB;
 };
 
 /**
- * ２点間の角度を算出する
+ * ２点間の角度を算出する.
+ * 時計の12時を0度とし、時計回りに角度を算出する.
  *
- * @param {Point} p1 - 1つ目の点の座標
- * @param {Point} p2 - 2つ目の点の座標
+ * @param {Point} o - 原点の座標
+ * @param {Point} p - 動点の座標
  * @returns {number} ２点間の角度（ラジアン）
  */
-export const calculateAngle = (p1: Point, p2: Point): number => {
-	const deltaY = p2.y - p1.y;
-	const deltaX = p2.x - p1.x;
-	const angle = Math.atan2(deltaY, deltaX); // ラジアンで角度を計算
+export const calcRadian = (o: Point, p: Point): number => {
+	const dx = p.x - o.x;
+	const dy = o.y - p.y; // y軸の正方向を上向きにするため反転
+
+	let angle = Math.atan2(dx, dy); // atan2(y, x)ではなく(x, y)とすることで12時基準に
+
+	if (angle < 0) {
+		angle += 2 * Math.PI; // 0 〜 2π の範囲に変換
+	}
+
 	return angle;
-};
-
-/**
- * 急勾配（45～135度、225～315度）かどうかを判定する
- *
- * @param angle 角度（ラジアン）
- * @returns 急勾配かどうか
- */
-export const isSteepAngle = (angle: number): boolean => {
-	return Math.abs(angle) >= Math.PI / 4 && Math.abs(angle) <= (Math.PI * 3) / 4;
-};
-
-/**
- * 与えられた角度が上向きかどうかを判定する
- *
- * @param angle 角度（ラジアン）
- * @returns 上向きかどうか
- */
-export const isUpAngle = (angle: number) => {
-	return 0 <= angle;
-};
-
-/**
- * 与えられた角度が右向きかどうかを判定する
- *
- * @param angle 角度（ラジアン）
- * @returns 右向きかどうか
- */
-export const isRightAngle = (angle: number) => {
-	return !(-Math.PI / 2 < angle && angle < Math.PI / 2);
-};
-
-// TODO いらんかも
-/**
- * 2点を結ぶ直線が急勾配（45～135度、225～315度）かどうかを判定する
- *
- * @param {Point} p1 - 1つ目の点の座標
- * @param {Point} p2 - 2つ目の点の座標
- * @returns 急勾配かどうか
- */
-export const isSteepLine = (p1: Point, p2: Point): boolean => {
-	const angle = calculateAngle(p1, p2);
-	return isSteepAngle(angle);
 };
 
 /**
@@ -479,12 +454,33 @@ export const calcRectangleVertices = (shape: Shape): RectangleVertices => {
  * @returns 短径の外接枠
  */
 export const calcRectangleOuterBox = (shape: Shape): Box => {
-	const { leftTopPoint, rightBottomPoint } = calcRectangleVertices(shape);
+	const { leftTopPoint, leftBottomPoint, rightTopPoint, rightBottomPoint } =
+		calcRectangleVertices(shape);
 
-	const left = Math.min(leftTopPoint.x, rightBottomPoint.x);
-	const top = Math.min(leftTopPoint.y, rightBottomPoint.y);
-	const right = Math.max(leftTopPoint.x, rightBottomPoint.x);
-	const bottom = Math.max(leftTopPoint.y, rightBottomPoint.y);
+	const left = Math.min(
+		leftTopPoint.x,
+		leftBottomPoint.x,
+		rightTopPoint.x,
+		rightBottomPoint.x,
+	);
+	const top = Math.min(
+		leftTopPoint.y,
+		leftBottomPoint.y,
+		rightTopPoint.y,
+		rightBottomPoint.y,
+	);
+	const right = Math.max(
+		leftTopPoint.x,
+		leftBottomPoint.x,
+		rightTopPoint.x,
+		rightBottomPoint.x,
+	);
+	const bottom = Math.max(
+		leftTopPoint.y,
+		leftBottomPoint.y,
+		rightTopPoint.y,
+		rightBottomPoint.y,
+	);
 
 	return {
 		top,

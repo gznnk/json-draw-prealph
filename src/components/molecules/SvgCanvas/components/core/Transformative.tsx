@@ -25,7 +25,7 @@ import {
 	affineTransformation,
 	calcNearestCircleIntersectionPoint,
 	calcRectangleVertices,
-	calculateAngle,
+	calcRadian,
 	createLinerX2yFunction,
 	createLinerY2xFunction,
 	degreesToRadians,
@@ -34,6 +34,9 @@ import {
 	radiansToDegrees,
 	signNonZero,
 } from "../../functions/Math";
+
+/** 回転ポイントのマージン */
+const ROTATE_POINT_MARGIN = 15;
 
 /**
  * 変形コンポーネントのプロパティ
@@ -601,7 +604,10 @@ const Transformative: React.FC<TransformativeProps> = ({
 	const rotationPoint = useMemo(
 		() =>
 			affineTransformation(
-				{ x: width / 2 + 15, y: -(height / 2 + 15) },
+				{
+					x: width / 2 + ROTATE_POINT_MARGIN,
+					y: -(height / 2 + ROTATE_POINT_MARGIN),
+				},
 				1,
 				1,
 				degreesToRadians(rotation),
@@ -613,11 +619,13 @@ const Transformative: React.FC<TransformativeProps> = ({
 
 	const handleDragRotationPoint = useCallback(
 		(e: DiagramDragEvent) => {
-			const angle = calculateAngle(point, e.endPoint);
-			const rotatePointAngle = calculateAngle(point, {
+			const radian = calcRadian(point, e.endPoint);
+			const rotatePointRadian = calcRadian(point, {
 				x: point.x + width,
-				y: point.y + height,
+				y: point.y - height,
 			});
+			const newRotation =
+				(radiansToDegrees(radian - rotatePointRadian) + 360) % 360;
 			const event = {
 				id: diagramId,
 				startShape: {
@@ -629,7 +637,7 @@ const Transformative: React.FC<TransformativeProps> = ({
 					height,
 					scaleX,
 					scaleY,
-					rotation: radiansToDegrees(angle + rotatePointAngle),
+					rotation: newRotation,
 				},
 			};
 
@@ -655,13 +663,13 @@ const Transformative: React.FC<TransformativeProps> = ({
 		(p: Point) =>
 			calcNearestCircleIntersectionPoint(
 				{ x: point.x, y: point.y },
-				width / 2 + 15,
+				width / 2 + ROTATE_POINT_MARGIN,
 				p,
 			),
 		[point, width],
 	);
 
-	// TODO: 変形中は計算しないほうがよい
+	// TODO: memo化が必要か検討
 	const cursors = useMemo(() => {
 		return {
 			topCenter: getCursorFromAngle(rotation),
