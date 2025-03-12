@@ -498,7 +498,11 @@ export const calcRectangleOuterBox = (shape: Shape): Box => {
  * @param box - 判定対象のボックス
  * @returns 交差していれば true, そうでなければ false
  */
-export const isIntersecting = (p1: Point, p2: Point, box: Box): boolean => {
+export const isLineIntersectingBox = (
+	p1: Point,
+	p2: Point,
+	box: Box,
+): boolean => {
 	const boxEdges: [Point, Point][] = [
 		[
 			{ x: box.left, y: box.top },

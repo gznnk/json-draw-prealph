@@ -32,6 +32,7 @@ import {
 	lineIntersects,
 	degreesToRadians,
 	boolSign,
+	isLineIntersectingBox,
 } from "../../functions/Math";
 
 import { drawPoint, drawRect } from "../../functions/Diagram";
@@ -64,6 +65,14 @@ const getDirection = (radians: number): Direction => {
 
 const getDirectionFromPoint = (o: Point, p: Point): Direction => {
 	return getDirection(calcRadian(o, p));
+};
+
+const isUpDown = (direction: Direction): boolean => {
+	return direction === "up" || direction === "down";
+};
+
+const isLeftRight = (direction: Direction): boolean => {
+	return direction === "left" || direction === "right";
 };
 
 type ConnectionEvent = {
@@ -109,6 +118,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			p4: createPathPointId(id, 4),
 			p5: createPathPointId(id, 5),
 			p6: createPathPointId(id, 6),
+			p7: createPathPointId(id, 7),
 		}),
 		[id],
 	);
@@ -118,7 +128,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 	const ownerOuterBox = calcRectangleOuterBox(ownerShape);
 
 	const direction = getDirectionFromPoint(ownerShape.point, point);
-	const isUpDown = direction === "up" || direction === "down";
+	const isDirectionUpDown = isUpDown(direction);
 
 	const calcPathPoints = useCallback(
 		(dragPoint: Point) => {
@@ -137,14 +147,15 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 			// p2
 			const p2 = {
-				x: isUpDown ? point.x : (point.x + endPoint.x) / 2,
-				y: isUpDown ? (point.y + endPoint.y) / 2 : point.y,
+				x: isDirectionUpDown ? point.x : Math.abs((point.x + endPoint.x) / 2),
+				y: isDirectionUpDown ? Math.abs((point.y + endPoint.y) / 2) : point.y,
 			};
 			// p1-p2間の線の方向が逆向きになっているかチェック
-			const p2AcrossShape = getDirectionFromPoint(point, p2) !== direction;
-			if (p2AcrossShape) {
+			const isP2ReverseDirection =
+				getDirectionFromPoint(point, p2) !== direction;
+			if (isP2ReverseDirection) {
 				// 逆向きになっている場合は、p2を反対方向に移動
-				if (isUpDown) {
+				if (isDirectionUpDown) {
 					if (direction === "up") {
 						p2.y = ownerOuterBox.top - CONNECT_LINE_MARGIN;
 					} else {
@@ -162,8 +173,8 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 			// p3
 			const p3 = {
-				x: isUpDown ? endPoint.x : p2.x,
-				y: isUpDown ? p2.y : endPoint.y,
+				x: isDirectionUpDown ? endPoint.x : p2.x,
+				y: isDirectionUpDown ? p2.y : endPoint.y,
 			};
 
 			// p4
@@ -237,7 +248,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 			if (isAccrossCloserLine) {
 				// 近い辺と交差している場合は、p3を近い辺に移動
-				if (isUpDown) {
+				if (isDirectionUpDown) {
 					p3.x = closer(
 						endPoint.x,
 						ownerOuterBox.left - CONNECT_LINE_MARGIN,
@@ -251,7 +262,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 					);
 				}
 				// p4が図形の中に入らないよう位置を修正
-				if (isUpDown) {
+				if (isDirectionUpDown) {
 					p4.x = p3.x;
 					p4.y = endPoint.y;
 				} else {
@@ -279,63 +290,106 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 					connectingPoint.current?.point,
 					connectingPoint.current?.ownerShape.point,
 				);
-				const connectDirection = calcRadian(
-					newPoints[newPoints.length - 2].point,
-					newPoints[newPoints.length - 1].point,
-				);
+				const connectDirection = getDirectionFromPoint(p3, p4);
 
 				if (targetDirection !== connectDirection) {
-				}
+					// 接続の方向が違う場合
 
-				// TODO こっから
-				const p3AcrossShape = false;
-				if (p3AcrossShape) {
-					// 横断している場合は、p3を反対方向に移動
-					const p3y =
-						endPoint.y - signNonZero(newPoints[2].point.y - endPoint.y) * 20;
-					newPoints[2].point.y = p3y;
+					const targetOwnerOuterBox = calcRectangleOuterBox(
+						connectingPoint.current.ownerShape,
+					);
+					const targetOwnerEdges = {
+						leftTop: {
+							x: targetOwnerOuterBox.left,
+							y: targetOwnerOuterBox.top,
+						},
+						rightTop: {
+							x: targetOwnerOuterBox.right,
+							y: targetOwnerOuterBox.top,
+						},
+						rightBottom: {
+							x: targetOwnerOuterBox.right,
+							y: targetOwnerOuterBox.bottom,
+						},
+						leftBottom: {
+							x: targetOwnerOuterBox.left,
+							y: targetOwnerOuterBox.bottom,
+						},
+					};
 
-					if (!p2AcrossShape) {
-						// p2が横断していなかった場合は、p2のy位置をp3と同じにする
-						newPoints[1].point.y = p3y;
+					if (isUpDown(targetDirection) === isUpDown(connectDirection)) {
+						// 反対向きの場合
 					} else {
-						// p2, p3がどちらも横断していた場合は、ジグザグ状に変形する
-						const ownerBox = calcRectangleOuterBox(ownerShape);
-						const connectingPointOwnerBox = calcRectangleOuterBox(
-							connectingPoint.current.ownerShape,
-						);
+						// 反対向きでもない場合
 
-						const startSide = closer(endPoint.x, ownerBox.left, ownerBox.right);
-						const endSide = closer(
-							newPoints[0].point.x,
-							connectingPointOwnerBox.left,
-							connectingPointOwnerBox.right,
-						);
+						// １つ前の線の方向
+						const prevDirection = getDirectionFromPoint(p2, p3);
 
-						const x = Math.round((startSide + endSide) / 2);
-						newPoints.splice(2, 0, {
-							id: pathPointIds.p5,
-							point: {
-								x: x,
-								y: newPoints[1].point.y,
-							},
-							isSelected: false,
-						});
-						newPoints.splice(3, 0, {
-							id: pathPointIds.p6,
-							point: {
-								x: x,
-								y: newPoints[3].point.y,
-							},
-							isSelected: false,
-						});
+						if (prevDirection === targetDirection) {
+							// １つ前の線の方向が接続の方向と一致している場合
+							if (isP2ReverseDirection) {
+								// p2の向きが逆向きの場合、点を１つ追加して接続する
+								const p5 = { ...endPoint };
+								if (targetDirection === "up") {
+									p5.y = targetOwnerOuterBox.bottom + CONNECT_LINE_MARGIN;
+									p3.y = p5.y;
+									p4.y = p5.y;
+								} else if (targetDirection === "down") {
+									p5.y = targetOwnerOuterBox.top - CONNECT_LINE_MARGIN;
+									p3.y = p5.y;
+									p4.y = p5.y;
+								} else if (targetDirection === "right") {
+									p5.x = targetOwnerOuterBox.left - CONNECT_LINE_MARGIN;
+									p3.y = p5.x;
+									p4.y = p5.x;
+								} else if (targetDirection === "left") {
+									p5.x = targetOwnerOuterBox.right + CONNECT_LINE_MARGIN;
+									p3.y = p5.x;
+									p4.y = p5.x;
+								}
+
+								newPoints.push(createPathPointData(pathPointIds.p5, p5));
+								newPoints.push(
+									createPathPointData(pathPointIds.p6, { ...endPoint }),
+								);
+							} else {
+								// p2の向きが逆向きでない場合、１つ前の線を接続する
+								newPoints.pop();
+								newPoints[newPoints.length - 1].point = endPoint;
+								if (isUpDown(prevDirection)) {
+									newPoints[newPoints.length - 2].point.x = endPoint.x;
+								} else {
+									newPoints[newPoints.length - 2].point.y = endPoint.y;
+								}
+							}
+						} else {
+						}
+
+						// TODO: ダメ
+						// if (
+						// 	!isLineIntersectingBox(
+						// 		newPoints[newPoints.length - 2].point,
+						// 		newPoints[newPoints.length - 3].point,
+						// 		targetOwnerOuterBox,
+						// 	)
+						// ) {
+						// 	newPoints.pop();
+						// 	newPoints[newPoints.length - 1].point = endPoint;
+						// }
 					}
 				}
 			}
 
 			return newPoints;
 		},
-		[point, ownerShape, ownerOuterBox, direction, isUpDown, pathPointIds],
+		[
+			point,
+			ownerShape,
+			ownerOuterBox,
+			direction,
+			isDirectionUpDown,
+			pathPointIds,
+		],
 	);
 
 	const handleDragStart = useCallback((_e: DiagramDragEvent) => {
@@ -354,12 +408,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 	const handleDragEnd = useCallback(
 		(_e: DiagramDragEvent) => {
-			setPathPoints((prevState) =>
-				prevState.map((item) => ({
-					...item,
-					point: point,
-				})),
-			);
+			setPathPoints([]);
 			setIsDragging(false);
 		},
 		[point],
