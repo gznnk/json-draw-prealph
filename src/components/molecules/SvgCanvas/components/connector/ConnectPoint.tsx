@@ -200,26 +200,22 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 					if (customEvent.detail.type === "connect") {
 						// 接続完了時の処理
-						// 接続ラインのデータを生成してイベント発火
-						// TODO: 無駄なポイントを除去する
-						const points: PathPointData[] = [];
-						points.push({
-							id,
-							point,
-							isSelected: false,
-						});
-						for (let i = 1; i < pathPoints.length - 1; i++) {
-							points.push({
-								id: pathPoints[i].id,
-								point: pathPoints[i].point,
-								isSelected: false,
-							});
+						// 接続線のデータを生成してイベント発火
+
+						// 接続線をクリーンアップ
+						const points: PathPointData[] = [...pathPoints];
+						for (let i = points.length - 3; i >= 0; i--) {
+							if (
+								// 3点が一直線上にある場合は中間の点を削除
+								isStraight(
+									points[i].point,
+									points[i + 1].point,
+									points[i + 2].point,
+								)
+							) {
+								points.splice(i + 1, 1);
+							}
 						}
-						points.push({
-							id: customEvent.detail.id,
-							point: customEvent.detail.point,
-							isSelected: false,
-						});
 
 						onConnect?.({
 							points,
@@ -236,7 +232,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				document.removeEventListener("Connection", handleConnection);
 			}
 		};
-	}, [onConnect, updatePathPoints, id, point, isDragging, pathPoints]);
+	}, [onConnect, updatePathPoints, id, isDragging, pathPoints]);
 
 	return (
 		<>

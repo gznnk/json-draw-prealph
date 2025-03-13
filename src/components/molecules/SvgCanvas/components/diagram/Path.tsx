@@ -238,6 +238,21 @@ const Path: React.FC<PathProps> = ({
 		isActive: !isTransformMode,
 	}));
 
+	const newVertexList: NewVertexData[] = [];
+	for (let i = 0; i < items.length - 1; i++) {
+		const item = items[i];
+		const nextItem = items[i + 1];
+
+		const x = (item.point.x + nextItem.point.x) / 2;
+		const y = (item.point.y + nextItem.point.y) / 2;
+
+		newVertexList.push({
+			id: crypto.randomUUID(),
+			point: { x, y },
+			index: i,
+		});
+	}
+
 	return (
 		<>
 			{/* 描画用のパス */}
@@ -276,6 +291,30 @@ const Path: React.FC<PathProps> = ({
 					onGroupDataChange={onGroupDataChange}
 				/>
 			)}
+			{isSelected &&
+				!isTransformMode &&
+				newVertexList.map((item) => (
+					<NewVertex
+						key={item.id}
+						{...item}
+						onDoubleClick={(e) => {
+							const index = e.index;
+							const newItems = [...items];
+							const newItem = {
+								id: crypto.randomUUID(),
+								type: "PathPoint",
+								point: e.point,
+								isSelected: false,
+							} as Diagram;
+							newItems.splice(index + 1, 0, newItem);
+							onGroupDataChange?.({
+								id,
+								point,
+								items: newItems,
+							});
+						}}
+					/>
+				))}
 		</>
 	);
 };
@@ -297,6 +336,37 @@ export const PathPoint: React.FC<PathPointProps> = memo(
 				onDragStart={onDragStart}
 				onDrag={onDrag}
 				onDragEnd={onDragEnd}
+			/>
+		);
+	},
+);
+
+type NewVertexData = {
+	id: string;
+	point: Point;
+	index: number;
+};
+
+type NewVertexProps = NewVertexData & {
+	onDoubleClick?: (e: NewVertexData) => void;
+};
+
+const NewVertex: React.FC<NewVertexProps> = memo(
+	({ id, point, index, onDoubleClick }) => {
+		const handleDoubleClick = () => {
+			onDoubleClick?.({ id, point, index });
+		};
+
+		return (
+			<circle
+				id={id}
+				cx={point.x}
+				cy={point.y}
+				r={5}
+				fill="white"
+				stroke="rgba(100, 149, 237, 0.8)"
+				strokeWidth="1px"
+				onDoubleClick={handleDoubleClick}
 			/>
 		);
 	},
