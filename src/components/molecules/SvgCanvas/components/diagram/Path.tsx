@@ -43,6 +43,7 @@ const createDValue = (items: Diagram[]) => {
 export type PathProps = DiagramBaseProps &
 	TransformativeProps &
 	PathData & {
+		dragEnabled?: boolean;
 		onGroupDataChange?: (e: GroupDataChangeEvent) => void; // TODO: 共通化
 	};
 
@@ -58,6 +59,7 @@ const Path: React.FC<PathProps> = ({
 	stroke = "black",
 	strokeWidth = "1px",
 	isSelected = false,
+	dragEnabled = true,
 	onClick,
 	onDragStart,
 	onDrag,
@@ -69,10 +71,12 @@ const Path: React.FC<PathProps> = ({
 }) => {
 	const [isDragging, setIsDragging] = useState(false);
 	const [isPathPointDragging, setIsPathPointDragging] = useState(false);
-	const [isNewVertexDragging, setIsNewVertexDragging] = useState(false);
 	const [isSequentialSelection, setIsSequentialSelection] = useState(false);
 	const [isTransformMode, setIsTransformMode] = useState(false);
-	const [newVertexList, setNewVertexList] = useState<NewVertexData[]>([]);
+
+	const [draggingNewVertex, setDraggingNewVertex] = useState<
+		{ id: string; point: Point } | undefined
+	>();
 
 	const startItems = useRef<Diagram[]>(items);
 	const dragSvgRef = useRef<SVGPathElement>({} as SVGPathElement);
@@ -123,6 +127,10 @@ const Path: React.FC<PathProps> = ({
 	 */
 	const handleDragStart = useCallback(
 		(e: DiagramDragEvent) => {
+			if (!dragEnabled) {
+				return;
+			}
+
 			if (isSelected) {
 				setIsDragging(true);
 			}
@@ -131,7 +139,7 @@ const Path: React.FC<PathProps> = ({
 
 			startItems.current = items;
 		},
-		[onDragStart, isSelected, items],
+		[onDragStart, isSelected, dragEnabled, items],
 	);
 
 	/**
@@ -139,6 +147,10 @@ const Path: React.FC<PathProps> = ({
 	 */
 	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
+			if (!dragEnabled) {
+				return;
+			}
+
 			if (!isDragging) {
 				onDrag?.(e);
 				return;
@@ -159,7 +171,7 @@ const Path: React.FC<PathProps> = ({
 				items: newItems,
 			});
 		},
-		[onDrag, onGroupDataChange, id, isDragging],
+		[onDrag, onGroupDataChange, id, dragEnabled, isDragging],
 	);
 
 	/**
@@ -191,7 +203,7 @@ const Path: React.FC<PathProps> = ({
 	 * @param {DiagramDragEvent} e ドラッグ開始イベント
 	 * @returns {void}
 	 */
-	const handleLinePointDragStart = useCallback(
+	const handlePathPointDragStart = useCallback(
 		(e: DiagramDragEvent) => {
 			setIsPathPointDragging(true);
 			onDragStart?.(e);
@@ -205,7 +217,7 @@ const Path: React.FC<PathProps> = ({
 	 * @param {DiagramDragEvent} e ドラッグ中イベント
 	 * @returns {void}
 	 */
-	const handleLinePointDrag = useCallback(
+	const handlePathPointDrag = useCallback(
 		(e: DiagramDragEvent) => {
 			onDrag?.(e);
 
@@ -227,7 +239,7 @@ const Path: React.FC<PathProps> = ({
 	 * @param {DiagramDragEvent} e ドラッグ完了イベント
 	 * @returns {void}
 	 */
-	const handleLinePointDragEnd = useCallback(
+	const handlePathPointDragEnd = useCallback(
 		(e: DiagramDragEvent) => {
 			setIsPathPointDragging(false);
 			onDragEnd?.(e);
@@ -245,13 +257,17 @@ const Path: React.FC<PathProps> = ({
 	}));
 
 	// 頂点作成ポイントを生成
-	useEffect(() => {
-		if (!isSelected || isDragging || isNewVertexDragging || isTransformMode) {
-			return;
-		}
-		setNewVertexList((prev) => {
-			const isPathPointMove = items.length - 1 === prev.length;
-			const list: NewVertexData[] = [];
+	const newVertexList: NewVertexData[] = [];
+	if (draggingNewVertex) {
+		newVertexList.push({
+			id: draggingNewVertex.id,
+			point: draggingNewVertex.point,
+			hidden: false,
+		});
+	} else {
+		const showNewVertex =
+			isSelected && !isDragging && !isTransformMode && !isPathPointDragging;
+		if (showNewVertex) {
 			for (let i = 0; i < items.length - 1; i++) {
 				const item = items[i];
 				const nextItem = items[i + 1];
@@ -259,103 +275,67 @@ const Path: React.FC<PathProps> = ({
 				const x = (item.point.x + nextItem.point.x) / 2;
 				const y = (item.point.y + nextItem.point.y) / 2;
 
-				list.push({
-					id: isPathPointMove ? prev[i].id : crypto.randomUUID(),
+				newVertexList.push({
+					id: `${item.id}-${nextItem.id}`, // TODO
+					// id: crypto.randomUUID(),
 					point: { x, y },
 					hidden: false,
 				});
 			}
-			return list;
+		}
+	}
+
+	// newVertexListが描画のたび更新されるのでメモ化しない
+	const handleNewVertexDragStart = (e: DiagramDragEvent) => {
+		const idx = newVertexList.findIndex((v) => v.id === e.id);
+		const newItems = [...items];
+		const newItem = {
+			id: e.id,
+			type: "PathPoint",
+			point: e.startPoint,
+			isSelected: false,
+		} as Diagram;
+		newItems.splice(idx + 1, 0, newItem);
+
+		setDraggingNewVertex({ id: e.id, point: e.startPoint });
+
+		onGroupDataChange?.({
+			id,
+			point,
+			items: newItems,
 		});
-		const newBox = calcPointsOuterBox(items.map((item) => item.point));
-		// onTransform?.({
-		// 	id,
-		// 	startShape: {
-		// 		point,
-		// 		width,
-		// 		height,
-		// 		rotation,
-		// 		scaleX,
-		// 		scaleY,
-		// 	},
-		// 	endShape: {
-		// 		point: newBox.center,
-		// 		width: newBox.right - newBox.left,
-		// 		height: newBox.bottom - newBox.top,
-		// 		rotation,
-		// 		scaleX,
-		// 		scaleY,
-		// 	},
-		// });
-		// onGroupDataChange?.({
-		// 	id,
-		// 	point: newBox.center,
-		// 	width: newBox.right - newBox.left,
-		// 	height: newBox.bottom - newBox.top,
-		// });
-	}, [
-		onGroupDataChange,
-		onTransform,
-		isDragging,
-		isNewVertexDragging,
-		isTransformMode,
-		id,
-		isSelected,
-		items,
-	]);
-
-	const handleNewVertexDragStart = useCallback(
-		(e: DiagramDragEvent) => {
-			setIsNewVertexDragging(true);
-
-			// 頂点を追加
-			const idx = newVertexList.findIndex((v) => v.id === e.id);
-			const newItems = [...items];
-			const newItem = {
-				id: e.id,
-				type: "PathPoint",
-				point: e.startPoint,
-				isSelected: false,
-			} as Diagram;
-			newItems.splice(idx + 1, 0, newItem);
-			onGroupDataChange?.({
-				id,
-				point,
-				items: newItems,
-			});
-
-			// 頂点作成ポイントの位置更新
-			setNewVertexList((prev) =>
-				prev.map((v) => {
-					if (v.id !== e.id) {
-						return { ...v, hidden: true };
-					}
-					return v;
-				}),
-			);
-		},
-		[onGroupDataChange, id, point, items, newVertexList],
-	);
+	};
 
 	const handleNewVertexDrag = useCallback(
 		(e: DiagramDragEvent) => {
-			const idx = newVertexList.findIndex((v) => v.id === e.id);
-			setNewVertexList((prev) => {
-				const newItems = [...prev];
-				newItems[idx].point = e.endPoint;
-				return newItems;
+			setDraggingNewVertex({ id: e.id, point: e.endPoint });
+			onGroupDataChange?.({
+				id,
+				items: items.map((item) =>
+					item.id === e.id ? { ...item, point: e.endPoint } : item,
+				),
 			});
-			onDrag?.(e);
 		},
-		[onDrag, newVertexList],
+		[onGroupDataChange, id, items],
 	);
 
 	const handleNewVertexDragEnd = useCallback(
 		(e: DiagramDragEvent) => {
-			setIsNewVertexDragging(false);
-			onDragEnd?.(e);
+			setDraggingNewVertex(undefined);
+			const box = calcPointsOuterBox(
+				items.map((item) => (item.id === e.id ? e.endPoint : item.point)),
+			);
+			onGroupDataChange?.({
+				id,
+				point: box.center,
+				width: box.right - box.left,
+				height: box.bottom - box.top,
+				items: items.map((item) =>
+					item.id === e.id ? { ...item, point: e.endPoint } : item,
+				),
+			});
 		},
-		[onDragEnd],
+		[onGroupDataChange, id, items],
 	);
 
 	return (
@@ -371,7 +351,7 @@ const Path: React.FC<PathProps> = ({
 				fill="none"
 				stroke="transparent"
 				strokeWidth={7}
-				cursor="move"
+				cursor={dragEnabled ? "move" : "default"}
 				tabIndex={0}
 				ref={dragSvgRef}
 				{...draggableProps}
@@ -389,26 +369,22 @@ const Path: React.FC<PathProps> = ({
 					scaleY={scaleY}
 					keepProportion={false}
 					items={linePoints}
-					onDragStart={handleLinePointDragStart}
-					onDrag={handleLinePointDrag}
-					onDragEnd={handleLinePointDragEnd}
+					onDragStart={handlePathPointDragStart}
+					onDrag={handlePathPointDrag}
+					onDragEnd={handlePathPointDragEnd}
 					onTransform={onTransform}
 					onGroupDataChange={onGroupDataChange}
 				/>
 			)}
-			{isSelected &&
-				!isDragging &&
-				!isTransformMode &&
-				!isPathPointDragging &&
-				newVertexList.map((item) => (
-					<NewVertex
-						key={item.id}
-						{...item}
-						onDragStart={handleNewVertexDragStart}
-						onDrag={handleNewVertexDrag}
-						onDragEnd={handleNewVertexDragEnd}
-					/>
-				))}
+			{newVertexList.map((item) => (
+				<NewVertex
+					key={item.id}
+					{...item}
+					onDragStart={handleNewVertexDragStart}
+					onDrag={handleNewVertexDrag}
+					onDragEnd={handleNewVertexDragEnd}
+				/>
+			))}
 		</>
 	);
 };
