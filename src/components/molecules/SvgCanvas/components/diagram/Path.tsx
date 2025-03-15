@@ -32,11 +32,10 @@ import {
 	calcRadian,
 	createLinerX2yFunction,
 	createLinerY2xFunction,
-	degreesToRadians,
 	radiansToDegrees,
 	rotatePoint,
 } from "../../functions/Math";
-import { newId } from "../../functions/Diagram";
+import { newId, getCursorFromAngle } from "../../functions/Diagram";
 
 import { drawPoint } from "../../functions/Diagram";
 
@@ -63,6 +62,16 @@ export type PathProps = DiagramBaseProps &
 		onGroupDataChange?: (e: GroupDataChangeEvent) => void; // TODO: 共通化
 	};
 
+/**
+ * 折れ線コンポーネント.
+ * できること：
+ * - 折れ線の描画
+ * - 折れ線の全体ドラッグ
+ * - 折れ線の選択
+ * - 折れ線の変形
+ * - 折れ線の線分のドラッグ
+ * - 折れ線の新規頂点の追加
+ */
 const Path: React.FC<PathProps> = ({
 	id,
 	point,
@@ -283,7 +292,6 @@ const Path: React.FC<PathProps> = ({
 
 					segmentList.push({
 						id: `${item.id}-${nextItem.id}`, // TODO
-						// id: crypto.randomUUID(),
 						startPoint: item.point,
 						startPointId: item.id,
 						endPoint: nextItem.point,
@@ -296,55 +304,64 @@ const Path: React.FC<PathProps> = ({
 
 	const handleSegmentDragStart = (e: DiagramDragEvent) => {
 		const idx = segmentList.findIndex((v) => v.id === e.id);
-		if (idx !== 0 && idx !== segmentList.length - 1) {
-			const segment = segmentList[idx];
-			segmentDragStart.current = { ...segment };
-			const midPoint = {
-				x: (segment.startPoint.x + segment.endPoint.x) / 2,
-				y: (segment.startPoint.y + segment.endPoint.y) / 2,
-			};
-			const rotateStartPoint = rotatePoint(
-				segment.startPoint,
-				midPoint,
-				Math.PI / 2,
-			);
-			const rotateEndPoint = rotatePoint(
-				segment.endPoint,
-				midPoint,
-				Math.PI / 2,
-			);
-			const degree = radiansToDegrees(
-				calcRadian(rotateStartPoint, rotateEndPoint),
-			);
-			const isX2y = (degree + 405) % 180 > 90;
 
-			draggingSegmentFunc.current = (p: Point) =>
-				isX2y
-					? createLinerX2yFunction(rotateStartPoint, rotateEndPoint)(p)
-					: createLinerY2xFunction(rotateStartPoint, rotateEndPoint)(p);
-			setDraggingSegment(segment);
-		} else {
+		const segment = segmentList[idx];
+		segmentDragStart.current = { ...segment };
+
+		const midPoint = {
+			x: (segment.startPoint.x + segment.endPoint.x) / 2,
+			y: (segment.startPoint.y + segment.endPoint.y) / 2,
+		};
+		const rotateStartPoint = rotatePoint(
+			segment.startPoint,
+			midPoint,
+			Math.PI / 2,
+		);
+		const rotateEndPoint = rotatePoint(segment.endPoint, midPoint, Math.PI / 2);
+		const degree = radiansToDegrees(
+			calcRadian(rotateStartPoint, rotateEndPoint),
+		);
+		const isX2y = (degree + 405) % 180 > 90;
+
+		draggingSegmentFunc.current = (p: Point) =>
+			isX2y
+				? createLinerX2yFunction(rotateStartPoint, rotateEndPoint)(p)
+				: createLinerY2xFunction(rotateStartPoint, rotateEndPoint)(p);
+
+		const newSegment = {
+			...segment,
+		};
+		if (idx === 0 || idx === segmentList.length - 1) {
 			const newItems = [...items];
-			const newItem = {
-				id: e.id,
-				type: "PathPoint",
-				point: e.startPoint,
-				isSelected: false,
-			} as Diagram;
-			newItems.splice(idx + 1, 0, newItem);
+			let newItem: Diagram;
 
-			// setDraggingSegment({
-			// 	id: e.id,
-			// 	startPoint: e.startPoint,
-			// 	endPoint: e.endPoint,
-			// });
+			if (idx === 0) {
+				newItem = {
+					id: e.id,
+					type: "PathPoint",
+					point: segment.startPoint,
+					isSelected: false,
+				};
+				newItems.splice(1, 0, newItem);
+				newSegment.startPointId = newItem.id;
+			} else {
+				newItem = {
+					id: e.id,
+					type: "PathPoint",
+					point: segment.endPoint,
+					isSelected: false,
+				};
+				newItems.splice(newItems.length - 1, 0, newItem);
+				newSegment.endPointId = newItem.id;
+			}
 
-			// onGroupDataChange?.({
-			// 	id,
-			// 	point,
-			// 	items: newItems,
-			// });
+			onGroupDataChange?.({
+				id,
+				items: newItems,
+			});
 		}
+
+		setDraggingSegment(newSegment);
 	};
 
 	const handleSegmentDrag = useCallback(
@@ -395,9 +412,9 @@ const Path: React.FC<PathProps> = ({
 				point: box.center,
 				width: box.right - box.left,
 				height: box.bottom - box.top,
-				items: items.map((item) =>
-					item.id === e.id ? { ...item, point: e.endPoint } : item,
-				),
+				// items: items.map((item) =>
+				// 	item.id === e.id ? { ...item, point: e.endPoint } : item,
+				// ),
 			});
 		},
 		[onGroupDataChange, id, items],
@@ -709,3 +726,4 @@ const Segment: React.FC<SegmentProps> = memo(
 		);
 	},
 );
+Segment.displayName = "Segment";

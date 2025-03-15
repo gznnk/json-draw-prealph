@@ -20,9 +20,9 @@ declare global {
 if (!window.profiler) {
 	window.profiler = new Profiler();
 
-	setInterval(() => {
-		window.profiler.summary();
-	}, 5000);
+	// setInterval(() => {
+	// 	window.profiler.summary();
+	// }, 5000);
 }
 
 const testItems1 = [

@@ -330,62 +330,15 @@ export const createRectangleData = (
 	});
 
 	const items: Diagram[] = [];
-	items.push({
-		id: newId(),
-		type: "ConnectPoint",
-		point: vertices.leftTopPoint,
-		isSelected: false,
-		name: "leftTopPoint",
-	});
-	items.push({
-		id: newId(),
-		type: "ConnectPoint",
-		point: vertices.rightTopPoint,
-		isSelected: false,
-		name: "rightTopPoint",
-	});
-	items.push({
-		id: newId(),
-		type: "ConnectPoint",
-		point: vertices.leftBottomPoint,
-		isSelected: false,
-		name: "leftBottomPoint",
-	});
-	items.push({
-		id: newId(),
-		type: "ConnectPoint",
-		point: vertices.rightBottomPoint,
-		isSelected: false,
-		name: "rightBottomPoint",
-	});
-	items.push({
-		id: newId(),
-		type: "ConnectPoint",
-		point: vertices.topCenterPoint,
-		isSelected: false,
-		name: "topCenterPoint",
-	});
-	items.push({
-		id: newId(),
-		type: "ConnectPoint",
-		point: vertices.bottomCenterPoint,
-		isSelected: false,
-		name: "bottomCenterPoint",
-	});
-	items.push({
-		id: newId(),
-		type: "ConnectPoint",
-		point: vertices.leftCenterPoint,
-		isSelected: false,
-		name: "leftCenterPoint",
-	});
-	items.push({
-		id: newId(),
-		type: "ConnectPoint",
-		point: vertices.rightCenterPoint,
-		isSelected: false,
-		name: "rightCenterPoint",
-	});
+	for (const key of Object.keys(vertices)) {
+		items.push({
+			id: newId(),
+			type: "ConnectPoint",
+			point: vertices[key as keyof RectangleVertices],
+			isSelected: false,
+			name: key, // TODO: 今んとこ使ってない
+		});
+	}
 
 	return {
 		id,

@@ -1,4 +1,4 @@
-import { radiansToDegrees, degreesToRadians, calcRadian } from "./Math";
+import { radiansToDegrees, degreesToRadians, calcRadian } from "../Math";
 
 test("Math radiansToDegrees", () => {
 	expect(radiansToDegrees(0)).toBe(0);
