@@ -28,7 +28,7 @@ import { useDrag } from "../../hooks/dragHooks";
 
 // SvgCanvas関連関数をインポート
 import {
-	calcPointsOuterBox,
+	calcPointsOuterBox, // TODO: 回転時にずれるので要修正
 	calcRadian,
 	createLinerX2yFunction,
 	createLinerY2xFunction,
@@ -57,6 +57,7 @@ export type PathProps = DiagramBaseProps &
 	TransformativeProps &
 	PathData & {
 		dragEnabled?: boolean;
+		transformEnabled?: boolean;
 		segmentDragEnabled?: boolean;
 		newVertexEnabled?: boolean;
 		onGroupDataChange?: (e: GroupDataChangeEvent) => void; // TODO: 共通化
@@ -80,11 +81,13 @@ const Path: React.FC<PathProps> = ({
 	rotation,
 	scaleX,
 	scaleY,
+	keepProportion = false,
 	fill = "none",
 	stroke = "black",
 	strokeWidth = "1px",
 	isSelected = false,
-	dragEnabled = false,
+	dragEnabled = true,
+	transformEnabled = true,
 	segmentDragEnabled = true,
 	newVertexEnabled = true,
 	onClick,
@@ -126,14 +129,14 @@ const Path: React.FC<PathProps> = ({
 	 */
 	const handleClick = useCallback(
 		(_e: DiagramClickEvent) => {
-			if (isSequentialSelection) {
+			if (isSequentialSelection && transformEnabled) {
 				setIsTransformMode(!isTransformMode);
 			}
 			onClick?.({
 				id,
 			});
 		},
-		[onClick, id, isSequentialSelection, isTransformMode],
+		[onClick, id, transformEnabled, isSequentialSelection, isTransformMode],
 	);
 
 	// 折れ線の選択状態制御
@@ -276,34 +279,19 @@ const Path: React.FC<PathProps> = ({
 				ref={dragSvgRef}
 				{...dragProps}
 			/>
-			{/* 変形用グループ */}
-			{isSelected && (
-				<Group
-					id={id}
-					point={point}
-					isSelected={isTransformMode}
-					width={width}
-					height={height}
-					rotation={rotation}
-					scaleX={scaleX}
-					scaleY={scaleY}
-					keepProportion={false}
-					items={linePoints}
-					onDragStart={handlePathPointDragStart}
-					onDrag={handlePathPointDrag}
-					onDragEnd={handlePathPointDragEnd}
-					onTransform={onTransform}
-					onGroupDataChange={onGroupDataChange}
-				/>
-			)}
 			{/* 線分ドラッグ */}
-			{segmentDragEnabled && isSelected && (
-				<SegmentList
-					id={id}
-					items={items}
-					onGroupDataChange={onGroupDataChange}
-				/>
-			)}
+			{segmentDragEnabled &&
+				isSelected &&
+				!isTransformMode &&
+				!isPathPointDragging && (
+					<SegmentList
+						id={id}
+						items={items}
+						onPointerDown={handlePointerDown}
+						onClick={handleClick}
+						onGroupDataChange={onGroupDataChange}
+					/>
+				)}
 			{/* 新規頂点 */}
 			{newVertexEnabled &&
 				isSelected &&
@@ -315,6 +303,26 @@ const Path: React.FC<PathProps> = ({
 						onGroupDataChange={onGroupDataChange}
 					/>
 				)}
+			{/* 変形用グループ */}
+			{isSelected && (
+				<Group
+					id={id}
+					point={point}
+					isSelected={transformEnabled && isTransformMode}
+					width={width}
+					height={height}
+					rotation={rotation}
+					scaleX={scaleX}
+					scaleY={scaleY}
+					keepProportion={keepProportion}
+					items={linePoints}
+					onDragStart={handlePathPointDragStart}
+					onDrag={handlePathPointDrag}
+					onDragEnd={handlePathPointDragEnd}
+					onTransform={onTransform}
+					onGroupDataChange={onGroupDataChange}
+				/>
+			)}
 		</>
 	);
 };
@@ -530,6 +538,8 @@ type SegmentData = {
  * 線分プロパティ
  */
 type SegmentProps = SegmentData & {
+	onPointerDown?: (e: DiagramPointerEvent) => void;
+	onClick?: (e: DiagramClickEvent) => void;
 	onDragStart?: (e: DiagramDragEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragEnd?: (e: DiagramDragEvent) => void;
@@ -540,7 +550,16 @@ type SegmentProps = SegmentData & {
  * 線分コンポーネント
  */
 const Segment: React.FC<SegmentProps> = memo(
-	({ id, startPoint, endPoint, onDragStart, onDrag, onDragEnd }) => {
+	({
+		id,
+		startPoint,
+		endPoint,
+		onPointerDown,
+		onClick,
+		onDragStart,
+		onDrag,
+		onDragEnd,
+	}) => {
 		const midPoint = {
 			x: (startPoint.x + endPoint.x) / 2,
 			y: (startPoint.y + endPoint.y) / 2,
@@ -571,6 +590,8 @@ const Segment: React.FC<SegmentProps> = memo(
 				startPoint={startPoint}
 				endPoint={endPoint}
 				cursor={cursor}
+				onPointerDown={onPointerDown}
+				onClick={onClick}
 				onDragStart={onDragStart}
 				onDrag={onDrag}
 				onDragEnd={onDragEnd}
@@ -587,6 +608,8 @@ Segment.displayName = "Segment";
 type SegmentListProps = {
 	id: string;
 	items: Diagram[];
+	onPointerDown?: (e: DiagramPointerEvent) => void;
+	onClick?: (e: DiagramClickEvent) => void;
 	onGroupDataChange?: (e: GroupDataChangeEvent) => void;
 };
 
@@ -594,7 +617,7 @@ type SegmentListProps = {
  * 線分リストコンポーネント
  */
 const SegmentList: React.FC<SegmentListProps> = memo(
-	({ id, items, onGroupDataChange }) => {
+	({ id, items, onPointerDown, onClick, onGroupDataChange }) => {
 		const [draggingSegment, setDraggingSegment] = useState<
 			SegmentData | undefined
 		>();
@@ -756,6 +779,8 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 			<Segment
 				key={item.id}
 				{...item}
+				onPointerDown={onPointerDown}
+				onClick={onClick}
 				onDragStart={handleSegmentDragStart}
 				onDrag={handleSegmentDrag}
 				onDragEnd={handleSegmentDragEnd}

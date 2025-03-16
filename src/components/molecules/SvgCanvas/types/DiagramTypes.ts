@@ -18,6 +18,7 @@ import type {
 } from "./EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
+import ConnectLine from "../components/connector/ConnectLine";
 import Ellipse from "../components/diagram/Ellipse";
 import Group from "../components/diagram/Group";
 import Path, { PathPoint } from "../components/diagram/Path";
@@ -40,6 +41,7 @@ export type Shape = {
  * 図形の種類
  */
 export type DiagramType =
+	| "ConnectLine"
 	| "ConnectPoint"
 	| "Ellipse"
 	| "Group"
@@ -70,6 +72,11 @@ export type TransformativeData = DiagramBaseData & {
 	scaleY: number;
 	keepProportion: boolean;
 };
+
+/**
+ * 接続線のデータ
+ */
+export type ConnectLineData = PathData & {};
 
 /**
  * 接続ポイントのデータ
@@ -139,6 +146,7 @@ const DummyComponent: React.FC<DiagramBaseData> = () => null;
  * 全図形のデータを統合した型
  */
 type DiagramCombined =
+	| ConnectLineData
 	| ConnectPointData
 	| EllipseData
 	| GroupData
@@ -184,6 +192,7 @@ export const DiagramTypeComponentMap: {
 	// biome-ignore lint/suspicious/noExplicitAny: 種々の図形の共通の型を作るのは困難なため
 	[key in DiagramType]: React.FC<any>;
 } = {
+	ConnectLine: ConnectLine,
 	ConnectPoint: DummyComponent,
 	Ellipse: Ellipse,
 	Group: Group,

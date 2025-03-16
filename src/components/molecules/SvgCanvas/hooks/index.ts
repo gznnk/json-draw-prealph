@@ -251,7 +251,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 
 		addItem({
 			id: generateId(),
-			type: "Path",
+			type: "ConnectLine",
 			point: box.center,
 			width: box.right - box.left,
 			height: box.bottom - box.top,
