@@ -23,7 +23,7 @@ import DragPoint from "../core/DragPoint";
 import Path from "../diagram/Path";
 
 // SvgCanvas関連関数をインポート
-import { drawPoint, newId } from "../../functions/Diagram";
+import { newId } from "../../functions/Diagram";
 import {
 	calcDistance,
 	calcRadian,
@@ -33,8 +33,6 @@ import {
 	lineIntersects,
 	radiansToDegrees,
 } from "../../functions/Math";
-
-// import { drawPoint, drawRect } from "../../functions/Diagram";
 
 /** 図形と接続線のマージン */
 const CONNECT_LINE_MARGIN = 20;
@@ -85,6 +83,9 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 	const direction = getLineDirection(ownerShape.point, point);
 
+	/**
+	 * 接続線の座標を更新
+	 */
 	const updatePathPoints = useCallback(
 		(dragPoint: Point) => {
 			let newPoints: Point[] = [];
@@ -117,10 +118,16 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 		[point, ownerShape, ownerOuterBox, direction],
 	);
 
+	/**
+	 * 接続ポイントのドラッグ開始イベントハンドラ
+	 */
 	const handleDragStart = useCallback((_e: DiagramDragEvent) => {
 		setIsDragging(true);
 	}, []);
 
+	/**
+	 * 接続ポイントのドラッグイベントハンドラ
+	 */
 	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
 			if (connectingPoint.current) {
@@ -134,11 +141,17 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 		[updatePathPoints],
 	);
 
+	/**
+	 * 接続ポイントのドラッグ終了イベントハンドラ
+	 */
 	const handleDragEnd = useCallback((_e: DiagramDragEvent) => {
 		setPathPoints([]);
 		setIsDragging(false);
 	}, []);
 
+	/**
+	 * この接続ポイントの上に要素が乗った時のイベントハンドラ
+	 */
 	const handleDragOver = useCallback(
 		(e: DiagramDragDropEvent) => {
 			if (e.dropItem.type === "ConnectPoint") {
@@ -146,7 +159,13 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				// 接続中の処理
 				document.dispatchEvent(
 					new CustomEvent(EVENT_NAME_CONNECTTION, {
-						detail: { id, type: "connecting", point, ownerShape },
+						detail: {
+							id,
+							type: "connecting",
+							point,
+							ownerShape,
+							dropItemId: e.dropItem.id,
+						},
 					}),
 				);
 			}
@@ -154,6 +173,9 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 		[id, point, ownerShape],
 	);
 
+	/**
+	 * この接続ポイントの上から要素が外れた時のイベントハンドラ
+	 */
 	const handleDragLeave = useCallback(
 		(e: DiagramDragDropEvent) => {
 			setIsHovered(false);
@@ -162,7 +184,12 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				// 接続元に情報を送信
 				document.dispatchEvent(
 					new CustomEvent(EVENT_NAME_CONNECTTION, {
-						detail: { id, type: "disconnect", point },
+						detail: {
+							id,
+							type: "disconnect",
+							point,
+							dropItemId: e.dropItem.id,
+						},
 					}),
 				);
 			}
@@ -170,6 +197,9 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 		[id, point],
 	);
 
+	/**
+	 * この接続ポイントに要素がドロップされた時のイベントハンドラ
+	 */
 	const handleDrop = useCallback(
 		(e: DiagramDragDropEvent) => {
 			// ドロップされたときの処理
@@ -177,7 +207,13 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				// 接続元に情報を送信
 				document.dispatchEvent(
 					new CustomEvent(EVENT_NAME_CONNECTTION, {
-						detail: { id, type: "connect", point, ownerShape },
+						detail: {
+							id,
+							type: "connect",
+							point,
+							ownerShape,
+							dropItemId: e.dropItem.id,
+						},
 					}),
 				);
 			}
@@ -196,54 +232,63 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 		setIsHovered(e.isHovered);
 	}, []);
 
-	// 接続イベントのリスナー登録
+	// 接続イベントのハンドラ登録
+	// ハンドラ登録の頻発を回避するため、参照するpropsの最新をuseRefで保持する
+	// 参照の作成
+	const onConnectRef = useRef(onConnect);
+	const updatePathPointsRef = useRef(updatePathPoints);
+	const idRef = useRef(id);
+	const pathPointsRef = useRef(pathPoints);
+	// 参照の更新
+	onConnectRef.current = onConnect;
+	updatePathPointsRef.current = updatePathPoints;
+	idRef.current = id;
+	pathPointsRef.current = pathPoints;
+
 	useEffect(() => {
-		let handleConnection: (e: Event) => void;
-		if (isDragging) {
-			handleConnection = (e: Event) => {
-				const customEvent = e as CustomEvent<ConnectionEvent>;
-				if (customEvent.detail.id !== id) {
-					if (customEvent.detail.type === "connecting") {
-						// 接続が始まった時の処理
-						// 接続中のポイントを保持
-						connectingPoint.current = {
-							...customEvent.detail,
-						};
+		const handleConnection = (e: Event) => {
+			const customEvent = e as CustomEvent<ConnectionEvent>;
+			if (customEvent.detail.dropItemId === idRef.current) {
+				if (customEvent.detail.type === "connecting") {
+					// 接続が始まった時の処理
+					// 接続中のポイントを保持
+					connectingPoint.current = {
+						...customEvent.detail,
+					};
 
-						// 接続中のポイントと線がつながるよう、パスポイントを再計算
-						updatePathPoints(customEvent.detail.point);
-					}
-
-					if (customEvent.detail.type === "disconnect") {
-						// 切断時の処理
-						// 接続中のポイントを解除
-						connectingPoint.current = undefined;
-					}
-
-					if (customEvent.detail.type === "connect") {
-						// 接続完了時の処理
-						// 接続線のデータを生成してイベント発火
-
-						const points: PathPointData[] = [...pathPoints];
-						points[0].id = id;
-						points[points.length - 1].id = customEvent.detail.id;
-
-						onConnect?.({
-							points: points,
-						});
-					}
+					// 接続中のポイントと線がつながるよう、パスポイントを再計算
+					updatePathPointsRef.current(customEvent.detail.point);
 				}
-			};
 
-			document.addEventListener(EVENT_NAME_CONNECTTION, handleConnection);
-		}
+				if (customEvent.detail.type === "disconnect") {
+					// 切断時の処理
+					// 接続中のポイントを解除
+					connectingPoint.current = undefined;
+				}
+
+				if (customEvent.detail.type === "connect") {
+					// 接続完了時の処理
+					// 接続線のデータを生成してイベント発火
+
+					const points: PathPointData[] = [...pathPointsRef.current];
+					points[0].id = idRef.current;
+					points[points.length - 1].id = customEvent.detail.id;
+
+					onConnectRef.current?.({
+						points: points,
+					});
+				}
+			}
+		};
+
+		document.addEventListener(EVENT_NAME_CONNECTTION, handleConnection);
 
 		return () => {
 			if (handleConnection) {
 				document.removeEventListener(EVENT_NAME_CONNECTTION, handleConnection);
 			}
 		};
-	}, [onConnect, updatePathPoints, id, isDragging, pathPoints]);
+	}, []);
 
 	return (
 		<>
@@ -291,11 +336,13 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 export default memo(ConnectPoint);
 
 // 以下内部型定義
+// TODO: keyがわかりにくいので変更
 type ConnectionEvent = {
 	id: string;
 	type: "connecting" | "connect" | "disconnect";
 	point: Point;
 	ownerShape: Shape;
+	dropItemId: string;
 };
 
 type ConnectingPoint = {
@@ -321,7 +368,7 @@ const getDirection = (radians: number): Direction => {
 	return "left";
 };
 
-const getLineDirection = (o: Point, p: Point): Direction => {
+export const getLineDirection = (o: Point, p: Point): Direction => {
 	return getDirection(calcRadian(o, p));
 };
 
@@ -537,13 +584,13 @@ type GridPoint = Point & {
 	score?: number;
 };
 
-const createBestConnectPath = (
+export const createBestConnectPath = (
 	startPoint: Point,
 	startDirection: Direction,
 	startOwnerShape: Shape,
 	endPoint: Point,
 	endOwnerShape: Shape,
-) => {
+): Point[] => {
 	const startOuterBox = calcRectangleOuterBox(startOwnerShape);
 	const endOuterBox = calcRectangleOuterBox(endOwnerShape);
 

@@ -477,10 +477,7 @@ export const useDrag = (props: DragProps) => {
 					onDragLeave?.(dragDropEvent);
 				}
 			};
-			document?.addEventListener(
-				EVENT_NAME_BROADCAST_DRAG,
-				handleBroadcastDrag,
-			);
+			document.addEventListener(EVENT_NAME_BROADCAST_DRAG, handleBroadcastDrag);
 		}
 
 		if (onDrop) {
@@ -501,7 +498,7 @@ export const useDrag = (props: DragProps) => {
 					});
 				}
 			};
-			document?.addEventListener(
+			document.addEventListener(
 				EVENT_NAME_BROADCAST_DRAG_END,
 				handleBroadcastDragEnd,
 			);
@@ -509,13 +506,13 @@ export const useDrag = (props: DragProps) => {
 
 		return () => {
 			if (handleBroadcastDrag) {
-				document?.removeEventListener(
+				document.removeEventListener(
 					EVENT_NAME_BROADCAST_DRAG,
 					handleBroadcastDrag,
 				);
 			}
 			if (handleBroadcastDragEnd) {
-				document?.removeEventListener(
+				document.removeEventListener(
 					EVENT_NAME_BROADCAST_DRAG_END,
 					handleBroadcastDragEnd,
 				);

@@ -94,4 +94,5 @@ export type ConnectPointMoveEvent = {
 	id: string;
 	type: "moveStart" | "move" | "moveEnd";
 	point: Point;
+	ownerShape: Shape;
 };

@@ -3,11 +3,16 @@ import type React from "react";
 import { memo, useEffect, useRef } from "react";
 
 // SvgCanvas関連コンポーネントをインポート
-import { EVENT_NAME_CONNECT_POINT_MOVE } from "../connector/ConnectPoint";
+import {
+	createBestConnectPath,
+	getLineDirection,
+	EVENT_NAME_CONNECT_POINT_MOVE,
+} from "../connector/ConnectPoint";
 import Path from "../diagram/Path";
 
 // SvgCanvas関連型定義をインポート
 import type {
+	Diagram,
 	ConnectLineData,
 	DiagramBaseProps,
 	TransformativeProps,
@@ -19,6 +24,7 @@ import type {
 
 // SvgCanvas関連関数をインポート
 import { calcRadian, radiansToDegrees } from "../../functions/Math";
+import { newId } from "../../functions/Diagram";
 
 type ConnectLineProps = DiagramBaseProps &
 	TransformativeProps &
@@ -47,8 +53,16 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 	onGroupDataChange,
 	items = [],
 }) => {
+	const initialItems = useRef(items);
 	const startItems = useRef(items);
 	const isVerticalHorizontalLines = useRef<boolean>(true);
+
+	// 一番最初の描画時からitemsが変更されているかどうか
+	const isItemsChanged =
+		initialItems.current.length !== startItems.current.length ||
+		initialItems.current.some(
+			(item, idx) => item.id !== startItems.current[idx].id,
+		);
 
 	useEffect(() => {
 		const handleConnectPointMove = (e: Event) => {
@@ -56,6 +70,8 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 			const movedId = event.detail.id;
 			const movedPoint = event.detail.point;
 			const type = event.detail.type;
+			const ownerShape = event.detail.ownerShape;
+
 			if (type === "moveStart") {
 				startItems.current = items;
 				isVerticalHorizontalLines.current = items.every((item, idx) => {
@@ -71,46 +87,101 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 				return;
 			}
 
-			const i = items.findIndex((item) => item.id === movedId);
-			if (0 <= i) {
-				const p = startItems.current[i];
-				const dx = movedPoint.x - p.point.x;
-				const dy = movedPoint.y - p.point.y;
-				const newItems = startItems.current.map((item, idx) => {
-					if (item.id === movedId) {
-						return { ...item, point: movedPoint };
+			const _startItems = startItems.current;
+
+			const foundIdx = _startItems.findIndex((item) => item.id === movedId);
+			if (0 <= foundIdx) {
+				if (isItemsChanged) {
+					// 一番最初の描画時からitemsが変更されている場合は、
+					// 接続ポイントとその隣の点のみ位置を変更する
+					const p = startItems.current[foundIdx];
+					const dx = movedPoint.x - p.point.x;
+					const dy = movedPoint.y - p.point.y;
+					const newItems = startItems.current.map((item, idx) => {
+						if (item.id === movedId) {
+							return { ...item, point: movedPoint };
+						}
+
+						const mustMove =
+							(foundIdx === 0 && idx === 1) ||
+							(foundIdx === _startItems.length - 1 &&
+								idx === _startItems.length - 2);
+
+						if (mustMove) {
+							const direction = calcRadian(p.point, item.point);
+							const degrees = radiansToDegrees(direction);
+							const isVertical = (degrees + 405) % 180 > 90;
+
+							return {
+								...item,
+								point: {
+									x:
+										!isVertical && isVerticalHorizontalLines.current
+											? item.point.x + dx
+											: item.point.x,
+									y:
+										isVertical && isVerticalHorizontalLines.current
+											? item.point.y + dy
+											: item.point.y,
+								},
+							};
+						}
+
+						return item;
+					});
+					onGroupDataChange?.({
+						id,
+						items: newItems,
+					});
+				} else {
+					const lastIdx = _startItems.length - 1;
+					const thisSide =
+						foundIdx === 0 ? _startItems[0] : _startItems[lastIdx];
+					const thisSide2th =
+						foundIdx === 0 ? _startItems[1] : _startItems[lastIdx];
+
+					const thatSide =
+						foundIdx === 0 ? _startItems[lastIdx] : _startItems[0];
+					const thisSidedirection = getLineDirection(
+						thisSide.point,
+						thisSide2th.point,
+					);
+
+					const newPath = createBestConnectPath(
+						movedPoint,
+						thisSidedirection,
+						ownerShape,
+						thatSide.point,
+						{
+							point: thatSide.point,
+							width: 10,
+							height: 10,
+							rotation: 0,
+							scaleX: 1,
+							scaleY: 1,
+						},
+					);
+					const newItems = newPath.map((p, idx) => ({
+						id: newId(),
+						name: `cp-${idx}`,
+						type: "PathPoint",
+						point: p,
+						isSelected: false,
+					})) as Diagram[];
+					newItems[0].id = _startItems[0].id;
+					newItems[lastIdx].id = _startItems[lastIdx].id;
+					onGroupDataChange?.({
+						id,
+						items: newItems,
+					});
+
+					if (type === "moveEnd") {
+						startItems.current = [];
+						if (!isItemsChanged) {
+							initialItems.current = newItems;
+						}
 					}
-
-					const mustMove =
-						(i === 0 && idx === 1) ||
-						(i === items.length - 1 && idx === items.length - 2);
-
-					if (mustMove) {
-						const direction = calcRadian(p.point, item.point);
-						const degrees = radiansToDegrees(direction);
-						const isVertical = (degrees + 405) % 180 > 90;
-
-						return {
-							...item,
-							point: {
-								x:
-									!isVertical && isVerticalHorizontalLines.current
-										? item.point.x + dx
-										: item.point.x,
-								y:
-									isVertical && isVerticalHorizontalLines.current
-										? item.point.y + dy
-										: item.point.y,
-							},
-						};
-					}
-
-					return item;
-				});
-				onGroupDataChange?.({
-					id,
-					items: newItems,
-				});
+				}
 			}
 		};
 		document.addEventListener(
@@ -124,7 +195,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 				handleConnectPointMove,
 			);
 		};
-	}, [onGroupDataChange, id, items]);
+	}, [onGroupDataChange, isItemsChanged, id, items]);
 
 	return (
 		<Path

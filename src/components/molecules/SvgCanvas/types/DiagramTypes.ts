@@ -74,7 +74,10 @@ export type TransformativeData = DiagramBaseData & {
 /**
  * 接続線のデータ
  */
-export type ConnectLineData = PathData & {};
+export type ConnectLineData = PathData & {
+	startOwnerShape: Shape;
+	endOwnerShape: Shape;
+};
 
 /**
  * 接続ポイントのデータ

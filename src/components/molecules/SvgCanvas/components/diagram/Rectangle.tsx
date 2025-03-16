@@ -28,14 +28,8 @@ import Transformative from "../core/Transformative";
 import { useDrag } from "../../hooks/dragHooks";
 
 // SvgCanvas関連関数をインポート
-import { newId, createSvgTransform } from "../../functions/Diagram";
+import { createSvgTransform, newId } from "../../functions/Diagram";
 import { calcRectangleVertices, degreesToRadians } from "../../functions/Math";
-
-// ユーティリティをインポート
-// import { getLogger } from "../../../../../utils/Logger";
-
-// ロガーを取得
-// const logger = getLogger("Rectangle");
 
 export type RectangleProps = DiagramBaseProps &
 	TransformativeProps &
@@ -65,18 +59,19 @@ const Rectangle: React.FC<RectangleProps> = ({
 	onTransform,
 	onTransformEnd,
 }) => {
+	// 変形中かのフラグ
 	const [isTransformimg, setIsTransforming] = useState(false);
-	// ホバー状態の管理
+	// ホバー中かのフラグ
 	const [isHovered, setIsHovered] = useState(false);
-
+	// 変形対象のSVG要素への参照
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
 	/**
 	 * 接続ポイントの位置を更新
 	 */
 	const triggerConnectPointsMove = useCallback(
-		(type: "move" | "moveStart" | "moveEnd", shape: Shape) => {
-			const vertices = calcRectangleVertices(shape);
+		(type: "move" | "moveStart" | "moveEnd", ownerShape: Shape) => {
+			const vertices = calcRectangleVertices(ownerShape);
 
 			for (const cp of (items as ConnectPointData[]) ?? []) {
 				const cPoint = (vertices as RectangleVertices)[
@@ -90,6 +85,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 						x: cPoint.x,
 						y: cPoint.y,
 					},
+					ownerShape,
 				});
 			}
 		},
