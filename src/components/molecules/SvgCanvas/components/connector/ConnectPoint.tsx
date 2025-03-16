@@ -23,7 +23,7 @@ import DragPoint from "../core/DragPoint";
 import Path from "../diagram/Path";
 
 // SvgCanvas関連関数をインポート
-import { newId } from "../../functions/Diagram";
+import { drawPoint, newId } from "../../functions/Diagram";
 import {
 	calcDistance,
 	calcRadian,
@@ -224,25 +224,12 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 						// 接続完了時の処理
 						// 接続線のデータを生成してイベント発火
 
-						// 接続線をクリーンアップ
 						const points: PathPointData[] = [...pathPoints];
-						for (let i = points.length - 3; i >= 0; i--) {
-							if (
-								// 3点が一直線上にある場合は中間の点を削除
-								isStraight(
-									points[i].point,
-									points[i + 1].point,
-									points[i + 2].point,
-								)
-							) {
-								points.splice(i + 1, 1);
-							}
-						}
 						points[0].id = id;
 						points[points.length - 1].id = customEvent.detail.id;
 
 						onConnect?.({
-							points,
+							points: points,
 						});
 					}
 				}
@@ -361,7 +348,7 @@ const getSecondConnectPoint = (ownerShape: Shape, point: Point): Point => {
 	return { x: 0, y: 0 };
 };
 
-const addGridCrossPoint = (grid: Point[], point: Point) => {
+const addGridCrossPoint = (grid: GridPoint[], point: GridPoint) => {
 	if (!grid.some((p) => p.x === point.x && p.y === point.y)) {
 		const len = grid.length;
 		for (let i = 0; i < len; i++) {
@@ -369,10 +356,10 @@ const addGridCrossPoint = (grid: Point[], point: Point) => {
 			// すでにある点を中心とする水平線および垂直線上と
 			// 追加した点を中心とする水平線および垂直線上との交点を追加
 			if (p.x !== point.x) {
-				grid.push({ x: p.x, y: point.y });
+				grid.push({ x: p.x, y: point.y, score: p.score });
 			}
 			if (p.y !== point.y) {
-				grid.push({ x: point.x, y: p.y });
+				grid.push({ x: point.x, y: p.y, score: p.score });
 			}
 		}
 		grid.push(point);
@@ -546,6 +533,10 @@ const createConnectPathOnDrag = (
 	return newPoints;
 };
 
+type GridPoint = Point & {
+	score?: number;
+};
+
 const createBestConnectPath = (
 	startPoint: Point,
 	startDirection: Direction,
@@ -561,6 +552,7 @@ const createBestConnectPath = (
 	const midPoint = {
 		x: (startP2.x + endP2.x) / 2,
 		y: (startP2.y + endP2.y) / 2,
+		score: 1,
 	};
 
 	// 接続線の中心候補となるポイントのグリッドを作成
@@ -607,22 +599,40 @@ const createBestConnectPath = (
 		};
 
 		if (!isIntersecting()) {
-			pathList.push(connectPath);
+			pathList.push(cleanPath(connectPath));
 		} else {
-			intersectsPathList.push(connectPath);
+			intersectsPathList.push(cleanPath(connectPath));
 		}
 	}
 
 	return pathList.length !== 0
-		? getBestPath(pathList)
-		: getBestPath(intersectsPathList);
+		? getBestPath(pathList, [midPoint])
+		: getBestPath(intersectsPathList, [midPoint]);
+};
+
+const cleanPath = (list: Point[]): Point[] => {
+	const points: Point[] = [...list];
+	for (let i = points.length - 3; i >= 0; i--) {
+		if (
+			// 3点が一直線上にある場合は中間の点を削除
+			isStraight(points[i], points[i + 1], points[i + 2])
+		) {
+			points.splice(i + 1, 1);
+		}
+	}
+	return points;
 };
 
 const isStraight = (p1: Point, p2: Point, p3: Point): boolean => {
 	return (p1.x === p2.x && p2.x === p3.x) || (p1.y === p2.y && p2.y === p3.y);
 };
 
-const getBestPath = (list: Point[][]): Point[] => {
+const getBestPath = (list: Point[][], goodPoints: GridPoint[]): Point[] => {
+	const getScore = (p: Point): number => {
+		const goodPoint = goodPoints.find((gp) => gp.x === p.x && gp.y === p.y);
+		return goodPoint ? goodPoint.score || 0 : 0;
+	};
+
 	return list.reduce((a, b) => {
 		const distanceA = a.reduce((acc, p, i) => {
 			if (i === 0) return acc;
@@ -632,6 +642,8 @@ const getBestPath = (list: Point[][]): Point[] => {
 			if (i < 2) return acc;
 			return acc + (isStraight(a[i - 2], a[i - 1], p) ? 0 : 1);
 		}, 0);
+		const scoreA = a.reduce((acc, p) => acc + getScore(p), 0);
+
 		const distanceB = b.reduce((acc, p, i) => {
 			if (i === 0) return acc;
 			return acc + calcDistance(b[i - 1], p);
@@ -640,8 +652,11 @@ const getBestPath = (list: Point[][]): Point[] => {
 			if (i < 2) return acc;
 			return acc + (isStraight(b[i - 2], b[i - 1], p) ? 0 : 1);
 		}, 0);
+		const scoreB = b.reduce((acc, p) => acc + getScore(p), 0);
 
-		return distanceA < distanceB || (distanceA === distanceB && turnsA < turnsB)
+		return distanceA < distanceB ||
+			(distanceA === distanceB && turnsA < turnsB) ||
+			(distanceA === distanceB && turnsA === turnsB && scoreA > scoreB)
 			? a
 			: b;
 	});
