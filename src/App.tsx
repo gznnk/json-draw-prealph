@@ -722,6 +722,13 @@ function App() {
 						}}
 					/>
 				</div>
+				<Button
+					onClick={() => {
+						window.profiler.summary();
+					}}
+				>
+					Profile
+				</Button>
 			</div>
 			<div
 				style={{

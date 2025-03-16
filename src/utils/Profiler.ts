@@ -73,7 +73,7 @@ export class Profiler {
 			}
 			const avarage = labelTotal / labelCalls;
 			console.log(
-				`Group: ${label}, Average: ${(avarage).toFixed(8)}, Calls: ${labelCalls}`,
+				`Group: ${label}, Average: ${(avarage).toFixed(4)} ms, Calls: ${labelCalls}`,
 			);
 			summary.calls = labelCalls;
 			summary.time = avarage;
