@@ -5,7 +5,11 @@ import { useCallback, useEffect, useState } from "react";
 import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 
 // SvgCanvas関連型定義をインポート
-import type { ConnectLineData, Diagram } from "../types/DiagramTypes";
+import type {
+	ConnectLineData,
+	Diagram,
+	PathPointData,
+} from "../types/DiagramTypes";
 import type {
 	ConnectPointMoveEvent,
 	DiagramConnectEvent,
@@ -137,8 +141,8 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 			items: e.points.map((p) => ({
 				...p,
 				type: "PathPoint",
-				isSelected: false,
-			})) as Diagram[],
+			})) as PathPointData[],
+			startOwnerId: e.startOwnerId,
 			endOwnerId: e.endOwnerId,
 		} as ConnectLineData);
 	}, []);

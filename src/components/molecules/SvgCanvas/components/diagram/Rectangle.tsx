@@ -98,11 +98,12 @@ const Rectangle: React.FC<RectangleProps> = ({
 						x: cPoint.x,
 						y: cPoint.y,
 					},
+					ownerId: id,
 					ownerShape,
 				});
 			}
 		},
-		[items],
+		[id, items],
 	);
 
 	/**

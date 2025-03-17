@@ -84,9 +84,9 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 	const [pathPoints, setPathPoints] = useState<PathPointData[]>([]);
 	// 接続中のポイント
 	const connectingPoint = useRef<ConnectingPoint | undefined>(undefined);
-
+	// 接続ポイントの所有者の外接矩形
 	const ownerOuterBox = calcRectangleOuterBox(ownerShape);
-
+	// 接続ポイントの方向
 	const direction = getLineDirection(ownerShape.point, point);
 
 	/**
@@ -97,6 +97,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			let newPoints: Point[] = [];
 
 			if (!connectingPoint.current) {
+				// ドラッグ中の接続線
 				newPoints = createConnectPathOnDrag(
 					point,
 					direction,
@@ -104,19 +105,20 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 					dragPoint,
 				);
 			} else {
+				// 接続中のポイントがある場合の接続線
 				newPoints = createBestConnectPath(
 					point,
 					direction,
 					ownerShape,
-					connectingPoint.current.point,
-					connectingPoint.current.ownerShape,
+					connectingPoint.current.point, // 接続先のポイント
+					connectingPoint.current.ownerShape, // 接続先の所有者の形状
 				);
 			}
 
 			const newPathPoints = newPoints.map(
 				(p) =>
 					({
-						id: newId(),
+						id: newId(), // TODO: 接続が確定する前は仮のIDにしたい
 						point: p,
 					}) as PathPointData,
 			);
@@ -170,7 +172,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 						detail: {
 							type: "connecting",
 							startPointId: e.dropItem.id,
-							point: e.dropItem.point,
+							startPoint: e.dropItem.point,
 							endPointId: id,
 							endPoint: point,
 							endOwnerId: ownerId,
@@ -197,7 +199,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 						detail: {
 							type: "disconnect",
 							startPointId: e.dropItem.id,
-							point: e.dropItem.point,
+							startPoint: e.dropItem.point,
 							endPointId: id,
 							endPoint: point,
 							endOwnerId: ownerId,
@@ -221,10 +223,9 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				document.dispatchEvent(
 					new CustomEvent(EVENT_NAME_CONNECTTION, {
 						detail: {
-							id,
 							type: "connect",
 							startPointId: e.dropItem.id,
-							point: e.dropItem.point,
+							startPoint: e.dropItem.point,
 							endPointId: id,
 							endPoint: point,
 							endOwnerId: ownerId,
@@ -249,10 +250,10 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 	}, []);
 
 	// 接続イベントのハンドラ登録
-	// ハンドラ登録の頻発を回避するため、参照するprops等の最新をuseRefで保持する
-	// 参照の作成
+	// ハンドラ登録の頻発を回避するため、参照する値をuseRefで保持する
 	const refBusVal = {
 		_id: id,
+		_ownerId: ownerId,
 		_pathPoints: pathPoints,
 		_onConnect: onConnect,
 		_updatePathPoints: updatePathPoints,
@@ -262,14 +263,14 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 	useEffect(() => {
 		const handleConnection = (e: Event) => {
-			const { _id, _pathPoints, _onConnect, _updatePathPoints } =
+			const { _id, _pathPoints, _ownerId, _onConnect, _updatePathPoints } =
 				refBus.current;
 
 			const customEvent = e as CustomEvent<ConnectionEvent>;
 			if (customEvent.detail.startPointId === _id) {
 				if (customEvent.detail.type === "connecting") {
 					// 接続が始まった時の処理
-					// 接続中のポイントを保持
+					// 接続先のポイントを保持
 					connectingPoint.current = {
 						id: customEvent.detail.endPointId,
 						point: customEvent.detail.endPoint,
@@ -277,7 +278,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 						ownerShape: customEvent.detail.endOwnerShape,
 					};
 
-					// 接続中のポイントと線がつながるよう、パスポイントを再計算
+					// 接続先のポイントと線がつながるよう、パスポイントを再計算
 					_updatePathPoints(customEvent.detail.endPoint);
 				}
 
@@ -296,7 +297,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 					points[points.length - 1].id = customEvent.detail.endPointId;
 
 					_onConnect?.({
-						startOwnerId: _id,
+						startOwnerId: _ownerId,
 						points: points,
 						endOwnerId: customEvent.detail.endOwnerId,
 					});
@@ -375,7 +376,7 @@ type ConnectingPoint = {
 	ownerShape: Shape;
 };
 
-type Direction = "up" | "down" | "left" | "right";
+export type Direction = "up" | "down" | "left" | "right";
 
 // 以下内部関数定義
 const getDirection = (radians: number): Direction => {
