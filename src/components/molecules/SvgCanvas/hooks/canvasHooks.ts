@@ -13,7 +13,7 @@ import type {
 	DiagramDragEvent,
 	DiagramSelectEvent,
 	DiagramTransformEvent,
-	GroupDataChangeEvent,
+	ItemableChangeEvent,
 } from "../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
@@ -54,7 +54,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		}));
 	}, []);
 
-	const onGroupDataChange = useCallback((e: GroupDataChangeEvent) => {
+	const onItemableChange = useCallback((e: ItemableChangeEvent) => {
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyRecursive(prevState.items, (item) =>
@@ -177,7 +177,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onDelete,
 		onConnect,
 		onTransform,
-		onGroupDataChange,
+		onItemableChange,
 	};
 
 	const getSelectedItem = useCallback(() => {

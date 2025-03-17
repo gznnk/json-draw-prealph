@@ -19,7 +19,7 @@ import type {
 	DiagramClickEvent,
 	DiagramDragEvent,
 	DiagramPointerEvent,
-	GroupDataChangeEvent,
+	ItemableChangeEvent,
 } from "../../types/EventTypes";
 
 // SvgCanvas関連カスタムフックをインポート
@@ -53,13 +53,13 @@ export type PathProps = CreateDiagramProps<
 	{
 		selectable: true;
 		transformative: true;
+		itemable: true;
 	}
 > & {
 	dragEnabled?: boolean;
 	transformEnabled?: boolean;
 	segmentDragEnabled?: boolean;
 	newVertexEnabled?: boolean;
-	onGroupDataChange?: (e: GroupDataChangeEvent) => void; // TODO: 共通化
 };
 
 /**
@@ -94,7 +94,7 @@ const Path: React.FC<PathProps> = ({
 	onDragEnd,
 	onSelect,
 	onTransform,
-	onGroupDataChange,
+	onItemableChange,
 	items = [],
 }) => {
 	const [isDragging, setIsDragging] = useState(false);
@@ -189,13 +189,13 @@ const Path: React.FC<PathProps> = ({
 				return { ...item, point: { x, y } };
 			});
 
-			onGroupDataChange?.({
+			onItemableChange?.({
 				id,
 				point: e.endPoint,
 				items: newItems,
 			});
 		},
-		[onDrag, onGroupDataChange, id, dragEnabled, isDragging],
+		[onDrag, onItemableChange, id, dragEnabled, isDragging],
 	);
 
 	/**
@@ -288,7 +288,7 @@ const Path: React.FC<PathProps> = ({
 						items={items}
 						onPointerDown={handlePointerDown}
 						onClick={handleClick}
-						onGroupDataChange={onGroupDataChange}
+						onItemableChange={onItemableChange}
 					/>
 				)}
 			{/* 新規頂点 */}
@@ -299,7 +299,7 @@ const Path: React.FC<PathProps> = ({
 					<NewVertexList
 						id={id}
 						items={items}
-						onGroupDataChange={onGroupDataChange}
+						onItemableChange={onItemableChange}
 					/>
 				)}
 			{/* 変形用グループ */}
@@ -319,7 +319,7 @@ const Path: React.FC<PathProps> = ({
 					onDrag={handlePathPointDrag}
 					onDragEnd={handlePathPointDragEnd}
 					onTransform={onTransform}
-					onGroupDataChange={onGroupDataChange}
+					onItemableChange={onItemableChange}
 				/>
 			)}
 		</>
@@ -403,14 +403,14 @@ NewVertex.displayName = "NewVertex";
 type NewVertexListProps = {
 	id: string;
 	items: Diagram[];
-	onGroupDataChange?: (e: GroupDataChangeEvent) => void;
+	onItemableChange?: (e: ItemableChangeEvent) => void;
 };
 
 /**
  * 新規頂点リストコンポーネント
  */
 const NewVertexList: React.FC<NewVertexListProps> = memo(
-	({ id, items, onGroupDataChange }) => {
+	({ id, items, onItemableChange }) => {
 		// ドラッグ中の新規頂点
 		const [draggingNewVertex, setDraggingNewVertex] = useState<
 			NewVertexData | undefined
@@ -454,12 +454,12 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 
 				setDraggingNewVertex({ id: e.id, point: e.startPoint });
 
-				onGroupDataChange?.({
+				onItemableChange?.({
 					id,
 					items: newItems,
 				});
 			},
-			[onGroupDataChange, id, items],
+			[onItemableChange, id, items],
 		);
 
 		/**
@@ -471,14 +471,14 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 				setDraggingNewVertex({ id: e.id, point: e.endPoint });
 
 				// 新規頂点のドラッグに伴うパスの頂点の位置変更
-				onGroupDataChange?.({
+				onItemableChange?.({
 					id,
 					items: items.map((item) =>
 						item.id === e.id ? { ...item, point: e.endPoint } : item,
 					),
 				});
 			},
-			[onGroupDataChange, id, items],
+			[onItemableChange, id, items],
 		);
 
 		/**
@@ -495,7 +495,7 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 				);
 
 				// 新規頂点のドラッグ完了に伴うパスのデータ変更
-				onGroupDataChange?.({
+				onItemableChange?.({
 					id,
 					point: box.center,
 					width: box.right - box.left,
@@ -511,7 +511,7 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 					),
 				});
 			},
-			[onGroupDataChange, id, items],
+			[onItemableChange, id, items],
 		);
 
 		return (
@@ -618,14 +618,14 @@ type SegmentListProps = {
 	items: Diagram[];
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onClick?: (e: DiagramClickEvent) => void;
-	onGroupDataChange?: (e: GroupDataChangeEvent) => void;
+	onItemableChange?: (e: ItemableChangeEvent) => void;
 };
 
 /**
  * 線分リストコンポーネント
  */
 const SegmentList: React.FC<SegmentListProps> = memo(
-	({ id, items, onPointerDown, onClick, onGroupDataChange }) => {
+	({ id, items, onPointerDown, onClick, onItemableChange }) => {
 		const [draggingSegment, setDraggingSegment] = useState<
 			SegmentData | undefined
 		>();
@@ -687,7 +687,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 						newSegment.startPointId = newItem.id;
 					}
 
-					onGroupDataChange?.({
+					onItemableChange?.({
 						id,
 						items: newItems,
 					});
@@ -695,7 +695,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 
 				setDraggingSegment(newSegment);
 			},
-			[onGroupDataChange, id, items],
+			[onItemableChange, id, items],
 		);
 
 		/**
@@ -724,7 +724,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 					endPoint: newEndPoint,
 				});
 
-				onGroupDataChange?.({
+				onItemableChange?.({
 					id,
 					items: items.map((item) => {
 						if (item.id === draggingSegment.startPointId) {
@@ -737,7 +737,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 					}),
 				});
 			},
-			[onGroupDataChange, id, items, draggingSegment],
+			[onItemableChange, id, items, draggingSegment],
 		);
 
 		/**
@@ -762,7 +762,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 				const box = calcPointsOuterBox(
 					items.map((item) => (item.id === e.id ? e.endPoint : item.point)),
 				);
-				onGroupDataChange?.({
+				onItemableChange?.({
 					id,
 					point: box.center,
 					width: box.right - box.left,
@@ -780,7 +780,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 				});
 				setDraggingSegment(undefined);
 			},
-			[onGroupDataChange, id, items, draggingSegment],
+			[onItemableChange, id, items, draggingSegment],
 		);
 
 		return segmentList.map((item) => (

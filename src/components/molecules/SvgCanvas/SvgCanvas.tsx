@@ -14,7 +14,7 @@ import type {
 	DiagramDragEvent,
 	DiagramSelectEvent,
 	DiagramTransformEvent,
-	GroupDataChangeEvent,
+	ItemableChangeEvent,
 } from "./types/EventTypes";
 
 // SvgCanvas関連関数をインポート
@@ -53,7 +53,7 @@ type SvgCanvasProps = {
 	title?: string;
 	items: Array<Diagram>;
 	onTransform?: (e: DiagramTransformEvent) => void;
-	onGroupDataChange?: (e: GroupDataChangeEvent) => void;
+	onItemableChange?: (e: ItemableChangeEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragEnd?: (e: DiagramDragEvent) => void;
 	onDrop?: (e: DiagramDragDropEvent) => void;
@@ -69,7 +69,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	title,
 	items,
 	onTransform,
-	onGroupDataChange,
+	onItemableChange,
 	onDrag,
 	onDragEnd,
 	onDrop,
@@ -149,7 +149,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 			...item,
 			key: item.id,
 			onTransform,
-			onGroupDataChange,
+			onItemableChange,
 			onDrag,
 			onDragEnd,
 			onDrop,

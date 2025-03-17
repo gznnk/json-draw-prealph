@@ -6,7 +6,6 @@ import type React from "react";
 // SvgCanvas関連型定義をインポート
 import type { Point } from "./CoordinateTypes";
 import type {
-	ConnectPointMoveEvent,
 	DiagramClickEvent,
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
@@ -14,6 +13,7 @@ import type {
 	DiagramHoverEvent,
 	DiagramSelectEvent,
 	DiagramTransformEvent,
+	ItemableChangeEvent,
 } from "./EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
@@ -112,20 +112,15 @@ type DiagramDataOptions = {
 };
 
 /**
- * 空の型
- */
-type Empty = object;
-
-/**
  * 図形のデータ型を作成する型
  */
 type CreateDiagramType<T extends DiagramDataOptions> = DiagramBaseData &
-	(T["selectable"] extends true ? SelectableData : Empty) &
-	(T["transformative"] extends true ? TransformativeData : Empty) &
-	(T["itemable"] extends true ? ItemableData : Empty) &
-	(T["connectable"] extends true ? ConnectableData : Empty) &
-	(T["bordered"] extends true ? BorderedData : Empty) &
-	(T["fillable"] extends true ? FillableData : Empty);
+	(T["selectable"] extends true ? SelectableData : object) &
+	(T["transformative"] extends true ? TransformativeData : object) &
+	(T["itemable"] extends true ? ItemableData : object) &
+	(T["connectable"] extends true ? ConnectableData : object) &
+	(T["bordered"] extends true ? BorderedData : object) &
+	(T["fillable"] extends true ? FillableData : object);
 
 /**
  * 楕円のデータ
@@ -260,6 +255,13 @@ export type TransformativeProps = {
 };
 
 /**
+ * 子図形を持つ図形のプロパティ
+ */
+export type ItemableProps = {
+	onItemableChange?: (e: ItemableChangeEvent) => void;
+};
+
+/**
  * 接続可能な図形のプロパティ
  */
 export type ConnectableProps = {
@@ -286,9 +288,10 @@ export type CreateDiagramProps<T, U extends DiagramPropsOptions> = Omit<
 	"type"
 > &
 	DiagramBaseProps &
-	(U["selectable"] extends true ? SelectableProps : Empty) &
-	(U["transformative"] extends true ? TransformativeProps : Empty) &
-	(U["connectable"] extends true ? ConnectableProps : Empty);
+	(U["selectable"] extends true ? SelectableProps : object) &
+	(U["transformative"] extends true ? TransformativeProps : object) &
+	(U["itemable"] extends true ? ItemableProps : object) &
+	(U["connectable"] extends true ? ConnectableProps : object);
 
 /**
  * 図形の種類とコンポーネントのマッピング

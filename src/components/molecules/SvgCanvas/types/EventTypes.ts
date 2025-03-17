@@ -74,8 +74,10 @@ export type DiagramTransformEvent = {
 	endShape: Shape;
 };
 
-// TODO: なんかいい名前
-export type GroupDataChangeEvent = {
+/**
+ * 子図形をもつ図形の変更イベント
+ */
+export type ItemableChangeEvent = {
 	id: string;
 	point?: Point;
 	width?: number;

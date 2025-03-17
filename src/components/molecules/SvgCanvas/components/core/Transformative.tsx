@@ -4,11 +4,13 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
 import type { Point } from "../../types/CoordinateTypes";
-import type { DiagramType } from "../../types/DiagramTypes";
 import type {
-	DiagramDragEvent,
-	DiagramTransformEvent,
-} from "../../types/EventTypes";
+	DiagramType,
+	TransformativeData,
+	SelectableData,
+	TransformativeProps,
+} from "../../types/DiagramTypes";
+import type { DiagramDragEvent } from "../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
 import DragLine from "./DragLine";
@@ -40,26 +42,17 @@ const ROTATE_POINT_MARGIN = 15;
 /**
  * 変形コンポーネントのプロパティ
  */
-type TransformativeProps = {
-	diagramId: string;
-	type: DiagramType;
-	point: Point;
-	width: number;
-	height: number;
-	rotation: number;
-	scaleX: number;
-	scaleY: number;
-	keepProportion: boolean;
-	isSelected: boolean;
-	onTransformStart?: (e: DiagramTransformEvent) => void;
-	onTransform?: (e: DiagramTransformEvent) => void;
-	onTransformEnd?: (e: DiagramTransformEvent) => void;
-};
+type Props = TransformativeData &
+	SelectableData &
+	TransformativeProps & {
+		diagramId: string;
+		type: DiagramType;
+	};
 
 /**
  * 変形コンポーネント
  */
-const Transformative: React.FC<TransformativeProps> = ({
+const Transformative: React.FC<Props> = ({
 	diagramId,
 	point,
 	width,

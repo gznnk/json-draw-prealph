@@ -17,10 +17,7 @@ import type {
 	Diagram,
 	ConnectLineData,
 } from "../../types/DiagramTypes";
-import type {
-	ConnectPointMoveEvent,
-	GroupDataChangeEvent,
-} from "../../types/EventTypes";
+import type { ConnectPointMoveEvent } from "../../types/EventTypes";
 
 // SvgCanvas関連関数をインポート
 import { calcRadian, radiansToDegrees } from "../../functions/Math";
@@ -31,10 +28,9 @@ type ConnectLineProps = CreateDiagramProps<
 	{
 		selectable: true;
 		transformative: true;
+		itemable: true;
 	}
-> & {
-	onGroupDataChange?: (e: GroupDataChangeEvent) => void; // TODO: 共通化
-};
+>;
 
 const ConnectLine: React.FC<ConnectLineProps> = ({
 	id,
@@ -53,7 +49,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 	onDragEnd,
 	onSelect,
 	onTransform,
-	onGroupDataChange,
+	onItemableChange,
 	items = [],
 	endOwnerId,
 }) => {
@@ -73,7 +69,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 		_id: id,
 		_items: items,
 		_endOwnerId: endOwnerId,
-		_onGroupDataChange: onGroupDataChange,
+		_onItemableChange: onItemableChange,
 		_canvasStateProvider: canvasStateProvider,
 	};
 	const refBus = useRef(refBusVal);
@@ -85,7 +81,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 				_id,
 				_items,
 				_endOwnerId,
-				_onGroupDataChange,
+				_onItemableChange,
 				_canvasStateProvider,
 			} = refBus.current;
 
@@ -164,7 +160,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 
 						return item;
 					}) as Diagram[];
-					_onGroupDataChange?.({
+					_onItemableChange?.({
 						id: _id,
 						items: newItems,
 					});
@@ -213,7 +209,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 					) as Diagram[];
 					newItems[0].id = _startItems[0].id;
 					newItems[newItems.length - 1].id = _startItems[lastIdx].id;
-					_onGroupDataChange?.({
+					_onItemableChange?.({
 						id: _id,
 						items: newItems,
 					});
@@ -263,7 +259,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 			onDragEnd={onDragEnd}
 			onSelect={onSelect}
 			onTransform={onTransform}
-			onGroupDataChange={onGroupDataChange}
+			onItemableChange={onItemableChange}
 			items={items}
 		/>
 	);

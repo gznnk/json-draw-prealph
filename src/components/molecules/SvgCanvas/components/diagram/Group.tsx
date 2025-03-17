@@ -13,7 +13,7 @@ import type {
 	DiagramDragEvent,
 	DiagramSelectEvent,
 	DiagramTransformEvent,
-	GroupDataChangeEvent,
+	ItemableChangeEvent,
 } from "../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
@@ -217,10 +217,9 @@ export type GroupProps = CreateDiagramProps<
 	{
 		selectable: true;
 		transformative: true;
+		itemable: true;
 	}
-> & {
-	onGroupDataChange?: (e: GroupDataChangeEvent) => void; // TODO: 共通化
-};
+>;
 
 /**
  * グループコンポーネント
@@ -241,7 +240,7 @@ const Group: React.FC<GroupProps> = ({
 	onDrag,
 	onDragEnd,
 	onSelect,
-	onGroupDataChange,
+	onItemableChange,
 	items = [],
 }) => {
 	// logger.debug("Group items", items);
@@ -400,7 +399,7 @@ const Group: React.FC<GroupProps> = ({
 			const dy = e.endPoint.y - e.startPoint.y;
 
 			const moveRecursive = (diagrams: Diagram[]) => {
-				const events: GroupDataChangeEvent[] = [];
+				const events: ItemableChangeEvent[] = [];
 				for (const item of diagrams) {
 					events.push({
 						...item,
@@ -417,7 +416,7 @@ const Group: React.FC<GroupProps> = ({
 				return events as Diagram[];
 			};
 
-			const event: GroupDataChangeEvent = {
+			const event: ItemableChangeEvent = {
 				id,
 				point: {
 					x: startBox.current.x + dx,
@@ -426,9 +425,9 @@ const Group: React.FC<GroupProps> = ({
 				items: moveRecursive(startItems.current),
 			};
 
-			onGroupDataChange?.(event);
+			onItemableChange?.(event);
 		},
-		[onDrag, onGroupDataChange, id, isDragging],
+		[onDrag, onItemableChange, id, isDragging],
 	);
 
 	const handleChildDiagramDragEnd = useCallback(
@@ -483,7 +482,7 @@ const Group: React.FC<GroupProps> = ({
 			const groupScaleY = e.endShape.height / e.startShape.height;
 
 			const transformRecursive = (diagrams: Diagram[]) => {
-				const events: GroupDataChangeEvent[] = [];
+				const events: ItemableChangeEvent[] = [];
 				for (const item of diagrams) {
 					const inversedItemCenter = rotatePoint(
 						item.point,
@@ -539,23 +538,23 @@ const Group: React.FC<GroupProps> = ({
 				return events as Diagram[];
 			};
 
-			const event: GroupDataChangeEvent = {
+			const event: ItemableChangeEvent = {
 				id,
 				...e.endShape,
 				items: transformRecursive(startItems.current),
 			};
 
-			onGroupDataChange?.(event);
+			onItemableChange?.(event);
 		},
-		[onGroupDataChange, id],
+		[onItemableChange, id],
 	);
 
 	const handleTransformEnd = useCallback((_e: DiagramTransformEvent) => {
 		// TODO: 伝番させる
 	}, []);
 
-	const handleChildGroupDataChange = useCallback(
-		(e: GroupDataChangeEvent) => {
+	const handleChildItemableChange = useCallback(
+		(e: ItemableChangeEvent) => {
 			// アウトラインの更新
 			const changeItem = getChildDiagramById(items, e.id);
 			if (changeItem) {
@@ -565,9 +564,9 @@ const Group: React.FC<GroupProps> = ({
 				} as Diagram);
 			}
 
-			onGroupDataChange?.(e);
+			onItemableChange?.(e);
 		},
-		[onGroupDataChange, transformGroupOutline, items],
+		[onItemableChange, transformGroupOutline, items],
 	);
 
 	// グループ内の図形の作成
@@ -582,7 +581,7 @@ const Group: React.FC<GroupProps> = ({
 			onDragEnd: handleChildDiagramDragEnd,
 			onTransform: handleChildDiagramTransfrom,
 			onTransformEnd: handleChildDiagramTransfromEnd,
-			onGroupDataChange: handleChildGroupDataChange,
+			onItemableChange: handleChildItemableChange,
 			onSelect: handleChildDiagramSelect,
 		};
 
