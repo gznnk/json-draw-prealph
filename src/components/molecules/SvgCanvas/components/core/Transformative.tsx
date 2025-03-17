@@ -23,8 +23,8 @@ import {
 import {
 	affineTransformation,
 	calcNearestCircleIntersectionPoint,
-	calcRectangleVertices,
 	calcRadian,
+	calcRectangleVertices,
 	createLinerX2yFunction,
 	createLinerY2xFunction,
 	degreesToRadians,

@@ -1,158 +1,44 @@
 // Reactのインポート
-import { useState, useCallback, useEffect, useRef, use } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // 型定義をインポート
 import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 
 // SvgCanvas関連型定義をインポート
+import type { Diagram } from "../types/DiagramTypes";
 import type {
-	ConnectPointData,
-	Diagram,
-	PathData,
-	PathPointData,
-} from "../types/DiagramTypes";
-import type {
-	DiagramSelectEvent,
-	DiagramDragEvent,
-	DiagramDragDropEvent,
-	DiagramConnectEvent,
 	ConnectPointMoveEvent,
+	DiagramConnectEvent,
+	DiagramDragDropEvent,
+	DiagramDragEvent,
+	DiagramSelectEvent,
 	DiagramTransformEvent,
 	GroupDataChangeEvent,
 } from "../types/EventTypes";
 
-// SvgCanvas関連関数をインポート
-import { isGroupData } from "../SvgCanvasFunctions";
-
+// SvgCanvas関連コンポーネントをインポート
 import { EVENT_NAME_CONNECT_POINT_MOVE } from "../components/connector/ConnectPoint";
 
-// ユーティリティをインポート
-import { getLogger } from "../../../../utils/Logger";
+// SvgCanvas関連関数をインポート
+import { isGroupData, newId } from "../functions/Diagram";
 import { calcPointsOuterBox } from "../functions/Math";
 
-const logger = getLogger("SvgCanvasHooks");
-
-const getDiagramById = (
-	diagrams: Diagram[],
-	id: string,
-): Diagram | undefined => {
-	for (const diagram of diagrams) {
-		if (diagram.id === id) {
-			return diagram;
-		}
-		if (isGroupData(diagram)) {
-			const ret = getDiagramById(diagram.items || [], id);
-			if (ret) {
-				return ret;
-			}
-		}
-	}
-};
-
-// const getConnectPointById = (
-// 	diagrams: Diagram[],
-// 	id: string,
-// ): ConnectPointData | undefined => {
-// 	for (const diagram of diagrams) {
-// 		if (isGroupData(diagram)) {
-// 			const ret = getConnectPointById(diagram.items || [], id);
-// 			if (ret) {
-// 				return ret;
-// 			}
-// 		}
-// 		const ret = diagram.connectPoints?.find((cp) => cp.id === id);
-// 		if (ret) {
-// 			return ret;
-// 		}
-// 	}
-// };
-
-const generateId = (): string => crypto.randomUUID();
-
-function removeNulls<T extends object>(obj: T): Partial<T> {
-	return Object.fromEntries(
-		Object.entries(obj).filter(([_, value]) => value !== undefined),
-	) as Partial<T>;
-}
-
-// TODO: ちゃんと中身を見ていないので要確認
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const deepMerge = <T extends Record<string, any>>(
-	target: T,
-	...sources: Partial<T>[]
-): T => {
-	for (const source of sources) {
-		if (typeof source !== "object" || source === null) continue;
-
-		for (const key of Object.keys(source)) {
-			const sourceValue = source[key];
-			const targetValue = target[key];
-
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			(target as any)[key] =
-				typeof sourceValue === "object" && sourceValue !== null
-					? deepMerge(
-							Array.isArray(sourceValue) ? [] : { ...targetValue },
-							sourceValue,
-						)
-					: sourceValue;
-		}
-	}
-
-	return Array.isArray(target) ? target : { ...target };
-};
-
+/**
+ * SvgCanvasの状態の型定義
+ */
 export type SvgCanvasState = {
 	items: Diagram[];
 	selectedItemId?: string;
 };
 
-// type AddItem = Omit<PartiallyRequired<Diagram, "type">, "id" | "isSelected">;
-type AddItem = Diagram;
+// TODO: 精査
 type UpdateItem = Omit<PartiallyRequired<Diagram, "id">, "type" | "isSelected">;
-
-const DEFAULT_ITEM_VALUE = {
-	point: { x: 10, y: 10 },
-	width: 100,
-	height: 100,
-	fill: "transparent",
-	stroke: "black",
-	strokeWidth: "1px",
-	keepProportion: false,
-	isSelected: false,
-	childItems: [],
-};
-
-const applyRecursive = (items: Diagram[], func: (item: Diagram) => Diagram) => {
-	let isItemChanged = false;
-	const newItems: Diagram[] = [];
-	for (const item of items) {
-		const newItem = func(item);
-		newItems.push(newItem);
-
-		// アイテムの参照先が変わった場合は変更ありと判断する
-		if (item !== newItem) {
-			isItemChanged = true;
-		}
-		if (isGroupData(item) && isGroupData(newItem)) {
-			const newGroupItems = applyRecursive(item.items ?? [], func);
-			// 配列の参照先が変わった場合は変更ありと判断する
-			if (newGroupItems !== item.items) {
-				newItem.items = newGroupItems;
-				isItemChanged = true;
-			}
-		}
-	}
-
-	// 変更がない場合はReactが変更なしと検知するよう元の配列を返す
-	return isItemChanged ? newItems : items;
-};
 
 /**
  * SVGキャンバスのフック
  *
- * @param initialItems
- * @returns
+ * @param initialItems 初期図形配列
+ * @returns キャンバスの状態と関数
  */
 export const useSvgCanvas = (initialItems: Diagram[]) => {
 	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
@@ -169,25 +55,12 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	}, []);
 
 	const onGroupDataChange = useCallback((e: GroupDataChangeEvent) => {
-		// console.log("onGroupDataChange", e);
-
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyRecursive(prevState.items, (item) =>
 				item.id === e.id ? deepMerge(item, e) : item,
 			),
 		}));
-
-		// setCanvasState((prevState) => ({
-		// 	...prevState,
-		// 	items: applyRecursive(prevState.items, (item) => {
-		// 		console.log("", item.id);
-		// 		if (item.id === e.id) {
-		// 			return deepMerge(item, e);
-		// 		}
-		// 		return item;
-		// 	}),
-		// }));
 	}, []);
 
 	const onDrag = useCallback((e: DiagramDragEvent) => {
@@ -200,7 +73,6 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	}, []);
 
 	const onDragEnd = useCallback((e: DiagramDragEvent) => {
-		logger.debug("onDragEnd", e);
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyRecursive(prevState.items, (item) =>
@@ -209,7 +81,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		}));
 	}, []);
 
-	const onDrop = useCallback((e: DiagramDragDropEvent) => {
+	const onDrop = useCallback((_e: DiagramDragDropEvent) => {
 		// NOP
 	}, []);
 
@@ -244,15 +116,10 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	}, []);
 
 	const onConnect = useCallback((e: DiagramConnectEvent) => {
-		// alert("connect");
-		// const startItem = getDiagramById(canvasState.items, e.startPoint.id);
-		// const endItem = getDiagramById(canvasState.items, e.endPoint.id);
-		// console.log("onConnect", e);
-
 		const box = calcPointsOuterBox(e.points.map((p) => p.point));
 
 		addItem({
-			id: generateId(),
+			id: newId(),
 			type: "ConnectLine",
 			point: box.center,
 			width: box.right - box.left,
@@ -297,7 +164,6 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		...canvasState,
 		onDrag,
 		onDragEnd,
-		onDragEndByGroup: onDragEnd,
 		onDrop,
 		onSelect,
 		onDelete,
@@ -349,11 +215,71 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		updateItem,
 	};
 
-	// console.log("canvasState", canvasState);
-
 	return {
 		state: [canvasState, setCanvasState],
 		canvasProps,
 		canvasFunctions,
 	} as const;
+};
+
+/**
+ * 再帰的に更新関数を適用する
+ *
+ * @param items 更新対象の図形配列
+ * @param updateFunction 更新関数
+ * @returns 更新後の図形配列
+ */
+const applyRecursive = (
+	items: Diagram[],
+	updateFunction: (item: Diagram) => Diagram,
+) => {
+	let isItemChanged = false;
+	const newItems: Diagram[] = [];
+	for (const item of items) {
+		const newItem = updateFunction(item);
+		newItems.push(newItem);
+
+		// アイテムの参照先が変わった場合は変更ありと判断する
+		if (item !== newItem) {
+			isItemChanged = true;
+		}
+		if (isGroupData(item) && isGroupData(newItem)) {
+			const newGroupItems = applyRecursive(item.items ?? [], updateFunction);
+			// 配列の参照先が変わった場合は変更ありと判断する
+			if (newGroupItems !== item.items) {
+				newItem.items = newGroupItems;
+				isItemChanged = true;
+			}
+		}
+	}
+
+	// 変更がない場合はReactが変更なしと検知するよう元の配列を返す
+	return isItemChanged ? newItems : items;
+};
+
+// TODO: ちゃんと中身を見ていないので要確認
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+const deepMerge = <T extends Record<string, any>>(
+	target: T,
+	...sources: Partial<T>[]
+): T => {
+	for (const source of sources) {
+		if (typeof source !== "object" || source === null) continue;
+
+		for (const key of Object.keys(source)) {
+			const sourceValue = source[key];
+			const targetValue = target[key];
+
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			(target as any)[key] =
+				typeof sourceValue === "object" && sourceValue !== null
+					? deepMerge(
+							Array.isArray(sourceValue) ? [] : { ...targetValue },
+							sourceValue,
+						)
+					: sourceValue;
+		}
+	}
+
+	return Array.isArray(target) ? target : { ...target };
 };

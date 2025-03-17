@@ -5,6 +5,7 @@ import React, { createContext, memo, useCallback, useRef } from "react";
 import styled from "@emotion/styled";
 
 // SvgCanvas関連型定義をインポート
+import type { SvgCanvasState } from "./hooks/canvasHooks";
 import type { Diagram } from "./types/DiagramTypes";
 import { DiagramTypeComponentMap } from "./types/DiagramTypes";
 import type {
@@ -16,19 +17,17 @@ import type {
 	GroupDataChangeEvent,
 } from "./types/EventTypes";
 
-import type { SvgCanvasState } from "./hooks";
-import { isGroupData } from "./SvgCanvasFunctions";
+// SvgCanvas関連関数をインポート
+import { isGroupData } from "./functions/Diagram";
 
+// SvgCanvasの状態を階層を跨いで提供するためにSvgCanvasStateProviderを保持するコンテキストを作成
 export const SvgCanvasContext = createContext<SvgCanvasStateProvider | null>(
 	null,
 );
 
-// ユーティリティをインポート
-import { getLogger } from "../../../utils/Logger";
-
-// ロガーを取得
-const logger = getLogger("SvgCanvas");
-
+/**
+ * svg要素のコンテナのスタイル定義
+ */
 const ContainerDiv = styled.div`
 	position: absolute;
     top: 0;
@@ -38,12 +37,18 @@ const ContainerDiv = styled.div`
 	overflow: auto;
 `;
 
+/**
+ * svg要素のスタイル定義
+ */
 const Svg = styled.svg`
 	* {
 		outline: none;
 	}
 `;
 
+/**
+ * SvgCanvasのプロパティの型定義
+ */
 type SvgCanvasProps = {
 	title?: string;
 	items: Array<Diagram>;
@@ -51,125 +56,140 @@ type SvgCanvasProps = {
 	onGroupDataChange?: (e: GroupDataChangeEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragEnd?: (e: DiagramDragEvent) => void;
-	onDragEndByGroup?: (e: DiagramDragEvent) => void;
 	onDrop?: (e: DiagramDragDropEvent) => void;
 	onSelect?: (e: DiagramSelectEvent) => void;
 	onDelete?: () => void;
 	onConnect?: (e: DiagramConnectEvent) => void;
 };
 
-const SvgCanvas: React.FC<SvgCanvasProps> = memo(
-	({
-		title,
-		items,
-		onTransform,
-		onGroupDataChange,
-		onDrag,
-		onDragEnd,
-		onDragEndByGroup,
-		onDrop,
-		onSelect,
-		onDelete,
-		onConnect,
-	}) => {
-		const k1 = window.profiler.start("SvgCanvas render");
+/**
+ * SvgCanvasコンポーネント
+ */
+const SvgCanvas: React.FC<SvgCanvasProps> = ({
+	title,
+	items,
+	onTransform,
+	onGroupDataChange,
+	onDrag,
+	onDragEnd,
+	onDrop,
+	onSelect,
+	onDelete,
+	onConnect,
+}) => {
+	// Ctrlキーが押されているかどうかのフラグ
+	const isCtrlDown = useRef(false);
 
-		const isCtrlDown = useRef(false);
+	// SvgCanvasStateProviderのインスタンスを生成
+	// 現時点ではシングルトン的に扱うため、useRefで保持し、以降再作成しない
+	// TODO: レンダリングの負荷が高くなければ、都度インスタンスを更新して再レンダリングさせたい
+	const stateProvider = useRef(new SvgCanvasStateProvider({ items }));
+	stateProvider.current.setState({ items });
 
-		const handleSelect = useCallback(
-			(e: DiagramSelectEvent) => {
-				onSelect?.({ id: e.id, isMultiSelect: isCtrlDown.current });
-			},
-			[onSelect],
-		);
-
-		logger.debug("SvgCanvas items", items);
-
-		const renderedItems = items.map((item) => {
-			const itemType = DiagramTypeComponentMap[item.type];
-			const props = {
-				...item,
-				key: item.id,
-				onTransform,
-				onGroupDataChange,
-				onDrag,
-				onDragEnd,
-				onDragEndByGroup,
-				onDrop,
-				onSelect: handleSelect,
-				onConnect,
-			};
-
-			return React.createElement(itemType, props);
-		});
-
-		const handlePointerDown = useCallback(
-			(e: React.PointerEvent<SVGSVGElement>) => {
-				if (e.target === e.currentTarget) {
-					onSelect?.({ id: "dummy" });
-				}
-			},
-			[onSelect],
-		);
-
-		const handleKeyDown = useCallback(
-			(e: React.KeyboardEvent<SVGSVGElement>) => {
-				if (e.key === "Control") {
-					isCtrlDown.current = true;
-				}
-
-				if (e.key === "Delete") {
-					onDelete?.();
-				}
-
-				// キャンバスにフォーカスがない場合はイベントをキャンセルし、スクロールを無効化
-				if (e.target !== e.currentTarget) {
-					e.preventDefault();
-				}
-			},
-			[onDelete],
-		);
-
-		const handleKeyUp = useCallback((e: React.KeyboardEvent<SVGSVGElement>) => {
-			if (e.key === "Control") {
-				isCtrlDown.current = false;
+	/**
+	 * SvgCanvasのポインターダウンイベントハンドラ
+	 */
+	const handlePointerDown = useCallback(
+		(e: React.PointerEvent<SVGSVGElement>) => {
+			if (e.target === e.currentTarget) {
+				onSelect?.({ id: "dummy" });
 			}
-		}, []);
+		},
+		[onSelect],
+	);
 
-		// console.log(items);
+	/**
+	 * SvgCanvasのキーダウンイベントハンドラ
+	 */
+	const handleKeyDown = useCallback(
+		(e: React.KeyboardEvent<SVGSVGElement>) => {
+			// Controlキー押下の検知のみを行い、処理はHooksに委譲
+			if (e.key === "Control") {
+				isCtrlDown.current = true;
+			}
 
-		window.profiler.end("SvgCanvas render", k1);
+			// Deleteキー押下の検知のみを行い、処理はHooksに委譲
+			if (e.key === "Delete") {
+				onDelete?.();
+			}
 
-		const stateProvider = useRef(new SvgCanvasStateProvider({ items }));
-		stateProvider.current.setState({ items });
+			// キャンバスにフォーカスがない場合はイベントをキャンセルし、スクロールを無効化
+			if (e.target !== e.currentTarget) {
+				e.preventDefault();
+			}
+		},
+		[onDelete],
+	);
 
-		return (
-			<ContainerDiv>
-				<SvgCanvasContext.Provider value={stateProvider.current}>
-					<Svg
-						width="120vw"
-						height="120vh"
-						onPointerDown={handlePointerDown}
-						onKeyDown={handleKeyDown}
-						onKeyUp={handleKeyUp}
-					>
-						<title>{title}</title>
-						{renderedItems}
-					</Svg>
-				</SvgCanvasContext.Provider>
-			</ContainerDiv>
-		);
-	},
-);
+	/**
+	 * SvgCanvasのキーアップイベントハンドラ
+	 */
+	const handleKeyUp = useCallback((e: React.KeyboardEvent<SVGSVGElement>) => {
+		// Controlキー離上の検知のみを行い、処理はHooksに委譲
+		if (e.key === "Control") {
+			isCtrlDown.current = false;
+		}
+	}, []);
 
-export default SvgCanvas;
+	/**
+	 * 図形選択イベントハンドラ
+	 */
+	const handleSelect = useCallback(
+		(e: DiagramSelectEvent) => {
+			// Ctrlキーの押下状態を付与して、処理をHooksに委譲
+			onSelect?.({ id: e.id, isMultiSelect: isCtrlDown.current });
+		},
+		[onSelect],
+	);
 
+	// 図形の描画
+	const renderedItems = items.map((item) => {
+		const itemType = DiagramTypeComponentMap[item.type];
+		const props = {
+			...item,
+			key: item.id,
+			onTransform,
+			onGroupDataChange,
+			onDrag,
+			onDragEnd,
+			onDrop,
+			onSelect: handleSelect,
+			onConnect,
+		};
+
+		return React.createElement(itemType, props);
+	});
+
+	return (
+		<ContainerDiv>
+			<SvgCanvasContext.Provider value={stateProvider.current}>
+				<Svg
+					width="120vw"
+					height="120vh"
+					onPointerDown={handlePointerDown}
+					onKeyDown={handleKeyDown}
+					onKeyUp={handleKeyUp}
+				>
+					<title>{title}</title>
+					{renderedItems}
+				</Svg>
+			</SvgCanvasContext.Provider>
+		</ContainerDiv>
+	);
+};
+
+export default memo(SvgCanvas);
+
+/**
+ * 階層を跨いでSvgCanvasの状態を提供するクラス.
+ */
 class SvgCanvasStateProvider {
 	s: SvgCanvasState;
 	constructor(state: SvgCanvasState) {
 		this.s = state;
 	}
 	setState(state: SvgCanvasState) {
+		// 現時点ではシングルトン的に扱っているため、状態の更新関数を提供
 		this.s = state;
 	}
 	state(): SvgCanvasState {
@@ -183,6 +203,13 @@ class SvgCanvasStateProvider {
 	}
 }
 
+/**
+ * IDに対応する図形データを取得する
+ *
+ * @param diagrams - 図形データ配列
+ * @param id - ID
+ * @returns - 図形データ
+ */
 const getDiagramById = (
 	diagrams: Diagram[],
 	id: string,
@@ -191,6 +218,7 @@ const getDiagramById = (
 		if (diagram.id === id) {
 			return diagram;
 		}
+		// グループデータの場合は再帰的に探索
 		if (isGroupData(diagram)) {
 			const ret = getDiagramById(diagram.items || [], id);
 			if (ret) {

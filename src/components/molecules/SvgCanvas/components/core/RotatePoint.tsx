@@ -3,9 +3,12 @@ import type React from "react";
 import { useRef } from "react";
 
 // SvgCanvas関連カスタムフックをインポート
-import { useDrag } from "../../hooks/dragHooks";
 import type { DragProps } from "../../hooks/dragHooks";
+import { useDrag } from "../../hooks/dragHooks";
 
+/**
+ * 回転ポイントコンポーネントのPropsの型定義
+ */
 export type RotatePointProps = Omit<DragProps, "ref"> & {
 	rotation?: number;
 	color?: string;
@@ -13,6 +16,9 @@ export type RotatePointProps = Omit<DragProps, "ref"> & {
 	hidden?: boolean;
 };
 
+/**
+ * 回転ポイントコンポーネント
+ */
 const RotatePoint: React.FC<RotatePointProps> = ({
 	id,
 	type,

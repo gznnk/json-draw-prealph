@@ -32,10 +32,16 @@ import { useDrag } from "../../hooks/dragHooks";
 import { createSvgTransform, newId } from "../../functions/Diagram";
 import { calcRectangleVertices, degreesToRadians } from "../../functions/Math";
 
+/**
+ * 四角形コンポーネントのプロパティ
+ */
 export type RectangleProps = DiagramBaseProps &
 	TransformativeProps &
 	RectangleData;
 
+/**
+ * 四角形コンポーネント
+ */
 const Rectangle: React.FC<RectangleProps> = ({
 	id,
 	point,

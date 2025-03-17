@@ -37,8 +37,6 @@ import {
 	rotatePoint,
 } from "../../functions/Math";
 
-import { drawPoint } from "../../functions/Diagram";
-
 // ユーティリティをインポート
 // import { getLogger } from "../../../../../utils/Logger";
 

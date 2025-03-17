@@ -21,15 +21,8 @@ import type {
 import Transformative from "../core/Transformative";
 
 // SvgCanvas関連関数をインポート
-import { isGroupData, isTransformativeData } from "../../SvgCanvasFunctions";
+import { isGroupData, isTransformativeData } from "../../functions/Diagram";
 import { degreesToRadians, nanToZero, rotatePoint } from "../../functions/Math";
-//import { drawPoint, drawRect } from "../../functions/Svg";
-
-// ユーティリティをインポート
-// import { getLogger } from "../../../../../utils/Logger";
-
-// ロガーを取得
-// const logger = getLogger("Group");
 
 /**
  * 選択されたグループ内の図形を、配下のグループも含めて再帰的に取得する
@@ -211,7 +204,6 @@ const calcGroupBoxOfNoRotation = (
  * @property {(e: DiagramDragEvent) => void} [onDrag] グループ内の図形のドラッグ中のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
  * @property {(e: DiagramDragEvent) => void} [onDragEnd] グループ内の図形のドラッグ終了時のイベントハンドラ（グループのドラッグはグループ内の図形のドラッグに連動して行わせるため、グループ自体のドラッグは存在しない）
  * @property {(e: DiagramDragDropEvent) => void} [onDrop] グループ内の図形のドラッグ＆ドロップ時のイベントハンドラ
- * @property {(e: DiagramDragEvent) => void} [onDragEndByGroup] グループ全体の移動に伴うグループ内の図形のドラッグ終了時のイベントハンドラ
  * @property {(e: DiagramSelectEvent) => void} [onSelect] 選択時のイベントハンドラ
  * @property {(e: DiagramConnectEvent) => void} [onConnect] 図形の接続時のイベントハンドラ
  * @property {Diagram[]} [items] グループ内の図形リスト

@@ -6,8 +6,8 @@ import { useRef } from "react";
 import styled from "@emotion/styled";
 
 // SvgCanvas関連カスタムフックをインポート
-import { useDrag } from "../../hooks/dragHooks";
 import type { DragProps } from "../../hooks/dragHooks";
+import { useDrag } from "../../hooks/dragHooks";
 
 /**
  * SVGのcircle要素のProps型定義
