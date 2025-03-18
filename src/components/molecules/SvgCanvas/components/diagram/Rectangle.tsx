@@ -85,155 +85,179 @@ const Rectangle: React.FC<RectangleProps> = ({
 	/**
 	 * 接続ポイントの位置を更新
 	 */
-	const triggerConnectPointsMove = useCallback(
-		(type: ConnectPointMoveEventType, ownerShape: Shape) => {
-			const vertices = calcRectangleVertices(ownerShape);
+	const triggerConnectPointsMove = (
+		type: ConnectPointMoveEventType,
+		ownerShape: Shape,
+	) => {
+		const vertices = calcRectangleVertices(ownerShape);
 
-			for (const connectPointData of (items as ConnectPointData[]) ?? []) {
-				const connectPoint = (vertices as RectangleVertices)[
-					connectPointData.name as keyof RectangleVertices
-				];
+		for (const connectPointData of (items as ConnectPointData[]) ?? []) {
+			const connectPoint = (vertices as RectangleVertices)[
+				connectPointData.name as keyof RectangleVertices
+			];
 
-				triggerConnectPointMove({
-					id: connectPointData.id,
-					type,
-					x: connectPoint.x,
-					y: connectPoint.y,
-					ownerId: id,
-					ownerShape,
-				});
-			}
-		},
-		[id, items],
-	);
+			triggerConnectPointMove({
+				id: connectPointData.id,
+				type,
+				x: connectPoint.x,
+				y: connectPoint.y,
+				ownerId: id,
+				ownerShape,
+			});
+		}
+	};
+
+	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	const refBusVal = {
+		// プロパティ
+		id,
+		width,
+		height,
+		rotation,
+		scaleX,
+		scaleY,
+		isSelected,
+		onDragStart,
+		onDrag,
+		onDragEnd,
+		onSelect,
+		onTransformStart,
+		onTransform,
+		onTransformEnd,
+		// 内部変数・内部関数
+		triggerConnectPointsMove,
+	};
+	const refBus = useRef(refBusVal);
+	refBus.current = refBusVal;
 
 	/**
 	 * 四角形のドラッグ開始イベントハンドラ
 	 */
-	const handleDragStart = useCallback(
-		(e: DiagramDragEvent) => {
-			setIsDragging(true);
-
-			// TODO: 簡潔に書きたい
-			triggerConnectPointsMove("moveStart", {
-				x: e.endX,
-				y: e.endY,
-				width,
-				height,
-				rotation,
-				scaleX,
-				scaleY,
-			});
-
-			onDragStart?.(e);
-		},
-		[
-			onDragStart,
-			triggerConnectPointsMove,
+	const handleDragStart = useCallback((e: DiagramDragEvent) => {
+		const {
 			width,
 			height,
 			rotation,
 			scaleX,
 			scaleY,
-		],
-	);
+			onDragStart,
+			triggerConnectPointsMove,
+		} = refBus.current;
+
+		setIsDragging(true);
+
+		// TODO: 簡潔に書きたい
+		triggerConnectPointsMove("moveStart", {
+			x: e.endX,
+			y: e.endY,
+			width,
+			height,
+			rotation,
+			scaleX,
+			scaleY,
+		});
+
+		onDragStart?.(e);
+	}, []);
 
 	/**
 	 * 四角形のドラッグ中イベントハンドラ
 	 */
-	const handleDrag = useCallback(
-		(e: DiagramDragEvent) => {
-			triggerConnectPointsMove("move", {
-				x: e.endX,
-				y: e.endY,
-				width,
-				height,
-				rotation,
-				scaleX,
-				scaleY,
-			});
-
-			onDrag?.(e);
-		},
-		[onDrag, triggerConnectPointsMove, width, height, rotation, scaleX, scaleY],
-	);
-
-	/**
-	 * 四角形のドラッグ完了イベントハンドラ
-	 */
-	const handleDragEnd = useCallback(
-		(e: DiagramDragEvent) => {
-			onDragEnd?.(e);
-
-			triggerConnectPointsMove("moveEnd", {
-				x: e.endX,
-				y: e.endY,
-				width,
-				height,
-				rotation,
-				scaleX,
-				scaleY,
-			});
-
-			setIsDragging(false);
-		},
-		[
-			onDragEnd,
-			triggerConnectPointsMove,
+	const handleDrag = useCallback((e: DiagramDragEvent) => {
+		const {
 			width,
 			height,
 			rotation,
 			scaleX,
 			scaleY,
-		],
-	);
+			onDrag,
+			triggerConnectPointsMove,
+		} = refBus.current;
+
+		triggerConnectPointsMove("move", {
+			x: e.endX,
+			y: e.endY,
+			width,
+			height,
+			rotation,
+			scaleX,
+			scaleY,
+		});
+
+		onDrag?.(e);
+	}, []);
+
+	/**
+	 * 四角形のドラッグ完了イベントハンドラ
+	 */
+	const handleDragEnd = useCallback((e: DiagramDragEvent) => {
+		const {
+			width,
+			height,
+			rotation,
+			scaleX,
+			scaleY,
+			onDragEnd,
+			triggerConnectPointsMove,
+		} = refBus.current;
+
+		triggerConnectPointsMove("moveEnd", {
+			x: e.endX,
+			y: e.endY,
+			width,
+			height,
+			rotation,
+			scaleX,
+			scaleY,
+		});
+
+		onDragEnd?.(e);
+
+		setIsDragging(false);
+	}, []);
 
 	/**
 	 * 四角形の変形開始イベントハンドラ
 	 */
-	const handleTransformStart = useCallback(
-		(e: DiagramTransformEvent) => {
-			setIsTransforming(true);
-			onTransformStart?.(e);
-			triggerConnectPointsMove("moveStart", e.endShape);
-		},
-		[onTransformStart, triggerConnectPointsMove],
-	);
+	const handleTransformStart = useCallback((e: DiagramTransformEvent) => {
+		const { onTransformStart, triggerConnectPointsMove } = refBus.current;
+		setIsTransforming(true);
+		onTransformStart?.(e);
+		triggerConnectPointsMove("moveStart", e.endShape);
+	}, []);
 
 	/**
 	 * 四角形の変形中イベントハンドラ
 	 */
-	const handleTransform = useCallback(
-		(e: DiagramTransformEvent) => {
-			onTransform?.(e);
-			triggerConnectPointsMove("move", e.endShape);
-		},
-		[onTransform, triggerConnectPointsMove],
-	);
+	const handleTransform = useCallback((e: DiagramTransformEvent) => {
+		const { onTransform, triggerConnectPointsMove } = refBus.current;
+		onTransform?.(e);
+		triggerConnectPointsMove("move", e.endShape);
+	}, []);
 
 	/**
 	 * 四角形の変形完了イベントハンドラ
 	 */
-	const handleTransformEnd = useCallback(
-		(e: DiagramTransformEvent) => {
-			onTransformEnd?.(e);
-			triggerConnectPointsMove("moveEnd", e.endShape);
-			setIsTransforming(false);
-		},
-		[onTransformEnd, triggerConnectPointsMove],
-	);
+	const handleTransformEnd = useCallback((e: DiagramTransformEvent) => {
+		const { onTransformEnd, triggerConnectPointsMove } = refBus.current;
+		onTransformEnd?.(e);
+		triggerConnectPointsMove("moveEnd", e.endShape);
+		setIsTransforming(false);
+	}, []);
 
 	/**
 	 * ポインターダウンイベントハンドラ
 	 */
 	const handlePointerDown = useCallback(() => {
+		const { id, isSelected, onSelect } = refBus.current;
+
 		if (!isSelected) {
 			// 図形選択イベントを発火
 			onSelect?.({
 				id,
 			});
 		}
-	}, [id, isSelected, onSelect]);
+	}, []);
 
 	/**
 	 * ホバー状態変更イベントハンドラ
@@ -255,14 +279,6 @@ const Rectangle: React.FC<RectangleProps> = ({
 		onDragEnd: handleDragEnd,
 		onHover: handleHover,
 	});
-
-	const rectTransform = createSvgTransform(
-		scaleX,
-		scaleY,
-		degreesToRadians(rotation),
-		x,
-		y,
-	);
 
 	// TODO:
 	const ownerShape = {
@@ -290,7 +306,13 @@ const Rectangle: React.FC<RectangleProps> = ({
 					strokeWidth={strokeWidth}
 					tabIndex={0}
 					cursor="move"
-					transform={rectTransform}
+					transform={createSvgTransform(
+						scaleX,
+						scaleY,
+						degreesToRadians(rotation),
+						x,
+						y,
+					)}
 					ref={svgRef}
 					{...dragProps}
 				/>
@@ -332,31 +354,6 @@ const Rectangle: React.FC<RectangleProps> = ({
 };
 
 export default memo(Rectangle);
-
-// export default memo(
-// 	Rectangle,
-// 	(prevProps: RectangleProps, nextProps: RectangleProps) => {
-// 		console.log("前回の props:", prevProps);
-// 		console.log("今回の props:", nextProps);
-
-// 		// どのプロパティが変わったか確認
-// 		for (const key in nextProps) {
-// 			if (
-// 				prevProps[key as keyof RectangleProps] !==
-// 				nextProps[key as keyof RectangleProps]
-// 			) {
-// 				console.log(`変更された prop: ${key}`);
-// 			}
-// 		}
-
-// 		// デフォルトの比較ロジック（=== 比較）を維持
-// 		return Object.keys(prevProps).every(
-// 			(key: string) =>
-// 				prevProps[key as keyof RectangleProps] ===
-// 				nextProps[key as keyof RectangleProps],
-// 		);
-// 	},
-// );
 
 /**
  * 短径データ作成

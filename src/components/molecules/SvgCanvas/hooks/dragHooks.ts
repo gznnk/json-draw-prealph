@@ -19,6 +19,9 @@ const EVENT_NAME_BROADCAST_DRAG = "BroadcastDrag";
 /** 全体通知用ドラッグ完了イベントの名前 */
 const EVENT_NAME_BROADCAST_DRAG_END = "BroadcastDragEnd";
 
+/** ドラッグのあそび */
+const DRAG_DEAD_ZONE = 5;
+
 /**
  * 全体通知用ドラッグイベントの型定義
  */
@@ -215,8 +218,8 @@ export const useDrag = (props: DragProps) => {
 
 		if (
 			!isDragging &&
-			(Math.abs(e.clientX - startClientX.current) > 3 ||
-				Math.abs(e.clientY - startClientY.current) > 3)
+			(Math.abs(e.clientX - startClientX.current) > DRAG_DEAD_ZONE ||
+				Math.abs(e.clientY - startClientY.current) > DRAG_DEAD_ZONE)
 		) {
 			// ドラッグ中でない場合、かつポインターの移動量が一定以上の場合はドラッグ開始とする
 			onDragStart?.({

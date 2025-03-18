@@ -20,53 +20,51 @@ type DragLineProps = Omit<DragProps, "ref"> & {
 /**
  * 辺ドラッグ用の線コンポーネント
  */
-const DragLine: React.FC<DragLineProps> = memo(
-	({
+const DragLine: React.FC<DragLineProps> = ({
+	id,
+	x,
+	y,
+	startX,
+	startY,
+	endX,
+	endY,
+	cursor,
+	onPointerDown,
+	onClick,
+	onDragStart,
+	onDrag,
+	onDragEnd,
+	dragPositioningFunction,
+}) => {
+	const svgRef = useRef<SVGLineElement>({} as SVGLineElement);
+
+	const dragProps = useDrag({
 		id,
 		x,
 		y,
-		startX,
-		startY,
-		endX,
-		endY,
-		cursor,
+		ref: svgRef,
 		onPointerDown,
 		onClick,
 		onDragStart,
 		onDrag,
 		onDragEnd,
 		dragPositioningFunction,
-	}) => {
-		const svgRef = useRef<SVGLineElement>({} as SVGLineElement);
+	});
 
-		const dragProps = useDrag({
-			id,
-			x,
-			y,
-			ref: svgRef,
-			onPointerDown,
-			onClick,
-			onDragStart,
-			onDrag,
-			onDragEnd,
-			dragPositioningFunction,
-		});
-
-		return (
-			<line
-				id={id}
-				x1={startX}
-				y1={startY}
-				x2={endX}
-				y2={endY}
-				stroke="transparent"
-				strokeWidth={3}
-				cursor={cursor}
-				ref={svgRef}
-				{...dragProps}
-			/>
-		);
-	},
-);
+	return (
+		<line
+			id={id}
+			x1={startX}
+			y1={startY}
+			x2={endX}
+			y2={endY}
+			stroke="transparent"
+			strokeWidth={3}
+			cursor={cursor}
+			ref={svgRef}
+			{...dragProps}
+		/>
+	);
+};
 
 export default memo(DragLine);

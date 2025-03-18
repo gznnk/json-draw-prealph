@@ -19,6 +19,9 @@ import { useDrag } from "../../hooks/dragHooks";
 import { createSvgTransform } from "../../functions/Diagram";
 import { degreesToRadians } from "../../functions/Math";
 
+/**
+ * 楕円コンポーネントのプロパティ
+ */
 export type EllipseProps = CreateDiagramProps<
 	EllipseData,
 	{
@@ -28,6 +31,9 @@ export type EllipseProps = CreateDiagramProps<
 	}
 >;
 
+/**
+ * 楕円コンポーネント
+ */
 const Ellipse: React.FC<EllipseProps> = ({
 	id,
 	x,

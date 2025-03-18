@@ -2,7 +2,6 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
-import type { Point } from "../../types/CoordinateTypes";
 import type {
 	CreateDiagramProps,
 	Diagram,
@@ -26,6 +25,439 @@ import {
 	isTransformativeData,
 } from "../../functions/Diagram";
 import { degreesToRadians, nanToZero, rotatePoint } from "../../functions/Math";
+
+/**
+ * グループのプロパティ
+ */
+export type GroupProps = CreateDiagramProps<
+	GroupData,
+	{
+		selectable: true;
+		transformative: true;
+		itemable: true;
+	}
+>;
+
+/**
+ * グループコンポーネント
+ */
+const Group: React.FC<GroupProps> = ({
+	id,
+	x,
+	y,
+	width,
+	height,
+	rotation,
+	scaleX,
+	scaleY,
+	keepProportion,
+	isSelected,
+	items,
+	onDragStart,
+	onDrag,
+	onDragEnd,
+	onClick,
+	onSelect,
+	onTransform,
+	onItemableChange,
+}) => {
+	// グループ全体のドラッグ中かどうかのフラグ（このグループが選択中でかつドラッグ中の場合のみtrueにする）
+	const [isDragging, setIsDragging] = useState(false);
+	// グループ連続選択フラグ。グループ連続選択とは、グループ内の図形（同じ図形でなくてよい）を連続して選択する操作のこと。
+	// このグループが選択中でかつ再度グループ内の図形でポインター押下された場合のみtrueにする
+	const isSequentialSelection = useRef(false);
+
+	// ドラッグ・変形開始時の子図形のリスト
+	const startItems = useRef<Diagram[]>(items);
+	// ドラッグ・変形開始時のグループの形状
+	const startBox = useRef({ x, y, width, height });
+
+	/**
+	 * 子図形の変更時にグループのアウトラインを更新する
+	 *
+	 * @param changeItem - 変更された子図形
+	 */
+	const transformGroupOutline = (changeItem?: Diagram) => {
+		const radians = degreesToRadians(rotation);
+		const box = calcGroupBoxOfNoRotation(items, x, y, rotation, changeItem);
+		const leftTop = rotatePoint(box.left, box.top, x, y, radians);
+		const rightBottom = rotatePoint(box.right, box.bottom, x, y, radians);
+		onTransform?.({
+			id,
+			startShape: {
+				x,
+				y,
+				width,
+				height,
+				rotation,
+				scaleX,
+				scaleY,
+			},
+			endShape: {
+				x: leftTop.x + (rightBottom.x - leftTop.x) / 2,
+				y: leftTop.y + (rightBottom.y - leftTop.y) / 2,
+				width: box.right - box.left,
+				height: box.bottom - box.top,
+				rotation,
+				scaleX,
+				scaleY,
+			},
+		});
+	};
+
+	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	const refBusVal = {
+		// プロパティ
+		id,
+		x,
+		y,
+		width,
+		height,
+		isSelected,
+		items,
+		onDragStart,
+		onDrag,
+		onDragEnd,
+		onClick,
+		onSelect,
+		onTransform,
+		onItemableChange,
+		// 内部変数・内部関数
+		isDragging,
+		transformGroupOutline,
+	};
+	const refBus = useRef(refBusVal);
+	refBus.current = refBusVal;
+
+	/**
+	 * グループ内の図形の選択イベントハンドラ
+	 */
+	const handleChildDiagramSelect = useCallback((e: DiagramSelectEvent) => {
+		const { id, isSelected, items, onSelect } = refBus.current;
+
+		const selectedChild = getSelectedChildDiagram(items);
+		if (!selectedChild) {
+			// グループ内の図形が選択されていない場合は、このグループの選択イベントを発火させる。
+			// これにより、グループ内の図形が選択されていないグループのうち、最も上位のグループのイベントが
+			// SvgCanvasまで伝番され、そのグループが選択状態になる。
+			onSelect?.({
+				id,
+			});
+		} else if (selectedChild.id !== e.id) {
+			// グループ内の図形が選択されていて、かつグループ内の別の図形が選択された場合、その図形を選択状態にする
+			onSelect?.(e);
+		}
+
+		if (isSelected) {
+			// グループ連続選択時のクリック（ポインターアップ）時に、グループ内でクリックされた図形を選択状態にしたいので、
+			// フラグを立てておき、クリックイベント側で参照する。
+			isSequentialSelection.current = true;
+		}
+	}, []);
+
+	/**
+	 * グループ内の図形のクリックイベントハンドラ
+	 */
+	const handleChildDiagramClick = useCallback((e: DiagramSelectEvent) => {
+		const { id, onSelect, onClick } = refBus.current;
+
+		if (isSequentialSelection.current) {
+			// グループ連続選択時のクリック（ポインターアップ）時であれば、そのグループ内の図形を選択状態にする。
+			// これにより、グループがネストしている場合は、選択の階層が１つずつ下がっていき、最終的にクリックされた図形が選択される。
+			onSelect?.(e);
+			isSequentialSelection.current = false;
+		} else {
+			// グループ連続選択時でない場合は、このグループのクリックイベントを発火させる。
+			// これにより、連続選択でないグループのうち、最も上位のグループのクリックイベントが
+			// 連続選択されたグループまで伝番し、そのグループの連続選択時の処理（当該分岐のtrue側）が実行され、
+			// その直下のグループが選択状態になる。
+			onClick?.({
+				id,
+			});
+		}
+	}, []);
+
+	// グループの選択状態制御
+	useEffect(() => {
+		// グループから選択が外れたら連続選択フラグも解除
+		if (!isSelected) {
+			isSequentialSelection.current = false;
+		}
+	}, [isSelected]);
+
+	/**
+	 * グループ内の図形のドラッグ開始イベントハンドラ
+	 */
+	const handleChildDiagramDragStart = useCallback((e: DiagramDragEvent) => {
+		const { x, y, width, height, isSelected, items, onDragStart } =
+			refBus.current;
+
+		if (isSelected) {
+			// グループ選択時であれば、グループ全体をドラッグ可能にする
+			setIsDragging(true);
+		}
+
+		// ドラッグ開始イベントをそのまま伝番させる
+		onDragStart?.(e);
+
+		// ドラッグ開始時のグループの形状を記憶
+		startItems.current = items;
+		startBox.current = { x, y, width, height };
+	}, []);
+
+	/**
+	 * グループ内の図形のドラッグ中イベントハンドラ
+	 */
+	const handleChildDiagramDrag = useCallback((e: DiagramDragEvent) => {
+		const { id, onDrag, onItemableChange, isDragging } = refBus.current;
+
+		if (!isDragging) {
+			// グループのドラッグでなければ、ドラッグイベントをそのまま伝番
+			onDrag?.(e);
+			return;
+		}
+
+		// グループ内の図形を再帰的に移動させる
+
+		const dx = e.endX - e.startX;
+		const dy = e.endY - e.startY;
+
+		const moveRecursive = (diagrams: Diagram[]) => {
+			const events: ItemableChangeEvent[] = [];
+			for (const item of diagrams) {
+				events.push({
+					...item,
+					x: item.x + dx,
+					y: item.y + dy,
+					items: isItemableData(item)
+						? moveRecursive(item.items ?? [])
+						: undefined,
+				});
+			}
+
+			return events as Diagram[];
+		};
+
+		const event: ItemableChangeEvent = {
+			id,
+			x: startBox.current.x + dx,
+			y: startBox.current.y + dy,
+			items: moveRecursive(startItems.current),
+		};
+
+		onItemableChange?.(event);
+	}, []);
+
+	/**
+	 * グループ内の図形のドラッグ完了イベントハンドラ
+	 */
+	const handleChildDiagramDragEnd = useCallback((e: DiagramDragEvent) => {
+		const { items, onDragEnd, isDragging, transformGroupOutline } =
+			refBus.current;
+
+		if (!isDragging) {
+			// グループのドラッグでなければ、子図形のドラッグに伴うアウトラインの更新を行う
+			const changeItem = getChildDiagramById(items, e.id);
+			if (changeItem) {
+				transformGroupOutline({
+					...changeItem,
+					x: e.endX,
+					y: e.endY,
+				} as Diagram);
+			}
+		}
+
+		onDragEnd?.(e);
+		setIsDragging(false);
+	}, []);
+
+	/**
+	 * グループ内の図形の変形イベントハンドラ
+	 */
+	const handleChildDiagramTransfrom = useCallback(
+		(e: DiagramTransformEvent) => {
+			const { onTransform } = refBus.current;
+			onTransform?.(e);
+		},
+		[],
+	);
+
+	/**
+	 * グループ内の図形の変形完了イベントハンドラ
+	 */
+	const handleChildDiagramTransfromEnd = useCallback(
+		(e: DiagramTransformEvent) => {
+			const { items, transformGroupOutline } = refBus.current;
+
+			// アウトラインの更新
+			const changeItem = getChildDiagramById(items, e.id);
+			if (changeItem) {
+				transformGroupOutline({
+					...changeItem,
+					...e.endShape,
+				} as Diagram);
+			}
+		},
+		[],
+	);
+
+	/**
+	 * グループ内の図形の変更イベントハンドラ
+	 */
+	const handleChildItemableChange = useCallback((e: ItemableChangeEvent) => {
+		const { items, transformGroupOutline, onItemableChange } = refBus.current;
+
+		// アウトラインの更新
+		const changeItem = getChildDiagramById(items, e.id);
+		if (changeItem) {
+			transformGroupOutline({
+				...changeItem,
+				...e,
+			} as Diagram);
+		}
+
+		onItemableChange?.(e);
+	}, []);
+
+	/**
+	 * グループの変形開始イベントハンドラ
+	 */
+	const handleTransformStart = useCallback(() => {
+		const { x, y, width, height, items } = refBus.current;
+
+		startBox.current = { x, y, width, height };
+		startItems.current = items;
+		// TODO: 伝番させる
+	}, []);
+
+	const handleTransform = useCallback((e: DiagramTransformEvent) => {
+		const { id, onItemableChange } = refBus.current;
+
+		// グループの拡縮を計算
+		const groupScaleX = e.endShape.width / e.startShape.width;
+		const groupScaleY = e.endShape.height / e.startShape.height;
+
+		const transformRecursive = (diagrams: Diagram[]) => {
+			const events: ItemableChangeEvent[] = [];
+			for (const item of diagrams) {
+				const inversedItemCenter = rotatePoint(
+					item.x,
+					item.y,
+					e.startShape.x,
+					e.startShape.y,
+					degreesToRadians(-e.startShape.rotation),
+				);
+				const dx =
+					(inversedItemCenter.x - e.startShape.x) *
+					e.startShape.scaleX *
+					e.endShape.scaleX;
+				const dy =
+					(inversedItemCenter.y - e.startShape.y) *
+					e.startShape.scaleY *
+					e.endShape.scaleY;
+
+				const newDx = dx * groupScaleX;
+				const newDy = dy * groupScaleY;
+
+				let newCenter = {
+					x: e.endShape.x + newDx,
+					y: e.endShape.y + newDy,
+				};
+				newCenter = rotatePoint(
+					newCenter.x,
+					newCenter.y,
+					e.endShape.x,
+					e.endShape.y,
+					degreesToRadians(e.endShape.rotation),
+				);
+
+				if (isTransformativeData(item)) {
+					const rotationDiff = e.endShape.rotation - e.startShape.rotation;
+					const newRotation = item.rotation + rotationDiff;
+
+					events.push({
+						...item,
+						x: newCenter.x,
+						y: newCenter.y,
+						width: item.width * groupScaleX,
+						height: item.height * groupScaleY,
+						rotation: newRotation,
+						scaleX: e.endShape.scaleX,
+						scaleY: e.endShape.scaleY,
+						items: isItemableData(item)
+							? transformRecursive(item.items ?? [])
+							: undefined,
+					});
+				} else {
+					events.push({
+						...item,
+						x: newCenter.x,
+						y: newCenter.y,
+					});
+				}
+			}
+
+			return events as Diagram[];
+		};
+
+		const event: ItemableChangeEvent = {
+			id,
+			...e.endShape,
+			items: transformRecursive(startItems.current),
+		};
+
+		onItemableChange?.(event);
+	}, []);
+
+	const handleTransformEnd = useCallback((_e: DiagramTransformEvent) => {
+		// TODO: 伝番させる
+	}, []);
+
+	// グループ内の図形の作成
+	const children = items.map((item) => {
+		const itemType = DiagramTypeComponentMap[item.type];
+		const props = {
+			...item,
+			key: item.id,
+			onClick: handleChildDiagramClick,
+			onDragStart: handleChildDiagramDragStart,
+			onDrag: handleChildDiagramDrag,
+			onDragEnd: handleChildDiagramDragEnd,
+			onTransform: handleChildDiagramTransfrom,
+			onTransformEnd: handleChildDiagramTransfromEnd,
+			onItemableChange: handleChildItemableChange,
+			onSelect: handleChildDiagramSelect,
+		};
+
+		return React.createElement(itemType, props);
+	});
+
+	return (
+		<>
+			{children}
+			{!isDragging && (
+				<Transformative
+					diagramId={id}
+					type="Group"
+					x={x}
+					y={y}
+					width={width}
+					height={height}
+					rotation={rotation}
+					scaleX={scaleX}
+					scaleY={scaleY}
+					keepProportion={keepProportion}
+					isSelected={isSelected}
+					onTransformStart={handleTransformStart}
+					onTransform={handleTransform}
+					onTransformEnd={handleTransformEnd}
+				/>
+			)}
+		</>
+	);
+};
+
+export default memo(Group);
 
 /**
  * 選択されたグループ内の図形を、配下のグループも含めて再帰的に取得する
@@ -206,423 +638,3 @@ const calcGroupBoxOfNoRotation = (
 		right,
 	};
 };
-
-/**
- * グループのPropsの型定義
- */
-export type GroupProps = CreateDiagramProps<
-	GroupData,
-	{
-		selectable: true;
-		transformative: true;
-		itemable: true;
-	}
->;
-
-/**
- * グループコンポーネント
- */
-const Group: React.FC<GroupProps> = ({
-	id,
-	x,
-	y,
-	width,
-	height,
-	rotation = 0,
-	scaleX = 1,
-	scaleY = 1,
-	keepProportion = false,
-	isSelected = false,
-	onTransform,
-	onClick,
-	onDragStart,
-	onDrag,
-	onDragEnd,
-	onSelect,
-	onItemableChange,
-	items = [],
-}) => {
-	// logger.debug("Group items", items);
-
-	// グループ全体のドラッグ中かどうかのフラグ（このグループが選択中でかつドラッグ中の場合のみtrueにする）
-	const [isDragging, setIsDragging] = useState(false);
-	// グループ連続選択フラグ。グループ連続選択とは、グループ内の図形（同じ図形でなくてよい）を連続して選択する操作のこと。
-	// このグループが選択中でかつ再度グループ内の図形でポインター押下された場合のみtrueにする
-	const [isSequentialSelection, setIsSequentialSelection] = useState(false);
-
-	const startItems = useRef<Diagram[]>(items);
-	const startBox = useRef({ x, y, width, height });
-
-	// --- 以下、図形選択関連処理 ---
-
-	/**
-	 * グループ内の図形の選択イベントハンドラ
-	 *
-	 * @param {DiagramSelectEvent} e 図形選択イベント
-	 * @returns {void}
-	 */
-	const handleChildDiagramSelect = useCallback(
-		(e: DiagramSelectEvent) => {
-			const selectedChild = getSelectedChildDiagram(items);
-			if (!selectedChild) {
-				// グループ内の図形が選択されていない場合は、このグループの選択イベントを発火させる。
-				// これにより、グループ内の図形が選択されていないグループのうち、最も上位のグループのイベントが
-				// SvgCanvasまで伝番され、そのグループが選択状態になる。
-				onSelect?.({
-					id,
-				});
-			} else if (selectedChild.id !== e.id) {
-				// グループ内の図形が選択されていて、かつグループ内の別の図形が選択された場合、その図形を選択状態にする
-				onSelect?.(e);
-			}
-
-			if (isSelected) {
-				// グループ連続選択時のクリック（ポインターアップ）時に、グループ内でクリックされた図形を選択状態にしたいので、
-				// フラグを立てておき、クリックイベント側で参照する。
-				setIsSequentialSelection(true);
-			}
-		},
-		[onSelect, id, isSelected, items],
-	);
-
-	/**
-	 * グループ内の図形のクリックイベントハンドラ
-	 *
-	 * @param {DiagramSelectEvent} e 図形選択イベント
-	 * @returns {void}
-	 */
-	const handleChildDiagramClick = useCallback(
-		(e: DiagramSelectEvent) => {
-			if (isSequentialSelection) {
-				// グループ連続選択時のクリック（ポインターアップ）時であれば、そのグループ内の図形を選択状態にする。
-				// これにより、グループがネストしている場合は、選択の階層が１つずつ下がっていき、最終的にクリックされた図形が選択される。
-				onSelect?.(e);
-				setIsSequentialSelection(false);
-			} else {
-				// グループ連続選択時でない場合は、このグループのクリックイベントを発火させる。
-				// これにより、連続選択でないグループのうち、最も上位のグループのクリックイベントが
-				// 連続選択されたグループまで伝番し、そのグループの連続選択時の処理（当該分岐のtrue側）が実行され、
-				// その直下のグループが選択状態になる。
-				onClick?.({
-					id,
-				});
-			}
-		},
-		[onSelect, onClick, isSequentialSelection, id],
-	);
-
-	useEffect(() => {
-		// グループから選択が外れたら連続選択フラグも解除
-		if (!isSelected) {
-			setIsSequentialSelection(false);
-		}
-	}, [isSelected]);
-
-	const transformGroupOutline = useCallback(
-		(changeItem?: Diagram) => {
-			const radians = degreesToRadians(rotation);
-			const box = calcGroupBoxOfNoRotation(items, x, y, rotation, changeItem);
-			const leftTop = rotatePoint(box.left, box.top, x, y, radians);
-			const rightBottom = rotatePoint(box.right, box.bottom, x, y, radians);
-			onTransform?.({
-				id,
-				startShape: {
-					x,
-					y,
-					width,
-					height,
-					rotation,
-					scaleX,
-					scaleY,
-				},
-				endShape: {
-					x: leftTop.x + (rightBottom.x - leftTop.x) / 2,
-					y: leftTop.y + (rightBottom.y - leftTop.y) / 2,
-					width: box.right - box.left,
-					height: box.bottom - box.top,
-					rotation,
-					scaleX,
-					scaleY,
-				},
-			});
-		},
-		[onTransform, id, x, y, width, height, rotation, scaleX, scaleY, items],
-	);
-
-	/**
-	 * グループ内の図形のドラッグ開始イベントハンドラ
-	 *
-	 * @param {DiagramDragEvent} _e 図形ドラッグ開始イベント
-	 */
-	const handleChildDiagramDragStart = useCallback(
-		(e: DiagramDragEvent) => {
-			if (isSelected) {
-				// グループ選択時であれば、グループ全体をドラッグ可能にする
-				setIsDragging(true);
-			}
-
-			// ドラッグ開始イベントをそのまま伝番させる
-			onDragStart?.(e);
-
-			// ドラッグ開始時のグループの形状を記憶
-			startItems.current = items;
-			startBox.current = { x, y, width, height };
-		},
-		[onDragStart, x, y, width, height, isSelected, items],
-	);
-
-	/**
-	 * グループ内の図形のドラッグ中イベントハンドラ
-	 *
-	 * @param {DiagramDragEvent} e 図形ドラッグ中イベント
-	 */
-	const handleChildDiagramDrag = useCallback(
-		(e: DiagramDragEvent) => {
-			if (!isDragging) {
-				// グループのドラッグでなければ、ドラッグイベントをそのまま伝番
-				onDrag?.(e);
-				return;
-			}
-
-			// グループ内の図形を再帰的に移動させる
-
-			const dx = e.endX - e.startX;
-			const dy = e.endY - e.startY;
-
-			const moveRecursive = (diagrams: Diagram[]) => {
-				const events: ItemableChangeEvent[] = [];
-				for (const item of diagrams) {
-					events.push({
-						...item,
-						x: item.x + dx,
-						y: item.y + dy,
-						items: isItemableData(item)
-							? moveRecursive(item.items ?? [])
-							: undefined,
-					});
-				}
-
-				return events as Diagram[];
-			};
-
-			const event: ItemableChangeEvent = {
-				id,
-				x: startBox.current.x + dx,
-				y: startBox.current.y + dy,
-				items: moveRecursive(startItems.current),
-			};
-
-			onItemableChange?.(event);
-		},
-		[onDrag, onItemableChange, id, isDragging],
-	);
-
-	const handleChildDiagramDragEnd = useCallback(
-		(e: DiagramDragEvent) => {
-			if (!isDragging) {
-				// グループのドラッグでなければ、子図形のドラッグに伴うアウトラインの更新を行う
-				const changeItem = getChildDiagramById(items, e.id);
-				if (changeItem) {
-					transformGroupOutline({
-						...changeItem,
-						x: e.endX,
-						y: e.endY,
-					} as Diagram);
-				}
-			}
-
-			onDragEnd?.(e);
-			setIsDragging(false);
-		},
-		[onDragEnd, transformGroupOutline, items, isDragging],
-	);
-
-	const handleChildDiagramTransfrom = useCallback(
-		(e: DiagramTransformEvent) => {
-			onTransform?.(e);
-		},
-		[onTransform],
-	);
-
-	const handleChildDiagramTransfromEnd = useCallback(
-		(e: DiagramTransformEvent) => {
-			// アウトラインの更新
-			const changeItem = getChildDiagramById(items, e.id);
-			if (changeItem) {
-				transformGroupOutline({
-					...changeItem,
-					...e.endShape,
-				} as Diagram);
-			}
-		},
-		[transformGroupOutline, items],
-	);
-
-	const handleTransformStart = useCallback(() => {
-		startBox.current = { x, y, width, height };
-		startItems.current = items;
-	}, [x, y, width, height, items]);
-
-	const handleTransform = useCallback(
-		(e: DiagramTransformEvent) => {
-			// グループの拡縮を計算
-			const groupScaleX = e.endShape.width / e.startShape.width;
-			const groupScaleY = e.endShape.height / e.startShape.height;
-
-			const transformRecursive = (diagrams: Diagram[]) => {
-				const events: ItemableChangeEvent[] = [];
-				for (const item of diagrams) {
-					const inversedItemCenter = rotatePoint(
-						item.x,
-						item.y,
-						e.startShape.x,
-						e.startShape.y,
-						degreesToRadians(-e.startShape.rotation),
-					);
-					const dx =
-						(inversedItemCenter.x - e.startShape.x) *
-						e.startShape.scaleX *
-						e.endShape.scaleX;
-					const dy =
-						(inversedItemCenter.y - e.startShape.y) *
-						e.startShape.scaleY *
-						e.endShape.scaleY;
-
-					const newDx = dx * groupScaleX;
-					const newDy = dy * groupScaleY;
-
-					let newCenter = {
-						x: e.endShape.x + newDx,
-						y: e.endShape.y + newDy,
-					};
-					newCenter = rotatePoint(
-						newCenter.x,
-						newCenter.y,
-						e.endShape.x,
-						e.endShape.y,
-						degreesToRadians(e.endShape.rotation),
-					);
-
-					if (isTransformativeData(item)) {
-						const rotationDiff = e.endShape.rotation - e.startShape.rotation;
-						const newRotation = item.rotation + rotationDiff;
-
-						events.push({
-							...item,
-							x: newCenter.x,
-							y: newCenter.y,
-							width: item.width * groupScaleX,
-							height: item.height * groupScaleY,
-							rotation: newRotation,
-							scaleX: e.endShape.scaleX,
-							scaleY: e.endShape.scaleY,
-							items: isItemableData(item)
-								? transformRecursive(item.items ?? [])
-								: undefined,
-						});
-					} else {
-						events.push({
-							...item,
-							x: newCenter.x,
-							y: newCenter.y,
-						});
-					}
-				}
-
-				return events as Diagram[];
-			};
-
-			const event: ItemableChangeEvent = {
-				id,
-				...e.endShape,
-				items: transformRecursive(startItems.current),
-			};
-
-			onItemableChange?.(event);
-		},
-		[onItemableChange, id],
-	);
-
-	const handleTransformEnd = useCallback((_e: DiagramTransformEvent) => {
-		// TODO: 伝番させる
-	}, []);
-
-	const handleChildItemableChange = useCallback(
-		(e: ItemableChangeEvent) => {
-			// アウトラインの更新
-			const changeItem = getChildDiagramById(items, e.id);
-			if (changeItem) {
-				transformGroupOutline({
-					...changeItem,
-					...e,
-				} as Diagram);
-			}
-
-			onItemableChange?.(e);
-		},
-		[onItemableChange, transformGroupOutline, items],
-	);
-
-	// グループ内の図形の作成
-	const children = items.map((item) => {
-		const itemType = DiagramTypeComponentMap[item.type];
-		const props = {
-			...item,
-			key: item.id,
-			onClick: handleChildDiagramClick,
-			onDragStart: handleChildDiagramDragStart,
-			onDrag: handleChildDiagramDrag,
-			onDragEnd: handleChildDiagramDragEnd,
-			onTransform: handleChildDiagramTransfrom,
-			onTransformEnd: handleChildDiagramTransfromEnd,
-			onItemableChange: handleChildItemableChange,
-			onSelect: handleChildDiagramSelect,
-		};
-
-		return React.createElement(itemType, props);
-	});
-
-	return (
-		<>
-			{children}
-			<Transformative
-				diagramId={id}
-				type="Group"
-				x={x}
-				y={y}
-				width={width}
-				height={height}
-				rotation={rotation}
-				scaleX={scaleX}
-				scaleY={scaleY}
-				keepProportion={keepProportion}
-				isSelected={isSelected}
-				onTransformStart={handleTransformStart}
-				onTransform={handleTransform}
-				onTransformEnd={handleTransformEnd}
-			/>
-		</>
-	);
-};
-
-export default memo(Group);
-
-// export default memo(Group, (prevProps: GroupProps, nextProps: GroupProps) => {
-// 	console.log("前回の props:", prevProps);
-// 	console.log("今回の props:", nextProps);
-
-// 	// どのプロパティが変わったか確認
-// 	for (const key in nextProps) {
-// 		if (
-// 			prevProps[key as keyof GroupProps] !== nextProps[key as keyof GroupProps]
-// 		) {
-// 			console.log(`変更された prop: ${key}`);
-// 		}
-// 	}
-
-// 	// デフォルトの比較ロジック（=== 比較）を維持
-// 	return Object.keys(prevProps).every(
-// 		(key: string) =>
-// 			prevProps[key as keyof GroupProps] === nextProps[key as keyof GroupProps],
-// 	);
-// });

@@ -1,6 +1,6 @@
 // Reactのインポート
 import type React from "react";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 
 // ライブラリのインポート
 import styled from "@emotion/styled";
@@ -27,7 +27,7 @@ const Circle = styled.circle<CircleProps>`
 `;
 
 /**
- * ドラッグポイントコンポーネントのPropsの型定義
+ * ドラッグポイントコンポーネントのプロパティ
  */
 export type DragPointProps = Omit<DragProps, "ref"> & {
 	radius?: number;
@@ -112,4 +112,4 @@ const DragPoint: React.FC<DragPointProps> = ({
 	);
 };
 
-export default DragPoint;
+export default memo(DragPoint);

@@ -1,13 +1,13 @@
 // Reactのインポート
 import type React from "react";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 
 // SvgCanvas関連カスタムフックをインポート
 import type { DragProps } from "../../hooks/dragHooks";
 import { useDrag } from "../../hooks/dragHooks";
 
 /**
- * 回転ポイントコンポーネントのPropsの型定義
+ * 回転ポイントコンポーネントのプロパティ
  */
 export type RotatePointProps = Omit<DragProps, "ref"> & {
 	rotation?: number;
@@ -100,4 +100,4 @@ const RotatePoint: React.FC<RotatePointProps> = ({
 	);
 };
 
-export default RotatePoint;
+export default memo(RotatePoint);
