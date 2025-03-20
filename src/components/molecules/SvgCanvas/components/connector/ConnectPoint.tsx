@@ -12,7 +12,6 @@ import type {
 	Shape,
 } from "../../types/DiagramTypes";
 import type {
-	ConnectPointMoveEvent,
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
 	DiagramDragEvent,
@@ -41,27 +40,10 @@ const CONNECT_LINE_MARGIN = 20;
 /** 接続イベントの名前 */
 const EVENT_NAME_CONNECTTION = "Connection";
 
-/** 接続ポイント移動イベントの名前 */
-export const EVENT_NAME_CONNECT_POINT_MOVE = "ConnectPointMove";
-
 /**
  * 接続ポイントの方向
  */
 export type Direction = "up" | "down" | "left" | "right";
-
-/**
- * 接続ポイント移動イベントを発火する
- *
- * @param id 接続ポイントID
- * @param point 移動先座標
- */
-export const triggerConnectPointMove = (e: ConnectPointMoveEvent) => {
-	document.dispatchEvent(
-		new CustomEvent(EVENT_NAME_CONNECT_POINT_MOVE, {
-			detail: e,
-		}),
-	);
-};
 
 /**
  * 接続ポイントプロパティ

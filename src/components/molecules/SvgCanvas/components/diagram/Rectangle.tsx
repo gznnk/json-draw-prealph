@@ -12,16 +12,15 @@ import type {
 	Shape,
 } from "../../types/DiagramTypes";
 import type {
-	ConnectPointMoveEventType,
+	ConnectPointMoveData,
+	ConnectPointsMoveEventType,
 	DiagramDragEvent,
 	DiagramHoverEvent,
 	DiagramTransformEvent,
 } from "../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import ConnectPoint, {
-	triggerConnectPointMove,
-} from "../connector/ConnectPoint";
+import ConnectPoint from "../connector/ConnectPoint";
 import Transformative from "../core/Transformative";
 
 // SvgCanvas関連カスタムフックをインポート
@@ -71,6 +70,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 	onTransform,
 	onTransformEnd,
 	onConnect,
+	onConnectPointsMove,
 }) => {
 	window.profiler.call(`Rectangle render: ${id}`);
 
@@ -86,8 +86,8 @@ const Rectangle: React.FC<RectangleProps> = ({
 	/**
 	 * 接続ポイントの位置を更新
 	 */
-	const triggerConnectPointsMove = (
-		type: ConnectPointMoveEventType,
+	const updateConnectPoints = (
+		type: ConnectPointsMoveEventType,
 		ownerShape: Partial<Shape>,
 	) => {
 		const newShape = {
@@ -102,20 +102,25 @@ const Rectangle: React.FC<RectangleProps> = ({
 		};
 		const vertices = calcRectangleVertices(newShape);
 
+		const moveDataList: ConnectPointMoveData[] = [];
 		for (const connectPointData of (items as ConnectPointData[]) ?? []) {
 			const connectPoint = (vertices as RectangleVertices)[
 				connectPointData.name as keyof RectangleVertices
 			];
 
-			triggerConnectPointMove({
+			moveDataList.push({
 				id: connectPointData.id,
-				type,
 				x: connectPoint.x,
 				y: connectPoint.y,
 				ownerId: id,
 				ownerShape: newShape,
 			});
 		}
+
+		onConnectPointsMove?.({
+			type,
+			points: moveDataList,
+		});
 	};
 
 	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
@@ -131,7 +136,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 		onTransform,
 		onTransformEnd,
 		// 内部変数・内部関数
-		triggerConnectPointsMove,
+		updateConnectPoints,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -140,11 +145,11 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 * 四角形のドラッグ開始イベントハンドラ
 	 */
 	const handleDragStart = useCallback((e: DiagramDragEvent) => {
-		const { onDragStart, triggerConnectPointsMove } = refBus.current;
+		const { onDragStart, updateConnectPoints } = refBus.current;
 
 		setIsDragging(true);
 
-		triggerConnectPointsMove("moveStart", {
+		updateConnectPoints("moveStart", {
 			x: e.endX,
 			y: e.endY,
 		});
@@ -156,9 +161,9 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 * 四角形のドラッグ中イベントハンドラ
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { onDrag, triggerConnectPointsMove } = refBus.current;
+		const { onDrag, updateConnectPoints } = refBus.current;
 
-		triggerConnectPointsMove("move", {
+		updateConnectPoints("move", {
 			x: e.endX,
 			y: e.endY,
 		});
@@ -170,9 +175,9 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 * 四角形のドラッグ完了イベントハンドラ
 	 */
 	const handleDragEnd = useCallback((e: DiagramDragEvent) => {
-		const { onDragEnd, triggerConnectPointsMove } = refBus.current;
+		const { onDragEnd, updateConnectPoints } = refBus.current;
 
-		triggerConnectPointsMove("moveEnd", {
+		updateConnectPoints("moveEnd", {
 			x: e.endX,
 			y: e.endY,
 		});
@@ -186,28 +191,28 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 * 四角形の変形開始イベントハンドラ
 	 */
 	const handleTransformStart = useCallback((e: DiagramTransformEvent) => {
-		const { onTransformStart, triggerConnectPointsMove } = refBus.current;
+		const { onTransformStart, updateConnectPoints } = refBus.current;
 		setIsTransforming(true);
 		onTransformStart?.(e);
-		triggerConnectPointsMove("moveStart", e.endShape);
+		updateConnectPoints("moveStart", e.endShape);
 	}, []);
 
 	/**
 	 * 四角形の変形中イベントハンドラ
 	 */
 	const handleTransform = useCallback((e: DiagramTransformEvent) => {
-		const { onTransform, triggerConnectPointsMove } = refBus.current;
+		const { onTransform, updateConnectPoints } = refBus.current;
 		onTransform?.(e);
-		triggerConnectPointsMove("move", e.endShape);
+		updateConnectPoints("move", e.endShape);
 	}, []);
 
 	/**
 	 * 四角形の変形完了イベントハンドラ
 	 */
 	const handleTransformEnd = useCallback((e: DiagramTransformEvent) => {
-		const { onTransformEnd, triggerConnectPointsMove } = refBus.current;
+		const { onTransformEnd, updateConnectPoints } = refBus.current;
 		onTransformEnd?.(e);
-		triggerConnectPointsMove("moveEnd", e.endShape);
+		updateConnectPoints("moveEnd", e.endShape);
 		setIsTransforming(false);
 	}, []);
 

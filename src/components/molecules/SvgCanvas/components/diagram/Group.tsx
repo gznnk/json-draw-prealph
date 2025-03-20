@@ -9,6 +9,7 @@ import type {
 } from "../../types/DiagramTypes";
 import { DiagramTypeComponentMap } from "../../types/DiagramTypes";
 import type {
+	ConnectPointsMoveEvent,
 	DiagramConnectEvent,
 	DiagramDragEvent,
 	DiagramSelectEvent,
@@ -65,6 +66,7 @@ const Group: React.FC<GroupProps> = ({
 	onTransformEnd,
 	onItemableChange,
 	onConnect,
+	onConnectPointsMove,
 }) => {
 	// グループ全体のドラッグ中かどうかのフラグ（このグループが選択中でかつドラッグ中の場合のみtrueにする）
 	const [isDragging, setIsDragging] = useState(false);
@@ -132,6 +134,7 @@ const Group: React.FC<GroupProps> = ({
 		onTransformEnd,
 		onItemableChange,
 		onConnect,
+		onConnectPointsMove,
 		// 内部変数・内部関数
 		isDragging,
 		transformGroupOutline,
@@ -340,6 +343,17 @@ const Group: React.FC<GroupProps> = ({
 	}, []);
 
 	/**
+	 * グループ内の図形の接続ポイント移動イベントハンドラ
+	 */
+	const handleChildDiagramConnectPointsMove = useCallback(
+		(e: ConnectPointsMoveEvent) => {
+			const { onConnectPointsMove } = refBus.current;
+			onConnectPointsMove?.(e);
+		},
+		[],
+	);
+
+	/**
 	 * グループの変形開始イベントハンドラ
 	 */
 	const handleTransformStart = useCallback(() => {
@@ -454,6 +468,7 @@ const Group: React.FC<GroupProps> = ({
 			onTransformEnd: handleChildDiagramTransfromEnd,
 			onItemableChange: handleChildItemableChange,
 			onConnect: handleChildDiagramConnect,
+			onConnectPointsMove: handleChildDiagramConnectPointsMove,
 		};
 
 		return React.createElement(itemType, props);
@@ -632,7 +647,7 @@ const calcGroupBoxOfNoRotation = (
 	let right = Number.NEGATIVE_INFINITY;
 
 	for (const item of items) {
-		// TODO: いけてない。ConnectPointは別配列でもつ？
+		// ConnectPointは形状の計算に含めない
 		const itemItems = isItemableData(item)
 			? (item.items ?? []).filter((i) => i.type !== "ConnectPoint")
 			: [];

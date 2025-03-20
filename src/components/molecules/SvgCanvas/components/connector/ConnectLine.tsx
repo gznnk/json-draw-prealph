@@ -6,7 +6,6 @@ import { memo, useEffect, useRef, useContext } from "react";
 import {
 	createBestConnectPath,
 	getLineDirection,
-	EVENT_NAME_CONNECT_POINT_MOVE,
 } from "../connector/ConnectPoint";
 import type { Direction } from "../connector/ConnectPoint";
 import Path from "../diagram/Path";
@@ -18,11 +17,28 @@ import type {
 	Diagram,
 	ConnectLineData,
 } from "../../types/DiagramTypes";
-import type { ConnectPointMoveEvent } from "../../types/EventTypes";
+import type { ConnectPointsMoveEvent } from "../../types/EventTypes";
 
 // SvgCanvas関連関数をインポート
 import { calcRadians, radiansToDegrees } from "../../functions/Math";
 import { isShape, newId } from "../../functions/Diagram";
+
+/** 接続ポイント移動イベントの名前 */
+export const EVENT_NAME_CONNECT_POINTS_MOVE = "ConnectPointMove";
+
+/**
+ * 接続ポイント移動イベントを発火する
+ *
+ * @param id 接続ポイントID
+ * @param point 移動先座標
+ */
+export const notifyConnectPointsMove = (e: ConnectPointsMoveEvent) => {
+	document.dispatchEvent(
+		new CustomEvent(EVENT_NAME_CONNECT_POINTS_MOVE, {
+			detail: e,
+		}),
+	);
+};
 
 /**
  * 接続線コンポーネントのプロパティ
@@ -89,7 +105,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 	refBus.current = refBusVal;
 
 	useEffect(() => {
-		const handleConnectPointMove = (e: Event) => {
+		const handleConnectPointsMove = (e: Event) => {
 			// refBusを介して参照値を取得
 			const {
 				id,
@@ -100,10 +116,15 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 				canvasStateProvider,
 			} = refBus.current;
 
-			const event = (e as CustomEvent<ConnectPointMoveEvent>).detail;
+			const event = (e as CustomEvent<ConnectPointsMoveEvent>).detail;
 
-			// 関係ない接続ポイントの移動イベントは無視
-			if (items.every((item) => item.id !== event.id)) {
+			// イベントの中からこの接続線に対応する接続ポイントを取得
+			// TODO: 同じ図形内で接続している場合のパターンも考慮する
+			const point = event.points.find((p) =>
+				items.some((item) => item.id === p.id),
+			);
+			if (!point) {
+				// 関係ない接続ポイントの移動イベントは無視
 				return;
 			}
 
@@ -113,10 +134,10 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 
 				// 移動開始時の接続ポイントの向きを保持
 				startDirection.current = getLineDirection(
-					event.ownerShape.x,
-					event.ownerShape.y,
-					event.x,
-					event.y,
+					point.ownerShape.x,
+					point.ownerShape.y,
+					point.x,
+					point.y,
 				);
 
 				// 垂直と水平の線のみかどうかを判定
@@ -148,18 +169,18 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 			const _startItems = startItems.current;
 			const _isItemsChanged = isItemsChanged.current;
 			const _isVerticalHorizontalLines = isVerticalHorizontalLines.current;
-			const foundIdx = _startItems.findIndex((item) => item.id === event.id);
+			const foundIdx = _startItems.findIndex((item) => item.id === point.id);
 			if (0 <= foundIdx) {
 				if (_isItemsChanged) {
 					// 一番最初の描画時からitemsが変更されている場合は、
 					// 接続ポイントとその隣の点のみ位置を変更する
 					const p = _startItems[foundIdx];
-					const dx = event.x - p.x;
-					const dy = event.y - p.y;
+					const dx = point.x - p.x;
+					const dy = point.y - p.y;
 					const newItems = _startItems.map((item, idx) => {
 						// 接続ポイントの移動にあわせて接続線側の点を移動
-						if (item.id === event.id) {
-							return { ...item, x: event.x, y: event.y };
+						if (item.id === point.id) {
+							return { ...item, x: point.x, y: point.y };
 						}
 
 						// 移動した点の隣の点かどうか
@@ -207,7 +228,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 
 					// 反対側の図形の情報を取得
 					const oppositeOwnerShape = canvasStateProvider?.getDiagramById(
-						event.ownerId === startOwnerId ? endOwnerId : startOwnerId,
+						point.ownerId === startOwnerId ? endOwnerId : startOwnerId,
 					);
 
 					// 型チェック（以降の処理で型エラーが出ないようにするためだけ）
@@ -217,10 +238,10 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 
 					// 最適な接続線を再計算
 					const newPath = createBestConnectPath(
-						event.x,
-						event.y,
+						point.x,
+						point.y,
 						startDirection.current,
-						event.ownerShape,
+						point.ownerShape,
 						oppositePoint.x,
 						oppositePoint.y,
 						oppositeOwnerShape,
@@ -258,14 +279,14 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 			}
 		};
 		document.addEventListener(
-			EVENT_NAME_CONNECT_POINT_MOVE,
-			handleConnectPointMove,
+			EVENT_NAME_CONNECT_POINTS_MOVE,
+			handleConnectPointsMove,
 		);
 
 		return () => {
 			document.removeEventListener(
-				EVENT_NAME_CONNECT_POINT_MOVE,
-				handleConnectPointMove,
+				EVENT_NAME_CONNECT_POINTS_MOVE,
+				handleConnectPointsMove,
 			);
 		};
 	}, []);

@@ -383,45 +383,25 @@ export const calcRectangleVertices = (shape: Shape): RectangleVertices => {
 		ty,
 	);
 
-	const topCenterPoint = affineTransformation(
-		0,
-		-halfHeight,
-		scaleX,
-		scaleY,
-		radians,
-		tx,
-		ty,
-	);
+	const topCenterPoint = {
+		x: nanToZero(leftTopPoint.x + rightTopPoint.x) / 2,
+		y: nanToZero(leftTopPoint.y + rightTopPoint.y) / 2,
+	};
 
-	const leftCenterPoint = affineTransformation(
-		-halfWidth,
-		0,
-		scaleX,
-		scaleY,
-		radians,
-		tx,
-		ty,
-	);
+	const leftCenterPoint = {
+		x: nanToZero(leftTopPoint.x + leftBottomPoint.x) / 2,
+		y: nanToZero(leftTopPoint.y + leftBottomPoint.y) / 2,
+	};
 
-	const rightCenterPoint = affineTransformation(
-		halfWidth,
-		0,
-		scaleX,
-		scaleY,
-		radians,
-		tx,
-		ty,
-	);
+	const rightCenterPoint = {
+		x: nanToZero(rightTopPoint.x + rightBottomPoint.x) / 2,
+		y: nanToZero(rightTopPoint.y + rightBottomPoint.y) / 2,
+	};
 
-	const bottomCenterPoint = affineTransformation(
-		0,
-		halfHeight,
-		scaleX,
-		scaleY,
-		radians,
-		tx,
-		ty,
-	);
+	const bottomCenterPoint = {
+		x: nanToZero(leftBottomPoint.x + rightBottomPoint.x) / 2,
+		y: nanToZero(leftBottomPoint.y + rightBottomPoint.y) / 2,
+	};
 
 	return {
 		leftTopPoint,

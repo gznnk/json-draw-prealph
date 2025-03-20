@@ -5,6 +5,7 @@
 		"quickfix.biome": "explicit"
 	},
 	"files.exclude": {
-		"**/__tests__": false
+		"chrome_extension": true,
+		"**/__tests__": true
 	}
 }

@@ -9,6 +9,7 @@ import type { SvgCanvasState } from "./hooks/canvasHooks";
 import type { Diagram } from "./types/DiagramTypes";
 import { DiagramTypeComponentMap } from "./types/DiagramTypes";
 import type {
+	ConnectPointsMoveEvent,
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
 	DiagramDragEvent,
@@ -60,6 +61,7 @@ type SvgCanvasProps = {
 	onSelect?: (e: DiagramSelectEvent) => void;
 	onDelete?: () => void;
 	onConnect?: (e: DiagramConnectEvent) => void;
+	onConnectPointsMove?: (e: ConnectPointsMoveEvent) => void;
 };
 
 /**
@@ -76,6 +78,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	onSelect,
 	onDelete,
 	onConnect,
+	onConnectPointsMove,
 }) => {
 	// Ctrlキーが押されているかどうかのフラグ
 	const isCtrlDown = useRef(false);
@@ -155,6 +158,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 			onDrop,
 			onSelect: handleSelect,
 			onConnect,
+			onConnectPointsMove,
 		};
 
 		return React.createElement(itemType, props);

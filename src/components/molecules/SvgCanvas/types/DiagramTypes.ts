@@ -5,6 +5,7 @@ import type React from "react";
 
 // SvgCanvas関連型定義をインポート
 import type {
+	ConnectPointsMoveEvent,
 	DiagramClickEvent,
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
@@ -268,6 +269,7 @@ export type ItemableProps = {
 export type ConnectableProps = {
 	showConnectPoints?: boolean;
 	onConnect?: (e: DiagramConnectEvent) => void;
+	onConnectPointsMove?: (e: ConnectPointsMoveEvent) => void;
 };
 
 /**

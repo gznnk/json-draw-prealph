@@ -104,22 +104,32 @@ export type DiagramConnectEvent = {
 /**
  * 接続ポイント移動イベントタイプ
  */
-export type ConnectPointMoveEventType = "moveStart" | "move" | "moveEnd";
+export type ConnectPointsMoveEventType = "moveStart" | "move" | "moveEnd";
 
 /**
- * 接続ポイント移動イベント
+ * 接続ポイント移動データ
  *
  * @param id 移動した接続ポイントID
- * @param type イベントタイプ
  * @param x 移動先X座標
  * @param y 移動先Y座標
- * @param ownerShape 接続ポイントの所有者の形状（接続線の再描画時に利用、接続先側の所有者の形状は接続線コンポーネント内で取得する）
  */
-export type ConnectPointMoveEvent = {
+export type ConnectPointMoveData = {
 	id: string;
-	type: ConnectPointMoveEventType;
 	x: number;
 	y: number;
 	ownerId: string;
 	ownerShape: Shape;
+};
+
+/**
+ * 接続ポイント移動イベント
+ *
+ * @param type イベントタイプ
+ * @param ownerId 接続ポイントの所有者ID
+ * @param ownerShape 接続ポイントの所有者の形状（接続線の再描画時に利用、接続先側の所有者の形状は接続線コンポーネント内で取得する）
+ * @param points 移動した接続ポイントのデータ
+ */
+export type ConnectPointsMoveEvent = {
+	type: ConnectPointsMoveEventType;
+	points: ConnectPointMoveData[];
 };

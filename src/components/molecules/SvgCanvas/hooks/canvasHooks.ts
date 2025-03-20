@@ -1,5 +1,5 @@
 // Reactのインポート
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 // 型定義をインポート
 import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
@@ -7,11 +7,13 @@ import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 // SvgCanvas関連型定義をインポート
 import type {
 	ConnectLineData,
+	ConnectPointData,
 	Diagram,
 	PathPointData,
 } from "../types/DiagramTypes";
 import type {
-	ConnectPointMoveEvent,
+	ConnectPointMoveData,
+	ConnectPointsMoveEvent,
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
 	DiagramDragEvent,
@@ -21,7 +23,7 @@ import type {
 } from "../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import { EVENT_NAME_CONNECT_POINT_MOVE } from "../components/connector/ConnectPoint";
+import { notifyConnectPointsMove } from "../components/connector/ConnectLine";
 
 // SvgCanvas関連関数をインポート
 import { isItemableData, isSelectableData, newId } from "../functions/Diagram";
@@ -65,6 +67,35 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				item.id === e.id ? deepMerge(item, e) : item,
 			),
 		}));
+
+		// 接続ポイントの移動を通知
+		const connectPoints: ConnectPointMoveData[] = [];
+		const findRecursive = (data: Diagram) => {
+			if (isItemableData(data)) {
+				for (const item of data.items ?? []) {
+					if (item.type === "ConnectPoint") {
+						connectPoints.push({
+							id: item.id,
+							x: item.x,
+							y: item.y,
+							ownerId: data.id,
+							ownerShape: {
+								...data,
+							},
+						});
+					}
+					if (isItemableData(item)) {
+						findRecursive(item);
+					}
+				}
+			}
+		};
+		findRecursive(e as Diagram);
+
+		notifyConnectPointsMove({
+			type: "move",
+			points: connectPoints,
+		});
 	}, []);
 
 	const onDrag = useCallback((e: DiagramDragEvent) => {
@@ -148,29 +179,23 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		} as ConnectLineData);
 	}, []);
 
-	useEffect(() => {
-		const handleConnectPointMove = (e: Event) => {
-			const event = e as CustomEvent<ConnectPointMoveEvent>;
-			setCanvasState((prevState) => ({
-				...prevState,
-				items: applyRecursive(prevState.items, (item) =>
-					item.id === event.detail.id //&& item.type !== "PathPoint"
-						? { ...item, x: event.detail.x, y: event.detail.y }
-						: item,
-				),
-			}));
-		};
-		document.addEventListener(
-			EVENT_NAME_CONNECT_POINT_MOVE,
-			handleConnectPointMove,
-		);
+	const onConnectPointsMove = useCallback((e: ConnectPointsMoveEvent) => {
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: applyRecursive(prevState.items, (item) => {
+				if (item.type === "ConnectLine") {
+					// 接続線の方の座標はnotifyConnectPointsMoveで更新されるのでここでは更新しない
+					return item;
+				}
+				const newPoint = e.points.find((p) => p.id === item.id);
+				if (newPoint) {
+					return { ...item, x: newPoint.x, y: newPoint.y };
+				}
+				return item;
+			}),
+		}));
 
-		return () => {
-			document.removeEventListener(
-				EVENT_NAME_CONNECT_POINT_MOVE,
-				handleConnectPointMove,
-			);
-		};
+		notifyConnectPointsMove(e);
 	}, []);
 
 	const canvasProps = {
@@ -181,6 +206,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onSelect,
 		onDelete,
 		onConnect,
+		onConnectPointsMove,
 		onTransform,
 		onItemableChange,
 	};
