@@ -11,13 +11,11 @@ import type {
 	DiagramDragEvent,
 	DiagramHoverEvent,
 	DiagramPointerEvent,
+	EventType,
 } from "../types/EventTypes";
 
 /** 全体通知用ドラッグイベントの名前 */
 const EVENT_NAME_BROADCAST_DRAG = "BroadcastDrag";
-
-/** 全体通知用ドラッグ完了イベントの名前 */
-const EVENT_NAME_BROADCAST_DRAG_END = "BroadcastDragEnd";
 
 /** ドラッグのあそび */
 const DRAG_DEAD_ZONE = 5;
@@ -27,6 +25,7 @@ const DRAG_DEAD_ZONE = 5;
  */
 type BroadcastDragEvent = {
 	id: string;
+	eventType: EventType;
 	type: DiagramType;
 	startX: number;
 	startY: number;
@@ -212,6 +211,19 @@ export const useDrag = (props: DragProps) => {
 			endY: dragPoint.y,
 		} as DiagramDragEvent;
 
+		// 全体通知用ドラッグイベント情報を作成
+		const broadcastDragEvent = {
+			id,
+			eventType: "InProgress",
+			type: type,
+			startX: startX.current,
+			startY: startY.current,
+			endX: dragPoint.x,
+			endY: dragPoint.y,
+			clientX: e.clientX,
+			clientY: e.clientY,
+		};
+
 		if (
 			!isDragging &&
 			(Math.abs(e.clientX - startClientX.current) > DRAG_DEAD_ZONE ||
@@ -222,6 +234,18 @@ export const useDrag = (props: DragProps) => {
 				...dragEvent,
 				eventType: "Start",
 			});
+
+			// 親子関係にない図形でハンドリングする用のドラッグ中イベント発火
+			ref.current?.dispatchEvent(
+				new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
+					bubbles: true,
+					detail: {
+						...broadcastDragEvent,
+						eventType: "Start",
+					},
+				}),
+			);
+
 			setIsDragging(true);
 			return;
 		}
@@ -238,16 +262,7 @@ export const useDrag = (props: DragProps) => {
 		ref.current?.dispatchEvent(
 			new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
 				bubbles: true,
-				detail: {
-					id,
-					type: type,
-					startX: startX.current,
-					startY: startY.current,
-					endX: dragPoint.x,
-					endY: dragPoint.y,
-					clientX: e.clientX,
-					clientY: e.clientY,
-				} as BroadcastDragEvent,
+				detail: broadcastDragEvent,
 			}),
 		);
 	};
@@ -272,10 +287,11 @@ export const useDrag = (props: DragProps) => {
 
 			// 親子関係にない図形でハンドリングする用のドラッグ終了イベント発火
 			ref.current?.dispatchEvent(
-				new CustomEvent(EVENT_NAME_BROADCAST_DRAG_END, {
+				new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
 					bubbles: true,
 					detail: {
 						id,
+						eventType: "End",
 						type: type,
 						startX: startX.current,
 						startY: startY.current,
@@ -476,10 +492,9 @@ export const useDrag = (props: DragProps) => {
 
 	useEffect(() => {
 		let handleBroadcastDrag: (e: Event) => void;
-		let handleBroadcastDragEnd: (e: Event) => void;
 
 		const { onDragOver, onDrop } = refBus.current;
-		if (onDragOver) {
+		if (onDragOver || onDrop) {
 			handleBroadcastDrag = (e: Event) => {
 				// refBusを介して参照値を取得
 				const { id, x, y, type, ref, onDragOver, onDragLeave } = refBus.current;
@@ -508,9 +523,26 @@ export const useDrag = (props: DragProps) => {
 						customEvent.detail.clientY,
 					)
 				) {
-					if (!dragEntered.current) {
-						dragEntered.current = true;
-						onDragOver?.(dragDropEvent);
+					if (customEvent.detail.eventType === "End") {
+						onDrop?.({
+							dropItem: {
+								id: customEvent.detail.id,
+								type: customEvent.detail.type,
+								x: customEvent.detail.startX,
+								y: customEvent.detail.startY,
+							},
+							dropTargetItem: {
+								id,
+								type,
+								x,
+								y,
+							},
+						});
+					} else {
+						if (!dragEntered.current) {
+							dragEntered.current = true;
+							onDragOver?.(dragDropEvent);
+						}
 					}
 				} else if (dragEntered.current) {
 					dragEntered.current = false;
@@ -520,51 +552,11 @@ export const useDrag = (props: DragProps) => {
 			document.addEventListener(EVENT_NAME_BROADCAST_DRAG, handleBroadcastDrag);
 		}
 
-		if (onDrop) {
-			handleBroadcastDragEnd = (e: Event) => {
-				// refBusを介して参照値を取得
-				const { id, x, y, type, ref, onDrop } = refBus.current;
-				const customEvent = e as CustomEvent<BroadcastDragEvent>;
-				if (
-					isPointerOver(
-						ref,
-						customEvent.detail.clientX,
-						customEvent.detail.clientY,
-					)
-				) {
-					onDrop?.({
-						dropItem: {
-							id: customEvent.detail.id,
-							type: customEvent.detail.type,
-							x: customEvent.detail.startX,
-							y: customEvent.detail.startY,
-						},
-						dropTargetItem: {
-							id,
-							type,
-							x,
-							y,
-						},
-					});
-				}
-			};
-			document.addEventListener(
-				EVENT_NAME_BROADCAST_DRAG_END,
-				handleBroadcastDragEnd,
-			);
-		}
-
 		return () => {
 			if (handleBroadcastDrag) {
 				document.removeEventListener(
 					EVENT_NAME_BROADCAST_DRAG,
 					handleBroadcastDrag,
-				);
-			}
-			if (handleBroadcastDragEnd) {
-				document.removeEventListener(
-					EVENT_NAME_BROADCAST_DRAG_END,
-					handleBroadcastDragEnd,
 				);
 			}
 		};

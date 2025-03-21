@@ -61,7 +61,6 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 
 	const onItemableChange = useCallback((e: ItemableChangeEvent) => {
 		// 接続ポイントの移動を通知
-		// TODO: Group側でやるべきか？
 		const connectPoints: ConnectPointMoveData[] = [];
 		const findRecursive = (data: Partial<Diagram>) => {
 			if (isItemableData(data)) {
