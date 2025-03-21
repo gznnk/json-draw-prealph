@@ -18,7 +18,10 @@ import type {
 	Diagram,
 	Shape,
 } from "../../types/DiagramTypes";
-import type { ConnectPointsMoveEvent } from "../../types/EventTypes";
+import type {
+	ConnectPointMoveData,
+	ConnectPointsMoveEvent,
+} from "../../types/EventTypes";
 
 // SvgCanvas関連関数をインポート
 import { newId } from "../../functions/Diagram";
@@ -118,11 +121,10 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 			const event = (e as CustomEvent<ConnectPointsMoveEvent>).detail;
 
 			// イベントの中からこの接続線に対応する接続ポイントを取得
-			// TODO: 同じ図形内で接続している場合のパターンも考慮する
-			const point = event.points.find((p) =>
+			const movedPoint = event.points.find((p) =>
 				items.some((item) => item.id === p.id),
 			);
-			if (!point) {
+			if (!movedPoint) {
 				// 関係ない接続ポイントの移動イベントは無視
 				return;
 			}
@@ -133,10 +135,10 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 
 				// 移動開始時の接続ポイントの向きを保持
 				startDirection.current = getLineDirection(
-					point.ownerShape.x,
-					point.ownerShape.y,
-					point.x,
-					point.y,
+					movedPoint.ownerShape.x,
+					movedPoint.ownerShape.y,
+					movedPoint.x,
+					movedPoint.y,
 				);
 
 				// 垂直と水平の線のみかどうかを判定
@@ -175,127 +177,159 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 			const _startItems = startItems.current;
 			const _isItemsChanged = isItemsChanged.current;
 			const _isVerticalHorizontalLines = isVerticalHorizontalLines.current;
-			const foundIdx = _startItems.findIndex((item) => item.id === point.id);
-			if (0 <= foundIdx) {
-				if (_isItemsChanged) {
-					// 一番最初の描画時からitemsが変更されている場合は、
-					// 接続ポイントとその隣の点のみ位置を変更する
-					const p = _startItems[foundIdx];
-					const dx = point.x - p.x;
-					const dy = point.y - p.y;
-					const newItems = _startItems.map((item, idx) => {
-						// 接続ポイントの移動にあわせて接続線側の点を移動
-						if (item.id === point.id) {
-							return { ...item, x: point.x, y: point.y };
+			const movedPointIdx = _startItems.findIndex(
+				(item) => item.id === movedPoint.id,
+			);
+
+			// 動いた接続ポイントの反対側の点を取得
+			const oppositeItem =
+				movedPointIdx === 0 ? items[items.length - 1] : items[0];
+			let oppositePoint = {
+				x: oppositeItem.x,
+				y: oppositeItem.y,
+			};
+
+			// 反対側の点も動いているかどうかを確認
+			const movedOppositPoint = event.points.find(
+				(p) => p.id === oppositeItem.id,
+			);
+
+			if (_isItemsChanged) {
+				// 一番最初の描画時からitemsが変更されている場合
+
+				// 移動後のポイント作成関数
+				const createNewPoint = (
+					movedBothEndsPoint: ConnectPointMoveData,
+					oldPoint: Diagram,
+					idx: number,
+				) => {
+					// 接続ポイントの移動にあわせて末端の点も移動
+					if (oldPoint.id === movedBothEndsPoint.id) {
+						return {
+							...oldPoint,
+							x: movedBothEndsPoint.x,
+							y: movedBothEndsPoint.y,
+						};
+					}
+
+					// 移動した点の隣の点かどうか TODO: 反対の点の時の判定がうまくいかん
+					const movedBothEndsPointIdx = _startItems.findIndex(
+						(item) => item.id === movedBothEndsPoint.id,
+					);
+					const isNextPoint =
+						(movedBothEndsPointIdx === 0 && idx === 1) ||
+						(movedBothEndsPointIdx === _startItems.length - 1 &&
+							idx === _startItems.length - 2);
+
+					if (isNextPoint) {
+						// 接続線が垂直と水平の線のみでない場合は、２番目の点はそのまま
+						if (!_isVerticalHorizontalLines) {
+							return oldPoint;
 						}
 
-						// 移動した点の隣の点かどうか
-						const isNextPoint =
-							(foundIdx === 0 && idx === 1) ||
-							(foundIdx === _startItems.length - 1 &&
-								idx === _startItems.length - 2);
+						// 接続線が垂直と水平の線のみは、それが維持されるよう２番目の点も移動する
 
-						if (isNextPoint) {
-							// 接続線が垂直と水平の線のみでない場合は、２番目の点はそのまま
-							if (!_isVerticalHorizontalLines) {
-								return item;
-							}
+						// 移動量を計算
+						const movedPointOldData = _startItems[movedBothEndsPointIdx];
+						const dx = movedBothEndsPoint.x - movedPointOldData.x;
+						const dy = movedBothEndsPoint.y - movedPointOldData.y;
 
-							// 接続線が垂直と水平の線のみは、それが維持されるよう２番目の点も移動する
+						// ２点間の角度を計算
+						const direction = calcRadians(
+							movedPointOldData.x,
+							movedPointOldData.y,
+							oldPoint.x,
+							oldPoint.y,
+						);
+						const degrees = radiansToDegrees(direction);
+						const isVertical = (degrees + 405) % 180 > 90;
 
-							// ２点間の角度を計算
-							const direction = calcRadians(p.x, p.y, item.x, item.y);
-							const degrees = radiansToDegrees(direction);
-							const isVertical = (degrees + 405) % 180 > 90;
+						// ２点間の線が水平であればx座標のみ、垂直であればy座標のみ移動
+						return {
+							...oldPoint,
+							x: !isVertical ? oldPoint.x + dx : oldPoint.x,
+							y: isVertical ? oldPoint.y + dy : oldPoint.y,
+						};
+					}
 
-							// ２点間の線が水平であればx座標のみ、垂直であればy座標のみ移動
-							return {
-								...item,
-								x: !isVertical ? item.x + dx : item.x,
-								y: isVertical ? item.y + dy : item.y,
-							};
-						}
+					return oldPoint;
+				};
 
-						return item;
-					}) as Diagram[];
+				const newItems = _startItems.map((item, idx) => {
+					const newPoint = createNewPoint(movedPoint, item, idx);
+					if (newPoint !== item) {
+						return newPoint;
+					}
+					if (movedOppositPoint) {
+						return createNewPoint(movedOppositPoint, item, idx);
+					}
+					return item;
+				}) as Diagram[];
 
-					// 接続線の変更イベントを発火
-					onItemableChange?.({
-						eventType: event.eventType,
-						id,
-						items: newItems,
-					});
+				// 接続線の変更イベントを発火
+				onItemableChange?.({
+					eventType: event.eventType,
+					id,
+					items: newItems,
+				});
+			} else {
+				// 一番最初の描画時からitemsが変更されていない場合は、最適な接続線を再計算
+
+				if (movedOppositPoint) {
+					// 反対側の点が動いている場合は、その座標を利用
+					oppositePoint = movedOppositPoint;
+				}
+
+				// 反対側の図形の情報を取得
+				let oppositeOwnerShape: Shape;
+				if (movedOppositPoint) {
+					oppositeOwnerShape = movedOppositPoint.ownerShape;
 				} else {
-					// 一番最初の描画時からitemsが変更されていない場合は、最適な接続線を再計算
+					// 反対側の図形が動いていない場合はcanvasStateProviderから情報を取得（１フレーム前の情報しか取れないが、接続先の図形に移動はない場合なので問題ない）
+					oppositeOwnerShape = canvasStateProvider?.getDiagramById(
+						movedPoint.ownerId === startOwnerId ? endOwnerId : startOwnerId,
+					) as Shape;
+				}
 
-					// 動いた接続ポイントの反対側の点を取得
-					const lastIdx = items.length - 1;
-					const oppositeItem = foundIdx === 0 ? items[lastIdx] : items[0];
-					let oppositePoint = {
-						x: oppositeItem.x,
-						y: oppositeItem.y,
-					};
+				// 最適な接続線を再計算
+				const newPath = createBestConnectPath(
+					movedPoint.x,
+					movedPoint.y,
+					startDirection.current,
+					movedPoint.ownerShape,
+					oppositePoint.x,
+					oppositePoint.y,
+					oppositeOwnerShape,
+				);
 
-					// 反対側の点も動いているかどうかを確認
-					const movedOppositPoint = event.points.find(
-						(p) => p.id === oppositeItem.id,
-					);
-					if (movedOppositPoint) {
-						// 反対側の点が動いている場合は、その座標を利用
-						oppositePoint = movedOppositPoint;
-					}
+				// 接続線の点のデータを作成
+				const newItems = (
+					movedPointIdx === 0 ? newPath : newPath.reverse()
+				).map((p, idx) => ({
+					id: event.eventType === "End" ? newId() : `${id}-${idx}`,
+					name: `cp-${idx}`,
+					type: "PathPoint",
+					x: p.x,
+					y: p.y,
+				})) as Diagram[];
+				// 両端の点のIDは維持する
+				newItems[0].id = _startItems[0].id;
+				newItems[newItems.length - 1].id =
+					_startItems[_startItems.length - 1].id;
 
-					// 反対側の図形の情報を取得
-					let oppositeOwnerShape: Shape;
-					if (movedOppositPoint) {
-						oppositeOwnerShape = movedOppositPoint.ownerShape;
-					} else {
-						// 反対側の図形が動いていない場合はcanvasStateProviderから情報を取得（１フレーム前の情報しか取れないが、接続先の図形に移動はない場合なので問題ない）
-						oppositeOwnerShape = canvasStateProvider?.getDiagramById(
-							point.ownerId === startOwnerId ? endOwnerId : startOwnerId,
-						) as Shape;
-					}
+				// 接続線の変更イベントを発火
+				onItemableChange?.({
+					eventType: event.eventType,
+					id,
+					items: newItems,
+				});
 
-					// 最適な接続線を再計算
-					const newPath = createBestConnectPath(
-						point.x,
-						point.y,
-						startDirection.current,
-						point.ownerShape,
-						oppositePoint.x,
-						oppositePoint.y,
-						oppositeOwnerShape,
-					);
-
-					// 接続線の点のデータを作成
-					const newItems = (foundIdx === 0 ? newPath : newPath.reverse()).map(
-						(p, idx) => ({
-							id: event.eventType === "End" ? newId() : `${id}-${idx}`,
-							name: `cp-${idx}`,
-							type: "PathPoint",
-							x: p.x,
-							y: p.y,
-						}),
-					) as Diagram[];
-					// 両端の点のIDは維持する
-					newItems[0].id = _startItems[0].id;
-					newItems[newItems.length - 1].id =
-						_startItems[_startItems.length - 1].id;
-
-					// 接続線の変更イベントを発火
-					onItemableChange?.({
-						eventType: event.eventType,
-						id,
-						items: newItems,
-					});
-
-					if (event.eventType === "End") {
-						startItems.current = [];
-						if (!_isItemsChanged) {
-							// 一番最初の描画時からitemsが変更されていない場合は、
-							// 再計算後の接続線を初期状態として保持
-							initialItems.current = newItems;
-						}
+				if (event.eventType === "End") {
+					startItems.current = [];
+					if (!_isItemsChanged) {
+						// 一番最初の描画時からitemsが変更されていない場合は、
+						// 再計算後の接続線を初期状態として保持
+						initialItems.current = newItems;
 					}
 				}
 			}
