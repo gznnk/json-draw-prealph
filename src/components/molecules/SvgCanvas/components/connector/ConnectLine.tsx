@@ -160,7 +160,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 							item.x !== startItems.current[idx].x ||
 							item.y !== startItems.current[idx].y,
 					);
-				// return;
+				return;
 			}
 
 			// 移動中と移動終了時の処理

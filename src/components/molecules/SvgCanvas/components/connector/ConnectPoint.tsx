@@ -635,14 +635,17 @@ export const createBestConnectPath = (
 	const startP2 = getSecondConnectPoint(startOwnerShape, startX, startY);
 	const endP2 = getSecondConnectPoint(endOwnerShape, endX, endY);
 
-	const minX = Math.min(startOuterBox.left, endOuterBox.left);
-	const minY = Math.min(startOuterBox.top, endOuterBox.top);
-	const maxX = Math.max(startOuterBox.right, endOuterBox.right);
-	const maxY = Math.max(startOuterBox.bottom, endOuterBox.bottom);
+	const p2MidX = (startP2.x + endP2.x) / 2;
+	const p2MidY = (startP2.y + endP2.y) / 2;
+
+	const startCloserX = closer(p2MidX, startOuterBox.left, startOuterBox.right);
+	const startCloserY = closer(p2MidY, startOuterBox.top, startOuterBox.bottom);
+	const endCloserX = closer(p2MidX, endOuterBox.left, endOuterBox.right);
+	const endCloserY = closer(p2MidY, endOuterBox.top, endOuterBox.bottom);
 
 	const midPoint = {
-		x: Math.round((minX + maxX) / 2),
-		y: Math.round((minY + maxY) / 2),
+		x: Math.round((startCloserX + endCloserX) / 2),
+		y: Math.round((startCloserY + endCloserY) / 2),
 		score: 1,
 	};
 
