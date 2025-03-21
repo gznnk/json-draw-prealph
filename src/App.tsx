@@ -431,22 +431,10 @@ const testItems5 = [
 		keepProportion: true,
 		isSelected: false,
 		items: [
-			{
-				id: "3",
-				type: "Rectangle",
+			createRectangleData({
 				x: 150,
 				y: 150,
-				width: 100,
-				height: 100,
-				rotation: 0,
-				scaleX: 1,
-				scaleY: 1,
-				fill: "transparent",
-				stroke: "black",
-				strokeWidth: "1px",
-				keepProportion: false,
-				isSelected: false,
-			},
+			}),
 			{
 				id: "4",
 				type: "Ellipse",
@@ -463,34 +451,19 @@ const testItems5 = [
 				keepProportion: false,
 				isSelected: false,
 			},
-			{
-				id: "5",
-				type: "Rectangle",
+			createRectangleData({
 				x: 250,
 				y: 250,
-				width: 100,
-				height: 100,
-				rotation: 0,
-				scaleX: 1,
-				scaleY: 1,
-				fill: "transparent",
-				stroke: "black",
-				strokeWidth: "1px",
-				keepProportion: false,
-				isSelected: false,
-			},
+			}),
 		],
 	},
-] as Diagram[];
-
-const testItems6 = [
 	createRectangleData({
 		x: 300,
-		y: 300,
+		y: 500,
 	}),
 	createRectangleData({
 		x: 500,
-		y: 300,
+		y: 500,
 	}),
 ] as Diagram[];
 
@@ -499,7 +472,7 @@ function App() {
 		state: [canvasState, _setCanvasState],
 		canvasProps,
 		canvasFunctions,
-	} = useSvgCanvas(testItems4);
+	} = useSvgCanvas(testItems5);
 
 	const handleAddRectangle = () => {
 		canvasFunctions.addItem(createRectangleData({ x: 50, y: 50 }) as Diagram);

@@ -60,14 +60,8 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	}, []);
 
 	const onItemableChange = useCallback((e: ItemableChangeEvent) => {
-		setCanvasState((prevState) => ({
-			...prevState,
-			items: applyRecursive(prevState.items, (item) =>
-				item.id === e.id ? deepMerge(item, e) : item,
-			),
-		}));
-
 		// 接続ポイントの移動を通知
+		// TODO: Group側でやるべきか？
 		const connectPoints: ConnectPointMoveData[] = [];
 		const findRecursive = (data: Partial<Diagram>) => {
 			if (isItemableData(data)) {
@@ -89,12 +83,20 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				}
 			}
 		};
+
 		findRecursive(e);
 
 		notifyConnectPointsMove({
 			eventType: e.eventType,
 			points: connectPoints,
 		});
+
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: applyRecursive(prevState.items, (item) =>
+				item.id === e.id ? deepMerge(item, e) : item,
+			),
+		}));
 	}, []);
 
 	const onDrag = useCallback((e: DiagramDragEvent) => {

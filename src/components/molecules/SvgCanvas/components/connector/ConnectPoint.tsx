@@ -32,6 +32,7 @@ import {
 	lineIntersects,
 	radiansToDegrees,
 } from "../../functions/Math";
+import { newId } from "../../functions/Diagram";
 
 /** 図形と接続線のマージン */
 const CONNECT_LINE_MARGIN = 20;
@@ -290,6 +291,9 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 
 					const points: PathPointData[] = [...pathPoints];
 					points[0].id = id;
+					for (let i = 1; i < points.length - 1; i++) {
+						points[i].id = newId();
+					}
 					points[points.length - 1].id = customEvent.detail.endPointId;
 
 					onConnect?.({

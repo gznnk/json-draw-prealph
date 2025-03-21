@@ -230,6 +230,7 @@ const Group: React.FC<GroupProps> = ({
 				onItemableChange?.({
 					eventType: "Start",
 					id,
+					items,
 				});
 			}
 			return;
@@ -381,6 +382,7 @@ const Group: React.FC<GroupProps> = ({
 			onItemableChange?.({
 				eventType: "Start",
 				id,
+				items,
 			});
 
 			setIsGroupTransforming(true);

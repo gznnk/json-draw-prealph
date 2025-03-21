@@ -1,27 +1,28 @@
 // Reactのインポート
 import type React from "react";
-import { memo, useEffect, useRef, useContext } from "react";
+import { memo, useContext, useEffect, useRef } from "react";
 
 // SvgCanvas関連コンポーネントをインポート
+import { SvgCanvasContext } from "../../SvgCanvas";
+import type { Direction } from "../connector/ConnectPoint";
 import {
 	createBestConnectPath,
 	getLineDirection,
 } from "../connector/ConnectPoint";
-import type { Direction } from "../connector/ConnectPoint";
 import Path from "../diagram/Path";
-import { SvgCanvasContext } from "../../SvgCanvas";
 
 // SvgCanvas関連型定義をインポート
 import type {
+	ConnectLineData,
 	CreateDiagramProps,
 	Diagram,
-	ConnectLineData,
+	Shape,
 } from "../../types/DiagramTypes";
 import type { ConnectPointsMoveEvent } from "../../types/EventTypes";
 
 // SvgCanvas関連関数をインポート
+import { newId } from "../../functions/Diagram";
 import { calcRadians, radiansToDegrees } from "../../functions/Math";
-import { isShape, newId } from "../../functions/Diagram";
 
 /** 接続ポイント移動イベントの名前 */
 export const EVENT_NAME_CONNECT_POINTS_MOVE = "ConnectPointMove";
@@ -79,7 +80,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 	// 一番最初の描画時のitems
 	const initialItems = useRef(items);
 	// 移動開始時のitems
-	const startItems = useRef(items);
+	const startItems = useRef<Diagram[]>([]);
 	// 移動開始時の接続ポイントの向き
 	const startDirection = useRef<Direction>("up");
 	// 垂直と水平の線のみかどうか
@@ -164,6 +165,13 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 			}
 
 			// 移動中と移動終了時の処理
+			if (startItems.current.length === 0) {
+				// 移動開始時のitemsがない場合は何もしない
+				// フェイルセーフの処理で、ここにくる場合はバグ
+				console.error("ConnectLine: startItems is empty");
+				return;
+			}
+
 			const _startItems = startItems.current;
 			const _isItemsChanged = isItemsChanged.current;
 			const _isVerticalHorizontalLines = isVerticalHorizontalLines.current;
@@ -211,7 +219,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 						return item;
 					}) as Diagram[];
 
-					// 子図形の変更イベントを発火
+					// 接続線の変更イベントを発火
 					onItemableChange?.({
 						eventType: event.eventType,
 						id,
@@ -221,18 +229,31 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 					// 一番最初の描画時からitemsが変更されていない場合は、最適な接続線を再計算
 
 					// 動いた接続ポイントの反対側の点を取得
-					const lastIdx = _startItems.length - 1;
-					const oppositePoint =
-						foundIdx === 0 ? _startItems[lastIdx] : _startItems[0];
+					const lastIdx = items.length - 1;
+					const oppositeItem = foundIdx === 0 ? items[lastIdx] : items[0];
+					let oppositePoint = {
+						x: oppositeItem.x,
+						y: oppositeItem.y,
+					};
+
+					// 反対側の点も動いているかどうかを確認
+					const movedOppositPoint = event.points.find(
+						(p) => p.id === oppositeItem.id,
+					);
+					if (movedOppositPoint) {
+						// 反対側の点が動いている場合は、その座標を利用
+						oppositePoint = movedOppositPoint;
+					}
 
 					// 反対側の図形の情報を取得
-					const oppositeOwnerShape = canvasStateProvider?.getDiagramById(
-						point.ownerId === startOwnerId ? endOwnerId : startOwnerId,
-					);
-
-					// 型チェック（以降の処理で型エラーが出ないようにするためだけ）
-					if (!isShape(oppositeOwnerShape)) {
-						return;
+					let oppositeOwnerShape: Shape;
+					if (movedOppositPoint) {
+						oppositeOwnerShape = movedOppositPoint.ownerShape;
+					} else {
+						// 反対側の図形が動いていない場合はcanvasStateProviderから情報を取得（１フレーム前の情報しか取れないが、接続先の図形に移動はない場合なので問題ない）
+						oppositeOwnerShape = canvasStateProvider?.getDiagramById(
+							point.ownerId === startOwnerId ? endOwnerId : startOwnerId,
+						) as Shape;
 					}
 
 					// 最適な接続線を再計算
@@ -258,9 +279,10 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 					) as Diagram[];
 					// 両端の点のIDは維持する
 					newItems[0].id = _startItems[0].id;
-					newItems[newItems.length - 1].id = _startItems[lastIdx].id;
+					newItems[newItems.length - 1].id =
+						_startItems[_startItems.length - 1].id;
 
-					// 子図形の変更イベントを発火
+					// 接続線の変更イベントを発火
 					onItemableChange?.({
 						eventType: event.eventType,
 						id,
