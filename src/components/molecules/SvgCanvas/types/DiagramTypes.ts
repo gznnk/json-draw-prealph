@@ -56,6 +56,7 @@ export type DiagramBaseData = {
 	type: DiagramType;
 	x: number;
 	y: number;
+	hidden?: boolean; // 永続化されないプロパティ
 };
 
 /**

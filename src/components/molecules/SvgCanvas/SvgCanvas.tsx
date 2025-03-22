@@ -6,7 +6,7 @@ import styled from "@emotion/styled";
 
 // SvgCanvas関連型定義をインポート
 import type { SvgCanvasState } from "./hooks/canvasHooks";
-import type { Diagram } from "./types/DiagramTypes";
+import type { Diagram, GroupData } from "./types/DiagramTypes";
 import { DiagramTypeComponentMap } from "./types/DiagramTypes";
 import type {
 	ConnectPointsMoveEvent,
@@ -17,6 +17,9 @@ import type {
 	DiagramTransformEvent,
 	ItemableChangeEvent,
 } from "./types/EventTypes";
+
+// SvgCanvas関連コンポーネントをインポート
+import Group from "./components/diagram/Group";
 
 // SvgCanvas関連関数をインポート
 import { isItemableData } from "./functions/Diagram";
@@ -52,7 +55,8 @@ const Svg = styled.svg`
  */
 type SvgCanvasProps = {
 	title?: string;
-	items: Array<Diagram>;
+	items: Diagram[];
+	multiSelectGroup?: GroupData;
 	onTransform?: (e: DiagramTransformEvent) => void;
 	onItemableChange?: (e: ItemableChangeEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
@@ -70,6 +74,7 @@ type SvgCanvasProps = {
 const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	title,
 	items,
+	multiSelectGroup,
 	onTransform,
 	onItemableChange,
 	onDrag,
@@ -174,6 +179,19 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 				>
 					<title>{title}</title>
 					{renderedItems}
+					{/* 複数選択時の一時グループ */}
+					{multiSelectGroup && (
+						<Group
+							{...multiSelectGroup}
+							id="multiSelectGroup"
+							onTransform={onTransform} // TODO: 必要か精査
+							onItemableChange={onItemableChange}
+							onDrag={onDrag} // TODO: 必要か精査
+							onDrop={onDrop} // TODO: 必要か精査
+							onConnect={onConnect} // TODO: 必要か精査
+							onConnectPointsMove={onConnectPointsMove}
+						/>
+					)}
 				</Svg>
 			</SvgCanvasContext.Provider>
 		</ContainerDiv>
@@ -228,4 +246,39 @@ const getDiagramById = (
 			}
 		}
 	}
+};
+
+/**
+ * 再帰的に更新関数を適用する
+ *
+ * @param items 更新対象の図形配列
+ * @param updateFunction 更新関数
+ * @returns 更新後の図形配列
+ */
+const applyRecursive = (
+	items: Diagram[],
+	updateFunction: (item: Diagram) => Diagram,
+) => {
+	let isItemChanged = false;
+	const newItems: Diagram[] = [];
+	for (const item of items) {
+		const newItem = updateFunction(item);
+		newItems.push(newItem);
+
+		// アイテムの参照先が変わった場合は変更ありと判断する
+		if (item !== newItem) {
+			isItemChanged = true;
+		}
+		if (isItemableData(item) && isItemableData(newItem)) {
+			const newGroupItems = applyRecursive(item.items ?? [], updateFunction);
+			// 配列の参照先が変わった場合は変更ありと判断する
+			if (newGroupItems !== item.items) {
+				newItem.items = newGroupItems;
+				isItemChanged = true;
+			}
+		}
+	}
+
+	// 変更がない場合はReactが変更なしと検知するよう元の配列を返す
+	return isItemChanged ? newItems : items;
 };

@@ -8,6 +8,7 @@ import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 import type {
 	ConnectLineData,
 	Diagram,
+	GroupData,
 	PathPointData,
 } from "../types/DiagramTypes";
 import type {
@@ -23,6 +24,7 @@ import type {
 
 // SvgCanvas関連コンポーネントをインポート
 import { notifyConnectPointsMove } from "../components/connector/ConnectLine";
+import { calcGroupBoxOfNoRotation } from "../components/diagram/Group";
 
 // SvgCanvas関連関数をインポート
 import { isItemableData, isSelectableData, newId } from "../functions/Diagram";
@@ -33,6 +35,7 @@ import { calcPointsOuterBox } from "../functions/Math";
  */
 export type SvgCanvasState = {
 	items: Diagram[];
+	multiSelectGroup?: GroupData;
 	selectedItemId?: string;
 };
 
@@ -50,6 +53,28 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		items: initialItems,
 	});
 
+	/**
+	 * 図形のドラッグイベントハンドラ
+	 */
+	const onDrag = useCallback((e: DiagramDragEvent) => {
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: applyRecursive(prevState.items, (item) =>
+				item.id === e.id ? { ...item, x: e.endX, y: e.endY } : item,
+			),
+		}));
+	}, []);
+
+	/**
+	 * 図形のドロップイベントハンドラ
+	 */
+	const onDrop = useCallback((_e: DiagramDragDropEvent) => {
+		// NOP
+	}, []);
+
+	/**
+	 * 図形の変形イベントハンドラ
+	 */
 	const onTransform = useCallback((e: DiagramTransformEvent) => {
 		setCanvasState((prevState) => ({
 			...prevState,
@@ -59,8 +84,11 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		}));
 	}, []);
 
+	/**
+	 * 子図形をもつ図形の変更イベントハンドラ
+	 */
 	const onItemableChange = useCallback((e: ItemableChangeEvent) => {
-		// 接続ポイントの移動を通知
+		// 接続ポイントの移動データを取得
 		const connectPoints: ConnectPointMoveData[] = [];
 		const findRecursive = (data: Partial<Diagram>) => {
 			if (isItemableData(data)) {
@@ -82,49 +110,102 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				}
 			}
 		};
-
 		findRecursive(e);
 
+		// 接続ポイントの移動を通知
 		notifyConnectPointsMove({
 			eventType: e.eventType,
 			points: connectPoints,
 		});
 
-		setCanvasState((prevState) => ({
-			...prevState,
-			items: applyRecursive(prevState.items, (item) =>
-				item.id === e.id ? deepMerge(item, e) : item,
-			),
-		}));
-	}, []);
-
-	const onDrag = useCallback((e: DiagramDragEvent) => {
-		setCanvasState((prevState) => ({
-			...prevState,
-			items: applyRecursive(prevState.items, (item) =>
-				item.id === e.id ? { ...item, x: e.endX, y: e.endY } : item,
-			),
-		}));
-	}, []);
-
-	const onDrop = useCallback((_e: DiagramDragDropEvent) => {
-		// NOP
-	}, []);
-
-	const onSelect = useCallback((e: DiagramSelectEvent) => {
 		setCanvasState((prevState) => {
-			const items = applyRecursive(prevState.items, (item) => {
-				if (!isSelectableData(item)) {
+			let items = applyRecursive(prevState.items, (item) =>
+				item.id === e.id ? deepMerge(item, e) : item,
+			);
+			let multiSelectGroup: GroupData | undefined = prevState.multiSelectGroup;
+
+			if (e.id === "multiSelectGroup") {
+				multiSelectGroup = {
+					...multiSelectGroup,
+					...e,
+				} as GroupData;
+				items = applyRecursive(prevState.items, (item) => {
+					const changedItem = (e.items ?? []).find((i) => i.id === item.id);
+					if (changedItem) {
+						return {
+							...item,
+							...changedItem,
+						};
+					}
 					return item;
-				}
-				return item.id === e.id
-					? { ...item, isSelected: true }
-					: { ...item, isSelected: e.isMultiSelect ? item.isSelected : false };
-			});
+				});
+			}
 
 			return {
 				...prevState,
 				items,
+				multiSelectGroup,
+			};
+		});
+	}, []);
+
+	/**
+	 * 図形の選択イベントハンドラ
+	 */
+	const onSelect = useCallback((e: DiagramSelectEvent) => {
+		setCanvasState((prevState) => {
+			let items = applyRecursive(prevState.items, (item) => {
+				if (!isSelectableData(item)) {
+					return item;
+				}
+				if (item.id === e.id) {
+					return { ...item, isSelected: true, hidden: false };
+				}
+
+				return {
+					...item,
+					// 複数選択でない場合は、選択された図形以外の選択状態を解除
+					isSelected: e.isMultiSelect ? item.isSelected : false,
+					hidden: false,
+				};
+			});
+
+			// 選択されたアイテムを取得
+			const selectedItems = getSelectedRecursive(items);
+
+			// 複数選択の場合は、選択されている図形をグループ化
+			let multiSelectGroup: GroupData | undefined = undefined;
+			if (1 < selectedItems.length) {
+				const box = calcGroupBoxOfNoRotation(selectedItems, 0, 0, 0);
+				multiSelectGroup = {
+					x: box.left + (box.right - box.left) / 2,
+					y: box.top + (box.bottom - box.top) / 2,
+					width: box.right - box.left,
+					height: box.bottom - box.top,
+					rotation: 0,
+					scaleX: 1,
+					scaleY: 1,
+					keepProportion: false,
+					isSelected: true, // 複数選択用のグループは常に選択状態にする
+					items: selectedItems.map((item) => ({
+						...item,
+						isSelected: false, // 複数選択用のグループ内の図形は選択状態を解除
+					})),
+				} as GroupData;
+
+				// 元の図形は非表示にする
+				items = applyRecursive(prevState.items, (item) => {
+					if (!isSelectableData(item)) {
+						return item;
+					}
+					return item.isSelected ? { ...item, hidden: true } : item;
+				});
+			}
+
+			return {
+				...prevState,
+				items,
+				multiSelectGroup,
 				selectedItemId: e.id,
 			};
 		});
@@ -244,6 +325,8 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		updateItem,
 	};
 
+	console.log("canvasState", canvasState);
+
 	return {
 		state: [canvasState, setCanvasState],
 		canvasProps,
@@ -311,4 +394,18 @@ const deepMerge = <T extends Record<string, any>>(
 	}
 
 	return Array.isArray(target) ? target : { ...target };
+};
+
+const getSelectedRecursive = (items: Diagram[], selectedItems?: Diagram[]) => {
+	const _selectedItems = selectedItems ?? [];
+	for (const item of items) {
+		if (isSelectableData(item)) {
+			if (item.isSelected) {
+				_selectedItems.push(item);
+			} else if (isItemableData(item)) {
+				getSelectedRecursive(item.items, _selectedItems);
+			}
+		}
+	}
+	return _selectedItems;
 };

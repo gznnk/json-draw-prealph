@@ -49,6 +49,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 	id,
 	x,
 	y,
+	hidden,
 	width,
 	height,
 	rotation,
@@ -221,6 +222,10 @@ const Rectangle: React.FC<RectangleProps> = ({
 		}),
 		[x, y, width, height, rotation, scaleX, scaleY],
 	);
+
+	if (hidden) {
+		return null;
+	}
 
 	// rectのtransform属性を生成
 	const transform = createSvgTransform(

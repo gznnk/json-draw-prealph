@@ -653,7 +653,7 @@ const calcItemBoxOfNoGroupRotation = (
  * @param groupRotation - グループの回転角度
  * @returns グループの四辺の座標
  */
-const calcGroupBoxOfNoRotation = (
+export const calcGroupBoxOfNoRotation = (
 	items: Diagram[],
 	groupCenterX: number,
 	groupCenterY: number,
