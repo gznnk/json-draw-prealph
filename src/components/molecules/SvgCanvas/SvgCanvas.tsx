@@ -187,6 +187,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 						<Group
 							{...multiSelectGroup}
 							id="MultiSelectGroup"
+							syncWithSameId
 							onTransform={onTransform}
 							onItemableChange={onItemableChange}
 							onDrag={onDrag} // TODO: 必要か精査

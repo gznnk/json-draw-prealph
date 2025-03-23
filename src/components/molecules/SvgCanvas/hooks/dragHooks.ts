@@ -45,6 +45,7 @@ export type DragProps = {
 	y: number;
 	allowXDecimal?: boolean;
 	allowYDecimal?: boolean;
+	syncWithSameId?: boolean;
 	ref: React.RefObject<SVGElement>;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onPointerUp?: (e: DiagramPointerEvent) => void;
@@ -67,6 +68,7 @@ export type DragProps = {
  * @param {number} props.y Y座標
  * @param {boolean} [props.allowXDecimal] X座標の小数点許可フラグ
  * @param {boolean} [props.allowYDecimal] Y座標の小数点許可フラグ
+ * @param {boolean} [props.syncWithSameId] 同じIDの図形とドラッグを同期させるかどうかのフラグ
  * @param {React.RefObject<SVGElement>} props.ref ドラッグ可能にする要素の参照
  * @param {(e: DiagramPointerEvent) => void} [props.onPointerDown] ポインター押下時のイベントハンドラ
  * @param {(e: DiagramPointerEvent) => void} [props.onPointerUp] ポインター離上時のイベントハンドラ
@@ -88,6 +90,7 @@ export const useDrag = (props: DragProps) => {
 		type,
 		allowXDecimal = true,
 		allowYDecimal = true,
+		syncWithSameId = false,
 		ref,
 		onPointerDown,
 		onPointerUp,
@@ -195,6 +198,8 @@ export const useDrag = (props: DragProps) => {
 	 * ドラッグ領域内でのポインターの移動イベントハンドラ
 	 */
 	const handlePointerMove = (e: React.PointerEvent<SVGElement>): void => {
+		ref.current?.style.setProperty("backgroud-color", "red");
+
 		if (!isPointerDown.current) {
 			// このドラッグ領域内でポインターが押されていない場合は何もしない
 			return;
@@ -483,22 +488,28 @@ export const useDrag = (props: DragProps) => {
 	// 全体周知用ドラッグイベントリスナー登録
 	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
 	const refBusVal = {
+		// プロパティ
 		id,
 		x,
 		y,
 		type,
 		ref,
+		onDrag,
 		onDragOver,
 		onDragLeave,
 		onDrop,
+		// 内部変数・内部関数
+		syncWithSameId,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	useEffect(() => {
 		let handleBroadcastDrag: (e: Event) => void;
+		let handleBroadcastDragForSync: (e: Event) => void;
 
-		const { onDragOver, onDrop } = refBus.current;
+		const { syncWithSameId, onDrag, onDragOver, onDrop } = refBus.current;
+
 		if (onDragOver || onDrop) {
 			handleBroadcastDrag = (e: Event) => {
 				// refBusを介して参照値を取得
@@ -557,11 +568,44 @@ export const useDrag = (props: DragProps) => {
 			document.addEventListener(EVENT_NAME_BROADCAST_DRAG, handleBroadcastDrag);
 		}
 
+		if (syncWithSameId && onDrag) {
+			handleBroadcastDragForSync = (e: Event) => {
+				// refBusを介して参照値を取得
+				const { id, onDrag } = refBus.current;
+				const customEvent = e as CustomEvent<BroadcastDragEvent>;
+
+				// 同じIDでかつ自身以外の図形のドラッグイベントの場合、同期のためのドラッグイベントを発火する
+				if (customEvent.detail.id === id && e.target !== ref.current) {
+					const dragEvent = {
+						id,
+						eventType: customEvent.detail.eventType,
+						startX: customEvent.detail.startX,
+						startY: customEvent.detail.startY,
+						endX: customEvent.detail.endX,
+						endY: customEvent.detail.endY,
+					};
+
+					onDrag?.(dragEvent);
+				}
+			};
+			document.addEventListener(
+				EVENT_NAME_BROADCAST_DRAG,
+				handleBroadcastDragForSync,
+			);
+		}
+
 		return () => {
 			if (handleBroadcastDrag) {
 				document.removeEventListener(
 					EVENT_NAME_BROADCAST_DRAG,
 					handleBroadcastDrag,
+				);
+			}
+
+			if (handleBroadcastDragForSync) {
+				document.removeEventListener(
+					EVENT_NAME_BROADCAST_DRAG,
+					handleBroadcastDragForSync,
 				);
 			}
 		};
