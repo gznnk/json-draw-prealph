@@ -530,37 +530,49 @@ export const calcEllipseVertices = (shape: Shape): EllipseVertices => {
  * @param points - 座標集合
  * @returns 外接枠
  */
-export const calcPointsOuterBox = (points: Point[]): Box => {
+export const calcPointsOuterShape = (
+	points: Point[],
+	rotation = 0,
+	scaleX = 1,
+	scaleY = 1,
+): Shape => {
 	const left = Math.min(...points.map((p) => p.x));
 	const top = Math.min(...points.map((p) => p.y));
 	const right = Math.max(...points.map((p) => p.x));
 	const bottom = Math.max(...points.map((p) => p.y));
 
+	const x = nanToZero((left + right) / 2);
+	const y = nanToZero((top + bottom) / 2);
+
+	const radians = degreesToRadians(rotation);
+
+	const inversePoints = points.map((p) =>
+		inverseAffineTransformation(p.x, p.y, scaleX, scaleY, radians, x, y),
+	);
+
+	const inverseLeft = Math.min(...inversePoints.map((p) => p.x));
+	const inverseTop = Math.min(...inversePoints.map((p) => p.y));
+	const inverseRight = Math.max(...inversePoints.map((p) => p.x));
+	const inverseBottom = Math.max(...inversePoints.map((p) => p.y));
+
+	const originalCenter = affineTransformation(
+		nanToZero((inverseLeft + inverseRight) / 2),
+		nanToZero((inverseTop + inverseBottom) / 2),
+		scaleX,
+		scaleY,
+		radians,
+		x,
+		y,
+	);
+
 	return {
-		top,
-		left,
-		right,
-		bottom,
-		center: {
-			x: (left + right) / 2,
-			y: (top + bottom) / 2,
-		},
-		leftTop: {
-			x: left,
-			y: top,
-		},
-		leftBottom: {
-			x: left,
-			y: bottom,
-		},
-		rightTop: {
-			x: right,
-			y: top,
-		},
-		rightBottom: {
-			x: right,
-			y: bottom,
-		},
+		x: originalCenter.x,
+		y: originalCenter.y,
+		width: inverseRight - inverseLeft,
+		height: inverseBottom - inverseTop,
+		rotation,
+		scaleX,
+		scaleY,
 	};
 };
 

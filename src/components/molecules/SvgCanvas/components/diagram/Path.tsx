@@ -28,7 +28,7 @@ import { useDrag } from "../../hooks/dragHooks";
 // SvgCanvas関連関数をインポート
 import { getCursorFromAngle, newId } from "../../functions/Diagram";
 import {
-	calcPointsOuterBox, // TODO: 回転時にずれるので要修正
+	calcPointsOuterShape,
 	calcRadians,
 	createLinerX2yFunction,
 	createLinerY2xFunction,
@@ -85,6 +85,9 @@ const Path: React.FC<PathProps> = ({
 	stroke = "black",
 	strokeWidth = "1px",
 	isSelected = false,
+	isMultiSelectSource = false,
+	items = [],
+	syncWithSameId = false,
 	dragEnabled = true,
 	transformEnabled = true,
 	segmentDragEnabled = true,
@@ -94,7 +97,6 @@ const Path: React.FC<PathProps> = ({
 	onSelect,
 	onTransform,
 	onItemableChange,
-	items = [],
 }) => {
 	const [isDragging, setIsDragging] = useState(false);
 	const [isPathPointDragging, setIsPathPointDragging] = useState(false);
@@ -110,6 +112,9 @@ const Path: React.FC<PathProps> = ({
 		id,
 		x,
 		y,
+		rotation,
+		scaleX,
+		scaleY,
 		isSelected,
 		transformEnabled,
 		dragEnabled,
@@ -229,12 +234,43 @@ const Path: React.FC<PathProps> = ({
 		}
 	}, []);
 
+	/**
+	 * 線分および新規頂点の変更イベントハンドラ
+	 */
+	const handleItemableChangeBySegumentAndNewVertex = useCallback(
+		(e: ItemableChangeEvent) => {
+			const { rotation, scaleX, scaleY, onItemableChange } = refBus.current;
+
+			if (e.eventType === "End") {
+				// 新規頂点および線分のドラッグ完了に伴うパスの外枠の形状計算
+				const newShape = calcPointsOuterShape(
+					(e.items ?? []).map((p) => ({ x: p.x, y: p.y })),
+					rotation,
+					scaleX,
+					scaleY,
+				);
+
+				onItemableChange?.({
+					...e,
+					x: newShape.x,
+					y: newShape.y,
+					width: newShape.width,
+					height: newShape.height,
+				});
+			} else {
+				onItemableChange?.(e);
+			}
+		},
+		[],
+	);
+
 	// 折れ線のドラッグ用要素のプロパティ生成
 	const dragProps = useDrag({
 		id,
 		type: "Path",
 		x,
 		y,
+		syncWithSameId,
 		ref: dragSvgRef,
 		onPointerDown: handlePointerDown,
 		onClick: handleClick,
@@ -280,7 +316,7 @@ const Path: React.FC<PathProps> = ({
 						items={items}
 						onPointerDown={handlePointerDown}
 						onClick={handleClick}
-						onItemableChange={onItemableChange}
+						onItemableChange={handleItemableChangeBySegumentAndNewVertex}
 					/>
 				)}
 			{/* 新規頂点 */}
@@ -292,7 +328,7 @@ const Path: React.FC<PathProps> = ({
 					<NewVertexList
 						id={id}
 						items={items}
-						onItemableChange={onItemableChange}
+						onItemableChange={handleItemableChangeBySegumentAndNewVertex}
 					/>
 				)}
 			{/* 変形用グループ */}
@@ -302,6 +338,7 @@ const Path: React.FC<PathProps> = ({
 					x={x}
 					y={y}
 					isSelected={transformEnabled && isTransformMode}
+					isMultiSelectSource={isMultiSelectSource}
 					width={width}
 					height={height}
 					rotation={rotation}
@@ -470,23 +507,10 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 				// ドラッグ中の新規頂点を解除
 				setDraggingNewVertex(undefined);
 
-				// 新規頂点のドラッグ完了に伴うパスの外枠の形状計算
-				const box = calcPointsOuterBox(
-					items.map((item) =>
-						item.id === e.id
-							? { x: e.endX, y: e.endY }
-							: { x: item.x, y: item.y },
-					),
-				);
-
 				// 新規頂点のドラッグ完了に伴うパスのデータ変更を通知
 				onItemableChange?.({
 					eventType: e.eventType,
 					id,
-					x: box.center.x,
-					y: box.center.y,
-					width: box.right - box.left,
-					height: box.bottom - box.top,
 					items: items.map((item) =>
 						item.id === e.id
 							? {
@@ -742,20 +766,9 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 			}
 
 			if (e.eventType === "End") {
-				const box = calcPointsOuterBox(
-					items.map((item) =>
-						item.id === e.id
-							? { x: e.endX, y: e.endY }
-							: { x: item.x, y: item.y },
-					),
-				);
 				onItemableChange?.({
 					eventType: e.eventType,
 					id,
-					x: box.center.x,
-					y: box.center.y,
-					width: box.right - box.left,
-					height: box.bottom - box.top,
 					items: items.map((item) => {
 						// ドラッグが完了したら、線分用のIDから新しいIDに変更
 						if (item.id === draggingSegment.startPointId) {

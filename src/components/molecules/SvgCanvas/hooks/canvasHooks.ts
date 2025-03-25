@@ -28,7 +28,7 @@ import { calcGroupBoxOfNoRotation } from "../components/diagram/Group";
 
 // SvgCanvas関連関数をインポート
 import { isItemableData, isSelectableData, newId } from "../functions/Diagram";
-import { calcPointsOuterBox } from "../functions/Math";
+import { calcPointsOuterShape } from "../functions/Math";
 
 /**
  * SvgCanvasの状態の型定義
@@ -282,15 +282,17 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	}, []);
 
 	const onConnect = useCallback((e: DiagramConnectEvent) => {
-		const box = calcPointsOuterBox(e.points.map((p) => ({ x: p.x, y: p.y })));
+		const shape = calcPointsOuterShape(
+			e.points.map((p) => ({ x: p.x, y: p.y })),
+		);
 
 		addItem({
 			id: newId(),
 			type: "ConnectLine",
-			x: box.center.x,
-			y: box.center.y,
-			width: box.right - box.left,
-			height: box.bottom - box.top,
+			x: shape.x,
+			y: shape.y,
+			width: shape.width,
+			height: shape.height,
 			isSelected: false,
 			keepProportion: false,
 			items: e.points.map((p) => ({
