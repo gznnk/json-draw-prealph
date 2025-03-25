@@ -1,16 +1,26 @@
 // Reactのインポート
 import type React from "react";
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
-import type { CreateDiagramProps, EllipseData } from "../../types/DiagramTypes";
+import type { EllipseVertices } from "../../types/CoordinateTypes";
 import type {
+	ConnectPointData,
+	CreateDiagramProps,
+	Diagram,
+	EllipseData,
+	Shape,
+} from "../../types/DiagramTypes";
+import type {
+	ConnectPointMoveData,
 	DiagramDragEvent,
 	DiagramHoverEvent,
 	DiagramTransformEvent,
+	EventType,
 } from "../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
+import ConnectPoint from "../connector/ConnectPoint";
 import Transformative from "../core/Transformative";
 
 // SvgCanvas関連カスタムフックをインポート
@@ -18,7 +28,7 @@ import { useDrag } from "../../hooks/dragHooks";
 
 // SvgCanvas関連関数をインポート
 import { createSvgTransform, newId } from "../../functions/Diagram";
-import { degreesToRadians } from "../../functions/Math";
+import { calcEllipseVertices, degreesToRadians } from "../../functions/Math";
 
 /**
  * 楕円コンポーネントのプロパティ
@@ -50,12 +60,15 @@ const Ellipse: React.FC<EllipseProps> = ({
 	keepProportion,
 	isSelected,
 	isMultiSelectSource,
+	items,
 	showConnectPoints = true,
 	syncWithSameId = false,
 	onDrag,
 	onClick,
 	onSelect,
 	onTransform,
+	onConnect,
+	onConnectPointsMove,
 }) => {
 	// ドラッグ中かのフラグ
 	const [isDragging, setIsDragging] = useState(false);
@@ -66,6 +79,56 @@ const Ellipse: React.FC<EllipseProps> = ({
 	// 変形対象のSVG要素への参照
 	const svgRef = useRef<SVGEllipseElement>({} as SVGEllipseElement);
 
+	/**
+	 * 接続ポイントの位置を更新
+	 *
+	 * @param eventType イベントタイプ
+	 * @param rectShape 四角形の形状（差分）
+	 */
+	const updateConnectPoints = (
+		eventType: EventType,
+		rectShape: Partial<Shape>,
+	) => {
+		// 複数選択時の選択元の場合、複数選択グループ側の処理と重複するためスキップ
+		if (isMultiSelectSource) return;
+
+		// 更新後の四角形の形状
+		const newRectShape = {
+			x,
+			y,
+			width,
+			height,
+			rotation,
+			scaleX,
+			scaleY,
+			...rectShape,
+		};
+		// 更新後の楕円の頂点座標を計算
+		const vertices = calcEllipseVertices(newRectShape);
+
+		// 接続ポイントの移動データを生成
+		const newConnectPoints: ConnectPointMoveData[] = [];
+		for (const connectPointData of (items as ConnectPointData[]) ?? []) {
+			const vertex = (vertices as EllipseVertices)[
+				connectPointData.name as keyof EllipseVertices
+			];
+
+			newConnectPoints.push({
+				id: connectPointData.id,
+				x: vertex.x,
+				y: vertex.y,
+				ownerId: id,
+				ownerShape: newRectShape,
+			});
+		}
+
+		// 接続ポイント移動イベントを発火
+		onConnectPointsMove?.({
+			eventType,
+			points: newConnectPoints,
+		});
+	};
+
 	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
 	const refBusVal = {
 		// プロパティ
@@ -75,7 +138,7 @@ const Ellipse: React.FC<EllipseProps> = ({
 		onSelect,
 		onTransform,
 		// 内部変数・内部関数
-		// updateConnectPoints,
+		updateConnectPoints,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -84,13 +147,18 @@ const Ellipse: React.FC<EllipseProps> = ({
 	 * 楕円のドラッグイベントハンドラ
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { onDrag } = refBus.current;
+		const { onDrag, updateConnectPoints } = refBus.current;
 
 		if (e.eventType === "Start") {
 			setIsDragging(true);
 		}
 
 		onDrag?.(e);
+
+		updateConnectPoints(e.eventType, {
+			x: e.endX,
+			y: e.endY,
+		});
 
 		if (e.eventType === "End") {
 			setIsDragging(false);
@@ -101,13 +169,15 @@ const Ellipse: React.FC<EllipseProps> = ({
 	 * 楕円の変形イベントハンドラ
 	 */
 	const handleTransform = useCallback((e: DiagramTransformEvent) => {
-		const { onTransform } = refBus.current;
+		const { onTransform, updateConnectPoints } = refBus.current;
 
 		if (e.eventType === "Start") {
 			setIsTransforming(true);
 		}
 
 		onTransform?.(e);
+
+		updateConnectPoints(e.eventType, e.endShape);
 
 		if (e.eventType === "End") {
 			setIsTransforming(false);
@@ -149,6 +219,22 @@ const Ellipse: React.FC<EllipseProps> = ({
 		onHover: handleHover,
 	});
 
+	// memo化によりConnectPointの再描画を抑制
+	// keyで分解してばらばらにpropsで渡すと、各ConnectPoint側それぞれで各keyに対して
+	// 比較処理が走り非効率なので、ここでまとめてShapeの差異を検知する
+	const ownerShape = useMemo(
+		() => ({
+			x,
+			y,
+			width,
+			height,
+			rotation,
+			scaleX,
+			scaleY,
+		}),
+		[x, y, width, height, rotation, scaleX, scaleY],
+	);
+
 	// ellipseのtransform属性を生成
 	const transform = createSvgTransform(
 		scaleX,
@@ -160,6 +246,14 @@ const Ellipse: React.FC<EllipseProps> = ({
 
 	// 変形コンポーネントを表示するかのフラグ
 	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
+
+	// 接続ポイントを表示するかのフラグ
+	const doShowConnectPoints =
+		showConnectPoints &&
+		!isSelected &&
+		!isMultiSelectSource &&
+		!isDragging &&
+		!isTransformimg;
 
 	return (
 		<>
@@ -198,6 +292,20 @@ const Ellipse: React.FC<EllipseProps> = ({
 					onTransform={handleTransform}
 				/>
 			)}
+			{doShowConnectPoints &&
+				(items as ConnectPointData[])?.map((cp) => (
+					<ConnectPoint
+						key={cp.id}
+						id={cp.id}
+						name={cp.name}
+						x={cp.x}
+						y={cp.y}
+						ownerId={id}
+						ownerShape={ownerShape}
+						isTransparent={!isHovered || isDragging || isTransformimg}
+						onConnect={onConnect}
+					/>
+				))}
 		</>
 	);
 };
@@ -232,6 +340,30 @@ export const createEllipseData = ({
 	stroke?: string;
 	strokeWidth?: string;
 }): EllipseData => {
+	// 接続ポイントを生成
+	const vertices = calcEllipseVertices({
+		x,
+		y,
+		width,
+		height,
+		rotation,
+		scaleX,
+		scaleY,
+	});
+
+	const items: Diagram[] = [];
+	for (const key of Object.keys(vertices)) {
+		const point = vertices[key as keyof EllipseVertices];
+		items.push({
+			id: newId(),
+			type: "ConnectPoint",
+			x: point.x,
+			y: point.y,
+			isSelected: false,
+			name: key,
+		});
+	}
+
 	return {
 		id: newId(),
 		type: "Ellipse",
@@ -248,6 +380,6 @@ export const createEllipseData = ({
 		strokeWidth,
 		isSelected: false,
 		isMultiSelectSource: false,
-		items: [],
+		items,
 	} as EllipseData;
 };

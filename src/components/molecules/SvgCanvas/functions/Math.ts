@@ -1,4 +1,9 @@
-import type { Point, Box, RectangleVertices } from "../types/CoordinateTypes";
+import type {
+	Point,
+	Box,
+	EllipseVertices,
+	RectangleVertices,
+} from "../types/CoordinateTypes";
 import type { Shape } from "../types/DiagramTypes";
 
 /**
@@ -322,15 +327,10 @@ export const createLinerX2yFunction = (p1: Point, p2: Point) => {
 };
 
 /**
- * 矩形の頂点を計算する
+ * 四角形の頂点を計算する
  *
- * @param point - 短径の中心座標
- * @param width	- 短径の幅
- * @param height - 短径の高さ
- * @param rotation - 短径の回転角度
- * @param scaleX - 短径のX軸方向の拡大率
- * @param scaleY - 短径のY軸方向の拡大率
- * @returns 矩形の頂点座標
+ * @param shape 形状
+ * @returns 頂点座標
  */
 export const calcRectangleVertices = (shape: Shape): RectangleVertices => {
 	const { x, y, width, height, rotation, scaleX, scaleY } = shape;
@@ -402,6 +402,115 @@ export const calcRectangleVertices = (shape: Shape): RectangleVertices => {
 		x: nanToZero(leftBottomPoint.x + rightBottomPoint.x) / 2,
 		y: nanToZero(leftBottomPoint.y + rightBottomPoint.y) / 2,
 	};
+
+	return {
+		leftTopPoint,
+		leftBottomPoint,
+		rightTopPoint,
+		rightBottomPoint,
+		topCenterPoint,
+		leftCenterPoint,
+		rightCenterPoint,
+		bottomCenterPoint,
+	};
+};
+
+/**
+ * 楕円の頂点を計算する
+ *
+ * @param shape 形状
+ * @returns 頂点座標
+ */
+export const calcEllipseVertices = (shape: Shape): EllipseVertices => {
+	const { x, y, width, height, rotation, scaleX, scaleY } = shape;
+
+	const halfWidth = width / 2;
+	const halfHeight = height / 2;
+
+	const tx = x;
+	const ty = y;
+
+	const radians = degreesToRadians(rotation);
+
+	const topCenterPoint = affineTransformation(
+		0,
+		-halfHeight,
+		scaleX,
+		scaleY,
+		radians,
+		tx,
+		ty,
+	);
+
+	const rightCenterPoint = affineTransformation(
+		halfWidth,
+		0,
+		scaleX,
+		scaleY,
+		radians,
+		tx,
+		ty,
+	);
+
+	const bottomCenterPoint = affineTransformation(
+		0,
+		halfHeight,
+		scaleX,
+		scaleY,
+		radians,
+		tx,
+		ty,
+	);
+
+	const leftCenterPoint = affineTransformation(
+		-halfWidth,
+		0,
+		scaleX,
+		scaleY,
+		radians,
+		tx,
+		ty,
+	);
+
+	const rightTopPoint = affineTransformation(
+		halfWidth / Math.sqrt(2),
+		-halfHeight / Math.sqrt(2),
+		scaleX,
+		scaleY,
+		radians,
+		tx,
+		ty,
+	);
+
+	const rightBottomPoint = affineTransformation(
+		halfWidth / Math.sqrt(2),
+		halfHeight / Math.sqrt(2),
+		scaleX,
+		scaleY,
+		radians,
+		tx,
+		ty,
+	);
+
+	const leftBottomPoint = affineTransformation(
+		-halfWidth / Math.sqrt(2),
+		halfHeight / Math.sqrt(2),
+		scaleX,
+		scaleY,
+		radians,
+		tx,
+		ty,
+	);
+
+	const leftTopPoint = affineTransformation(
+		-halfWidth / Math.sqrt(2),
+		-halfHeight / Math.sqrt(2),
+		scaleX,
+		scaleY,
+		radians,
+		tx,
+		ty,
+	);
 
 	return {
 		leftTopPoint,
