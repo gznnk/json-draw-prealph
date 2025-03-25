@@ -189,10 +189,16 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 					return { ...item, isSelected: true };
 				}
 
+				if (e.isMultiSelect && item.isSelected) {
+					// 複数選択の場合は、選択されている図形の選択状態を解除しない
+					return item;
+				}
+
 				return {
 					...item,
 					// 複数選択でない場合は、選択された図形以外の選択状態を解除
-					isSelected: e.isMultiSelect ? item.isSelected : false,
+					isSelected: false,
+					isMultiSelectSource: false,
 				};
 			});
 
