@@ -127,9 +127,9 @@ const testItems1 = [
 	{
 		id: "12",
 		type: "Path",
-		x: 0,
-		y: 100,
-		width: 100,
+		x: 100,
+		y: 150,
+		width: 200,
 		height: 100,
 		rotation: 0,
 		scaleX: 1,

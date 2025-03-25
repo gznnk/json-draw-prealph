@@ -105,7 +105,7 @@ const Path: React.FC<PathProps> = ({
 	const [isDragging, setIsDragging] = useState(false);
 	const [isPathPointDragging, setIsPathPointDragging] = useState(false);
 	const [isSequentialSelection, setIsSequentialSelection] = useState(false);
-	const [isTransformMode, setIsTransformMode] = useState(false);
+	const [isVerticesMode, setIsVerticesMode] = useState(!transformEnabled);
 
 	const startItems = useRef<Diagram[]>(items);
 	const dragSvgRef = useRef<SVGPathElement>({} as SVGPathElement);
@@ -129,7 +129,7 @@ const Path: React.FC<PathProps> = ({
 		onItemableChange,
 		// 内部変数・内部関数
 		isSequentialSelection,
-		isTransformMode,
+		isVerticesMode,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -138,12 +138,16 @@ const Path: React.FC<PathProps> = ({
 	 * 折れ線のポインターダウンイベントハンドラ
 	 */
 	const handlePointerDown = useCallback((_e: DiagramPointerEvent) => {
-		const { id, isSelected, onSelect } = refBus.current;
+		const { id, isSelected, transformEnabled, onSelect } = refBus.current;
 
 		// 図形選択イベントを発火
 		onSelect?.({
 			id,
 		});
+
+		if (!transformEnabled) {
+			setIsVerticesMode(true);
+		}
 
 		if (isSelected) {
 			setIsSequentialSelection(true);
@@ -157,13 +161,13 @@ const Path: React.FC<PathProps> = ({
 		const {
 			id,
 			isSequentialSelection,
-			isTransformMode,
+			isVerticesMode,
 			transformEnabled,
 			onClick,
 		} = refBus.current;
 
 		if (isSequentialSelection && transformEnabled) {
-			setIsTransformMode(!isTransformMode);
+			setIsVerticesMode(!isVerticesMode);
 		}
 		onClick?.({
 			id,
@@ -175,7 +179,7 @@ const Path: React.FC<PathProps> = ({
 		// グループから選択が外れたら連続選択フラグも解除
 		if (!isSelected) {
 			setIsSequentialSelection(false);
-			setIsTransformMode(false);
+			setIsVerticesMode(false);
 		}
 	}, [isSelected]);
 
@@ -183,10 +187,16 @@ const Path: React.FC<PathProps> = ({
 	 * 折れ線のドラッグイベントハンドラ
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { id, dragEnabled, items, onDrag, onItemableChange } = refBus.current;
+		const { id, dragEnabled, items, onDrag, onItemableChange, isVerticesMode } =
+			refBus.current;
 
 		// ドラッグが無効な場合はイベントを潰してドラッグを無効化
 		if (!dragEnabled) {
+			return;
+		}
+
+		// 頂点モードの場合はイベントを潰してドラッグを無効化
+		if (isVerticesMode) {
 			return;
 		}
 
@@ -287,16 +297,43 @@ const Path: React.FC<PathProps> = ({
 	// 頂点情報を生成
 	const linePoints = items.map((item, idx) => ({
 		...item,
-		hidden: isTransformMode || isDragging,
+		hidden: !isVerticesMode || isDragging,
 		pointerEventsDisabled:
 			fixBothEnds && (idx === 0 || idx === items.length - 1),
 	}));
+
+	// ドラッグ線分の表示フラグ
+	const showSegmentList =
+		segmentDragEnabled &&
+		isSelected &&
+		isVerticesMode &&
+		!isDragging &&
+		!isPathPointDragging &&
+		!isMultiSelectSource;
+
+	// 新規頂点の表示フラグ
+	const showNewVertex =
+		newVertexEnabled &&
+		isSelected &&
+		isVerticesMode &&
+		!isDragging &&
+		!isPathPointDragging &&
+		!isMultiSelectSource;
+
+	// 全体変形用グループの表示フラグ
+	const showTransformGroup = isSelected && !isMultiSelectSource;
 
 	return (
 		<>
 			{/* 描画用のパス */}
 			<g transform="translate(0.5,0.5)">
-				<path d={d} fill="none" stroke={stroke} strokeWidth={strokeWidth} />
+				<path
+					d={d}
+					fill="none"
+					stroke={stroke}
+					strokeWidth={strokeWidth}
+					style={{ visibility: isMultiSelectSource ? "hidden" : "visible" }}
+				/>
 			</g>
 			{/* ドラッグ用のパス */}
 			<path
@@ -304,47 +341,39 @@ const Path: React.FC<PathProps> = ({
 				d={d}
 				fill="none"
 				stroke="transparent"
-				strokeWidth={7}
-				cursor={dragEnabled ? "move" : "default"}
+				strokeWidth={5}
+				cursor={dragEnabled ? "move" : "pointer"}
 				tabIndex={0}
 				ref={dragSvgRef}
 				{...dragProps}
 			/>
 			{/* 線分ドラッグ */}
-			{segmentDragEnabled &&
-				isSelected &&
-				!isDragging &&
-				!isTransformMode &&
-				!isPathPointDragging && (
-					<SegmentList
-						id={id}
-						rightAngleSegmentDrag={rightAngleSegmentDrag}
-						fixBothEnds={fixBothEnds}
-						items={items}
-						onPointerDown={handlePointerDown}
-						onClick={handleClick}
-						onItemableChange={handleItemableChangeBySegumentAndNewVertex}
-					/>
-				)}
+			{showSegmentList && (
+				<SegmentList
+					id={id}
+					rightAngleSegmentDrag={rightAngleSegmentDrag}
+					fixBothEnds={fixBothEnds}
+					items={items}
+					onPointerDown={handlePointerDown}
+					onClick={handleClick}
+					onItemableChange={handleItemableChangeBySegumentAndNewVertex}
+				/>
+			)}
 			{/* 新規頂点 */}
-			{newVertexEnabled &&
-				isSelected &&
-				!isDragging &&
-				!isTransformMode &&
-				!isPathPointDragging && (
-					<NewVertexList
-						id={id}
-						items={items}
-						onItemableChange={handleItemableChangeBySegumentAndNewVertex}
-					/>
-				)}
-			{/* 変形用グループ */}
-			{isSelected && (
+			{showNewVertex && (
+				<NewVertexList
+					id={id}
+					items={items}
+					onItemableChange={handleItemableChangeBySegumentAndNewVertex}
+				/>
+			)}
+			{/* 全体変形用グループ */}
+			{showTransformGroup && (
 				<Group
 					id={id}
 					x={x}
 					y={y}
-					isSelected={transformEnabled && isTransformMode}
+					isSelected={transformEnabled && !isVerticesMode}
 					isMultiSelectSource={isMultiSelectSource}
 					width={width}
 					height={height}

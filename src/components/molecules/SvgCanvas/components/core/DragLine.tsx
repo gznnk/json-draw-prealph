@@ -55,7 +55,7 @@ const DragLine: React.FC<DragLineProps> = ({
 			x2={endX}
 			y2={endY}
 			stroke="transparent"
-			strokeWidth={3}
+			strokeWidth={5}
 			cursor={cursor}
 			ref={svgRef}
 			{...dragProps}

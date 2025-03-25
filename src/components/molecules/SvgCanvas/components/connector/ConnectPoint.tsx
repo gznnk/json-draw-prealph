@@ -326,6 +326,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				radius={6}
 				stroke="rgba(255, 204, 0, 0.8)"
 				fill="rgba(255, 204, 0, 0.8)"
+				cursor="pointer"
 				outline="none"
 				isTransparent={isTransparent && !isHovered} // TODO: !isHoverdは必要か検討
 				onDrag={handleDrag}
