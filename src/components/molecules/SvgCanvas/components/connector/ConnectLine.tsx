@@ -365,6 +365,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 			dragEnabled={false}
 			transformEnabled={false}
 			segmentDragEnabled={true}
+			rightAngleSegmentDrag={true}
 			newVertexEnabled={true}
 			fixBothEnds={true}
 			onClick={onClick}

@@ -59,6 +59,7 @@ export type PathProps = CreateDiagramProps<
 	dragEnabled?: boolean;
 	transformEnabled?: boolean;
 	segmentDragEnabled?: boolean;
+	rightAngleSegmentDrag?: boolean;
 	newVertexEnabled?: boolean;
 	fixBothEnds?: boolean;
 };
@@ -92,6 +93,7 @@ const Path: React.FC<PathProps> = ({
 	dragEnabled = true,
 	transformEnabled = true,
 	segmentDragEnabled = true,
+	rightAngleSegmentDrag = false,
 	newVertexEnabled = true,
 	fixBothEnds = false,
 	onClick,
@@ -316,6 +318,7 @@ const Path: React.FC<PathProps> = ({
 				!isPathPointDragging && (
 					<SegmentList
 						id={id}
+						rightAngleSegmentDrag={rightAngleSegmentDrag}
 						fixBothEnds={fixBothEnds}
 						items={items}
 						onPointerDown={handlePointerDown}
@@ -557,6 +560,7 @@ type SegmentData = {
  * 線分プロパティ
  */
 type SegmentProps = SegmentData & {
+	rightAngleSegmentDrag: boolean;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onClick?: (e: DiagramClickEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
@@ -567,7 +571,17 @@ type SegmentProps = SegmentData & {
  * 線分コンポーネント
  */
 const Segment: React.FC<SegmentProps> = memo(
-	({ id, startX, startY, endX, endY, onPointerDown, onClick, onDrag }) => {
+	({
+		id,
+		startX,
+		startY,
+		endX,
+		endY,
+		rightAngleSegmentDrag,
+		onPointerDown,
+		onClick,
+		onDrag,
+	}) => {
 		const midX = (startX + endX) / 2;
 		const midY = (startY + endY) / 2;
 
@@ -586,7 +600,9 @@ const Segment: React.FC<SegmentProps> = memo(
 			rotateEndPoint.x,
 			rotateEndPoint.y,
 		);
-		const cursor = getCursorFromAngle(radiansToDegrees(radian));
+		const cursor = rightAngleSegmentDrag
+			? getCursorFromAngle(radiansToDegrees(radian))
+			: "move";
 
 		// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
 		const refBusVal = {
@@ -621,7 +637,9 @@ const Segment: React.FC<SegmentProps> = memo(
 				onPointerDown={onPointerDown}
 				onClick={onClick}
 				onDrag={onDrag}
-				dragPositioningFunction={dragPositioningFunction}
+				dragPositioningFunction={
+					rightAngleSegmentDrag ? dragPositioningFunction : undefined
+				}
 			/>
 		);
 	},
@@ -633,6 +651,7 @@ Segment.displayName = "Segment";
  */
 type SegmentListProps = {
 	id: string;
+	rightAngleSegmentDrag: boolean;
 	fixBothEnds: boolean;
 	items: Diagram[];
 	onPointerDown?: (e: DiagramPointerEvent) => void;
@@ -644,7 +663,15 @@ type SegmentListProps = {
  * 線分リストコンポーネント
  */
 const SegmentList: React.FC<SegmentListProps> = memo(
-	({ id, items, fixBothEnds, onPointerDown, onClick, onItemableChange }) => {
+	({
+		id,
+		rightAngleSegmentDrag,
+		fixBothEnds,
+		items,
+		onPointerDown,
+		onClick,
+		onItemableChange,
+	}) => {
 		const [draggingSegment, setDraggingSegment] = useState<
 			SegmentData | undefined
 		>();
@@ -708,6 +735,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 					...segment,
 				};
 				if (fixBothEnds && (idx === 0 || idx === segmentList.length - 1)) {
+					// 両端を固定する場合は、端の線分の移動時に新しい頂点を追加する
 					const newItems = [...items];
 
 					if (idx === segmentList.length - 1) {
@@ -800,6 +828,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 			<Segment
 				key={item.id}
 				{...item}
+				rightAngleSegmentDrag={rightAngleSegmentDrag}
 				onPointerDown={onPointerDown}
 				onClick={onClick}
 				onDrag={handleSegmentDrag}
