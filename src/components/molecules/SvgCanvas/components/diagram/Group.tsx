@@ -344,21 +344,39 @@ const Group: React.FC<GroupProps> = ({
 	/**
 	 * グループ内の図形の変更イベントハンドラ
 	 */
-	const handleChildItemableChange = useCallback((e: ItemableChangeEvent) => {
-		const { items, transformGroupOutline, onItemableChange } = refBus.current;
+	const handleChildItemableChange = useCallback(
+		(e: ItemableChangeEvent) => {
+			const { id, isSelected, items, transformGroupOutline, onItemableChange } =
+				refBus.current;
 
-		// グループ内の図形の変更完了時にアウトラインの更新を行う
-		const changeItem = getChildDiagramById(items, e.id);
-		if (changeItem) {
-			transformGroupOutline({
-				...changeItem,
-				...e,
-			} as Diagram);
-		}
+			// グループ内の図形の変更完了時にアウトラインの更新を行う
+			const changeItem = getChildDiagramById(items, e.id);
+			if (changeItem) {
+				transformGroupOutline({
+					...changeItem,
+					...e,
+				} as Diagram);
+			}
 
-		// アウトライン以外はグループへの影響はないので、変更イベントをそのまま伝番する
-		onItemableChange?.(e);
-	}, []);
+			if (isSelected) {
+				// グループ選択時の場合、ここに来るのはドラッグ相当の操作の場合なので、ドラッグイベントに変換して伝番する
+				const dragEvent = {
+					eventType: e.eventType,
+					id,
+					startX: e.startItemable.x,
+					startY: e.startItemable.y,
+					endX: e.endItemable.x,
+					endY: e.endItemable.y,
+				} as DiagramDragEvent;
+
+				handleChildDiagramDrag(dragEvent);
+			} else {
+				// グループ選択時でない場合、アウトライン以外はグループへの影響はないので、変更イベントをそのまま伝番する
+				onItemableChange?.(e);
+			}
+		},
+		[handleChildDiagramDrag],
+	);
 
 	/**
 	 * グループ内の図形の接続イベントハンドラ
