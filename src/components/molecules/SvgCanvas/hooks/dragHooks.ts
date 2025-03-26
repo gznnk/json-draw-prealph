@@ -432,8 +432,8 @@ export const useDrag = (props: DragProps) => {
 		const dragEvent = {
 			id,
 			eventType: "End",
-			startX: x,
-			startY: y,
+			startX: startX.current,
+			startY: startY.current,
 			endX: x,
 			endY: y,
 		} as DiagramDragEvent;
