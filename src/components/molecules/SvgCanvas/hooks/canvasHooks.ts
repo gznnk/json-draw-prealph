@@ -110,7 +110,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				}
 			}
 		};
-		findRecursive(e);
+		findRecursive(e.endItemable);
 
 		if (0 < connectPoints.length) {
 			// 接続ポイントの移動を通知
@@ -129,14 +129,16 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				// 複数選択グループの変更の場合、複数選択グループ内の図形を更新
 				multiSelectGroup = {
 					...multiSelectGroup,
-					...e,
+					...e.endItemable,
 				} as GroupData;
 
 				// // 複数選択グループの変更が終了したタイミングで、元の図形にも変更を反映する
 				if (e.eventType === "End") {
 					items = applyRecursive(prevState.items, (item) => {
 						// 元図形に対応する複数選択グループ側の変更データを取得
-						const changedItem = (e.items ?? []).find((i) => i.id === item.id);
+						const changedItem = (e.endItemable.items ?? []).find(
+							(i) => i.id === item.id,
+						);
 						if (changedItem && isSelectableData(item)) {
 							const newItem = {
 								...item,
@@ -161,7 +163,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 			} else {
 				// 複数選択グループ以外の場合は、普通に更新
 				items = applyRecursive(prevState.items, (item) =>
-					item.id === e.id ? { ...item, ...e } : item,
+					item.id === e.id ? { ...item, ...e.endItemable } : item,
 				);
 			}
 

@@ -83,11 +83,9 @@ export type DiagramTransformEvent = {
 };
 
 /**
- * 子図形をもつ図形の変更イベント
+ * 子図形をもつ図形の変更イベントデータ
  */
-export type ItemableChangeEvent = {
-	eventType: EventType;
-	id: string;
+export type ItemableChangeData = {
 	x?: number;
 	y?: number;
 	width?: number;
@@ -96,6 +94,16 @@ export type ItemableChangeEvent = {
 	scaleX?: number;
 	scaleY?: number;
 	items?: Diagram[];
+};
+
+/**
+ * 子図形をもつ図形の変更イベント
+ */
+export type ItemableChangeEvent = {
+	eventType: EventType;
+	id: string;
+	startItemable: ItemableChangeData;
+	endItemable: ItemableChangeData;
 };
 
 /**

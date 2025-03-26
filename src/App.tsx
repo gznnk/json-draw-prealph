@@ -149,6 +149,7 @@ const testItems1 = [
 				height: 0,
 				keepProportion: false,
 				isSelected: false,
+				isMultiSelectSource: false,
 			},
 			{
 				id: "12-2",
@@ -159,6 +160,7 @@ const testItems1 = [
 				height: 0,
 				keepProportion: false,
 				isSelected: false,
+				isMultiSelectSource: false,
 			},
 			{
 				id: "12-3",
@@ -169,6 +171,7 @@ const testItems1 = [
 				height: 0,
 				keepProportion: false,
 				isSelected: false,
+				isMultiSelectSource: false,
 			},
 		],
 	},

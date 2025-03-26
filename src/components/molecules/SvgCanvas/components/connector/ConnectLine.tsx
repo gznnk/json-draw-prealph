@@ -270,7 +270,12 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 				onItemableChange?.({
 					eventType: event.eventType,
 					id,
-					items: newItems,
+					startItemable: {
+						items: _startItems,
+					},
+					endItemable: {
+						items: newItems,
+					},
 				});
 			} else {
 				// 一番最初の描画時からitemsが変更されていない場合は、最適な接続線を再計算
@@ -321,7 +326,12 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 				onItemableChange?.({
 					eventType: event.eventType,
 					id,
-					items: newItems,
+					startItemable: {
+						items: _startItems,
+					},
+					endItemable: {
+						items: newItems,
+					},
 				});
 
 				if (event.eventType === "End") {

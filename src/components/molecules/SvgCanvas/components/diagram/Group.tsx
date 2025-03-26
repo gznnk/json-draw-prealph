@@ -236,7 +236,16 @@ const Group: React.FC<GroupProps> = ({
 				onItemableChange?.({
 					eventType: "Start",
 					id,
-					items,
+					startItemable: {
+						x,
+						y,
+						items,
+					},
+					endItemable: {
+						x,
+						y,
+						items,
+					},
 				});
 			}
 			return;
@@ -282,9 +291,16 @@ const Group: React.FC<GroupProps> = ({
 			const event: ItemableChangeEvent = {
 				eventType: e.eventType,
 				id,
-				x: startBox.current.x + dx,
-				y: startBox.current.y + dy,
-				items: moveRecursive(startItems.current),
+				startItemable: {
+					x: startBox.current.x,
+					y: startBox.current.y,
+					items: startItems.current,
+				},
+				endItemable: {
+					x: startBox.current.x + dx,
+					y: startBox.current.y + dy,
+					items: moveRecursive(startItems.current),
+				},
 			};
 
 			// グループ内の全ての図形の移動をまとめて通知
@@ -388,7 +404,14 @@ const Group: React.FC<GroupProps> = ({
 			onItemableChange?.({
 				eventType: "Start",
 				id,
-				items,
+				startItemable: {
+					...e.startShape,
+					items,
+				},
+				endItemable: {
+					...e.endShape,
+					items,
+				},
 			});
 
 			setIsGroupTransforming(true);
@@ -468,8 +491,14 @@ const Group: React.FC<GroupProps> = ({
 		const event: ItemableChangeEvent = {
 			eventType: e.eventType,
 			id,
-			...e.endShape,
-			items: transformRecursive(startItems.current),
+			startItemable: {
+				...e.startShape,
+				items: startItems.current,
+			},
+			endItemable: {
+				...e.endShape,
+				items: transformRecursive(startItems.current),
+			},
 		};
 
 		// グループ内の全ての図形の変形をまとめて通知

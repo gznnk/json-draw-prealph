@@ -223,9 +223,16 @@ const Path: React.FC<PathProps> = ({
 		onItemableChange?.({
 			eventType: e.eventType,
 			id,
-			x: e.endX,
-			y: e.endY,
-			items: newItems,
+			startItemable: {
+				x: e.startX,
+				y: e.startY,
+				items: startItems.current,
+			},
+			endItemable: {
+				x: e.endX,
+				y: e.endY,
+				items: newItems,
+			},
 		});
 
 		if (e.eventType === "End") {
@@ -258,18 +265,21 @@ const Path: React.FC<PathProps> = ({
 			if (e.eventType === "End") {
 				// 新規頂点および線分のドラッグ完了に伴うパスの外枠の形状計算
 				const newShape = calcPointsOuterShape(
-					(e.items ?? []).map((p) => ({ x: p.x, y: p.y })),
+					(e.endItemable.items ?? []).map((p) => ({ x: p.x, y: p.y })),
 					rotation,
 					scaleX,
 					scaleY,
 				);
 
 				onItemableChange?.({
-					...e,
-					x: newShape.x,
-					y: newShape.y,
-					width: newShape.width,
-					height: newShape.height,
+					...e, // TODO: 開始時の形状情報がない
+					endItemable: {
+						...e.endItemable,
+						x: newShape.x,
+						y: newShape.y,
+						width: newShape.width,
+						height: newShape.height,
+					},
 				});
 			} else {
 				onItemableChange?.(e);
@@ -519,7 +529,12 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 				onItemableChange?.({
 					eventType: e.eventType,
 					id,
-					items: newItems,
+					startItemable: {
+						items, // TODO: 正しくない
+					},
+					endItemable: {
+						items: newItems,
+					},
 				});
 			}
 
@@ -532,9 +547,14 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 				onItemableChange?.({
 					eventType: e.eventType,
 					id,
-					items: items.map((item) =>
-						item.id === e.id ? { ...item, x: e.endX, y: e.endY } : item,
-					),
+					startItemable: {
+						items, // TODO: 正しくない
+					},
+					endItemable: {
+						items: items.map((item) =>
+							item.id === e.id ? { ...item, x: e.endX, y: e.endY } : item,
+						),
+					},
 				});
 			}
 
@@ -547,16 +567,21 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 				onItemableChange?.({
 					eventType: e.eventType,
 					id,
-					items: items.map((item) =>
-						item.id === e.id
-							? {
-									...item,
-									id: newId(), // ドラッグが完了したら、新規頂点用のIDから新しいIDに変更
-									x: e.endX,
-									y: e.endY,
-								}
-							: item,
-					),
+					startItemable: {
+						items, // TODO: 正しくない
+					},
+					endItemable: {
+						items: items.map((item) =>
+							item.id === e.id
+								? {
+										...item,
+										id: newId(), // ドラッグが完了したら、新規頂点用のIDから新しいIDに変更
+										x: e.endX,
+										y: e.endY,
+									}
+								: item,
+						),
+					},
 				});
 			}
 		}, []);
@@ -792,7 +817,12 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 					onItemableChange?.({
 						eventType: e.eventType,
 						id,
-						items: newItems,
+						startItemable: {
+							items, // TODO: 正しくない
+						},
+						endItemable: {
+							items: newItems,
+						},
 					});
 				}
 
@@ -822,15 +852,20 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 				onItemableChange?.({
 					eventType: e.eventType,
 					id,
-					items: items.map((item) => {
-						if (item.id === draggingSegment.startPointId) {
-							return { ...item, x: newStartX, y: newStartY };
-						}
-						if (item.id === draggingSegment.endPointId) {
-							return { ...item, x: newEndX, y: newEndY };
-						}
-						return item;
-					}),
+					startItemable: {
+						items, // TODO: 正しくない
+					},
+					endItemable: {
+						items: items.map((item) => {
+							if (item.id === draggingSegment.startPointId) {
+								return { ...item, x: newStartX, y: newStartY };
+							}
+							if (item.id === draggingSegment.endPointId) {
+								return { ...item, x: newEndX, y: newEndY };
+							}
+							return item;
+						}),
+					},
 				});
 			}
 
@@ -838,16 +873,21 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 				onItemableChange?.({
 					eventType: e.eventType,
 					id,
-					items: items.map((item) => {
-						// ドラッグが完了したら、線分用のIDから新しいIDに変更
-						if (item.id === draggingSegment.startPointId) {
-							return { ...item, x: newStartX, y: newStartY };
-						}
-						if (item.id === draggingSegment.endPointId) {
-							return { ...item, x: newEndX, y: newEndY };
-						}
-						return item;
-					}),
+					startItemable: {
+						items, // TODO: 正しくない
+					},
+					endItemable: {
+						items: items.map((item) => {
+							// ドラッグが完了したら、線分用のIDから新しいIDに変更
+							if (item.id === draggingSegment.startPointId) {
+								return { ...item, x: newStartX, y: newStartY };
+							}
+							if (item.id === draggingSegment.endPointId) {
+								return { ...item, x: newEndX, y: newEndY };
+							}
+							return item;
+						}),
+					},
 				});
 				setDraggingSegment(undefined);
 			}
