@@ -171,6 +171,11 @@ export const useDrag = (props: DragProps) => {
 	 * ドラッグ領域内でのポインターの押下イベントハンドラ
 	 */
 	const handlePointerDown = (e: React.PointerEvent<SVGElement>): void => {
+		if (e.button !== 0) {
+			// 左クリック以外の場合は何もしない
+			return;
+		}
+
 		// ポインターイベントが発生した要素のIDがこのドラッグ領域のIDと一致する場合のみイベントを処理する
 		if ((e.target as HTMLElement).id === id) {
 			// ポインターキャプチャーを設定

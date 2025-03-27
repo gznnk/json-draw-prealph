@@ -347,6 +347,53 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		notifyConnectPointsMove(e);
 	}, []);
 
+	const onGroup = useCallback(() => {
+		setCanvasState((prevState) => {
+			const selectedItems = getSelectedRecursive(prevState.items);
+			if (selectedItems.length < 2) {
+				// 選択されている図形が2つ未満の場合はグループ化させない
+				// ここに到達する場合は呼び出し元の制御に不備あり
+				console.error("Invalid selection count for group.");
+				return prevState;
+			}
+
+			// 新しいグループを作成
+			const box = calcGroupBoxOfNoRotation(selectedItems);
+			const group: GroupData = {
+				id: newId(),
+				type: "Group",
+				x: box.left + (box.right - box.left) / 2,
+				y: box.top + (box.bottom - box.top) / 2,
+				width: box.right - box.left,
+				height: box.bottom - box.top,
+				rotation: 0,
+				scaleX: 1,
+				scaleY: 1,
+				keepProportion: false,
+				isSelected: true,
+				isMultiSelectSource: false,
+				items: selectedItems.map((item) => ({
+					...item,
+					isSelected: false,
+					isMultiSelectSource: false,
+				})),
+			};
+
+			// グループ化された図形を図形配列から削除
+			let items = removeGroupedRecursive(prevState.items);
+			// 新しいグループを追加
+			items = [...items, group];
+			// 複数選択の選択元設定を解除
+			items = clearMultiSelectSourceRecursive(items);
+
+			return {
+				...prevState,
+				items,
+				multiSelectGroup: undefined,
+			};
+		});
+	}, []);
+
 	const canvasProps = {
 		...canvasState,
 		onDrag,
@@ -358,6 +405,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onConnectPointsMove,
 		onTransform,
 		onItemableChange,
+		onGroup,
 	};
 
 	const getSelectedItem = useCallback(() => {
@@ -472,6 +520,13 @@ const deepMerge = <T extends Record<string, any>>(
 	return Array.isArray(target) ? target : { ...target };
 };
 
+/**
+ * 選択されている図形を取得する
+ *
+ * @param items 図形配列
+ * @param selectedItems １つ前の再帰呼び出し時の選択されている図形の配列
+ * @returns 選択されている図形の配列
+ */
 const getSelectedRecursive = (items: Diagram[], selectedItems?: Diagram[]) => {
 	const _selectedItems = selectedItems ?? [];
 	for (const item of items) {
@@ -486,6 +541,13 @@ const getSelectedRecursive = (items: Diagram[], selectedItems?: Diagram[]) => {
 	return _selectedItems;
 };
 
+/**
+ * 複数選択時に、選択されている図形を選択元として設定する（非表示にする）
+ *
+ * @param items 図形配列
+ * @param isGroupMultiSelected 複数選択されたグループか
+ * @returns 更新後の図形配列
+ */
 const applyMultiSelectSourceRecursive = (
 	items: Diagram[],
 	isGroupMultiSelected: boolean,
@@ -503,5 +565,46 @@ const applyMultiSelectSourceRecursive = (
 			);
 		}
 		return newItem;
+	});
+};
+
+/**
+ * 複数選択時に、選択元として設定された図形の非表示を解除する
+ *
+ * @param items 図形配列
+ * @returns 更新後の図形配列
+ */
+const clearMultiSelectSourceRecursive = (items: Diagram[]): Diagram[] => {
+	return items.map((item) => {
+		const newItem = { ...item };
+		if (!isSelectableData(newItem)) {
+			return item;
+		}
+		newItem.isMultiSelectSource = false;
+		if (isItemableData(newItem)) {
+			newItem.items = clearMultiSelectSourceRecursive(newItem.items ?? []);
+		}
+		return newItem;
+	});
+};
+
+/**
+ * グループ化された図形を図形配列から削除する
+ *
+ * @param items 図形配列
+ * @returns 更新後の図形配列
+ */
+const removeGroupedRecursive = (items: Diagram[]) => {
+	return items.filter((item) => {
+		if (isSelectableData(item) && item.isSelected) {
+			return false;
+		}
+		if (isItemableData(item)) {
+			item.items = removeGroupedRecursive(item.items ?? []);
+			if (item.type === "Group" && item.items.length === 0) {
+				return false;
+			}
+		}
+		return true;
 	});
 };

@@ -5,6 +5,7 @@ import React, {
 	useCallback,
 	useEffect,
 	useRef,
+	useState,
 } from "react";
 
 // ライブラリのインポート
@@ -25,6 +26,9 @@ import type {
 } from "./types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
+import ContextMenu, {
+	type ContextMenuType,
+} from "./components/operation/ContextMenu";
 import Group from "./components/diagram/Group";
 
 // SvgCanvas関連関数をインポート
@@ -73,6 +77,7 @@ type SvgCanvasProps = {
 	onDelete?: () => void;
 	onConnect?: (e: DiagramConnectEvent) => void;
 	onConnectPointsMove?: (e: ConnectPointsMoveEvent) => void;
+	onGroup?: () => void;
 };
 
 /**
@@ -91,6 +96,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	onDelete,
 	onConnect,
 	onConnectPointsMove,
+	onGroup,
 }) => {
 	// Ctrlキーが押されているかどうかのフラグ
 	const isCtrlDown = useRef(false);
@@ -126,6 +132,8 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 					scrollTop: containerRef.current?.scrollTop ?? 0,
 				};
 			}
+
+			setContextMenu({ x: 0, y: 0, isVisible: false });
 		},
 		[onAllSelectionClear],
 	);
@@ -222,38 +230,77 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 		return React.createElement(itemType, props);
 	});
 
+	// コンテキストメニューの状態
+	const [contextMenu, setContextMenu] = useState({
+		x: 0,
+		y: 0,
+		isVisible: false,
+	});
+
+	/**
+	 * コンテキストメニュー表示時イベントハンドラ
+	 */
+	const handleContextMenu = useCallback(
+		(e: React.MouseEvent<SVGSVGElement>) => {
+			e.preventDefault();
+			const x = e.clientX;
+			const y = e.clientY;
+			setContextMenu({ x, y, isVisible: true });
+		},
+		[],
+	);
+
+	/**
+	 * コンテキストメニュークリックイベントハンドラ
+	 */
+	const handleContextMenuClick = useCallback(
+		(menuType: ContextMenuType) => {
+			switch (menuType) {
+				case "Group":
+					onGroup?.();
+					break;
+			}
+			setContextMenu({ x: 0, y: 0, isVisible: false });
+		},
+		[onGroup],
+	);
+
 	return (
-		<ContainerDiv ref={containerRef}>
-			<SvgCanvasContext.Provider value={stateProvider.current}>
-				<Svg
-					width="120vw"
-					height="120vh"
-					tabIndex={0}
-					onPointerDown={handlePointerDown}
-					onPointerMove={handlePointerMove}
-					onPointerUp={handlePointerUp}
-					onKeyDown={handleKeyDown}
-				>
-					<title>{title}</title>
-					{renderedItems}
-					{/* 複数選択時の一時グループ */}
-					{multiSelectGroup && (
-						<Group
-							{...multiSelectGroup}
-							id="MultiSelectGroup"
-							syncWithSameId
-							onSelect={handleSelect}
-							onTransform={onTransform}
-							onItemableChange={onItemableChange}
-							onDrag={onDrag} // TODO: 必要か精査
-							onDrop={onDrop} // TODO: 必要か精査
-							onConnect={onConnect} // TODO: 必要か精査
-							onConnectPointsMove={onConnectPointsMove}
-						/>
-					)}
-				</Svg>
-			</SvgCanvasContext.Provider>
-		</ContainerDiv>
+		<>
+			<ContainerDiv ref={containerRef}>
+				<SvgCanvasContext.Provider value={stateProvider.current}>
+					<Svg
+						width="120vw"
+						height="120vh"
+						tabIndex={0}
+						onPointerDown={handlePointerDown}
+						onPointerMove={handlePointerMove}
+						onPointerUp={handlePointerUp}
+						onKeyDown={handleKeyDown}
+						onContextMenu={handleContextMenu}
+					>
+						<title>{title}</title>
+						{renderedItems}
+						{/* 複数選択時の一時グループ */}
+						{multiSelectGroup && (
+							<Group
+								{...multiSelectGroup}
+								id="MultiSelectGroup"
+								syncWithSameId
+								onSelect={handleSelect}
+								onTransform={onTransform}
+								onItemableChange={onItemableChange}
+								onDrag={onDrag} // TODO: 必要か精査
+								onDrop={onDrop} // TODO: 必要か精査
+								onConnect={onConnect} // TODO: 必要か精査
+								onConnectPointsMove={onConnectPointsMove}
+							/>
+						)}
+					</Svg>
+				</SvgCanvasContext.Provider>
+			</ContainerDiv>
+			<ContextMenu {...contextMenu} onMenuClick={handleContextMenuClick} />
+		</>
 	);
 };
 
