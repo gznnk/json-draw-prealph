@@ -703,9 +703,9 @@ export const createBestConnectPath = (
 		};
 
 		if (!isIntersecting()) {
-			pathList.push(cleanPath(connectPath));
+			pathList.push(removeDuplicatePoints(connectPath));
 		} else {
-			intersectsPathList.push(cleanPath(connectPath));
+			intersectsPathList.push(removeDuplicatePoints(connectPath));
 		}
 	}
 
@@ -715,6 +715,19 @@ export const createBestConnectPath = (
 			: getBestPath(intersectsPathList, [midPoint]);
 
 	return cleanPath(bestPath);
+};
+
+const removeDuplicatePoints = (list: Point[]): Point[] => {
+	const uniquePoints: Point[] = [];
+	const seen = new Set<string>();
+	for (const point of list) {
+		const key = `${point.x},${point.y}`;
+		if (!seen.has(key)) {
+			uniquePoints.push(point);
+			seen.add(key);
+		}
+	}
+	return uniquePoints;
 };
 
 const cleanPath = (list: Point[]): Point[] => {
