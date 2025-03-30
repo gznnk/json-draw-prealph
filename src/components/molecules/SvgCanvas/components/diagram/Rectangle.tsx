@@ -21,6 +21,7 @@ import type {
 
 // SvgCanvas関連コンポーネントをインポート
 import ConnectPoint from "../connector/ConnectPoint";
+import Textable from "../core/Textable";
 import Transformative from "../core/Transformative";
 
 // SvgCanvas関連カスタムフックをインポート
@@ -39,6 +40,7 @@ export type RectangleProps = CreateDiagramProps<
 		selectable: true;
 		transformative: true;
 		connectable: true;
+		textable: true;
 	}
 >;
 
@@ -63,12 +65,20 @@ const Rectangle: React.FC<RectangleProps> = ({
 	items,
 	showConnectPoints = true,
 	syncWithSameId = false,
+	text,
+	fontColor,
+	fontSize,
+	fontFamily,
+	textAlign,
+	verticalAlign,
+	isTextEditing,
 	onDrag,
 	onClick,
 	onSelect,
 	onTransform,
 	onConnect,
 	onConnectPointsMove, // TODO: onItemableChangeに変更すべきか？
+	onTextEdit,
 }) => {
 	// ドラッグ中かのフラグ
 	const [isDragging, setIsDragging] = useState(false);
@@ -137,6 +147,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 		onDrag,
 		onSelect,
 		onTransform,
+		onTextEdit,
 		// 内部変数・内部関数
 		updateConnectPoints,
 	};
@@ -201,6 +212,19 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 */
 	const handleHover = useCallback((e: DiagramHoverEvent) => {
 		setIsHovered(e.isHovered);
+	}, []);
+
+	/**
+	 * ダブルクリックイベントハンドラ
+	 */
+	const handleDoubleClick = useCallback(() => {
+		const { id, isSelected, onTextEdit } = refBus.current;
+
+		// テキスト編集イベントを発火
+		if (!isSelected) return;
+		onTextEdit?.({
+			id,
+		});
 	}, []);
 
 	// ドラッグ用のプロパティを生成
@@ -271,9 +295,24 @@ const Rectangle: React.FC<RectangleProps> = ({
 					transform={transform}
 					style={{ visibility: isMultiSelectSource ? "hidden" : "visible" }}
 					ref={svgRef}
+					onDoubleClick={handleDoubleClick}
 					{...dragProps}
 				/>
 			</g>
+			<Textable
+				x={-width / 2}
+				y={-height / 2}
+				width={width}
+				height={height}
+				transform={transform}
+				text={text}
+				fontColor={fontColor}
+				fontSize={fontSize}
+				fontFamily={fontFamily}
+				textAlign={textAlign}
+				verticalAlign={verticalAlign}
+				isTextEditing={isTextEditing}
+			/>
 			{showTransformative && (
 				<Transformative
 					id={id}
@@ -380,5 +419,12 @@ export const createRectangleData = ({
 		isSelected: false,
 		isMultiSelectSource: false,
 		items,
+		text: "",
+		fontColor: "#000000",
+		fontSize: 16,
+		fontFamily: "Arial",
+		textAlign: "center",
+		verticalAlign: "center",
+		isTextEditing: false,
 	} as RectangleData;
 };

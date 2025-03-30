@@ -21,15 +21,18 @@ import type {
 	DiagramDragDropEvent,
 	DiagramDragEvent,
 	DiagramSelectEvent,
+	DiagramTextChangeEvent,
+	DiagramTextEditEvent,
 	DiagramTransformEvent,
 	ItemableChangeEvent,
 } from "./types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
+import { TextEditor, type TextEditorProps } from "./components/core/Textable";
+import Group from "./components/diagram/Group";
 import ContextMenu, {
 	type ContextMenuType,
 } from "./components/operation/ContextMenu";
-import Group from "./components/diagram/Group";
 
 // SvgCanvas関連関数をインポート
 import { isItemableData } from "./functions/Diagram";
@@ -40,7 +43,7 @@ export const SvgCanvasContext = createContext<SvgCanvasStateProvider | null>(
 );
 
 /**
- * svg要素のコンテナのスタイル定義
+ * SVG要素のコンテナのスタイル定義
  */
 const ContainerDiv = styled.div`
 	position: absolute;
@@ -52,7 +55,7 @@ const ContainerDiv = styled.div`
 `;
 
 /**
- * svg要素のスタイル定義
+ * SVG要素のスタイル定義
  */
 const Svg = styled.svg`
 	* {
@@ -77,6 +80,8 @@ type SvgCanvasProps = {
 	onDelete?: () => void;
 	onConnect?: (e: DiagramConnectEvent) => void;
 	onConnectPointsMove?: (e: ConnectPointsMoveEvent) => void;
+	onTextEdit?: (e: DiagramTextEditEvent) => void;
+	onTextChange?: (e: DiagramTextChangeEvent) => void;
 	onGroup?: () => void;
 	onUngroup?: () => void;
 };
@@ -97,21 +102,26 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	onDelete,
 	onConnect,
 	onConnectPointsMove,
+	onTextEdit,
+	onTextChange,
 	onGroup,
 	onUngroup,
 }) => {
+	// SVG要素のコンテナの参照
+	const containerRef = useRef<HTMLDivElement>(null);
+
 	// Ctrlキーが押されているかどうかのフラグ
 	const isCtrlDown = useRef(false);
 
+	// スクロール中かどうかのフラグ
 	const isScrolling = useRef(false);
+	// スクロール開始時の位置情報
 	const scrollStart = useRef({
 		clientX: 0,
 		clientY: 0,
 		scrollLeft: 0,
 		scrollTop: 0,
 	});
-
-	const containerRef = useRef<HTMLDivElement>(null);
 
 	// SvgCanvasStateProviderのインスタンスを生成
 	// 現時点ではシングルトン的に扱うため、useRefで保持し、以降再作成しない
@@ -125,7 +135,10 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	const handlePointerDown = useCallback(
 		(e: React.PointerEvent<SVGSVGElement>) => {
 			if (e.target === e.currentTarget) {
+				// 選択状態の解除
 				onAllSelectionClear?.();
+
+				// SvgCanvasのスクロール開始
 				isScrolling.current = true;
 				scrollStart.current = {
 					clientX: e.clientX,
@@ -145,6 +158,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	 */
 	const handlePointerMove = useCallback(
 		(e: React.PointerEvent<SVGSVGElement>) => {
+			// SvgCanvasのスクロール処理
 			if (isScrolling.current) {
 				const dx = scrollStart.current.clientX - e.clientX;
 				const dy = scrollStart.current.clientY - e.clientY;
@@ -161,6 +175,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	 * SvgCanvasのポインターアップイベントハンドラ
 	 */
 	const handlePointerUp = useCallback(() => {
+		// SvgCanvasのスクロール終了
 		isScrolling.current = false;
 	}, []);
 
@@ -191,6 +206,51 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 			onSelect?.({ id: e.id, isMultiSelect: isCtrlDown.current });
 		},
 		[onSelect],
+	);
+
+	/**
+	 * テキスト編集コンポーネントの状態
+	 */
+	const [textEditorState, setTextEditorState] = useState<TextEditorProps>({
+		isActive: false,
+	} as TextEditorProps);
+
+	/**
+	 * 図形のテキスト編集イベントハンドラ
+	 */
+	const handleTextEdit = useCallback(
+		(e: DiagramTextEditEvent) => {
+			// テキストエディタを表示
+			const diagram = getDiagramById(items, e.id);
+			setTextEditorState({
+				isActive: true,
+				...diagram,
+			} as TextEditorProps);
+
+			// テキスト編集イベントをHooksに通知
+			onTextEdit?.(e);
+		},
+		[items, onTextEdit],
+	);
+
+	/**
+	 * テキスト変更イベントハンドラ
+	 */
+	const handleTextChange = useCallback(
+		(e: DiagramTextChangeEvent) => {
+			// テキストエディタを非表示
+			setTextEditorState(
+				(prev) =>
+					({
+						...prev,
+						isActive: false,
+					}) as TextEditorProps,
+			);
+
+			// テキスト変更イベントをHooksに通知
+			onTextChange?.(e);
+		},
+		[onTextChange],
 	);
 
 	// Ctrlキーの押下状態を監視
@@ -227,6 +287,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 			onSelect: handleSelect,
 			onConnect,
 			onConnectPointsMove,
+			onTextEdit: handleTextEdit,
 		};
 
 		return React.createElement(itemType, props);
@@ -267,7 +328,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 			}
 			setContextMenu({ x: 0, y: 0, isVisible: false });
 		},
-		[onGroup],
+		[onGroup, onUngroup],
 	);
 
 	return (
@@ -303,6 +364,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 						)}
 					</Svg>
 				</SvgCanvasContext.Provider>
+				<TextEditor {...textEditorState} onTextChange={handleTextChange} />
 			</ContainerDiv>
 			<ContextMenu {...contextMenu} onMenuClick={handleContextMenuClick} />
 		</>

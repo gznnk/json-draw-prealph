@@ -12,6 +12,8 @@ import type {
 	DiagramDragEvent,
 	DiagramHoverEvent,
 	DiagramSelectEvent,
+	DiagramTextChangeEvent,
+	DiagramTextEditEvent,
 	DiagramTransformEvent,
 	ItemableChangeEvent,
 } from "./EventTypes";
@@ -87,7 +89,7 @@ export type ItemableData = {
 export type ConnectableData = ItemableData; // 接続ポイントを子図形としてもつ
 
 /**
- * 枠線を持つ図形のデータ
+ * 枠線を持つ図形のデータ TODO: 名前をStrokableDataに変更する
  */
 export type BorderedData = {
 	stroke: string;
@@ -102,6 +104,29 @@ export type FillableData = {
 };
 
 /**
+ * テキストの水平位置揃え
+ */
+export type TextAlign = "left" | "center" | "right";
+
+/**
+ * テキストの垂直位置揃え
+ */
+export type VerticalAlign = "top" | "center" | "bottom";
+
+/**
+ * テキストを持つ図形のデータ
+ */
+export type TextableData = {
+	text: string;
+	textAlign: TextAlign;
+	verticalAlign: VerticalAlign;
+	fontColor: string;
+	fontSize: number;
+	fontFamily: string;
+	isTextEditing: boolean; // 永続化されないプロパティ TODO: 永続化されるプロパティと分ける
+};
+
+/**
  * 図形の型作成オプション
  */
 type DiagramDataOptions = {
@@ -111,6 +136,7 @@ type DiagramDataOptions = {
 	connectable?: boolean;
 	bordered?: boolean;
 	fillable?: boolean;
+	textable?: boolean;
 };
 
 /**
@@ -122,7 +148,8 @@ type CreateDiagramType<T extends DiagramDataOptions> = DiagramBaseData &
 	(T["itemable"] extends true ? ItemableData : object) &
 	(T["connectable"] extends true ? ConnectableData : object) &
 	(T["bordered"] extends true ? BorderedData : object) &
-	(T["fillable"] extends true ? FillableData : object);
+	(T["fillable"] extends true ? FillableData : object) &
+	(T["textable"] extends true ? TextableData : object);
 
 /**
  * 楕円のデータ
@@ -144,6 +171,7 @@ export type RectangleData = CreateDiagramType<{
 	connectable: true;
 	bordered: true;
 	fillable: true;
+	textable: true;
 }>;
 
 /**
@@ -258,6 +286,13 @@ export type ConnectableProps = {
 };
 
 /**
+ * テキストを持つ図形のプロパティ
+ */
+export type TextableProps = {
+	onTextEdit?: (e: DiagramTextEditEvent) => void;
+};
+
+/**
  * 図形のプロパティ作成オプション
  */
 type DiagramPropsOptions = {
@@ -265,8 +300,7 @@ type DiagramPropsOptions = {
 	transformative?: boolean;
 	itemable?: boolean;
 	connectable?: boolean;
-	bordered?: boolean;
-	fillable?: boolean;
+	textable?: boolean;
 };
 
 /**
@@ -280,7 +314,8 @@ export type CreateDiagramProps<T, U extends DiagramPropsOptions> = Omit<
 	(U["selectable"] extends true ? SelectableProps : object) &
 	(U["transformative"] extends true ? TransformativeProps : object) &
 	(U["itemable"] extends true ? ItemableProps : object) &
-	(U["connectable"] extends true ? ConnectableProps : object);
+	(U["connectable"] extends true ? ConnectableProps : object) &
+	(U["textable"] extends true ? TextableProps : object);
 
 /**
  * 図形の種類とコンポーネントのマッピング

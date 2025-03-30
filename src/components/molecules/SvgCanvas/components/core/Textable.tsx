@@ -1,0 +1,301 @@
+// Reactのインポート
+import type React from "react";
+import { useState, memo, useEffect, useRef } from "react";
+
+// ライブラリのインポート
+import styled from "@emotion/styled";
+
+// SvgCanvas関連型定義をインポート
+import type { TextAlign, VerticalAlign } from "../../types/DiagramTypes";
+import type { DiagramTextChangeEvent } from "../../types/EventTypes";
+
+// SvgCanvas関連関数をインポート
+import { createSvgTransform } from "../../functions/Diagram";
+import { degreesToRadians } from "../../functions/Math";
+
+/**
+ * テキストの水平方向の配置をCSSスタイルに変換するマップ
+ */
+const TextAlignMap: Record<TextAlign, React.CSSProperties["textAlign"]> = {
+	left: "left",
+	center: "center",
+	right: "right",
+};
+
+/**
+ * テキストの垂直方向の配置をCSSスタイルに変換するマップ
+ */
+const VerticalAlignMap: Record<
+	VerticalAlign,
+	React.CSSProperties["alignItems"]
+> = {
+	top: "start",
+	center: "center",
+	bottom: "end",
+};
+
+/**
+ * テキスト表示用Div要素のラッパー要素のプロパティ
+ */
+type TextWapperProps = {
+	verticalAlign: VerticalAlign;
+};
+
+/**
+ * テキスト表示用Div要素のラッパー要素
+ */
+const TextWapper = styled.div<TextWapperProps>`
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: ${(props) => VerticalAlignMap[props.verticalAlign]};
+`;
+
+/**
+ * テキスト表示用Div要素のプロパティ
+ */
+type TextProps = {
+	textAlign: TextAlign;
+	color: string;
+	fontSize: number;
+	fontFamily: string;
+};
+
+/**
+ * テキスト表示用Div要素
+ */
+const Text = styled.div<TextProps>`
+	width: 100%;
+	text-align: ${(props) => TextAlignMap[props.textAlign]};
+	color: ${(props) => props.color};
+	font-size: ${(props) => props.fontSize}px;
+	font-family: ${(props) => props.fontFamily};
+	border: none;
+	outline: none;
+	background: transparent;
+	pointer-events: none;
+	user-select: none;
+	overflow: hidden;
+	word-break: break-word;
+	white-space: pre-wrap;
+	padding: 2px;
+	box-sizing: border-box;
+`;
+
+/**
+ * テキストコンポーネントのプロパティ
+ */
+type TextableProps = {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	transform: string;
+	text: string;
+	textAlign: TextAlign;
+	verticalAlign: VerticalAlign;
+	fontColor: string;
+	fontSize: number;
+	fontFamily: string;
+	isTextEditing: boolean;
+};
+
+/**
+ * テキストコンポーネント
+ */
+const Textable: React.FC<TextableProps> = ({
+	x,
+	y,
+	width,
+	height,
+	transform,
+	text,
+	textAlign,
+	verticalAlign,
+	fontColor,
+	fontSize,
+	fontFamily,
+	isTextEditing,
+}) => {
+	if (isTextEditing) return null;
+
+	return (
+		<foreignObject
+			x={x}
+			y={y}
+			width={width}
+			height={height}
+			transform={transform}
+			pointerEvents="none"
+		>
+			<TextWapper verticalAlign={verticalAlign}>
+				<Text
+					textAlign={textAlign}
+					color={fontColor}
+					fontSize={fontSize}
+					fontFamily={fontFamily}
+				>
+					{text}
+				</Text>
+			</TextWapper>
+		</foreignObject>
+	);
+};
+
+export default memo(Textable);
+
+/**
+ * テキストエディタのコンテナ要素
+ */
+const TextEditorContainer = styled.div`
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	user-select: none;
+`;
+
+/**
+ * テキストエディタ要素のプロパティ
+ */
+type TextEditorTextAreaProps = {
+	left: number;
+	top: number;
+	transform: string;
+	width: number;
+	height: number;
+	textAlign: string;
+	verticalAlign: string;
+	color: string;
+	fontSize: number;
+	fontFamily: string;
+};
+
+/**
+ * テキストエディタ要素
+ */
+const TextEditorTextArea = styled.textarea<TextEditorTextAreaProps>`
+    position: absolute;
+    left: ${(props) => props.left}px;
+    top: ${(props) => props.top}px;
+    transform: ${(props) => props.transform};
+    width: ${(props) => props.width}px;
+    height: ${(props) => props.height}px;
+    text-align: ${(props) => props.textAlign};
+    vertical-align: ${(props) => props.verticalAlign};
+    color: ${(props) => props.color};
+    font-size: ${(props) => props.fontSize}px;
+    font-family: ${(props) => props.fontFamily};
+    background: transparent;
+    border: none;
+	outline: none;
+    overflow: hidden;
+    resize: none;
+    box-sizing: border-box;
+    padding: 2px;
+	pointer-events: auto;
+`;
+
+/**
+ * テキストエディタのプロパティ
+ */
+export type TextEditorProps = {
+	id: string;
+	text: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	scaleX: number;
+	scaleY: number;
+	rotation: number;
+	textAlign: TextAlign;
+	verticalAlign: VerticalAlign;
+	fontColor: string;
+	fontSize: number;
+	fontFamily: string;
+	isActive: boolean;
+	onTextChange?: (e: DiagramTextChangeEvent) => void;
+};
+
+/**
+ * テキストエディタコンポーネント
+ */
+export const TextEditor: React.FC<TextEditorProps> = memo(
+	({
+		id,
+		text,
+		x,
+		y,
+		width,
+		height,
+		scaleX,
+		scaleY,
+		rotation,
+		textAlign,
+		verticalAlign,
+		fontColor,
+		fontSize,
+		fontFamily,
+		isActive,
+		onTextChange,
+	}) => {
+		const ref = useRef<HTMLTextAreaElement>(null);
+
+		const [inputText, setInputText] = useState(text);
+
+		useEffect(() => {
+			if (isActive) {
+				setInputText(text);
+				ref.current?.focus();
+				ref.current?.setSelectionRange(text.length, text.length);
+			} else {
+				setInputText("");
+			}
+		}, [isActive, text]);
+
+		if (!isActive) return null;
+
+		const transform = createSvgTransform(
+			scaleX,
+			scaleY,
+			degreesToRadians(rotation),
+			x,
+			y,
+		);
+
+		const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+			setInputText(e.target.value);
+		};
+
+		const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+			onTextChange?.({
+				id,
+				text: e.target.value,
+			});
+		};
+
+		return (
+			<TextEditorContainer>
+				<TextEditorTextArea
+					value={inputText}
+					left={-width / 2}
+					top={-height / 2}
+					transform={transform}
+					width={width}
+					height={height}
+					textAlign={textAlign}
+					verticalAlign={verticalAlign}
+					color={fontColor}
+					fontSize={fontSize}
+					fontFamily={fontFamily}
+					ref={ref}
+					onChange={handleChange}
+					onBlur={handleBlur}
+				/>
+			</TextEditorContainer>
+		);
+	},
+);

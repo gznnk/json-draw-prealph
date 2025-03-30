@@ -18,6 +18,7 @@ import type {
 	DiagramDragDropEvent,
 	DiagramDragEvent,
 	DiagramSelectEvent,
+	DiagramTextChangeEvent,
 	DiagramTransformEvent,
 	ItemableChangeEvent,
 } from "../types/EventTypes";
@@ -347,6 +348,32 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		notifyConnectPointsMove(e);
 	}, []);
 
+	/**
+	 * テキスト編集イベントハンドラ（開始時のみ発火する）
+	 */
+	const onTextEdit = useCallback((e: DiagramTextChangeEvent) => {
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: applyRecursive(prevState.items, (item) =>
+				item.id === e.id ? { ...item, isTextEditing: true } : item,
+			),
+		}));
+	}, []);
+
+	/**
+	 * テキスト変更イベントハンドラ（完了時のみ発火する）
+	 */
+	const onTextChange = useCallback((e: DiagramTextChangeEvent) => {
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: applyRecursive(prevState.items, (item) =>
+				item.id === e.id
+					? { ...item, text: e.text, isTextEditing: false }
+					: item,
+			),
+		}));
+	}, []);
+
 	const onGroup = useCallback(() => {
 		setCanvasState((prevState) => {
 			const selectedItems = getSelectedRecursive(prevState.items);
@@ -419,6 +446,8 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onConnectPointsMove,
 		onTransform,
 		onItemableChange,
+		onTextEdit,
+		onTextChange,
 		onGroup,
 		onUngroup,
 	};

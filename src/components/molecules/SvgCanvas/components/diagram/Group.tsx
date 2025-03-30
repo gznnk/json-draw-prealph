@@ -13,6 +13,7 @@ import type {
 	DiagramConnectEvent,
 	DiagramDragEvent,
 	DiagramSelectEvent,
+	DiagramTextEditEvent,
 	DiagramTransformEvent,
 	ItemableChangeEvent,
 } from "../../types/EventTypes";
@@ -38,6 +39,7 @@ export type GroupProps = CreateDiagramProps<
 		transformative: true;
 		itemable: true;
 		connectable: true;
+		textable: true;
 	}
 >;
 
@@ -66,6 +68,7 @@ const Group: React.FC<GroupProps> = ({
 	onItemableChange,
 	onConnect,
 	onConnectPointsMove,
+	onTextEdit,
 }) => {
 	// グループ全体のドラッグ中かどうかのフラグ（このグループが選択中でかつドラッグ中の場合のみtrueにする）
 	const [isGroupDragging, setIsGroupDragging] = useState(false);
@@ -133,6 +136,7 @@ const Group: React.FC<GroupProps> = ({
 		onItemableChange,
 		onConnect,
 		onConnectPointsMove,
+		onTextEdit,
 		// 内部変数・内部関数
 		isGroupDragging,
 		transformGroupOutline,
@@ -407,6 +411,16 @@ const Group: React.FC<GroupProps> = ({
 	);
 
 	/**
+	 * グループ内の図形のテキスト編集イベントハンドラ
+	 */
+	const handleChildDiagramTextEdit = useCallback((e: DiagramTextEditEvent) => {
+		const { onTextEdit } = refBus.current;
+
+		// グループ内の図形のテキスト編集イベントをそのまま伝番する
+		onTextEdit?.(e);
+	}, []);
+
+	/**
 	 * グループの変形イベントハンドラ
 	 */
 	const handleTransform = useCallback((e: DiagramTransformEvent) => {
@@ -545,6 +559,7 @@ const Group: React.FC<GroupProps> = ({
 			onItemableChange: handleChildItemableChange,
 			onConnect: handleChildDiagramConnect,
 			onConnectPointsMove: handleChildDiagramConnectPointsMove,
+			onTextEdit: handleChildDiagramTextEdit,
 		};
 
 		return React.createElement(itemType, props);

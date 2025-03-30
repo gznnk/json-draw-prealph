@@ -121,6 +121,8 @@ export type DiagramConnectEvent = {
  * @param id 移動した接続ポイントID
  * @param x 移動先X座標
  * @param y 移動先Y座標
+ * @param ownerId 接続ポイントの所有者ID
+ * @param ownerShape 接続ポイントの所有者の形状（接続線の再描画時に利用、接続先側の所有者の形状は接続線コンポーネント内で取得する）
  */
 export type ConnectPointMoveData = {
 	id: string;
@@ -134,11 +136,24 @@ export type ConnectPointMoveData = {
  * 接続ポイント移動イベント
  *
  * @param type イベントタイプ
- * @param ownerId 接続ポイントの所有者ID
- * @param ownerShape 接続ポイントの所有者の形状（接続線の再描画時に利用、接続先側の所有者の形状は接続線コンポーネント内で取得する）
  * @param points 移動した接続ポイントのデータ
  */
 export type ConnectPointsMoveEvent = {
 	eventType: EventType;
 	points: ConnectPointMoveData[];
+};
+
+/**
+ * 図形のテキスト編集イベント
+ */
+export type DiagramTextEditEvent = {
+	id: string;
+};
+
+/**
+ * 図形のテキスト変更イベント
+ */
+export type DiagramTextChangeEvent = {
+	id: string;
+	text: string;
 };
