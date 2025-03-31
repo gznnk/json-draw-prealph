@@ -14,6 +14,9 @@ import type {
 	EventType,
 } from "../types/EventTypes";
 
+// SvgCanvas関連関数をインポート
+import { newEventId } from "../functions/Util";
+
 /** 全体通知用ドラッグイベントの名前 */
 const EVENT_NAME_BROADCAST_DRAG = "BroadcastDrag";
 
@@ -24,8 +27,9 @@ const DRAG_DEAD_ZONE = 5;
  * 全体通知用ドラッグイベントの型定義
  */
 type BroadcastDragEvent = {
-	id: string;
+	eventId: string;
 	eventType: EventType;
+	id: string;
 	type: DiagramType;
 	startX: number;
 	startY: number;
@@ -194,6 +198,7 @@ export const useDrag = (props: DragProps) => {
 
 			// ポインター押下イベント発火
 			onPointerDown?.({
+				eventId: newEventId(),
 				id,
 			});
 		}
@@ -213,10 +218,14 @@ export const useDrag = (props: DragProps) => {
 		// ドラッグ座標を取得
 		const dragPoint = getPointOnDrag(e);
 
+		// イベントIDを生成
+		const eventId = newEventId();
+
 		// ドラッグ中のイベント情報を作成
 		const dragEvent = {
-			id,
+			eventId,
 			eventType: "InProgress",
+			id,
 			startX: startX.current,
 			startY: startY.current,
 			endX: dragPoint.x,
@@ -225,8 +234,9 @@ export const useDrag = (props: DragProps) => {
 
 		// 全体通知用ドラッグイベント情報を作成
 		const broadcastDragEvent = {
-			id,
+			eventId,
 			eventType: "InProgress",
+			id,
 			type: type,
 			startX: startX.current,
 			startY: startY.current,
@@ -286,14 +296,18 @@ export const useDrag = (props: DragProps) => {
 		// ポインターキャプチャーを解放
 		e.currentTarget.releasePointerCapture(e.pointerId);
 
+		// イベントIDを生成
+		const eventId = newEventId();
+
 		if (isDragging) {
 			// ドラッグ座標を取得
 			const dragPoint = getPointOnDrag(e);
 
 			// ドラッグ中だった場合はドラッグ終了イベントを発火
 			onDrag?.({
-				id,
+				eventId,
 				eventType: "End",
+				id,
 				startX: startX.current,
 				startY: startY.current,
 				endX: dragPoint.x,
@@ -305,8 +319,9 @@ export const useDrag = (props: DragProps) => {
 				new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
 					bubbles: true,
 					detail: {
-						id,
+						eventId,
 						eventType: "End",
+						id,
 						type: type,
 						startX: startX.current,
 						startY: startY.current,
@@ -322,12 +337,14 @@ export const useDrag = (props: DragProps) => {
 		if (isPointerDown.current && !isDragging) {
 			// ドラッグ後のポインターアップでなければ、クリックイベントを親側に通知する
 			onClick?.({
+				eventId,
 				id,
 			});
 		}
 
 		// ポインターの離上イベント発火
 		onPointerUp?.({
+			eventId,
 			id,
 		});
 
@@ -344,6 +361,9 @@ export const useDrag = (props: DragProps) => {
 		if (isPointerDown.current) {
 			return;
 		}
+
+		// イベントIDを生成
+		const eventId = newEventId();
 
 		/**
 		 * 矢印キーによる移動処理
@@ -364,8 +384,9 @@ export const useDrag = (props: DragProps) => {
 			newPoint = adjustCoordinates(newPoint.x, newPoint.y);
 
 			const dragEvent = {
-				id,
+				eventId,
 				eventType: "InProgress",
+				id,
 				startX: startX.current,
 				startY: startY.current,
 				endX: newPoint.x,
@@ -407,8 +428,9 @@ export const useDrag = (props: DragProps) => {
 					// 矢印キーによるドラッグ中にシフトキーが押された場合はドラッグを終了させる。
 					// ドラッグ終了イベントを発火させSvgCanvas側に座標の更新を通知し、座標を更新する。
 					onDrag?.({
-						id,
+						eventId,
 						eventType: "End",
+						id,
 						startX: x,
 						startY: y,
 						endX: x,
@@ -435,8 +457,9 @@ export const useDrag = (props: DragProps) => {
 
 		// 矢印キー移動完了時のイベント情報を作成
 		const dragEvent = {
-			id,
+			eventId: newEventId(),
 			eventType: "End",
+			id,
 			startX: startX.current,
 			startY: startY.current,
 			endX: x,
@@ -474,6 +497,7 @@ export const useDrag = (props: DragProps) => {
 	const handlePointerEnter = () => {
 		// ホバー時のイベント発火
 		onHover?.({
+			eventId: newEventId(),
 			id,
 			isHovered: true,
 		});
@@ -485,6 +509,7 @@ export const useDrag = (props: DragProps) => {
 	const handlePointerLeave = () => {
 		// ホバー解除時のイベント発火
 		onHover?.({
+			eventId: newEventId(),
 			id,
 			isHovered: false,
 		});
@@ -523,6 +548,7 @@ export const useDrag = (props: DragProps) => {
 
 				// ドラッグ＆ドロップのイベント情報を作成
 				const dragDropEvent = {
+					eventId: customEvent.detail.eventId,
 					dropItem: {
 						id: customEvent.detail.id,
 						type: customEvent.detail.type,
@@ -545,20 +571,7 @@ export const useDrag = (props: DragProps) => {
 					)
 				) {
 					if (customEvent.detail.eventType === "End") {
-						onDrop?.({
-							dropItem: {
-								id: customEvent.detail.id,
-								type: customEvent.detail.type,
-								x: customEvent.detail.startX,
-								y: customEvent.detail.startY,
-							},
-							dropTargetItem: {
-								id,
-								type,
-								x,
-								y,
-							},
-						});
+						onDrop?.(dragDropEvent);
 					} else {
 						if (!dragEntered.current) {
 							dragEntered.current = true;
@@ -582,8 +595,9 @@ export const useDrag = (props: DragProps) => {
 				// 同じIDでかつ自身以外の図形のドラッグイベントの場合、同期のためのドラッグイベントを発火する
 				if (customEvent.detail.id === id && e.target !== ref.current) {
 					const dragEvent = {
-						id,
+						eventId: customEvent.detail.eventId,
 						eventType: customEvent.detail.eventType,
+						id,
 						startX: customEvent.detail.startX,
 						startY: customEvent.detail.startY,
 						endX: customEvent.detail.endX,

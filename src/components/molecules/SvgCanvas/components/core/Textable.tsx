@@ -12,6 +12,7 @@ import type { DiagramTextChangeEvent } from "../../types/EventTypes";
 // SvgCanvas関連関数をインポート
 import { createSvgTransform } from "../../functions/Diagram";
 import { degreesToRadians } from "../../functions/Math";
+import { newEventId } from "../../functions/Util";
 
 /**
  * テキストの水平方向の配置をCSSスタイルに変換するマップ
@@ -272,6 +273,7 @@ export const TextEditor: React.FC<TextEditorProps> = memo(
 
 		const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
 			onTextChange?.({
+				eventId: newEventId(),
 				id,
 				text: e.target.value,
 			});

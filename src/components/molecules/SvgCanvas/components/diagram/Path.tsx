@@ -138,11 +138,12 @@ const Path: React.FC<PathProps> = ({
 	/**
 	 * 折れ線のポインターダウンイベントハンドラ
 	 */
-	const handlePointerDown = useCallback((_e: DiagramPointerEvent) => {
+	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
 		const { id, isSelected, transformEnabled, onSelect } = refBus.current;
 
 		// 図形選択イベントを発火
 		onSelect?.({
+			eventId: e.eventId,
 			id,
 		});
 
@@ -158,7 +159,7 @@ const Path: React.FC<PathProps> = ({
 	/**
 	 * 折れ線のクリックイベントハンドラ
 	 */
-	const handleClick = useCallback((_e: DiagramClickEvent) => {
+	const handleClick = useCallback((e: DiagramClickEvent) => {
 		const {
 			id,
 			isSequentialSelection,
@@ -171,6 +172,7 @@ const Path: React.FC<PathProps> = ({
 			setIsVerticesMode(!isVerticesMode);
 		}
 		onClick?.({
+			eventId: e.eventId,
 			id,
 		});
 	}, []);
@@ -222,6 +224,7 @@ const Path: React.FC<PathProps> = ({
 		});
 
 		onItemableChange?.({
+			eventId: e.eventId,
 			eventType: e.eventType,
 			id,
 			startItemable: {
@@ -528,6 +531,7 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 
 				// パスの変更を通知
 				onItemableChange?.({
+					eventId: e.eventId,
 					eventType: e.eventType,
 					id,
 					startItemable: {
@@ -546,6 +550,7 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 
 				// 新規頂点のドラッグに伴うパスの頂点の位置変更を通知
 				onItemableChange?.({
+					eventId: e.eventId,
 					eventType: e.eventType,
 					id,
 					startItemable: {
@@ -566,6 +571,7 @@ const NewVertexList: React.FC<NewVertexListProps> = memo(
 
 				// 新規頂点のドラッグ完了に伴うパスのデータ変更を通知
 				onItemableChange?.({
+					eventId: e.eventId,
 					eventType: e.eventType,
 					id,
 					startItemable: {
@@ -816,6 +822,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 					}
 
 					onItemableChange?.({
+						eventId: e.eventId,
 						eventType: e.eventType,
 						id,
 						startItemable: {
@@ -851,6 +858,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 				});
 
 				onItemableChange?.({
+					eventId: e.eventId,
 					eventType: e.eventType,
 					id,
 					startItemable: {
@@ -872,6 +880,7 @@ const SegmentList: React.FC<SegmentListProps> = memo(
 
 			if (e.eventType === "End") {
 				onItemableChange?.({
+					eventId: e.eventId,
 					eventType: e.eventType,
 					id,
 					startItemable: {

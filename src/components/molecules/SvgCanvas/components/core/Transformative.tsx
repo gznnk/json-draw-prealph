@@ -125,7 +125,7 @@ const Transformative: React.FC<Props> = ({
 			startShape.current.y,
 		);
 
-	const triggerTransformStart = () => {
+	const triggerTransformStart = (eventId: string) => {
 		startShape.current = {
 			x,
 			y,
@@ -139,6 +139,7 @@ const Transformative: React.FC<Props> = ({
 		};
 
 		onTransform?.({
+			eventId,
 			eventType: "Start",
 			id,
 			startShape: startShape.current,
@@ -147,12 +148,14 @@ const Transformative: React.FC<Props> = ({
 	};
 
 	const triggerTransform = (
+		eventId: string,
 		centerPoint: Point,
 		newWidth: number,
 		newHeight: number,
 		eventType: EventType,
 	) => {
 		const event = {
+			eventId,
 			eventType,
 			id,
 			startShape: {
@@ -207,7 +210,7 @@ const Transformative: React.FC<Props> = ({
 		} = refBus.current;
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart();
+			return triggerTransformStart(e.eventId);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -232,7 +235,7 @@ const Transformative: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(center, newWidth, newHeight, e.eventType);
+		triggerTransform(e.eventId, center, newWidth, newHeight, e.eventType);
 	}, []);
 
 	const linerDragFunctionLeftTop = useCallback(
@@ -256,7 +259,7 @@ const Transformative: React.FC<Props> = ({
 		} = refBus.current;
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart();
+			return triggerTransformStart(e.eventId);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -281,7 +284,7 @@ const Transformative: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(center, newWidth, newHeight, e.eventType);
+		triggerTransform(e.eventId, center, newWidth, newHeight, e.eventType);
 	}, []);
 
 	const linerDragFunctionLeftBottom = useCallback(
@@ -305,7 +308,7 @@ const Transformative: React.FC<Props> = ({
 		} = refBus.current;
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart();
+			return triggerTransformStart(e.eventId);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -330,7 +333,7 @@ const Transformative: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(center, newWidth, newHeight, e.eventType);
+		triggerTransform(e.eventId, center, newWidth, newHeight, e.eventType);
 	}, []);
 
 	const linerDragFunctionRightTop = useCallback(
@@ -354,7 +357,7 @@ const Transformative: React.FC<Props> = ({
 		} = refBus.current;
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart();
+			return triggerTransformStart(e.eventId);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -379,7 +382,7 @@ const Transformative: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(center, newWidth, newHeight, e.eventType);
+		triggerTransform(e.eventId, center, newWidth, newHeight, e.eventType);
 	}, []);
 
 	const linerDragFunctionRightBottom = useCallback(
@@ -403,7 +406,7 @@ const Transformative: React.FC<Props> = ({
 		} = refBus.current;
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart();
+			return triggerTransformStart(e.eventId);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -428,7 +431,7 @@ const Transformative: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(center, newWidth, newHeight, e.eventType);
+		triggerTransform(e.eventId, center, newWidth, newHeight, e.eventType);
 	}, []);
 
 	const linerDragFunctionTopCenter = useCallback(
@@ -457,7 +460,7 @@ const Transformative: React.FC<Props> = ({
 		} = refBus.current;
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart();
+			return triggerTransformStart(e.eventId);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -482,7 +485,7 @@ const Transformative: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(center, newWidth, newHeight, e.eventType);
+		triggerTransform(e.eventId, center, newWidth, newHeight, e.eventType);
 	}, []);
 
 	const linerDragFunctionLeftCenter = useCallback(
@@ -511,7 +514,7 @@ const Transformative: React.FC<Props> = ({
 		} = refBus.current;
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart();
+			return triggerTransformStart(e.eventId);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -536,7 +539,7 @@ const Transformative: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(center, newWidth, newHeight, e.eventType);
+		triggerTransform(e.eventId, center, newWidth, newHeight, e.eventType);
 	}, []);
 
 	const linerDragFunctionRightCenter = useCallback(
@@ -565,7 +568,7 @@ const Transformative: React.FC<Props> = ({
 		} = refBus.current;
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart();
+			return triggerTransformStart(e.eventId);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -590,7 +593,7 @@ const Transformative: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(center, newWidth, newHeight, e.eventType);
+		triggerTransform(e.eventId, center, newWidth, newHeight, e.eventType);
 	}, []);
 
 	const linerDragFunctionBottomCenter = useCallback(
@@ -663,7 +666,7 @@ const Transformative: React.FC<Props> = ({
 		} = refBus.current;
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart();
+			return triggerTransformStart(e.eventId);
 		}
 
 		const radian = calcRadians(x, y, e.endX, e.endY);
@@ -672,6 +675,7 @@ const Transformative: React.FC<Props> = ({
 			(radiansToDegrees(radian - rotatePointRadian) + 360) % 360,
 		);
 		const event = {
+			eventId: e.eventId,
 			eventType: e.eventType,
 			id,
 			startShape: {

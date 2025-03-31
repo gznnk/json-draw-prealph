@@ -15,6 +15,7 @@ import type {
 	ConnectPointMoveData,
 	DiagramDragEvent,
 	DiagramHoverEvent,
+	DiagramPointerEvent,
 	DiagramTransformEvent,
 	EventType,
 } from "../../types/EventTypes";
@@ -96,6 +97,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 	 * @param rectShape 四角形の形状（差分）
 	 */
 	const updateConnectPoints = (
+		eventId: string,
 		eventType: EventType,
 		rectShape: Partial<Shape>,
 	) => {
@@ -134,6 +136,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 
 		// 接続ポイント移動イベントを発火
 		onConnectPointsMove?.({
+			eventId,
 			eventType,
 			points: newConnectPoints,
 		});
@@ -166,7 +169,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 
 		onDrag?.(e);
 
-		updateConnectPoints(e.eventType, {
+		updateConnectPoints(e.eventId, e.eventType, {
 			x: e.endX,
 			y: e.endY,
 		});
@@ -188,7 +191,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 
 		onTransform?.(e);
 
-		updateConnectPoints(e.eventType, e.endShape);
+		updateConnectPoints(e.eventId, e.eventType, e.endShape);
 
 		if (e.eventType === "End") {
 			setIsTransforming(false);
@@ -198,11 +201,12 @@ const Rectangle: React.FC<RectangleProps> = ({
 	/**
 	 * ポインターダウンイベントハンドラ
 	 */
-	const handlePointerDown = useCallback(() => {
+	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
 		const { id, onSelect } = refBus.current;
 
 		// 図形選択イベントを発火
 		onSelect?.({
+			eventId: e.eventId,
 			id,
 		});
 	}, []);

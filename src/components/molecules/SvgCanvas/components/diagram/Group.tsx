@@ -89,13 +89,14 @@ const Group: React.FC<GroupProps> = ({
 	 *
 	 * @param changeItem - 変更された子図形
 	 */
-	const transformGroupOutline = (changeItem?: Diagram) => {
+	const transformGroupOutline = (eventId: string, changeItem?: Diagram) => {
 		const radians = degreesToRadians(rotation);
 		const box = calcGroupBoxOfNoRotation(items, x, y, rotation, changeItem);
 		const leftTop = rotatePoint(box.left, box.top, x, y, radians);
 		const rightBottom = rotatePoint(box.right, box.bottom, x, y, radians);
 
 		onTransform?.({
+			eventId,
 			eventType: "Immediate",
 			id,
 			startShape: {
@@ -152,7 +153,7 @@ const Group: React.FC<GroupProps> = ({
 			refBus.current;
 
 		// 複数選択時の移動・変形でアウトラインがずれるので、選択時にアウトラインを更新する
-		transformGroupOutline();
+		transformGroupOutline(e.eventId);
 
 		const selectedChild = getSelectedChildDiagram(items);
 		if (!selectedChild) {
@@ -160,6 +161,7 @@ const Group: React.FC<GroupProps> = ({
 			// これにより、グループ内の図形が選択されていないグループのうち、最も上位のグループのイベントが
 			// SvgCanvasまで伝番され、そのグループが選択状態になる。
 			onSelect?.({
+				eventId: e.eventId,
 				id,
 			});
 		} else if (selectedChild.id !== e.id) {
@@ -191,6 +193,7 @@ const Group: React.FC<GroupProps> = ({
 			// 連続選択されたグループまで伝番し、そのグループの連続選択時の処理（当該分岐のtrue側）が実行され、
 			// その直下のグループが選択状態になる。
 			onClick?.({
+				eventId: e.eventId,
 				id,
 			});
 		}
@@ -238,6 +241,7 @@ const Group: React.FC<GroupProps> = ({
 
 				// グループ全体の変更開始を通知
 				onItemableChange?.({
+					eventId: e.eventId,
 					eventType: "Start",
 					id,
 					startItemable: {
@@ -262,7 +266,7 @@ const Group: React.FC<GroupProps> = ({
 				// 子図形のドラッグに伴うアウトラインの更新を行う
 				const changeItem = getChildDiagramById(items, e.id);
 				if (changeItem) {
-					transformGroupOutline({
+					transformGroupOutline(e.eventId, {
 						...changeItem,
 						x: e.endX,
 						y: e.endY,
@@ -293,6 +297,7 @@ const Group: React.FC<GroupProps> = ({
 			};
 
 			const event: ItemableChangeEvent = {
+				eventId: e.eventId,
 				eventType: e.eventType,
 				id,
 				startItemable: {
@@ -332,7 +337,7 @@ const Group: React.FC<GroupProps> = ({
 				// グループ全体のドラッグ中はアウトライン更新を行わない
 				const changeItem = getChildDiagramById(items, e.id);
 				if (changeItem) {
-					transformGroupOutline({
+					transformGroupOutline(e.eventId, {
 						...changeItem,
 						...e.endShape,
 					} as Diagram);
@@ -356,7 +361,7 @@ const Group: React.FC<GroupProps> = ({
 			// グループ内の図形の変更完了時にアウトラインの更新を行う
 			const changeItem = getChildDiagramById(items, e.id);
 			if (changeItem) {
-				transformGroupOutline({
+				transformGroupOutline(e.eventId, {
 					...changeItem,
 					...e,
 				} as Diagram);
@@ -434,6 +439,7 @@ const Group: React.FC<GroupProps> = ({
 
 			// まだ何も変形してないので、開始の通知のみ行う
 			onItemableChange?.({
+				eventId: e.eventId,
 				eventType: "Start",
 				id,
 				startItemable: {
@@ -521,6 +527,7 @@ const Group: React.FC<GroupProps> = ({
 		};
 
 		const event: ItemableChangeEvent = {
+			eventId: e.eventId,
 			eventType: e.eventType,
 			id,
 			startItemable: {

@@ -31,6 +31,7 @@ import { calcGroupBoxOfNoRotation } from "../components/diagram/Group";
 // SvgCanvas関連関数をインポート
 import { isItemableData, isSelectableData, newId } from "../functions/Diagram";
 import { calcPointsOuterShape } from "../functions/Math";
+import { newEventId } from "../functions/Util";
 
 /**
  * 最大履歴サイズ
@@ -46,7 +47,7 @@ export type SvgCanvasState = {
 	selectedItemId?: string; // TODO: いらないかも
 	history: SvgCanvasState[];
 	historyIndex: number;
-	lastUpdateTime: number;
+	lastUpdateEventId: string;
 };
 
 // TODO: 精査
@@ -63,10 +64,15 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
 		items: initialItems,
 		history: [
-			{ items: initialItems, history: [], historyIndex: 0, lastUpdateTime: 0 },
+			{
+				items: initialItems,
+				history: [],
+				historyIndex: 0,
+				lastUpdateEventId: "",
+			},
 		],
 		historyIndex: 0,
-		lastUpdateTime: 0,
+		lastUpdateEventId: "",
 	});
 
 	/**
@@ -80,11 +86,13 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				items: applyRecursive(prevState.items, (item) =>
 					item.id === e.id ? { ...item, x: e.endX, y: e.endY } : item,
 				),
+				lastUpdateEventId: e.eventId,
 			};
 
 			if (e.eventType === "End") {
 				// 終了時に履歴を追加
 				newState = addHistory(prevState, newState);
+				console.log("addHistory caused by Drag", e.eventId);
 			}
 
 			return newState;
@@ -109,11 +117,13 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				items: applyRecursive(prevState.items, (item) =>
 					item.id === e.id ? { ...item, ...e.endShape } : item,
 				),
+				lastUpdateEventId: e.eventId,
 			};
 
 			if (e.eventType === "End") {
 				// 終了時に履歴を追加
 				newState = addHistory(prevState, newState);
+				console.log("addHistory caused by onTransform", e.eventId);
 			}
 
 			return newState;
@@ -151,6 +161,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		if (0 < connectPoints.length) {
 			// 接続ポイントの移動を通知
 			notifyConnectPointsMove({
+				eventId: e.eventId,
 				eventType: e.eventType,
 				points: connectPoints,
 			});
@@ -207,12 +218,14 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 			let newState = {
 				...prevState,
 				items,
+				lastUpdateEventId: e.eventId,
 				multiSelectGroup,
 			} as SvgCanvasState;
 
 			if (e.eventType === "End") {
 				// 終了時に履歴を追加
 				newState = addHistory(prevState, newState);
+				console.log("addHistory caused by onItemableChange", e.eventId);
 			}
 
 			return newState;
@@ -349,10 +362,12 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 			let newState = {
 				...prevState,
 				items,
+				lastUpdateEventId: newEventId(),
 			};
 
 			// 履歴を追加
 			newState = addHistory(prevState, newState);
+			console.log("addHistory caused by Delete");
 
 			return newState;
 		});
@@ -428,6 +443,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 						? { ...item, text: e.text, isTextEditing: false }
 						: item,
 				),
+				lastUpdateEventId: e.eventId,
 			};
 
 			// 履歴を追加
@@ -483,6 +499,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 			let newState = {
 				...prevState,
 				items,
+				lastUpdateEventId: newEventId(),
 				multiSelectGroup: undefined,
 			} as SvgCanvasState;
 
@@ -506,6 +523,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 			let newState = {
 				...prevState,
 				items: newItems,
+				lastUpdateEventId: newEventId(),
 				multiSelectGroup: undefined,
 			} as SvgCanvasState;
 
@@ -560,10 +578,12 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 						isSelected: true,
 					},
 				],
+				lastUpdateEventId: newEventId(),
 			} as SvgCanvasState;
 
 			// 履歴を追加
 			newState = addHistory(prevState, newState);
+			console.log("addHistory caused by addItem");
 
 			return newState;
 		});
@@ -820,15 +840,15 @@ const addHistory = (
 	newState.history = [];
 	newState.historyIndex = 0;
 
-	// 前回の履歴追加から10ms以上経過していない場合は最後の履歴を上書き
-	if (prevState.lastUpdateTime + 10 > Date.now()) {
+	// 前回の履歴追加時と同じイベントIDの場合、履歴を上書きする
+	if (prevState.lastUpdateEventId === newState.lastUpdateEventId) {
 		// 履歴を上書き
 		prevState.history[prevState.history.length - 1] = newState;
 		return {
-			...prevState,
+			...newState,
 			history: prevState.history,
 			historyIndex: prevState.historyIndex,
-			lastUpdateTime: Date.now(),
+			lastUpdateEventId: prevState.lastUpdateEventId,
 		};
 	}
 
@@ -845,6 +865,5 @@ const addHistory = (
 		...newState,
 		history: newHistory,
 		historyIndex: newHistory.length - 1,
-		lastUpdateTime: Date.now(),
 	};
 };

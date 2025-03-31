@@ -268,6 +268,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 
 				// 接続線の変更イベントを発火
 				onItemableChange?.({
+					eventId: event.eventId,
 					eventType: event.eventType,
 					id,
 					startItemable: {
@@ -324,6 +325,7 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 
 				// 接続線の変更イベントを発火
 				onItemableChange?.({
+					eventId: event.eventId,
 					eventType: event.eventType,
 					id,
 					startItemable: {

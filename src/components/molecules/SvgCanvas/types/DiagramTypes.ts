@@ -12,7 +12,6 @@ import type {
 	DiagramDragEvent,
 	DiagramHoverEvent,
 	DiagramSelectEvent,
-	DiagramTextChangeEvent,
 	DiagramTextEditEvent,
 	DiagramTransformEvent,
 	ItemableChangeEvent,

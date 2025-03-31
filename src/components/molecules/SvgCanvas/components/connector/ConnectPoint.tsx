@@ -175,6 +175,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			document.dispatchEvent(
 				new CustomEvent(EVENT_NAME_CONNECTTION, {
 					detail: {
+						eventId: e.eventId,
 						type: "connecting",
 						startPointId: e.dropItem.id,
 						startX: e.dropItem.x,
@@ -203,6 +204,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			document.dispatchEvent(
 				new CustomEvent(EVENT_NAME_CONNECTTION, {
 					detail: {
+						eventId: e.eventId,
 						type: "disconnect",
 						startPointId: e.dropItem.id,
 						startX: e.dropItem.x,
@@ -230,6 +232,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 			document.dispatchEvent(
 				new CustomEvent(EVENT_NAME_CONNECTTION, {
 					detail: {
+						eventId: e.eventId,
 						type: "connect",
 						startPointId: e.dropItem.id,
 						startX: e.dropItem.x,
@@ -297,6 +300,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 					points[points.length - 1].id = customEvent.detail.endPointId;
 
 					onConnect?.({
+						eventId: customEvent.detail.eventId,
 						startOwnerId: ownerId,
 						points: points,
 						endOwnerId: customEvent.detail.endOwnerId,
@@ -364,6 +368,7 @@ export default memo(ConnectPoint);
 
 // 以下内部型定義
 type ConnectionEvent = {
+	eventId: string;
 	type: "connecting" | "connect" | "disconnect";
 	startPointId: string;
 	startX: number;

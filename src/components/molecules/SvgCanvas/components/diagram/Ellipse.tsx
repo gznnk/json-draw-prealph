@@ -15,6 +15,7 @@ import type {
 	ConnectPointMoveData,
 	DiagramDragEvent,
 	DiagramHoverEvent,
+	DiagramPointerEvent,
 	DiagramTransformEvent,
 	EventType,
 } from "../../types/EventTypes";
@@ -86,6 +87,7 @@ const Ellipse: React.FC<EllipseProps> = ({
 	 * @param rectShape 四角形の形状（差分）
 	 */
 	const updateConnectPoints = (
+		eventId: string,
 		eventType: EventType,
 		rectShape: Partial<Shape>,
 	) => {
@@ -124,6 +126,7 @@ const Ellipse: React.FC<EllipseProps> = ({
 
 		// 接続ポイント移動イベントを発火
 		onConnectPointsMove?.({
+			eventId,
 			eventType,
 			points: newConnectPoints,
 		});
@@ -156,7 +159,7 @@ const Ellipse: React.FC<EllipseProps> = ({
 		// TODO: onItemableChangeに変更し、接続ポイントの位置更新も同時におこなう？
 		onDrag?.(e);
 
-		updateConnectPoints(e.eventType, {
+		updateConnectPoints(e.eventId, e.eventType, {
 			x: e.endX,
 			y: e.endY,
 		});
@@ -179,7 +182,7 @@ const Ellipse: React.FC<EllipseProps> = ({
 		// TODO: onItemableChangeに変更し、接続ポイントの位置更新も同時におこなう？
 		onTransform?.(e);
 
-		updateConnectPoints(e.eventType, e.endShape);
+		updateConnectPoints(e.eventId, e.eventType, e.endShape);
 
 		if (e.eventType === "End") {
 			setIsTransforming(false);
@@ -189,11 +192,12 @@ const Ellipse: React.FC<EllipseProps> = ({
 	/**
 	 * ポインターダウンイベントハンドラ
 	 */
-	const handlePointerDown = useCallback(() => {
+	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
 		const { id, onSelect } = refBus.current;
 
 		// 図形選択イベントを発火
 		onSelect?.({
+			eventId: e.eventId,
 			id,
 		});
 	}, []);

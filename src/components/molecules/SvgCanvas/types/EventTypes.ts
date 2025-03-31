@@ -16,6 +16,7 @@ export type EventType = "Start" | "InProgress" | "End" | "Immediate";
  * 図形のポインターダウンイベント
  */
 export type DiagramPointerEvent = {
+	eventId: string;
 	id: string;
 };
 
@@ -23,6 +24,7 @@ export type DiagramPointerEvent = {
  * 図形のドラッグイベント
  */
 export type DiagramDragEvent = {
+	eventId: string;
 	eventType: EventType;
 	id: string;
 	startX: number;
@@ -35,6 +37,7 @@ export type DiagramDragEvent = {
  * 図形のドラッグドロップイベント
  */
 export type DiagramDragDropEvent = {
+	eventId: string;
 	dropItem: {
 		id: string;
 		type?: DiagramType;
@@ -53,6 +56,7 @@ export type DiagramDragDropEvent = {
  * 図形のクリックイベント
  */
 export type DiagramClickEvent = {
+	eventId: string;
 	id: string;
 };
 
@@ -60,6 +64,7 @@ export type DiagramClickEvent = {
  * 図形のホバーイベント
  */
 export type DiagramHoverEvent = {
+	eventId: string;
 	id: string;
 	isHovered: boolean;
 };
@@ -68,6 +73,7 @@ export type DiagramHoverEvent = {
  * 図形の選択イベント
  */
 export type DiagramSelectEvent = {
+	eventId: string;
 	id: string;
 	isMultiSelect?: boolean;
 };
@@ -76,6 +82,7 @@ export type DiagramSelectEvent = {
  * 図形の変形イベント
  */
 export type DiagramTransformEvent = {
+	eventId: string;
 	id: string;
 	eventType: EventType;
 	startShape: Shape;
@@ -100,6 +107,7 @@ export type ItemableChangeData = {
  * 子図形をもつ図形の変更イベント
  */
 export type ItemableChangeEvent = {
+	eventId: string;
 	eventType: EventType;
 	id: string;
 	startItemable: ItemableChangeData;
@@ -110,6 +118,7 @@ export type ItemableChangeEvent = {
  * 図形の接続イベント
  */
 export type DiagramConnectEvent = {
+	eventId: string;
 	startOwnerId: string;
 	points: PathPointData[];
 	endOwnerId: string;
@@ -139,6 +148,7 @@ export type ConnectPointMoveData = {
  * @param points 移動した接続ポイントのデータ
  */
 export type ConnectPointsMoveEvent = {
+	eventId: string;
 	eventType: EventType;
 	points: ConnectPointMoveData[];
 };
@@ -154,6 +164,7 @@ export type DiagramTextEditEvent = {
  * 図形のテキスト変更イベント
  */
 export type DiagramTextChangeEvent = {
+	eventId: string;
 	id: string;
 	text: string;
 };
