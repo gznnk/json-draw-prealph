@@ -270,14 +270,22 @@ export type TransformativeProps = {
 };
 
 /**
- * 子図形を持つ図形のプロパティ
+ * Properties of having child diagrams component.
+ *
+ * @property {function} onDiagramChange - Event handler for diagram change.
+ *                                        Trigger this handler when notifying changes in the properties of a diagram.
  */
 export type ItemableProps = {
 	onDiagramChange?: (e: DiagramChangeEvent) => void;
 };
 
 /**
- * 接続可能な図形のプロパティ
+ * Properties of connectable component.
+ *
+ * @property {boolean} showConnectPoints - Visibility of owned ConnectPoint components.
+ *                                         When false, the connectable component must not render ConnectPoint components.
+ * @property {function} onConnect        - Event handler for diagram connection.
+ *                                         The connectable component must trigger this event when a connection is made.
  */
 export type ConnectableProps = {
 	showConnectPoints?: boolean;
@@ -286,7 +294,7 @@ export type ConnectableProps = {
 };
 
 /**
- * テキストを持つ図形のプロパティ
+ * Properties of textable component.
  */
 export type TextableProps = {
 	onTextEdit?: (e: DiagramTextEditEvent) => void;

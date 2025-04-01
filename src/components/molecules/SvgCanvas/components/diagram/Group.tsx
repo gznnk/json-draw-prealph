@@ -549,7 +549,10 @@ const Group: React.FC<GroupProps> = ({
 	}, []);
 
 	const doShowConnectPoints =
-		showConnectPoints && !isGroupDragging && !isGroupTransforming;
+		showConnectPoints &&
+		!isSelected &&
+		!isGroupDragging &&
+		!isGroupTransforming;
 
 	// グループ内の図形の作成
 	const children = items.map((item) => {

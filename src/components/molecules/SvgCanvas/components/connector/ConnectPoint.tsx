@@ -332,7 +332,9 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 				fill="rgba(255, 204, 0, 0.8)"
 				cursor="pointer"
 				outline="none"
-				isTransparent={isTransparent && !isHovered} // TODO: !isHoverdは必要か検討
+				// Show when hovered, even if isTransparent is true.
+				// If you want to hide when hovered, do not render this component.
+				isTransparent={isTransparent && !isHovered}
 				onDrag={handleDrag}
 				onDragOver={handleDragOver}
 				onDragLeave={handleDragLeave}
