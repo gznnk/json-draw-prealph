@@ -716,33 +716,6 @@ const applyRecursive = (
 	return isItemChanged ? newItems : items;
 };
 
-// TODO: ちゃんと中身を見ていないので要確認
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const deepMerge = <T extends Record<string, any>>(
-	target: T,
-	...sources: Partial<T>[]
-): T => {
-	for (const source of sources) {
-		if (typeof source !== "object" || source === null) continue;
-
-		for (const key of Object.keys(source)) {
-			const sourceValue = source[key];
-			const targetValue = target[key];
-
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			(target as any)[key] =
-				typeof sourceValue === "object" && sourceValue !== null
-					? deepMerge(
-							Array.isArray(sourceValue) ? [] : { ...targetValue },
-							sourceValue,
-						)
-					: sourceValue;
-		}
-	}
-
-	return Array.isArray(target) ? target : { ...target };
-};
-
 /**
  * 選択されている図形を取得する
  *

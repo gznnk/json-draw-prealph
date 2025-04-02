@@ -139,7 +139,6 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 					);
 					return degrees % 90 === 0;
 				});
-				return;
 			}
 
 			// 移動中と移動終了時の処理

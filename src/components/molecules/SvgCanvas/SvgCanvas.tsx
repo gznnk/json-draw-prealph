@@ -389,8 +389,6 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 								onSelect={handleSelect}
 								onTransform={onTransform}
 								onDiagramChange={onDiagramChange}
-								onDrag={onDrag} // TODO: 必要か精査
-								onDrop={onDrop} // TODO: 必要か精査
 								onConnectPointsMove={onConnectPointsMove}
 							/>
 						)}
