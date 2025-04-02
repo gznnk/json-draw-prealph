@@ -4,7 +4,6 @@ import { memo, useCallback, useContext, useEffect, useRef } from "react";
 
 // Import SvgCanvas related components.
 import { SvgCanvasContext } from "../../SvgCanvas";
-import type { Direction } from "../connector/ConnectPoint";
 import {
 	createBestConnectPath,
 	getLineDirection,
@@ -81,8 +80,6 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 }) => {
 	// Items of ConnectLine component at the start of the change event.
 	const startItems = useRef<Diagram[]>([]);
-	// Direction of ConnectLine component at the start of the change event.
-	const startDirection = useRef<Direction>("up");
 	// Is the line only vertical or horizontal.
 	const isVerticalHorizontalLines = useRef<boolean>(true);
 	// SvgCanvas state provider.
@@ -129,14 +126,6 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 			if (event.eventType === "Start") {
 				// 移動開始時のitemsを保持
 				startItems.current = items;
-
-				// 移動開始時の接続ポイントの向きを保持
-				startDirection.current = getLineDirection(
-					movedPoint.ownerShape.x,
-					movedPoint.ownerShape.y,
-					movedPoint.x,
-					movedPoint.y,
-				);
 
 				// 垂直と水平の線のみかどうかを判定
 				isVerticalHorizontalLines.current = items.every((item, idx) => {
@@ -283,11 +272,19 @@ const ConnectLine: React.FC<ConnectLineProps> = ({
 					) as Shape;
 				}
 
+				// Calculate the direction of the segment starting from the moved ConnectPoint.
+				const startDirection = getLineDirection(
+					movedPoint.ownerShape.x,
+					movedPoint.ownerShape.y,
+					movedPoint.x,
+					movedPoint.y,
+				);
+
 				// 最適な接続線を再計算
 				const newPath = createBestConnectPath(
 					movedPoint.x,
 					movedPoint.y,
-					startDirection.current,
+					startDirection,
 					movedPoint.ownerShape,
 					oppositePoint.x,
 					oppositePoint.y,
