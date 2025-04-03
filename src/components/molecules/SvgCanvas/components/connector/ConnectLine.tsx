@@ -2,14 +2,6 @@
 import type React from "react";
 import { memo, useCallback, useContext, useEffect, useRef } from "react";
 
-// Import SvgCanvas related components.
-import { SvgCanvasContext } from "../../SvgCanvas";
-import {
-	createBestConnectPath,
-	getLineDirection,
-} from "../connector/ConnectPoint";
-import Path from "../diagram/Path";
-
 // Import SvgCanvas related types.
 import type {
 	ConnectLineData,
@@ -22,6 +14,14 @@ import type {
 	ConnectPointsMoveEvent,
 	DiagramChangeEvent,
 } from "../../types/EventTypes";
+
+// Import SvgCanvas related components.
+import { SvgCanvasContext } from "../../SvgCanvas";
+import {
+	createBestConnectPath,
+	getLineDirection,
+} from "../connector/ConnectPoint";
+import Path from "../diagram/Path";
 
 // Import SvgCanvas related functions.
 import { newId } from "../../functions/Diagram";

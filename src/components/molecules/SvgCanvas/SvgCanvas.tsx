@@ -35,7 +35,7 @@ import ContextMenu, {
 } from "./components/operation/ContextMenu";
 
 // SvgCanvas関連関数をインポート
-import { isItemableData } from "./functions/Diagram";
+import { getDiagramById } from "./functions/SvgCanvas";
 import { newEventId } from "./functions/Util";
 
 // SvgCanvasの状態を階層を跨いで提供するためにSvgCanvasStateProviderを保持するコンテキストを作成
@@ -85,6 +85,8 @@ type SvgCanvasProps = {
 	onTextChange?: (e: DiagramTextChangeEvent) => void;
 	onGroup?: () => void;
 	onUngroup?: () => void;
+	onUndo?: () => void;
+	onRedo?: () => void;
 };
 
 /**
@@ -425,28 +427,3 @@ class SvgCanvasStateProvider {
 		return getDiagramById(this.s.items, id);
 	}
 }
-
-/**
- * IDに対応する図形データを取得する
- *
- * @param diagrams - 図形データ配列
- * @param id - ID
- * @returns - 図形データ
- */
-const getDiagramById = (
-	diagrams: Diagram[],
-	id: string,
-): Diagram | undefined => {
-	for (const diagram of diagrams) {
-		if (diagram.id === id) {
-			return diagram;
-		}
-		// グループデータの場合は再帰的に探索
-		if (isItemableData(diagram)) {
-			const ret = getDiagramById(diagram.items || [], id);
-			if (ret) {
-				return ret;
-			}
-		}
-	}
-};
