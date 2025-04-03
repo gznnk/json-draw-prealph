@@ -7,6 +7,7 @@ import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 // SvgCanvas関連型定義をインポート
 import type {
 	ConnectLineData,
+	ConnectPointData,
 	Diagram,
 	GroupData,
 	PathPointData,
@@ -355,7 +356,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	const onDelete = useCallback(() => {
 		setCanvasState((prevState) => {
 			// Remove selected items.
-			const items = applyRecursive(prevState.items, (item) => {
+			let items = applyRecursive(prevState.items, (item) => {
 				if (!isSelectableData(item)) {
 					return item;
 				}
@@ -364,6 +365,21 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				);
 				return item;
 			}).filter((item) => !isSelectableData(item) || !item.isSelected);
+
+			// Find all ConnectLine components.
+			const connectLines = items.filter(
+				(item) => item.type === "ConnectLine",
+			) as ConnectLineData[];
+
+			// Remove ConnectLine components whose owner was deleted."
+			for (const connectLine of connectLines) {
+				if (
+					!getDiagramById(items, connectLine.startOwnerId) ||
+					!getDiagramById(items, connectLine.endOwnerId)
+				) {
+					items = items.filter((item) => item.id !== connectLine.id);
+				}
+			}
 
 			// Create new state.
 			let newState = {
@@ -717,6 +733,32 @@ const applyRecursive = (
 
 	// 変更がない場合はReactが変更なしと検知するよう元の配列を返す
 	return isItemChanged ? newItems : items;
+};
+
+// TODO: SvgCanvas側にもあるので共通化する
+/**
+ * IDに対応する図形データを取得する
+ *
+ * @param diagrams - 図形データ配列
+ * @param id - ID
+ * @returns - 図形データ
+ */
+const getDiagramById = (
+	diagrams: Diagram[],
+	id: string,
+): Diagram | undefined => {
+	for (const diagram of diagrams) {
+		if (diagram.id === id) {
+			return diagram;
+		}
+		// グループデータの場合は再帰的に探索
+		if (isItemableData(diagram)) {
+			const ret = getDiagramById(diagram.items || [], id);
+			if (ret) {
+				return ret;
+			}
+		}
+	}
 };
 
 /**
