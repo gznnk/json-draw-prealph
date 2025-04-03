@@ -8,10 +8,13 @@ type AIChatProps = {
 
 const AIChat: React.FC<AIChatProps> = ({ onResponse }) => {
 	const [apiKey, setApiKey] = useState<string>("");
+	// 	const [systemRole, setSystemRole] =
+	// 		useState<string>(`作図アプリケーションのバックエンドで動く、ユーザーの入力を受けてそれに対応する図形データを生成するノード。
+	// データはJSON形式で、配列の中に複数の図形のデータをオブジェクトとして持つ。
+	// 回答はJSONデータのみを返し、JSON内にコメントは記載しない。`);
 	const [systemRole, setSystemRole] =
-		useState<string>(`作図アプリケーションのバックエンドで動く、ユーザーの入力を受けてそれに対応する図形データを生成するノード。
-データはJSON形式で、配列の中に複数の図形のデータをオブジェクトとして持つ。
-回答はJSONデータのみを返し、JSON内にコメントは記載しない。`);
+		useState<string>(`作図アプリケーションのバックエンドで動く、ユーザーの入力を受けてそれに対応するSVGを生成するノード。
+そのまま保存すればSVGとして利用できる文字列のみを返却すること。`);
 	const [userPrompt, setUserPrompt] = useState<string>("");
 	const [response, setResponse] = useState<string>("");
 
@@ -40,39 +43,46 @@ const AIChat: React.FC<AIChatProps> = ({ onResponse }) => {
 			});
 
 			const prompt = `
-以下の個々の図形のデータ構造を参考に、ユーザーの入力に基づいて図形データを生成してほしいです。
+			以下のユーザーの入力に基づいてSVGを生成してください。
+			そのまま保存すればSVGとして利用できる文字列のみを返却すること。
+			また、xやy等の座標や大きさは単位をpxとし、数値のみを返却すること。
+			また使うSVG要素はcircle, rect, ellipse, line, rectのみとしてください。
+			ユーザーの入力: ${userPrompt}`;
 
-１．四角形のデータ
----------------------------------------
-type: Rectangle（固定値）
-x: 中心X座標
-y: 中心y座標
-width: 幅
-height: 高さ
-rotation: 図形の中心を原点として回転（度単位）
-fill: 図形の塗りつぶしの色（HEX表記）
-stroke: 図形の枠線の色（HEX表記）
-strokeWidth: 図形の枠線の太さ（px単位）
----------------------------------------
+			// 			const prompt = `
+			// 以下の個々の図形のデータ構造を参考に、ユーザーの入力に基づいて図形データを生成してほしいです。
 
-２．楕円のデータ
----------------------------------------
-type: Ellipse（固定値）
-x: 中心X座標
-y: 中心y座標
-width: 幅
-height: 高さ
-rotation: 図形の中心を原点として回転（度単位）
-fill: 図形の塗りつぶしの色（HEX表記）
-stroke: 図形の枠線の色（HEX表記）
-strokeWidth: 図形の枠線の太さ（px単位）
----------------------------------------
+			// １．四角形のデータ
+			// ---------------------------------------
+			// type: Rectangle（固定値）
+			// x: 中心X座標
+			// y: 中心y座標
+			// width: 幅
+			// height: 高さ
+			// rotation: 図形の中心を原点として回転（度単位）
+			// fill: 図形の塗りつぶしの色（HEX表記）
+			// stroke: 図形の枠線の色（HEX表記）
+			// strokeWidth: 図形の枠線の太さ（px単位）
+			// ---------------------------------------
 
-回答はJSONデータのみを返すこと。JSON内にコメントは記載しないこと。
+			// ２．楕円のデータ
+			// ---------------------------------------
+			// type: Ellipse（固定値）
+			// x: 中心X座標
+			// y: 中心y座標
+			// width: 幅
+			// height: 高さ
+			// rotation: 図形の中心を原点として回転（度単位）
+			// fill: 図形の塗りつぶしの色（HEX表記）
+			// stroke: 図形の枠線の色（HEX表記）
+			// strokeWidth: 図形の枠線の太さ（px単位）
+			// ---------------------------------------
 
-上記のデータ構造を参考に、以下のユーザーの入力に基づいて図形データを生成してください。
-ユーザーの入力: ${userPrompt}
-			`;
+			// 回答はJSONデータのみを返すこと。JSON内にコメントは記載しないこと。
+
+			// 上記のデータ構造を参考に、以下のユーザーの入力に基づいて図形データを生成してください。
+			// ユーザーの入力: ${userPrompt}
+			// 			`;
 
 			const response = await openai.chat.completions.create({
 				model: "gpt-4o",
@@ -83,11 +93,15 @@ strokeWidth: 図形の枠線の太さ（px単位）
 				],
 			});
 			setResponse(response.choices[0].message.content ?? "");
-			onResponse(
-				response.choices[0].message.content
-					?.replace("```json", "")
-					.replace("```", "") ?? "",
-			);
+			const normalizedResponse = response.choices[0].message.content
+				?.replace("```svg", "")
+				.replace("```", "");
+			onResponse(normalizedResponse ?? "");
+			// onResponse(
+			// 	response.choices[0].message.content
+			// 		?.replace("```json", "")
+			// 		.replace("```", "") ?? "",
+			// );
 		} catch (error) {
 			console.error("Error fetching data from OpenAI API:", error);
 			alert("APIリクエスト中にエラーが発生しました。");

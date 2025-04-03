@@ -603,14 +603,23 @@ function App() {
 				</Button>
 				<AIChat
 					onResponse={(res) => {
+						// try {
+						// 	const item = makeDataFromAi(JSON.parse(res));
+						// 	setCanvasState((prev) => ({
+						// 		...prev,
+						// 		items: [...prev.items, item],
+						// 	}));
+						// } catch (e) {
+						// 	alert("Invalid JSON format. Please check the response.");
+						// }
 						try {
-							const item = makeDataFromAi(JSON.parse(res));
+							const item = makeDataFromAi2(res);
 							setCanvasState((prev) => ({
 								...prev,
 								items: [...prev.items, item],
 							}));
 						} catch (e) {
-							alert("Invalid JSON format. Please check the response.");
+							alert("Invalid SVG format. Please check the response.");
 						}
 					}}
 				/>
@@ -649,6 +658,135 @@ const makeDataFromAi = (data: Partial<Diagram>[]): Diagram => {
 
 		return newItem;
 	});
+	return {
+		id: crypto.randomUUID(),
+		type: "Group",
+		x: 100,
+		y: 100,
+		width: 100,
+		height: 100,
+		rotation: 0,
+		scaleX: 1,
+		scaleY: 1,
+		isSelected: false,
+		isMultiSelectSource: false,
+		items: newData,
+	} as Diagram;
+};
+
+const makeDataFromAi2 = (data: string): Diagram => {
+	// convert svg string to json
+	const parser = new DOMParser();
+	const svgDoc = parser.parseFromString(data, "image/svg+xml");
+	const svgElement = svgDoc.documentElement;
+	console.log(svgElement);
+	// Convert the SVG child elements to JSON
+	const newData: Diagram[] = [];
+	for (const element of svgElement.children) {
+		const tagName = element.tagName;
+		if (tagName === "rect") {
+			const x = Number(element.getAttribute("x"));
+			const y = Number(element.getAttribute("y"));
+			const width = Number(element.getAttribute("width"));
+			const height = Number(element.getAttribute("height"));
+			newData.push({
+				id: crypto.randomUUID(),
+				type: "Rectangle",
+				x: x + width / 2,
+				y: y + height / 2,
+				width,
+				height,
+				rotation: 0,
+				scaleX: 1,
+				scaleY: 1,
+				fill: element.getAttribute("fill") || "black",
+				stroke: element.getAttribute("stroke") || "black",
+				strokeWidth: element.getAttribute("stroke-width") || "1px",
+				isSelected: false,
+				isMultiSelectSource: false,
+			} as Diagram);
+		}
+		if (tagName === "ellipse") {
+			newData.push({
+				id: crypto.randomUUID(),
+				type: "Ellipse",
+				x: Number(element.getAttribute("cx")),
+				y: Number(element.getAttribute("cy")),
+				width: Number(element.getAttribute("rx")) * 2,
+				height: Number(element.getAttribute("ry")) * 2,
+				rotation: 0,
+				scaleX: 1,
+				scaleY: 1,
+				fill: element.getAttribute("fill") || "transparent",
+				stroke: element.getAttribute("stroke") || "transparent",
+				strokeWidth: element.getAttribute("stroke-width") || "1px",
+				isSelected: false,
+				isMultiSelectSource: false,
+			} as Diagram);
+		}
+		if (tagName === "circle") {
+			newData.push({
+				id: crypto.randomUUID(),
+				type: "Ellipse",
+				x: Number(element.getAttribute("cx")),
+				y: Number(element.getAttribute("cy")),
+				width: Number(element.getAttribute("r")) * 2,
+				height: Number(element.getAttribute("r")) * 2,
+				rotation: 0,
+				scaleX: 1,
+				scaleY: 1,
+				fill: element.getAttribute("fill") || "transparent",
+				stroke: element.getAttribute("stroke") || "transparent",
+				strokeWidth: element.getAttribute("stroke-width") || "1px",
+				isSelected: false,
+				isMultiSelectSource: false,
+			} as Diagram);
+		}
+		if (tagName === "line") {
+			newData.push({
+				id: crypto.randomUUID(),
+				type: "Path",
+				x: 0, // 仮の値
+				y: 0, // 仮の値
+				width: 0, // 仮の値
+				height: 0, // 仮の値
+				rotation: 0,
+				scaleX: 1,
+				scaleY: 1,
+				items: [
+					{
+						id: crypto.randomUUID(),
+						type: "PathPoint",
+						x: Number(element.getAttribute("x1")),
+						y: Number(element.getAttribute("y1")),
+						width: 0,
+						height: 0,
+						keepProportion: false,
+						isSelected: false,
+						isMultiSelectSource: false,
+					},
+					{
+						id: crypto.randomUUID(),
+						type: "PathPoint",
+						x: Number(element.getAttribute("x2")),
+						y: Number(element.getAttribute("y2")),
+						width: 0,
+						height: 0,
+						keepProportion: false,
+						isSelected: false,
+						isMultiSelectSource: false,
+					},
+				],
+				stroke: element.getAttribute("stroke") || "transparent",
+				strokeWidth: element.getAttribute("stroke-width") || "1px",
+				isSelected: false,
+				isMultiSelectSource: false,
+			} as Diagram);
+		}
+		// Process each element here
+	}
+	console.log(newData);
+
 	return {
 		id: crypto.randomUUID(),
 		type: "Group",
