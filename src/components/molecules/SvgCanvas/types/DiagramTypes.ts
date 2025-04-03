@@ -6,6 +6,7 @@ import type React from "react";
 // SvgCanvas関連型定義をインポート
 import type {
 	ConnectPointsMoveEvent,
+	DiagramChangeEvent,
 	DiagramClickEvent,
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
@@ -14,11 +15,11 @@ import type {
 	DiagramSelectEvent,
 	DiagramTextEditEvent,
 	DiagramTransformEvent,
-	DiagramChangeEvent,
 } from "./EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
 import ConnectLine from "../components/connector/ConnectLine";
+import type { ArrowHeadType } from "../components/core/ArrowHead";
 import Ellipse from "../components/diagram/Ellipse";
 import Group from "../components/diagram/Group";
 import Path, { PathPoint } from "../components/diagram/Path";
@@ -189,7 +190,10 @@ export type PathData = CreateDiagramType<{
 	transformative: true;
 	itemable: true;
 	strokable: true;
-}>;
+}> & {
+	startArrowHead?: ArrowHeadType;
+	endArrowHead?: ArrowHeadType;
+};
 
 /**
  * 接続ポイントのデータ
@@ -210,6 +214,8 @@ export type ConnectLineData = CreateDiagramType<{
 	startOwnerId: string;
 	endOwnerId: string;
 	autoRouting: boolean;
+	startArrowHead?: ArrowHeadType;
+	endArrowHead?: ArrowHeadType;
 };
 
 /**

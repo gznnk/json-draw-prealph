@@ -359,6 +359,7 @@ const ConnectPoint: React.FC<ConnectPointProps> = ({
 					dragEnabled={false}
 					segmentDragEnabled={false}
 					newVertexEnabled={false}
+					endArrowHead="ConcaveTriangle"
 					items={pathPoints as Diagram[]}
 				/>
 			)}

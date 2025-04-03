@@ -19,6 +19,7 @@ width: 幅
 height: 高さ
 rotation: 図形の中心を原点として回転（度単位）
 fill: 図形の塗りつぶしの色（HEX表記）
+stroke: 図形の枠線の色（HEX表記）
 回答はJSONデータのみを返す。コメントや説明文は不要。`);
 	const [userPrompt, setUserPrompt] = useState<string>("");
 	const [response, setResponse] = useState<string>("");

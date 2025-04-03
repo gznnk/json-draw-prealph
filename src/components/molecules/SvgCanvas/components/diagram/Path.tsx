@@ -3,6 +3,7 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import SvgCanvas related components.
+import ArrowHead from "../core/ArrowHead";
 import DragLine from "../core/DragLine";
 import DragPoint from "../core/DragPoint";
 import Group from "./Group";
@@ -16,10 +17,10 @@ import type {
 	PathPointData,
 } from "../../types/DiagramTypes";
 import type {
+	DiagramChangeEvent,
 	DiagramClickEvent,
 	DiagramDragEvent,
 	DiagramPointerEvent,
-	DiagramChangeEvent,
 } from "../../types/EventTypes";
 
 // Import SvgCanvas related hooks.
@@ -97,6 +98,8 @@ const Path: React.FC<PathProps> = ({
 	rightAngleSegmentDrag = false,
 	newVertexEnabled = true,
 	fixBothEnds = false,
+	startArrowHead = "None",
+	endArrowHead = "None",
 	onClick,
 	onDrag,
 	onSelect,
@@ -350,6 +353,50 @@ const Path: React.FC<PathProps> = ({
 	// 全体変形用グループの表示フラグ
 	const showTransformGroup = isSelected && !isMultiSelectSource;
 
+	// ArrowHead.
+	let startArrowHeadComp = undefined;
+	let endArrowHeadComp = undefined;
+	if (1 < items.length) {
+		if (startArrowHead && startArrowHead !== "None") {
+			const startPoint = items[0];
+			const start2thPoint = items[1];
+			const startArrowHeadRadians = calcRadians(
+				startPoint.x,
+				startPoint.y,
+				start2thPoint.x,
+				start2thPoint.y,
+			);
+			startArrowHeadComp = (
+				<ArrowHead
+					type={startArrowHead}
+					color={stroke}
+					x={startPoint.x}
+					y={startPoint.y}
+					radians={startArrowHeadRadians}
+				/>
+			);
+		}
+		if (endArrowHead && endArrowHead !== "None") {
+			const endPoint = items[items.length - 1];
+			const end2thPoint = items[items.length - 2];
+			const endArrowHeadRadians = calcRadians(
+				endPoint.x,
+				endPoint.y,
+				end2thPoint.x,
+				end2thPoint.y,
+			);
+			endArrowHeadComp = (
+				<ArrowHead
+					type={endArrowHead}
+					color={stroke}
+					x={endPoint.x}
+					y={endPoint.y}
+					radians={endArrowHeadRadians}
+				/>
+			);
+		}
+	}
+
 	return (
 		<>
 			{/* 描画用のパス */}
@@ -374,6 +421,10 @@ const Path: React.FC<PathProps> = ({
 				ref={dragSvgRef}
 				{...dragProps}
 			/>
+			{/* Start point arrow head. */}
+			{startArrowHeadComp}
+			{/* End point arrow head. */}
+			{endArrowHeadComp}
 			{/* 線分ドラッグ */}
 			{showSegmentList && (
 				<SegmentList
