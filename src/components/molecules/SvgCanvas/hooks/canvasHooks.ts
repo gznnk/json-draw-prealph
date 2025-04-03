@@ -286,6 +286,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 			// 選択されたアイテムを取得
 			const selectedItems = getSelectedItems(items);
 
+			// TODO: 今の別グループでやる方式だと、重なり順がおかしくなる
 			// 複数選択の場合は、選択されている図形をグループ化
 			let multiSelectGroup: GroupData | undefined = undefined;
 			if (1 < selectedItems.length) {

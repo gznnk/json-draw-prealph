@@ -11,6 +11,7 @@ import { getLogger } from "./utils/Logger";
 import { Profiler } from "./utils/Profiler";
 
 import { radiansToDegrees } from "./components/molecules/SvgCanvas/functions/Math";
+import { svgDataToDiagram } from "./components/molecules/SvgCanvas/functions/Diagram";
 const logger = getLogger("App");
 declare global {
 	interface Window {
@@ -613,7 +614,8 @@ function App() {
 						// 	alert("Invalid JSON format. Please check the response.");
 						// }
 						try {
-							const item = makeDataFromAi2(res);
+							document.getElementById("svg-preview")!.innerHTML = res;
+							const item = svgDataToDiagram(res);
 							setCanvasState((prev) => ({
 								...prev,
 								items: [...prev.items, item],
@@ -623,6 +625,7 @@ function App() {
 						}
 					}}
 				/>
+				<div id="svg-preview" />
 			</div>
 			<div
 				style={{
