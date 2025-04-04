@@ -122,6 +122,7 @@ const Textable: React.FC<TextableProps> = ({
 
 	return (
 		<foreignObject
+			className="diagram"
 			x={x}
 			y={y}
 			width={width}

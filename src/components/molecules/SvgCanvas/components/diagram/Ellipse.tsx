@@ -288,6 +288,7 @@ const Ellipse: React.FC<EllipseProps> = ({
 		<>
 			<g transform="translate(0.5,0.5)">
 				<ellipse
+					className="diagram"
 					id={id}
 					cx={0}
 					cy={0}
@@ -299,7 +300,6 @@ const Ellipse: React.FC<EllipseProps> = ({
 					tabIndex={0}
 					cursor="move"
 					transform={transform}
-					style={{ visibility: isMultiSelectSource ? "hidden" : "visible" }}
 					ref={svgRef}
 					onDoubleClick={handleDoubleClick}
 					{...dragProps}

@@ -286,7 +286,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 		<>
 			<g transform="translate(0.5,0.5)">
 				<rect
-					key={id}
+					className="diagram"
 					id={id}
 					x={-width / 2}
 					y={-height / 2}
@@ -298,7 +298,6 @@ const Rectangle: React.FC<RectangleProps> = ({
 					tabIndex={0}
 					cursor="move"
 					transform={transform}
-					style={{ visibility: isMultiSelectSource ? "hidden" : "visible" }}
 					ref={svgRef}
 					onDoubleClick={handleDoubleClick}
 					{...dragProps}

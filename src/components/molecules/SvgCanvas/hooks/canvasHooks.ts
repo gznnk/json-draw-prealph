@@ -190,34 +190,31 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 					...e.endDiagram,
 				} as GroupData;
 
-				// // 複数選択グループの変更が終了したタイミングで、元の図形にも変更を反映する
-				if (e.eventType === "End") {
-					items = applyRecursive(prevState.items, (item) => {
-						// 元図形に対応する複数選択グループ側の変更データを取得
-						const changedItem = (e.endDiagram.items ?? []).find(
-							(i) => i.id === item.id,
-						);
-						if (changedItem && isSelectableData(item)) {
-							const newItem = {
-								...item,
-								...changedItem,
-								isSelected: item.isSelected, // 元図形の選択状態を維持（これをやらないとchangeItem側の値で上書きされてしまう）
-								isMultiSelectSource: item.isMultiSelectSource, // 元図形の非表示を維持（同上）
-							};
-							if (isItemableData(newItem)) {
-								newItem.items = applyMultiSelectSourceRecursive(
-									newItem.items ?? [],
-									item.isMultiSelectSource,
-								); // 子図形の非表示を維持（同上）
-							}
+				items = applyRecursive(prevState.items, (item) => {
+					// 元図形に対応する複数選択グループ側の変更データを取得
+					const changedItem = (e.endDiagram.items ?? []).find(
+						(i) => i.id === item.id,
+					);
+					if (
+						changedItem &&
+						isSelectableData(item) &&
+						isSelectableData(changedItem)
+					) {
+						// Remove the properties that are not needed for the update.
+						const { isSelected, isMultiSelectSource, ...updateItem } =
+							changedItem;
 
-							return newItem;
-						}
+						const newItem = {
+							...item,
+							...updateItem,
+						};
 
-						// 対応する変更データがない場合はそのまま
-						return item;
-					});
-				}
+						return newItem;
+					}
+
+					// 対応する変更データがない場合はそのまま
+					return item;
+				});
 			} else {
 				// 複数選択グループ以外の場合は、普通に更新
 				items = applyRecursive(prevState.items, (item) =>
@@ -286,7 +283,6 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 			// 選択されたアイテムを取得
 			const selectedItems = getSelectedItems(items);
 
-			// TODO: 今の別グループでやる方式だと、重なり順がおかしくなる
 			// 複数選択の場合は、選択されている図形をグループ化
 			let multiSelectGroup: GroupData | undefined = undefined;
 			if (1 < selectedItems.length) {
@@ -315,7 +311,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 					}),
 				} as GroupData;
 
-				// Hide the original diagrams during multi-selection by setting `isMultiSelectSource` to true.
+				// Set `isMultiSelectSource` to true to hide the transform outline of the original diagrams during multi-selection.
 				items = applyMultiSelectSourceRecursive(items);
 			} else {
 				// 複数選択でない場合は、全図形に対して複数選択の選択元ではないと設定

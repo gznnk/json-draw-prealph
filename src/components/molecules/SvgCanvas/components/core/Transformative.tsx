@@ -722,6 +722,7 @@ const Transformative: React.FC<Props> = ({
 		return null;
 	}
 
+	// Hide the transform outline when the component is the source of a multi-selection.
 	if (isMultiSelectSource) {
 		return null;
 	}

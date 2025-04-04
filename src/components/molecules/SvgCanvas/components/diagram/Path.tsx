@@ -402,11 +402,11 @@ const Path: React.FC<PathProps> = ({
 			{/* 描画用のパス */}
 			<g transform="translate(0.5,0.5)">
 				<path
+					className="diagram"
 					d={d}
 					fill="none"
 					stroke={stroke}
 					strokeWidth={strokeWidth}
-					style={{ visibility: isMultiSelectSource ? "hidden" : "visible" }}
 				/>
 			</g>
 			{/* ドラッグ用のパス */}

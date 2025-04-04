@@ -65,6 +65,15 @@ const Svg = styled.svg`
 `;
 
 /**
+ * Style for the container of the multi-select group.
+ */
+const MultiSelectGroupContainer = styled.g`
+	.diagram {
+		opacity: 0;
+	}
+`;
+
+/**
  * SvgCanvasのプロパティの型定義
  */
 type SvgCanvasProps = {
@@ -381,18 +390,23 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 						onContextMenu={handleContextMenu}
 					>
 						<title>{title}</title>
+						{/* Render the items in the SvgCanvas. */}
 						{renderedItems}
-						{/* 複数選択時の一時グループ */}
+						{/* Dummy group for multi-select. */}
 						{multiSelectGroup && (
-							<Group
-								{...multiSelectGroup}
-								id="MultiSelectGroup"
-								syncWithSameId
-								onSelect={handleSelect}
-								onTransform={onTransform}
-								onDiagramChange={onDiagramChange}
-								onConnectPointsMove={onConnectPointsMove}
-							/>
+							// The MultiSelectGroupContainer makes the diagrams transparent and displays only the outline for transformations.
+							// This allows for the dragging and transformation of the multi-selected diagrams while maintaining their stacking order of rendering.
+							<MultiSelectGroupContainer>
+								<Group
+									{...multiSelectGroup}
+									id="MultiSelectGroup"
+									syncWithSameId
+									onSelect={handleSelect}
+									onTransform={onTransform}
+									onDiagramChange={onDiagramChange}
+									onConnectPointsMove={onConnectPointsMove}
+								/>
+							</MultiSelectGroupContainer>
 						)}
 					</Svg>
 				</SvgCanvasContext.Provider>
