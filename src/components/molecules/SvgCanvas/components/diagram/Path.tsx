@@ -329,7 +329,6 @@ const Path: React.FC<PathProps> = ({
 	const linePoints = items.map((item, idx) => ({
 		...item,
 		hidden: !isVerticesMode || isDragging || (fixBothEnds && isBothEnds(idx)),
-		pointerEventsDisabled: fixBothEnds && isBothEnds(idx),
 	}));
 
 	// ドラッグ線分の表示フラグ
@@ -480,17 +479,8 @@ type PathPointProps = CreateDiagramProps<PathPointData, object>;
  * 折れ線の頂点コンポーネント
  */
 export const PathPoint: React.FC<PathPointProps> = memo(
-	({ id, x, y, hidden, pointerEventsDisabled, onDrag }) => {
-		return (
-			<DragPoint
-				id={id}
-				x={x}
-				y={y}
-				hidden={hidden}
-				pointerEventsDisabled={pointerEventsDisabled}
-				onDrag={onDrag}
-			/>
-		);
+	({ id, x, y, hidden, onDrag }) => {
+		return <DragPoint id={id} x={x} y={y} hidden={hidden} onDrag={onDrag} />;
 	},
 );
 PathPoint.displayName = "PathPoint";

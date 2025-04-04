@@ -180,7 +180,6 @@ export type RectangleData = CreateDiagramType<{
  */
 export type PathPointData = DiagramBaseData & {
 	hidden: boolean;
-	pointerEventsDisabled: boolean;
 };
 
 /**

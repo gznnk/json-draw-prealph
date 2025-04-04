@@ -314,7 +314,6 @@ export const lineElementToDiagram = (element: SVGLineElement): PathData => {
 				x: x1,
 				y: y1,
 				hidden: false,
-				pointerEventsDisabled: false,
 			},
 			{
 				id: newId(),
@@ -322,7 +321,6 @@ export const lineElementToDiagram = (element: SVGLineElement): PathData => {
 				x: x2,
 				y: y2,
 				hidden: false,
-				pointerEventsDisabled: false,
 			},
 		] as PathPointData[],
 	} as PathData;
