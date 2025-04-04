@@ -15,16 +15,18 @@ import styled from "@emotion/styled";
 import type { SvgCanvasState } from "./hooks/canvasHooks";
 import type { Diagram, GroupData } from "./types/DiagramTypes";
 import { DiagramTypeComponentMap } from "./types/DiagramTypes";
-import type {
-	ConnectPointsMoveEvent,
-	DiagramChangeEvent,
-	DiagramConnectEvent,
-	DiagramDragDropEvent,
-	DiagramDragEvent,
-	DiagramSelectEvent,
-	DiagramTextChangeEvent,
-	DiagramTextEditEvent,
-	DiagramTransformEvent,
+import {
+	SVG_CANVAS_SCROLL_EVENT_NAME,
+	type ConnectPointsMoveEvent,
+	type DiagramChangeEvent,
+	type DiagramConnectEvent,
+	type DiagramDragDropEvent,
+	type DiagramDragEvent,
+	type DiagramSelectEvent,
+	type DiagramTextChangeEvent,
+	type DiagramTextEditEvent,
+	type DiagramTransformEvent,
+	type SvgCanvasScrollEvent,
 } from "./types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
@@ -265,6 +267,25 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 		[onTextChange],
 	);
 
+	/**
+	 * Handle scroll event to dispatch a custom event with scroll position.
+	 */
+	const handleScroll = useCallback(
+		(e: React.UIEvent<HTMLDivElement, UIEvent>) => {
+			// Dispatch a custom event with scroll position.
+			document.dispatchEvent(
+				new CustomEvent(SVG_CANVAS_SCROLL_EVENT_NAME, {
+					bubbles: true,
+					detail: {
+						scrollTop: e.currentTarget.scrollTop,
+						scrollLeft: e.currentTarget.scrollLeft,
+					} as SvgCanvasScrollEvent,
+				}),
+			);
+		},
+		[],
+	);
+
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		onDelete,
@@ -377,7 +398,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 
 	return (
 		<>
-			<ContainerDiv ref={containerRef}>
+			<ContainerDiv ref={containerRef} onScroll={handleScroll}>
 				<SvgCanvasContext.Provider value={stateProvider.current}>
 					<Svg
 						width="120vw"

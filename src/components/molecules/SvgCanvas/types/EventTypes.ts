@@ -169,3 +169,16 @@ export type DiagramTextChangeEvent = {
 	id: string;
 	text: string;
 };
+
+/**
+ * Event name for SvgCanvas scroll.
+ */
+export const SVG_CANVAS_SCROLL_EVENT_NAME = "SvgCanvasScrollEvent" as const;
+
+/**
+ * Event type for SvgCanvas scroll.
+ */
+export type SvgCanvasScrollEvent = {
+	scrollTop: number;
+	scrollLeft: number;
+};

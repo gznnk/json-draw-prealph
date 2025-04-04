@@ -5,13 +5,15 @@ import { useEffect, useRef, useState } from "react";
 // SvgCanvas関連型定義をインポート
 import type { Point } from "../types/CoordinateTypes";
 import type { DiagramType } from "../types/DiagramTypes";
-import type {
-	DiagramClickEvent,
-	DiagramDragDropEvent,
-	DiagramDragEvent,
-	DiagramHoverEvent,
-	DiagramPointerEvent,
-	EventType,
+import {
+	SVG_CANVAS_SCROLL_EVENT_NAME,
+	type SvgCanvasScrollEvent,
+	type DiagramClickEvent,
+	type DiagramDragDropEvent,
+	type DiagramDragEvent,
+	type DiagramHoverEvent,
+	type DiagramPointerEvent,
+	type EventType,
 } from "../types/EventTypes";
 
 // SvgCanvas関連関数をインポート
@@ -47,8 +49,6 @@ export type DragProps = {
 	type?: DiagramType;
 	x: number;
 	y: number;
-	allowXDecimal?: boolean;
-	allowYDecimal?: boolean;
 	syncWithSameId?: boolean;
 	ref: React.RefObject<SVGElement>;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
@@ -70,8 +70,6 @@ export type DragProps = {
  * @param {DiagramType} [props.type] 図形の種類
  * @param {number} props.x X座標
  * @param {number} props.y Y座標
- * @param {boolean} [props.allowXDecimal] X座標の小数点許可フラグ
- * @param {boolean} [props.allowYDecimal] Y座標の小数点許可フラグ
  * @param {boolean} [props.syncWithSameId] 同じIDの図形とドラッグを同期させるかどうかのフラグ
  * @param {React.RefObject<SVGElement>} props.ref ドラッグ可能にする要素の参照
  * @param {(e: DiagramPointerEvent) => void} [props.onPointerDown] ポインター押下時のイベントハンドラ
@@ -92,8 +90,6 @@ export const useDrag = (props: DragProps) => {
 		x,
 		y,
 		type,
-		allowXDecimal = true,
-		allowYDecimal = true,
 		syncWithSameId = false,
 		ref,
 		onPointerDown,
@@ -121,44 +117,36 @@ export const useDrag = (props: DragProps) => {
 	// ドラッグ開始時のブラウザウィンドウ上のポインタの座標
 	const startClientX = useRef(0);
 	const startClientY = useRef(0);
-
-	/**
-	 * 座標を調整する
-	 *
-	 * 基本的には座標は整数値とし、小数点での指定が必要な場合のみ小数点以下を許容する。
-	 *
-	 * @param {number} px X座標
-	 * @param {number} py Y座標
-	 * @returns {Point} 調整後の座標
-	 */
-	const adjustCoordinates = (px: number, py: number): Point => {
-		let newX = px;
-		let newY = py;
-
-		if (!allowXDecimal) {
-			newX = Math.round(newX);
-		}
-
-		if (!allowYDecimal) {
-			newY = Math.round(newY);
-		}
-
-		return {
-			x: newX,
-			y: newY,
-		};
-	};
+	// ドラッグ中のブラウザウィンドウ上のポインタの座標
+	const currentClientX = useRef(0);
+	const currentClientY = useRef(0);
+	// スクロール開始時のスクロール位置
+	const startScrollTop = useRef<number | undefined>(undefined);
+	const startScrollLeft = useRef<number | undefined>(undefined);
+	// スクロール中のスクロール位置
+	const currentScrollTop = useRef<number>(0);
+	const currentScrollLeft = useRef<number>(0);
 
 	/**
 	 * ドラッグ中のポインターの位置からドラッグ領域の座標を取得する
 	 *
-	 * @param {React.PointerEvent<SVGElement>} e ポインターイベント
+	 * @param {number} clientX ブラウザウィンドウ上のポインタのX座標
+	 * @param {number} clientY ブラウザウィンドウ上のポインタのY座標
 	 * @returns {Point} ドラッグ領域の座標
 	 */
-	const getPointOnDrag = (e: React.PointerEvent<SVGElement>): Point => {
+	const getPointOnDrag = (clientX: number, clientY: number): Point => {
 		// ドラッグ中のポインターの移動量から、ドラッグ中のこの領域の座標を計算
-		let newX = startX.current + (e.clientX - startClientX.current);
-		let newY = startY.current + (e.clientY - startClientY.current);
+		let newX = startX.current + (clientX - startClientX.current);
+		let newY = startY.current + (clientY - startClientY.current);
+
+		if (
+			startScrollLeft.current !== undefined &&
+			startScrollTop.current !== undefined
+		) {
+			// スクロール位置を考慮して座標を調整
+			newX += currentScrollLeft.current - startScrollLeft.current;
+			newY += currentScrollTop.current - startScrollTop.current;
+		}
 
 		if (dragPositioningFunction) {
 			// ドラッグ位置変換関数が指定されている場合は、その関数を適用
@@ -167,8 +155,10 @@ export const useDrag = (props: DragProps) => {
 			newY = p.y;
 		}
 
-		// 座標を調整して返却
-		return adjustCoordinates(newX, newY);
+		return {
+			x: newX,
+			y: newY,
+		};
 	};
 
 	/**
@@ -195,6 +185,8 @@ export const useDrag = (props: DragProps) => {
 			// ドラッグ開始時のブラウザウィンドウ上のポインタの座標を記憶
 			startClientX.current = e.clientX;
 			startClientY.current = e.clientY;
+			currentClientX.current = e.clientX;
+			currentClientY.current = e.clientY;
 
 			// ポインター押下イベント発火
 			onPointerDown?.({
@@ -215,8 +207,12 @@ export const useDrag = (props: DragProps) => {
 			return;
 		}
 
+		// 現在のブラウザウィンドウ上のポインタの座標を記憶
+		currentClientX.current = e.clientX;
+		currentClientY.current = e.clientY;
+
 		// ドラッグ座標を取得
-		const dragPoint = getPointOnDrag(e);
+		const dragPoint = getPointOnDrag(e.clientX, e.clientY);
 
 		// イベントIDを生成
 		const eventId = newEventId();
@@ -301,7 +297,7 @@ export const useDrag = (props: DragProps) => {
 
 		if (isDragging) {
 			// ドラッグ座標を取得
-			const dragPoint = getPointOnDrag(e);
+			const dragPoint = getPointOnDrag(e.clientX, e.clientY);
 
 			// ドラッグ中だった場合はドラッグ終了イベントを発火
 			onDrag?.({
@@ -380,8 +376,6 @@ export const useDrag = (props: DragProps) => {
 			if (dragPositioningFunction) {
 				newPoint = dragPositioningFunction(newPoint.x, newPoint.y);
 			}
-
-			newPoint = adjustCoordinates(newPoint.x, newPoint.y);
 
 			const dragEvent = {
 				eventId,
@@ -524,12 +518,13 @@ export const useDrag = (props: DragProps) => {
 		y,
 		type,
 		ref,
+		syncWithSameId,
 		onDrag,
 		onDragOver,
 		onDragLeave,
 		onDrop,
 		// 内部変数・内部関数
-		syncWithSameId,
+		getPointOnDrag,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -629,6 +624,60 @@ export const useDrag = (props: DragProps) => {
 			}
 		};
 	}, []);
+
+	/**
+	 * Handle SvgCanvas scroll event.
+	 */
+	useEffect(() => {
+		let handleSvgCanvasScroll: (e: Event) => void;
+		if (isDragging) {
+			handleSvgCanvasScroll = (e: Event) => {
+				const { id, getPointOnDrag, onDrag } = refBus.current;
+
+				// ドラッグ中にSVGCanvasがスクロールした場合、ドラッグ座標を更新する
+				const event = e as CustomEvent<SvgCanvasScrollEvent>;
+				if (startScrollTop.current === undefined) {
+					startScrollLeft.current = event.detail.scrollLeft;
+					startScrollTop.current = event.detail.scrollTop;
+				}
+				currentScrollLeft.current = event.detail.scrollLeft;
+				currentScrollTop.current = event.detail.scrollTop;
+
+				const dragPoint = getPointOnDrag(
+					currentClientX.current,
+					currentClientY.current,
+				);
+
+				onDrag?.({
+					eventId: newEventId(),
+					eventType: "InProgress",
+					id,
+					startX: startX.current,
+					startY: startY.current,
+					endX: dragPoint.x,
+					endY: dragPoint.y,
+				});
+			};
+			document.addEventListener(
+				SVG_CANVAS_SCROLL_EVENT_NAME,
+				handleSvgCanvasScroll,
+				true,
+			);
+		} else {
+			// ドラッグ中でない場合はスクロール位置をリセットする
+			startScrollLeft.current = undefined;
+			startScrollTop.current = undefined;
+		}
+		return () => {
+			if (handleSvgCanvasScroll) {
+				document.removeEventListener(
+					SVG_CANVAS_SCROLL_EVENT_NAME,
+					handleSvgCanvasScroll,
+					true,
+				);
+			}
+		};
+	}, [isDragging]);
 
 	return {
 		onPointerDown: handlePointerDown,
