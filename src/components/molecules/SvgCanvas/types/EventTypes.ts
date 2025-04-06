@@ -181,7 +181,4 @@ export const SVG_CANVAS_SCROLL_EVENT_NAME = "SvgCanvasScrollEvent" as const;
 export type SvgCanvasScrollEvent = {
 	scrollTop: number;
 	scrollLeft: number;
-	isProgrammaticScroll: boolean;
-	scrollTopIncrement: number;
-	scrollLeftIncrement: number;
 };

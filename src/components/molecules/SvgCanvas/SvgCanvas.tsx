@@ -130,9 +130,6 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	const [minY, setMinY] = useState(0);
 	const [width, setWidth] = useState(window.innerWidth);
 	const [height, setHeight] = useState(window.innerHeight);
-	const isProgrammaticScroll = useRef(false); // プログラムによるスクロールかどうかのフラグ
-	const scrollTopIncrement = useRef(0); // スクロールの増分
-	const scrollLeftIncrement = useRef(0); // スクロールの増分
 
 	// SVG要素のコンテナの参照
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -222,44 +219,50 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 
 	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
-			// ドラッグイベントをHooksに通知
-
-			// console.log(e.endX, e.endY);
-
-			if (e.endX < minX) {
-				setMinX(minX - EXPAND_SIZE);
-				setWidth(width - minX + EXPAND_SIZE);
+			if (e.endX <= minX) {
 				if (containerRef.current && svgRef.current) {
-					svgRef.current.setAttribute("width", `${width - minX + EXPAND_SIZE}`);
+					// SVGの幅を増やす
+					const newMinX = minX - EXPAND_SIZE;
+					const newWidth = width - newMinX + EXPAND_SIZE;
+					setMinX(newMinX);
+					setWidth(newWidth);
+
+					// スクロール位置の設定がDOMの直接更新である一方、state変更によるSVG要素の更新は次のReactの描画処理時であることにより、
+					// 描画タイミングのずれが発生してしまうので、一度SVGのviewBoxを直接更新し、ずれが発生しないようにする
+					svgRef.current.setAttribute("width", `${newWidth}`);
 					svgRef.current.setAttribute(
 						"viewBox",
-						`${minX - EXPAND_SIZE} ${minY} ${width - minX + EXPAND_SIZE} ${height}`,
+						`${newMinX} ${minY} ${newWidth} ${height}`,
 					);
-					isProgrammaticScroll.current = true;
-					scrollLeftIncrement.current = EXPAND_SIZE;
+
+					// スクロール位置を調整
 					containerRef.current.scrollLeft = EXPAND_SIZE;
 				}
-			} else if (e.endY < minY) {
-				setMinY(minY - EXPAND_SIZE);
-				setHeight(height - minY + EXPAND_SIZE);
+			} else if (e.endY <= minY) {
 				if (containerRef.current && svgRef.current) {
-					svgRef.current.setAttribute(
-						"height",
-						`${height - minY + EXPAND_SIZE}`,
-					);
+					// SVGの高さを増やす
+					const newMinY = minY - EXPAND_SIZE;
+					const newHeight = height - newMinY;
+					setMinY(newMinY);
+					setHeight(newHeight);
+
+					// スクロール位置の設定がDOMの直接更新である一方、state変更によるSVG要素の更新は次のReactの描画処理時であることにより、
+					// 描画タイミングのずれが発生してしまうので、一度SVGのviewBoxを直接更新し、ずれが発生しないようにする
+					svgRef.current.setAttribute("height", `${newHeight}`);
 					svgRef.current.setAttribute(
 						"viewBox",
-						`${minX} ${minY - EXPAND_SIZE} ${width} ${height - minY + EXPAND_SIZE}`,
+						`${minX} ${newMinY} ${width} ${newHeight}`,
 					);
-					isProgrammaticScroll.current = true;
-					scrollTopIncrement.current = EXPAND_SIZE;
+
+					// スクロール位置を調整
 					containerRef.current.scrollTop = EXPAND_SIZE;
 				}
-			} else if (e.endX > minX + width) {
+			} else if (e.endX >= minX + width) {
 				setWidth(minX + width + EXPAND_SIZE);
-			} else if (e.endY > minY + height) {
+			} else if (e.endY >= minY + height) {
 				setHeight(minY + height + EXPAND_SIZE);
 			} else {
+				// ドラッグイベントをHooksに通知
 				onDrag?.(e);
 			}
 		},
@@ -331,10 +334,6 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	 */
 	const handleScroll = useCallback(
 		(e: React.UIEvent<HTMLDivElement, UIEvent>) => {
-			// if (isProgrammaticScroll.current) {
-			// 	isProgrammaticScroll.current = false;
-			// 	return;
-			// }
 			// Dispatch a custom event with scroll position.
 			document.dispatchEvent(
 				new CustomEvent(SVG_CANVAS_SCROLL_EVENT_NAME, {
@@ -342,15 +341,9 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 					detail: {
 						scrollTop: e.currentTarget.scrollTop,
 						scrollLeft: e.currentTarget.scrollLeft,
-						isProgrammaticScroll: isProgrammaticScroll.current,
-						scrollTopIncrement: scrollTopIncrement.current,
-						scrollLeftIncrement: scrollLeftIncrement.current,
 					} as SvgCanvasScrollEvent,
 				}),
 			);
-			scrollTopIncrement.current = 0;
-			scrollLeftIncrement.current = 0;
-			isProgrammaticScroll.current = false;
 		},
 		[],
 	);

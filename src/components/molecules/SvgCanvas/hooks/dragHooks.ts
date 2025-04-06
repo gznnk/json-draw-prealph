@@ -7,7 +7,6 @@ import type { Point } from "../types/CoordinateTypes";
 import type { DiagramType } from "../types/DiagramTypes";
 import {
 	SVG_CANVAS_SCROLL_EVENT_NAME,
-	type SvgCanvasScrollEvent,
 	type DiagramClickEvent,
 	type DiagramDragDropEvent,
 	type DiagramDragEvent,
@@ -114,18 +113,9 @@ export const useDrag = (props: DragProps) => {
 	// ドラッグ開始時のドラッグ領域の座標
 	const startX = useRef(0);
 	const startY = useRef(0);
-	// ドラッグ開始時のブラウザウィンドウ上のポインタの座標
-	const startClientX = useRef(0);
-	const startClientY = useRef(0);
 	// ドラッグ中のブラウザウィンドウ上のポインタの座標
 	const currentClientX = useRef(0);
 	const currentClientY = useRef(0);
-	// スクロール開始時のスクロール位置
-	const startScrollTop = useRef<number | undefined>(undefined);
-	const startScrollLeft = useRef<number | undefined>(undefined);
-	// スクロール中のスクロール位置
-	const currentScrollTop = useRef<number>(0);
-	const currentScrollLeft = useRef<number>(0);
 
 	/**
 	 * ドラッグ中のポインターの位置からドラッグ領域の座標を取得する
@@ -135,20 +125,19 @@ export const useDrag = (props: DragProps) => {
 	 * @returns {Point} ドラッグ領域の座標
 	 */
 	const getPointOnDrag = (clientX: number, clientY: number): Point => {
-		// ドラッグ中のポインターの移動量から、ドラッグ中のこの領域の座標を計算
-		let newX = startX.current + (clientX - startClientX.current);
-		let newY = startY.current + (clientY - startClientY.current);
+		const ownerSVGElement = ref.current?.ownerSVGElement;
+		if (ownerSVGElement === null) throw new Error("ownerSVGElement is null."); // 到達し得ない。以降の型エラー抑止のためのチェック処理
 
-		if (
-			startScrollLeft.current !== undefined &&
-			startScrollTop.current !== undefined
-		) {
-			// スクロール位置を考慮して座標を調整
-			console.log(currentScrollLeft.current - startScrollLeft.current);
-			console.log(currentScrollTop.current - startScrollTop.current);
-			newX += currentScrollLeft.current - startScrollLeft.current;
-			newY += currentScrollTop.current - startScrollTop.current;
-		}
+		const point = ownerSVGElement.createSVGPoint();
+		point.x = clientX;
+		point.y = clientY;
+
+		const svgPoint = point.matrixTransform(
+			ownerSVGElement.getScreenCTM()?.inverse(),
+		);
+
+		let newX = svgPoint.x;
+		let newY = svgPoint.y;
 
 		if (dragPositioningFunction) {
 			// ドラッグ位置変換関数が指定されている場合は、その関数を適用
@@ -184,9 +173,7 @@ export const useDrag = (props: DragProps) => {
 			startX.current = x;
 			startY.current = y;
 
-			// ドラッグ開始時のブラウザウィンドウ上のポインタの座標を記憶
-			startClientX.current = e.clientX;
-			startClientY.current = e.clientY;
+			// 現在のブラウザウィンドウ上のポインタの座標を記憶
 			currentClientX.current = e.clientX;
 			currentClientY.current = e.clientY;
 
@@ -202,8 +189,6 @@ export const useDrag = (props: DragProps) => {
 	 * ドラッグ領域内でのポインターの移動イベントハンドラ
 	 */
 	const handlePointerMove = (e: React.PointerEvent<SVGElement>): void => {
-		ref.current?.style.setProperty("backgroud-color", "red");
-
 		if (!isPointerDown.current) {
 			// このドラッグ領域内でポインターが押されていない場合は何もしない
 			return;
@@ -246,8 +231,8 @@ export const useDrag = (props: DragProps) => {
 
 		if (
 			!isDragging &&
-			(Math.abs(e.clientX - startClientX.current) > DRAG_DEAD_ZONE ||
-				Math.abs(e.clientY - startClientY.current) > DRAG_DEAD_ZONE)
+			(Math.abs(dragPoint.x - startX.current) > DRAG_DEAD_ZONE ||
+				Math.abs(dragPoint.y - startY.current) > DRAG_DEAD_ZONE)
 		) {
 			// ドラッグ中でない場合、かつポインターの移動量が一定以上の場合はドラッグ開始とする
 			onDrag?.({
@@ -631,61 +616,10 @@ export const useDrag = (props: DragProps) => {
 	 * Handle SvgCanvas scroll event.
 	 */
 	useEffect(() => {
-		let handleSvgCanvasScroll: (e: Event) => void;
+		let handleSvgCanvasScroll: () => void;
 		if (isDragging) {
-			handleSvgCanvasScroll = (e: Event) => {
+			handleSvgCanvasScroll = () => {
 				const { id, getPointOnDrag, onDrag } = refBus.current;
-
-				// ドラッグ中にSVGCanvasがスクロールした場合、ドラッグ座標を更新する
-				const event = e as CustomEvent<SvgCanvasScrollEvent>;
-
-				console.log(
-					"handleSvgCanvasScroll",
-					event.detail.scrollLeft,
-					event.detail.scrollTop,
-					event.detail.isProgrammaticScroll,
-				);
-
-				if (startScrollTop.current === undefined) {
-					startScrollLeft.current = event.detail.scrollLeft;
-					startScrollTop.current = event.detail.scrollTop;
-					// console.log(
-					// 	"startScroll initialized",
-					// 	startScrollLeft.current,
-					// 	startScrollTop.current,
-					// );
-				}
-				if (event.detail.isProgrammaticScroll) {
-					// startScrollLeft.current = currentScrollLeft.current;
-					// startScrollTop.current = currentScrollTop.current;
-					// console.log(
-					// 	"startScroll updated",
-					// 	event.detail.scrollLeft,
-					// 	event.detail.scrollTop,
-					// );
-					//startScrollLeft.current = event.detail.scrollLeft;
-					//startScrollTop.current = event.detail.scrollTop;
-					// console.log(
-					// 	"startScroll updated",
-					// 	startScrollLeft.current,
-					// 	startScrollTop.current,
-					// );
-					// startScrollLeft.current =
-					// 	startScrollLeft.current + event.detail.scrollLeftIncrement;
-					// startScrollTop.current =
-					// 	startScrollTop.current + event.detail.scrollTopIncrement;
-					if (
-						startScrollTop.current === undefined ||
-						startScrollLeft.current === undefined
-					) {
-						startScrollLeft.current = 0;
-						startScrollTop.current = 0;
-					}
-					startScrollLeft.current += event.detail.scrollLeftIncrement;
-					startScrollTop.current += event.detail.scrollTopIncrement;
-				}
-				currentScrollLeft.current = event.detail.scrollLeft;
-				currentScrollTop.current = event.detail.scrollTop;
 
 				const dragPoint = getPointOnDrag(
 					currentClientX.current,
@@ -707,10 +641,6 @@ export const useDrag = (props: DragProps) => {
 				handleSvgCanvasScroll,
 				true,
 			);
-		} else {
-			// ドラッグ中でない場合はスクロール位置をリセットする
-			startScrollLeft.current = undefined;
-			startScrollTop.current = undefined;
 		}
 		return () => {
 			if (handleSvgCanvasScroll) {
