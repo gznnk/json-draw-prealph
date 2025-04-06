@@ -147,19 +147,6 @@ const Textable: React.FC<TextableProps> = ({
 export default memo(Textable);
 
 /**
- * テキストエディタのコンテナ要素
- */
-const TextEditorContainer = styled.div`
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	pointer-events: none;
-	user-select: none;
-`;
-
-/**
  * テキストエディタ要素のプロパティ
  */
 type TextEditorTextAreaProps = {
@@ -281,24 +268,22 @@ export const TextEditor: React.FC<TextEditorProps> = memo(
 		};
 
 		return (
-			<TextEditorContainer>
-				<TextEditorTextArea
-					value={inputText}
-					left={-width / 2}
-					top={-height / 2}
-					transform={transform}
-					width={width}
-					height={height}
-					textAlign={textAlign}
-					verticalAlign={verticalAlign}
-					color={fontColor}
-					fontSize={fontSize}
-					fontFamily={fontFamily}
-					ref={ref}
-					onChange={handleChange}
-					onBlur={handleBlur}
-				/>
-			</TextEditorContainer>
+			<TextEditorTextArea
+				value={inputText}
+				left={-width / 2}
+				top={-height / 2}
+				transform={transform}
+				width={width}
+				height={height}
+				textAlign={textAlign}
+				verticalAlign={verticalAlign}
+				color={fontColor}
+				fontSize={fontSize}
+				fontFamily={fontFamily}
+				ref={ref}
+				onChange={handleChange}
+				onBlur={handleBlur}
+			/>
 		);
 	},
 );

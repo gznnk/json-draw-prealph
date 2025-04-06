@@ -70,6 +70,28 @@ const Svg = styled.svg`
 `;
 
 /**
+ * Properties for the container of HTML elements.
+ */
+type HTMLElementsContainerProps = {
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+};
+
+/**
+ * Style for the container of HTML elements.
+ */
+const HTMLElementsContainer = styled.div<HTMLElementsContainerProps>`
+	position: absolute;
+	left: ${(props) => props.left}px;
+	top: ${(props) => props.top}px;
+	width: ${(props) => props.width}px;
+	height: ${(props) => props.height}px;
+	pointer-events: none;
+`;
+
+/**
  * Style for the container of the multi-select group.
  */
 const MultiSelectGroupContainer = styled.g`
@@ -495,7 +517,15 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 						)}
 					</Svg>
 				</SvgCanvasContext.Provider>
-				<TextEditor {...textEditorState} onTextChange={handleTextChange} />
+				{/* The container of HTML elements that overlays the SVG canvas.*/}
+				<HTMLElementsContainer
+					left={-minX}
+					top={-minY}
+					width={width + minX}
+					height={height + minY}
+				>
+					<TextEditor {...textEditorState} onTextChange={handleTextChange} />
+				</HTMLElementsContainer>
 			</ContainerDiv>
 			<ContextMenu {...contextMenu} onMenuClick={handleContextMenuClick} />
 		</>
