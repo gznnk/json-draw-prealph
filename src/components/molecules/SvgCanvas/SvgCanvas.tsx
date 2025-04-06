@@ -258,9 +258,9 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 					containerRef.current.scrollTop = EXPAND_SIZE;
 				}
 			} else if (e.endX >= minX + width) {
-				setWidth(minX + width + EXPAND_SIZE);
+				setWidth(width - minX + EXPAND_SIZE);
 			} else if (e.endY >= minY + height) {
-				setHeight(minY + height + EXPAND_SIZE);
+				setHeight(height - minY + EXPAND_SIZE);
 			} else {
 				// ドラッグイベントをHooksに通知
 				onDrag?.(e);
