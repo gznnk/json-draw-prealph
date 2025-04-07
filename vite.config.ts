@@ -11,7 +11,7 @@ Unauthorized copying of this file, via any medium is strictly prohibited.`;
 
 // https://vite.dev/config/
 export default defineConfig({
-	base: "/react-vite-project/",
+	// base: "/react-vite-project/",
 	plugins: [react()],
 	build: {
 		rollupOptions: {
