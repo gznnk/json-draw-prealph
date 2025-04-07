@@ -135,6 +135,7 @@ type SvgCanvasProps = {
 	onDragEnd?: (e: DiagramDragEvent) => void;
 	onDrop?: (e: DiagramDragDropEvent) => void;
 	onSelect?: (e: DiagramSelectEvent) => void;
+	onSelectAll?: () => void;
 	onAllSelectionClear?: () => void;
 	onDelete?: () => void;
 	onConnect?: (e: DiagramConnectEvent) => void;
@@ -166,6 +167,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	onDrag,
 	onDrop,
 	onSelect,
+	onSelectAll,
 	onAllSelectionClear,
 	onDelete,
 	onConnect,
@@ -431,6 +433,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		onDelete,
+		onSelectAll,
 		onAllSelectionClear,
 		onUndo,
 		onRedo,
@@ -442,7 +445,8 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	useEffect(() => {
 		const onDocumentKeyDown = (e: KeyboardEvent) => {
 			// Bypass references to avoid function creation in every render.
-			const { onDelete, onAllSelectionClear, onUndo, onRedo } = refBus.current;
+			const { onDelete, onSelectAll, onAllSelectionClear, onUndo, onRedo } =
+				refBus.current;
 
 			if (e.key === "Control") {
 				isCtrlDown.current = true;
@@ -457,10 +461,17 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 			}
 			if (e.ctrlKey) {
 				if (e.key === "z") {
+					// Undo the last action when Ctrl+Z is pressed.
 					onUndo?.();
 				}
 				if (e.key === "y") {
+					// Redo the last action when Ctrl+Y is pressed.
 					onRedo?.();
+				}
+				if (e.key === "a") {
+					// Select all items when Ctrl+A is pressed.
+					e.preventDefault();
+					onSelectAll?.();
 				}
 			}
 		};
@@ -544,6 +555,9 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 				case "Redo":
 					onRedo?.();
 					break;
+				case "SelectAll":
+					onSelectAll?.();
+					break;
 				case "Group":
 					onGroup?.();
 					break;
@@ -557,7 +571,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 			}
 			setContextMenu({ x: 0, y: 0, isVisible: false });
 		},
-		[onUndo, onRedo, onGroup, onUngroup, onDelete],
+		[onUndo, onRedo, onSelectAll, onGroup, onUngroup, onDelete],
 	);
 
 	return (

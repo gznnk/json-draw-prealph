@@ -534,16 +534,6 @@ function App() {
 				<Button onClick={handleAddEllipse}>Add Ellipse</Button>
 				<Button onClick={handleAddSquare}>Add Square</Button>
 				<Button onClick={handleAddCircle}>Add Circle</Button>
-				<div>{`id:${canvasState.selectedItemId}`}</div>
-				<div>{`x:${canvasFunctions.getSelectedItem()?.x}`}</div>
-				<div>{`y:${canvasFunctions.getSelectedItem()?.y}`}</div>
-				{/*
-				<div>{`width:${canvasFunctions.getSelectedItem()?.width}`}</div>
-				<div>{`height:${canvasFunctions.getSelectedItem()?.height}`}</div>
-				<div>{`rotation:${canvasFunctions.getSelectedItem()?.rotation}`}</div>
-				<div>{`scaleX:${canvasFunctions.getSelectedItem()?.scaleX}`}</div>
-				<div>{`scaleY:${canvasFunctions.getSelectedItem()?.scaleY}`}</div>
-				*/}
 				{/* <Input
 					value={canvasFunctions.getSelectedItem()?.fill || ""}
 					onChange={(e) => {
@@ -555,16 +545,6 @@ function App() {
 					}}
 				/> */}
 				{/*
-				<Input
-					value={canvasFunctions.getSelectedItem()?.width?.toString() || ""}
-					onChange={(e) => {
-						if (!canvasState.selectedItemId) return;
-						canvasFunctions.updateItem({
-							id: canvasState.selectedItemId,
-							width: Number(e.target.value),
-						});
-					}}
-				/>
 				<div>
 					keepProportion:
 					<input
@@ -580,20 +560,6 @@ function App() {
 					/>
 				</div>
 				*/}
-				<Button
-					onClick={() => {
-						canvasFunctions.redo();
-					}}
-				>
-					Redo
-				</Button>
-				<Button
-					onClick={() => {
-						canvasFunctions.undo();
-					}}
-				>
-					Undo
-				</Button>
 				<Button
 					onClick={() => {
 						window.profiler.summary();

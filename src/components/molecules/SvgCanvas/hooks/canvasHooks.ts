@@ -1,7 +1,7 @@
-// Reactのインポート
+// Import React library.
 import { useCallback, useState } from "react";
 
-// 型定義をインポート
+// Import SvgCanvas related types.
 import type { PartiallyRequired } from "../../../../types/ParticallyRequired";
 
 // Import SvgCanvas related types.
@@ -14,6 +14,7 @@ import type {
 import type {
 	ConnectPointMoveData,
 	ConnectPointsMoveEvent,
+	DiagramChangeEvent,
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
 	DiagramDragEvent,
@@ -21,7 +22,6 @@ import type {
 	DiagramTextChangeEvent,
 	DiagramTextEditEvent,
 	DiagramTransformEvent,
-	DiagramChangeEvent,
 	SvgCanvasResizeEvent,
 } from "../types/EventTypes";
 
@@ -32,20 +32,20 @@ import { calcGroupBoxOfNoRotation } from "../components/diagram/Group";
 // Import SvgCanvas related functions.
 import { isItemableData, isSelectableData, newId } from "../functions/Diagram";
 import { calcPointsOuterShape } from "../functions/Math";
-import { newEventId, deepCopy } from "../functions/Util";
 import {
-	getDiagramById,
 	addHistory,
-	applyRecursive,
 	applyMultiSelectSourceRecursive,
-	ungroupSelectedGroupsRecursive,
+	applyRecursive,
+	clearMultiSelectSourceRecursive,
+	getDiagramById,
 	getSelectedItems,
 	removeGroupedRecursive,
-	clearMultiSelectSourceRecursive,
+	ungroupSelectedGroupsRecursive,
 } from "../functions/SvgCanvas";
+import { deepCopy, newEventId } from "../functions/Util";
 
 /**
- * SvgCanvasの状態の型定義
+ * Type for the state of the SvgCanvas.
  */
 export type SvgCanvasState = {
 	minX: number;
@@ -69,10 +69,10 @@ export type SvgCanvasHistory = Omit<SvgCanvasState, "history" | "historyIndex">;
 type UpdateItem = Omit<PartiallyRequired<Diagram, "id">, "type" | "isSelected">;
 
 /**
- * SVGキャンバスのフック
+ * The SvgCanvas state and functions.
  *
- * @param initialItems 初期図形配列
- * @returns キャンバスの状態と関数
+ * @param initialItems - The initial items to be displayed on the canvas.
+ * @returns The state and functions of the SvgCanvas.
  */
 export const useSvgCanvas = (initialItems: Diagram[]) => {
 	// The state of the canvas.
@@ -352,6 +352,56 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 	}, []);
 
 	/**
+	 * Handle select all action.
+	 */
+	const onSelectAll = useCallback(() => {
+		setCanvasState((prevState) => {
+			const items = applyRecursive(prevState.items, (item) => {
+				if (isSelectableData(item)) {
+					return {
+						...item,
+						isSelected: true,
+						isMultiSelectSource: true,
+					};
+				}
+				return item;
+			});
+
+			const box = calcGroupBoxOfNoRotation(items);
+
+			const multiSelectGroup = {
+				x: box.left + (box.right - box.left) / 2,
+				y: box.top + (box.bottom - box.top) / 2,
+				width: box.right - box.left,
+				height: box.bottom - box.top,
+				rotation: 0,
+				scaleX: 1,
+				scaleY: 1,
+				keepProportion: false,
+				isSelected: true, // 複数選択用のグループは常に選択状態にする
+				isMultiSelectSource: false, // 複数選択の選択元ではないと設定
+				items: applyRecursive(items, (item) => {
+					if (!isSelectableData(item)) {
+						return item;
+					}
+					return {
+						...item,
+						isSelected: false, // 複数選択用のグループ内の図形は選択状態を解除
+						isMultiSelectSource: false, // 複数選択の選択元ではないと設定
+					};
+				}),
+			} as GroupData;
+
+			return {
+				...prevState,
+				items,
+				multiSelectGroup,
+				selectedItemId: undefined,
+			};
+		});
+	}, []);
+
+	/**
 	 * 選択状態の全解除イベントハンドラ
 	 */
 	const onAllSelectionClear = useCallback(() => {
@@ -605,6 +655,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onDrag,
 		onDrop,
 		onSelect,
+		onSelectAll,
 		onAllSelectionClear,
 		onDelete,
 		onConnect,

@@ -13,6 +13,7 @@ export type ContextMenuType =
 	| "Redo"
 	| "Copy"
 	| "Paste"
+	| "SelectAll"
 	| "Group"
 	| "Ungroup"
 	| "Delete";
@@ -89,6 +90,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 			</ContextMenuItem>
 			<ContextMenuItem menuType="Redo" {...menuItemProps}>
 				やり直し
+			</ContextMenuItem>
+			<ContextMenuDivider />
+			<ContextMenuItem menuType="SelectAll" {...menuItemProps}>
+				すべて選択
 			</ContextMenuItem>
 			<ContextMenuDivider />
 			<ContextMenuItem menuType="Group" {...menuItemProps}>
