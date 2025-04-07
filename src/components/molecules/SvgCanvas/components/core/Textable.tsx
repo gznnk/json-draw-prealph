@@ -118,6 +118,7 @@ const Textable: React.FC<TextableProps> = ({
 	fontFamily,
 	isTextEditing,
 }) => {
+	if (!text) return null;
 	if (isTextEditing) return null;
 
 	return (

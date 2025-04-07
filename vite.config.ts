@@ -17,6 +17,7 @@ export default defineConfig({
 			plugins: [
 				license({
 					banner: {
+						commentStyle: "ignored",
 						content: COPYRIGHT,
 					},
 					thirdParty: {
