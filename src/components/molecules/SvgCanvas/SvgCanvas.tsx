@@ -17,6 +17,7 @@ import type { Diagram, GroupData } from "./types/DiagramTypes";
 import { DiagramTypeComponentMap } from "./types/DiagramTypes";
 import {
 	SVG_CANVAS_SCROLL_EVENT_NAME,
+	type SvgCanvasResizeEvent,
 	type ConnectPointsMoveEvent,
 	type DiagramChangeEvent,
 	type DiagramConnectEvent,
@@ -105,6 +106,10 @@ const MultiSelectGroupContainer = styled.g`
  */
 type SvgCanvasProps = {
 	title?: string;
+	minX: number;
+	minY: number;
+	width: number;
+	height: number;
 	items: Diagram[];
 	multiSelectGroup?: GroupData;
 	onTransform?: (e: DiagramTransformEvent) => void;
@@ -123,6 +128,7 @@ type SvgCanvasProps = {
 	onUngroup?: () => void;
 	onUndo?: () => void;
 	onRedo?: () => void;
+	onCanvasResize?: (e: SvgCanvasResizeEvent) => void;
 };
 
 /**
@@ -130,6 +136,10 @@ type SvgCanvasProps = {
  */
 const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	title,
+	minX,
+	minY,
+	width,
+	height,
 	items,
 	multiSelectGroup,
 	onTransform,
@@ -147,11 +157,13 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	onUngroup,
 	onUndo,
 	onRedo,
+	onCanvasResize,
 }) => {
-	const [minX, setMinX] = useState(0);
-	const [minY, setMinY] = useState(0);
-	const [width, setWidth] = useState(window.innerWidth);
-	const [height, setHeight] = useState(window.innerHeight);
+	// In the SvgCanvas render function,
+	// we handle DOM events related to the SvgCanvas elements,
+	// process tasks that require element references,
+	// directly manipulate the DOM when needed,
+	// and pass the events to the hooks.
 
 	// SVG要素のコンテナの参照
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -239,6 +251,9 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 		}
 	}, []);
 
+	/**
+	 * Handle the drag event to resize the canvas.
+	 */
 	const handleDrag = useCallback(
 		(e: DiagramDragEvent) => {
 			if (e.endX <= minX) {
@@ -246,8 +261,14 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 					// SVGの幅を増やす
 					const newMinX = minX - EXPAND_SIZE;
 					const newWidth = width - newMinX + EXPAND_SIZE;
-					setMinX(newMinX);
-					setWidth(newWidth);
+
+					// Notify the new minX and width to the canvasHooks.
+					onCanvasResize?.({
+						minX: newMinX,
+						minY,
+						width: newWidth,
+						height,
+					} as SvgCanvasResizeEvent);
 
 					// スクロール位置の設定がDOMの直接更新である一方、state変更によるSVG要素の更新は次のReactの描画処理時であることにより、
 					// 描画タイミングのずれが発生してしまうので、一度SVGのviewBoxを直接更新し、ずれが発生しないようにする
@@ -257,7 +278,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 						`${newMinX} ${minY} ${newWidth} ${height}`,
 					);
 
-					// スクロール位置を調整
+					// Scroll position adjustment.
 					containerRef.current.scrollLeft = EXPAND_SIZE;
 				}
 			} else if (e.endY <= minY) {
@@ -265,8 +286,14 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 					// SVGの高さを増やす
 					const newMinY = minY - EXPAND_SIZE;
 					const newHeight = height - newMinY;
-					setMinY(newMinY);
-					setHeight(newHeight);
+
+					// Notify the new minY and height to the hooks.
+					onCanvasResize?.({
+						minX,
+						minY: newMinY,
+						width,
+						height: newHeight,
+					} as SvgCanvasResizeEvent);
 
 					// スクロール位置の設定がDOMの直接更新である一方、state変更によるSVG要素の更新は次のReactの描画処理時であることにより、
 					// 描画タイミングのずれが発生してしまうので、一度SVGのviewBoxを直接更新し、ずれが発生しないようにする
@@ -276,19 +303,31 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 						`${minX} ${newMinY} ${width} ${newHeight}`,
 					);
 
-					// スクロール位置を調整
+					// Scroll position adjustment.
 					containerRef.current.scrollTop = EXPAND_SIZE;
 				}
 			} else if (e.endX >= minX + width) {
-				setWidth(width - minX + EXPAND_SIZE);
+				// Notify the new width to the hooks.
+				onCanvasResize?.({
+					minX,
+					minY,
+					width: width - minX + EXPAND_SIZE,
+					height,
+				} as SvgCanvasResizeEvent);
 			} else if (e.endY >= minY + height) {
-				setHeight(height - minY + EXPAND_SIZE);
+				// Notify the new height to the hooks.
+				onCanvasResize?.({
+					minX,
+					minY,
+					width,
+					height: height - minY + EXPAND_SIZE,
+				} as SvgCanvasResizeEvent);
 			} else {
-				// ドラッグイベントをHooksに通知
+				// When the pointer is moved within the canvas, notify the drag event to the hooks.
 				onDrag?.(e);
 			}
 		},
-		[onDrag, minX, minY, width, height],
+		[onCanvasResize, height, minY, width, minX, onDrag],
 	);
 
 	/**

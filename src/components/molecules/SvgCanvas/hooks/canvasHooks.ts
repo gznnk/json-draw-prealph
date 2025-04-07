@@ -22,6 +22,7 @@ import type {
 	DiagramTextEditEvent,
 	DiagramTransformEvent,
 	DiagramChangeEvent,
+	SvgCanvasResizeEvent,
 } from "../types/EventTypes";
 
 // Import SvgCanvas related components.
@@ -47,6 +48,10 @@ import {
  * SvgCanvasの状態の型定義
  */
 export type SvgCanvasState = {
+	minX: number;
+	minY: number;
+	width: number;
+	height: number;
 	items: Diagram[];
 	multiSelectGroup?: GroupData;
 	selectedItemId?: string; // TODO: いらないかも
@@ -65,11 +70,19 @@ type UpdateItem = Omit<PartiallyRequired<Diagram, "id">, "type" | "isSelected">;
  * @returns キャンバスの状態と関数
  */
 export const useSvgCanvas = (initialItems: Diagram[]) => {
-	// SVGキャンバスの状態
+	// The state of the canvas.
 	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
+		minX: 0,
+		minY: 0,
+		width: window.innerWidth,
+		height: window.innerHeight,
 		items: initialItems,
 		history: [
 			{
+				minX: 0,
+				minY: 0,
+				width: window.innerWidth,
+				height: window.innerHeight,
 				items: deepCopy(initialItems),
 				history: [],
 				historyIndex: -1,
@@ -574,6 +587,16 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		redo();
 	}, []);
 
+	/**
+	 * Handle canvas resize event.
+	 */
+	const onCanvasResize = useCallback((e: SvgCanvasResizeEvent) => {
+		setCanvasState((prevState) => ({
+			...prevState,
+			...e, // Apply new minX, minY, width and height.
+		}));
+	}, []);
+
 	const canvasProps = {
 		...canvasState,
 		onDrag,
@@ -591,7 +614,10 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 		onUngroup,
 		onUndo,
 		onRedo,
+		onCanvasResize,
 	};
+
+	// --- Functions for accessing the canvas state and modifying the canvas. --- //
 
 	const getSelectedItem = useCallback(() => {
 		let selectedItem: Diagram | undefined;
