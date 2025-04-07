@@ -1,5 +1,9 @@
+// Import React library.
 import { useCallback } from "react";
 
+/**
+ * Custom hook for handling file drop events.
+ */
 const useFileDrop = () => {
 	const onDragOver = useCallback<React.DragEventHandler>((event) => {
 		event.preventDefault();
