@@ -18,6 +18,18 @@ export type ContextMenuType =
 	| "Delete";
 
 /**
+ * Context menu state.
+ */
+export type ContextMenuState = "Enable" | "Disable" | "Hidden";
+
+/**
+ * Context menu state map.
+ */
+export type ContextMenuStateMap = {
+	[key in ContextMenuType]: ContextMenuState;
+};
+
+/**
  * Properties for the ContextMenuDiv.
  */
 type ContextMenuDivProps = {
@@ -48,6 +60,7 @@ const ContextMenuDiv = styled.div<ContextMenuDivProps>`
 type ContextMenuProps = {
 	x: number;
 	y: number;
+	menuStateMap: ContextMenuStateMap;
 	isVisible: boolean;
 	onMenuClick: (menuType: ContextMenuType) => void;
 };
@@ -58,28 +71,34 @@ type ContextMenuProps = {
 const ContextMenu: React.FC<ContextMenuProps> = ({
 	x,
 	y,
+	menuStateMap,
 	isVisible,
 	onMenuClick,
 }) => {
 	if (!isVisible) return null;
 
+	const menuItemProps = {
+		menuStateMap,
+		onMenuClick,
+	};
+
 	return (
 		<ContextMenuDiv x={x} y={y}>
-			<ContextMenuItem menuType="Undo" onMenuClick={onMenuClick}>
+			<ContextMenuItem menuType="Undo" {...menuItemProps}>
 				元に戻す
 			</ContextMenuItem>
-			<ContextMenuItem menuType="Redo" onMenuClick={onMenuClick}>
+			<ContextMenuItem menuType="Redo" {...menuItemProps}>
 				やり直し
 			</ContextMenuItem>
 			<ContextMenuDivider />
-			<ContextMenuItem menuType="Group" onMenuClick={onMenuClick}>
+			<ContextMenuItem menuType="Group" {...menuItemProps}>
 				グループ化
 			</ContextMenuItem>
-			<ContextMenuItem menuType="Ungroup" onMenuClick={onMenuClick}>
+			<ContextMenuItem menuType="Ungroup" {...menuItemProps}>
 				グループ解除
 			</ContextMenuItem>
 			<ContextMenuDivider />
-			<ContextMenuItem menuType="Delete" onMenuClick={onMenuClick}>
+			<ContextMenuItem menuType="Delete" {...menuItemProps}>
 				削除
 			</ContextMenuItem>
 		</ContextMenuDiv>
@@ -104,12 +123,14 @@ const ContextMenuItemDiv = styled.div`
 
 type ContextMenuItemProps = {
 	menuType: ContextMenuType;
+	menuStateMap: ContextMenuStateMap;
 	children: React.ReactNode;
 	onMenuClick: (menuType: ContextMenuType) => void;
 };
 
 const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
 	menuType,
+	menuStateMap,
 	onMenuClick,
 	children,
 }) => {
@@ -117,8 +138,14 @@ const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
 		onMenuClick(menuType);
 	}, [menuType, onMenuClick]);
 
+	const menuState = menuStateMap[menuType];
+	if (menuState === "Hidden") return null;
+
 	return (
-		<ContextMenuItemDiv onClick={handleMenuClick}>
+		<ContextMenuItemDiv
+			className={menuState === "Disable" ? "disabled" : ""}
+			onClick={handleMenuClick}
+		>
 			{children}
 		</ContextMenuItemDiv>
 	);

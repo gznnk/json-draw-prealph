@@ -35,10 +35,11 @@ import { TextEditor, type TextEditorProps } from "./components/core/Textable";
 import Group from "./components/diagram/Group";
 import ContextMenu, {
 	type ContextMenuType,
+	type ContextMenuStateMap,
 } from "./components/operation/ContextMenu";
 
 // SvgCanvas関連関数をインポート
-import { getDiagramById } from "./functions/SvgCanvas";
+import { getDiagramById, getSelectedItems } from "./functions/SvgCanvas";
 import { newEventId } from "./functions/Util";
 
 // SvgCanvasの状態を階層を跨いで提供するためにSvgCanvasStateProviderを保持するコンテキストを作成
@@ -126,6 +127,8 @@ type SvgCanvasProps = {
 	height: number;
 	items: Diagram[];
 	multiSelectGroup?: GroupData;
+	history: SvgCanvasState[];
+	historyIndex: number;
 	onTransform?: (e: DiagramTransformEvent) => void;
 	onDiagramChange?: (e: DiagramChangeEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
@@ -156,6 +159,8 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	height,
 	items,
 	multiSelectGroup,
+	history,
+	historyIndex,
 	onTransform,
 	onDiagramChange,
 	onDrag,
@@ -502,6 +507,18 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 		isVisible: false,
 	});
 
+	// Create a map of context menu states.
+	const selectedItems = getSelectedItems(items);
+	const isItemSelected = selectedItems.length > 0;
+	const isGroupSelected = selectedItems.some((item) => item.type === "Group");
+	const contextMenuStateMap = {
+		Undo: historyIndex > 0 ? "Enable" : "Disable",
+		Redo: historyIndex < history.length - 1 ? "Enable" : "Disable",
+		Group: multiSelectGroup ? "Enable" : "Disable",
+		Ungroup: isGroupSelected ? "Enable" : "Disable",
+		Delete: isItemSelected ? "Enable" : "Disable",
+	} as ContextMenuStateMap;
+
 	/**
 	 * コンテキストメニュー表示時イベントハンドラ
 	 */
@@ -590,7 +607,11 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 					<TextEditor {...textEditorState} onTextChange={handleTextChange} />
 				</HTMLElementsContainer>
 				<ViewportOverlay>
-					<ContextMenu {...contextMenu} onMenuClick={handleContextMenuClick} />
+					<ContextMenu
+						{...contextMenu}
+						menuStateMap={contextMenuStateMap}
+						onMenuClick={handleContextMenuClick}
+					/>
 				</ViewportOverlay>
 			</ContainerDiv>
 		</>
