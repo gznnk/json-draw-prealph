@@ -12,12 +12,11 @@ import React, {
 import styled from "@emotion/styled";
 
 // SvgCanvas関連型定義をインポート
-import type { SvgCanvasState } from "./hooks/canvasHooks";
+import type { SvgCanvasHistory, SvgCanvasState } from "./hooks/canvasHooks";
 import type { Diagram, GroupData } from "./types/DiagramTypes";
 import { DiagramTypeComponentMap } from "./types/DiagramTypes";
 import {
 	SVG_CANVAS_SCROLL_EVENT_NAME,
-	type SvgCanvasResizeEvent,
 	type ConnectPointsMoveEvent,
 	type DiagramChangeEvent,
 	type DiagramConnectEvent,
@@ -27,6 +26,7 @@ import {
 	type DiagramTextChangeEvent,
 	type DiagramTextEditEvent,
 	type DiagramTransformEvent,
+	type SvgCanvasResizeEvent,
 	type SvgCanvasScrollEvent,
 } from "./types/EventTypes";
 
@@ -34,8 +34,8 @@ import {
 import { TextEditor, type TextEditorProps } from "./components/core/Textable";
 import Group from "./components/diagram/Group";
 import ContextMenu, {
-	type ContextMenuType,
 	type ContextMenuStateMap,
+	type ContextMenuType,
 } from "./components/operation/ContextMenu";
 
 // SvgCanvas関連関数をインポート
@@ -127,7 +127,7 @@ type SvgCanvasProps = {
 	height: number;
 	items: Diagram[];
 	multiSelectGroup?: GroupData;
-	history: SvgCanvasState[];
+	history: SvgCanvasHistory[];
 	historyIndex: number;
 	onTransform?: (e: DiagramTransformEvent) => void;
 	onDiagramChange?: (e: DiagramChangeEvent) => void;

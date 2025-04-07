@@ -55,10 +55,15 @@ export type SvgCanvasState = {
 	items: Diagram[];
 	multiSelectGroup?: GroupData;
 	selectedItemId?: string; // TODO: いらないかも
-	history: SvgCanvasState[];
+	history: SvgCanvasHistory[];
 	historyIndex: number;
 	lastHistoryEventId: string;
 };
+
+/**
+ * Type for the history of the SvgCanvas state.
+ */
+export type SvgCanvasHistory = Omit<SvgCanvasState, "history" | "historyIndex">;
 
 // TODO: 精査
 type UpdateItem = Omit<PartiallyRequired<Diagram, "id">, "type" | "isSelected">;
@@ -84,9 +89,7 @@ export const useSvgCanvas = (initialItems: Diagram[]) => {
 				width: window.innerWidth,
 				height: window.innerHeight,
 				items: deepCopy(initialItems),
-				history: [],
-				historyIndex: -1,
-				lastHistoryEventId: "",
+				lastHistoryEventId: newEventId(),
 			},
 		],
 		historyIndex: 0,
