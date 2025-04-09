@@ -503,7 +503,7 @@ useEffect(() => {
     const el = containerRef.current;
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (e.target !== e.currentTarget) {
+      if (e.target !== e.currentTarget && e.target !== svgRef.current) {
         e.preventDefault(); // これが効く！
       }
     };
