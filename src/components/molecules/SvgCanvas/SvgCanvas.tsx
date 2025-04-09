@@ -249,14 +249,14 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	const handlePointerMove = useCallback(
 		(e: React.PointerEvent<SVGSVGElement>) => {
 			// SvgCanvasのスクロール処理
-			if (isScrolling.current) {
-				const dx = scrollStart.current.clientX - e.clientX;
-				const dy = scrollStart.current.clientY - e.clientY;
-				if (containerRef.current) {
-					containerRef.current.scrollLeft = scrollStart.current.scrollLeft + dx;
-					containerRef.current.scrollTop = scrollStart.current.scrollTop + dy;
-				}
-			}
+			 // if (isScrolling.current) {
+				// const dx = scrollStart.current.clientX - e.clientX;
+				// const dy = scrollStart.current.clientY - e.clientY;
+				// if (containerRef.current) {
+				//	containerRef.current.scrollLeft = scrollStart.current.scrollLeft + dx;
+				//	containerRef.current.scrollTop = scrollStart.current.scrollTop + dy;
+				// }
+			// }
 		},
 		[],
 	);
