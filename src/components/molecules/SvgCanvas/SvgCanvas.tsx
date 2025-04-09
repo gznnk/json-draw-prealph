@@ -499,6 +499,22 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 		};
 	}, []);
 
+useEffect(() => {
+    const el = containerRef.current;
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.target !== e.currentTarget) {
+        e.preventDefault(); // これが効く！
+      }
+    };
+
+    el?.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      el?.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, []);
+
 	// 図形の描画
 	const renderedItems = items.map((item) => {
 		const itemType = DiagramTypeComponentMap[item.type];
