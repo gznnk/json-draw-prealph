@@ -24,6 +24,7 @@ import Ellipse from "../components/diagram/Ellipse";
 import Group from "../components/diagram/Group";
 import Path, { PathPoint } from "../components/diagram/Path";
 import Rectangle from "../components/diagram/Rectangle";
+import TextGenerator from "../components/worker/TextGenerator";
 
 /**
  * 図形の形状
@@ -48,7 +49,8 @@ export type DiagramType =
 	| "Group"
 	| "Path"
 	| "PathPoint"
-	| "Rectangle";
+	| "Rectangle"
+	| "TextGenerator";
 
 /**
  * 図形の基本データ
@@ -234,6 +236,22 @@ export type GroupData = CreateDiagramType<{
 }>;
 
 /**
+ * Data for text generator component.
+ */
+export type TextGeneratorData = CreateDiagramType<{
+	selectable: true;
+	transformative: true;
+	connectable: true;
+	strokable: true;
+	fillable: true;
+	textable: true;
+}> & {
+	text: string;
+	fontSize: number;
+	color: string;
+};
+
+/**
  * ダミー図形コンポーネント
  */
 const DummyComponent: React.FC<DiagramBaseData> = () => null;
@@ -248,7 +266,8 @@ type DiagramCombined =
 	| GroupData
 	| PathData
 	| PathPointData
-	| RectangleData;
+	| RectangleData
+	| TextGeneratorData;
 
 /**
  * 図形の型
@@ -351,4 +370,5 @@ export const DiagramTypeComponentMap: {
 	Path: Path,
 	PathPoint: PathPoint,
 	Rectangle: Rectangle,
+	TextGenerator: TextGenerator,
 };

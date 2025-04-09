@@ -5,6 +5,9 @@ import { useState, useEffect } from "react";
 // Import other libraries.
 import styled from "@emotion/styled";
 
+// Import utilities.
+import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
+
 const UserMenuDiv = styled.div`
     position: absolute;
     top: 10px;
@@ -32,14 +35,14 @@ const UserMenu: React.FC = () => {
 	const [isMenuOpen, setMenuOpen] = useState(false);
 
 	useEffect(() => {
-		const storedApiKey = localStorage.getItem("openai_api_key");
+		const storedApiKey = OpenAiKeyManager.loadKey();
 		if (storedApiKey) {
 			setApiKey(storedApiKey);
 		}
 	}, []);
 
 	const handleSaveApiKey = () => {
-		localStorage.setItem("openai_api_key", apiKey);
+		OpenAiKeyManager.saveKey(apiKey);
 		alert("APIキーを保存しました！");
 	};
 

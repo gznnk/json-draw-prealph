@@ -459,6 +459,34 @@ const testItems6 = [
 	},
 ] as Diagram[];
 
+const testItems7 = [
+	{
+		id: "1",
+		type: "TextGenerator",
+		x: 100,
+		y: 100,
+		width: 200,
+		height: 100,
+		rotation: 0,
+		scaleX: 1,
+		scaleY: 1,
+		keepProportion: false,
+		stroke: "#dddddd",
+		strokeWidth: "1px",
+		fill: "#ffffff",
+		isSelected: false,
+		isMultiSelectSource: false,
+		text: "Hello World",
+		textType: "textarea",
+		fontColor: "#000000",
+		fontSize: 16,
+		fontFamily: "Arial",
+		textAlign: "left",
+		verticalAlign: "top",
+		isTextEditing: false,
+	},
+] as Diagram[];
+
 const devData = {
 	item1: testItems1,
 	item2: testItems2,
@@ -466,6 +494,7 @@ const devData = {
 	item4: testItems4,
 	item5: testItems5,
 	item6: testItems6,
+	item7: testItems7,
 };
 
 function App() {
@@ -476,7 +505,7 @@ function App() {
 	} = useSvgCanvas(
 		document.documentElement.clientWidth,
 		document.documentElement.clientHeight,
-		devData.item1,
+		devData.item7,
 	);
 
 	// const {
@@ -608,6 +637,7 @@ function App() {
 					left: 0,
 					right: 0,
 					bottom: 0,
+					backgroundColor: "white",
 				}}
 			>
 				<SvgCanvas {...canvasProps} />

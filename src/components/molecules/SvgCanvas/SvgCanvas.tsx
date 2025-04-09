@@ -249,13 +249,13 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	const handlePointerMove = useCallback(
 		(_e: React.PointerEvent<SVGSVGElement>) => {
 			// SvgCanvasのスクロール処理
-			 // if (isScrolling.current) {
-				// const dx = scrollStart.current.clientX - e.clientX;
-				// const dy = scrollStart.current.clientY - e.clientY;
-				// if (containerRef.current) {
-				//	containerRef.current.scrollLeft = scrollStart.current.scrollLeft + dx;
-				//	containerRef.current.scrollTop = scrollStart.current.scrollTop + dy;
-				// }
+			// if (isScrolling.current) {
+			// const dx = scrollStart.current.clientX - e.clientX;
+			// const dy = scrollStart.current.clientY - e.clientY;
+			// if (containerRef.current) {
+			//	containerRef.current.scrollLeft = scrollStart.current.scrollLeft + dx;
+			//	containerRef.current.scrollTop = scrollStart.current.scrollTop + dy;
+			// }
 			// }
 		},
 		[],
@@ -499,21 +499,21 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 		};
 	}, []);
 
-useEffect(() => {
-    const el = containerRef.current;
+	useEffect(() => {
+		const el = containerRef.current;
 
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.target !== e.currentTarget && e.target !== svgRef.current) {
-        e.preventDefault(); // これが効く！
-      }
-    };
+		const handleTouchMove = (e: TouchEvent) => {
+			if (e.target !== e.currentTarget && e.target !== svgRef.current) {
+				e.preventDefault();
+			}
+		};
 
-    el?.addEventListener('touchmove', handleTouchMove, { passive: false });
+		el?.addEventListener("touchmove", handleTouchMove, { passive: false });
 
-    return () => {
-      el?.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, []);
+		return () => {
+			el?.removeEventListener("touchmove", handleTouchMove);
+		};
+	}, []);
 
 	// 図形の描画
 	const renderedItems = items.map((item) => {
