@@ -247,7 +247,7 @@ const SvgCanvas: React.FC<SvgCanvasProps> = ({
 	 * SvgCanvasのポインタームーブイベントハンドラ
 	 */
 	const handlePointerMove = useCallback(
-		(e: React.PointerEvent<SVGSVGElement>) => {
+		(_e: React.PointerEvent<SVGSVGElement>) => {
 			// SvgCanvasのスクロール処理
 			 // if (isScrolling.current) {
 				// const dx = scrollStart.current.clientX - e.clientX;
