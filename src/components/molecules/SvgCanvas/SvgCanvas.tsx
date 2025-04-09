@@ -13,7 +13,7 @@ import styled from "@emotion/styled";
 
 // SvgCanvas関連型定義をインポート
 import type { SvgCanvasHistory, SvgCanvasState } from "./hooks/canvasHooks";
-import type { Diagram, DiagramType, GroupData } from "./types/DiagramTypes";
+import type { Diagram, GroupData } from "./types/DiagramTypes";
 import { DiagramTypeComponentMap } from "./types/DiagramTypes";
 import {
 	type NewDiagramEvent,
