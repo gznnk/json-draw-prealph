@@ -2,22 +2,30 @@
 import styled from "@emotion/styled";
 
 /**
- * Properties for the DiagramMenuDiv.
+ * Properties for the DiagramMenuWrapper.
  */
-type DiagramMenuDivProps = {
+type DiagramMenuWrapperProps = {
 	x: number;
 	y: number;
 };
 
 /**
- * Styled element for the diagram menu.
+ * Styled element for the diagram menu wrapper.
  */
-export const DiagramMenuDiv = styled.div<DiagramMenuDivProps>`
+export const DiagramMenuWrapper = styled.div<DiagramMenuWrapperProps>`
     position: absolute;
     top: ${(props) => props.y}px;
-    left: ${(props) => props.x}px;
-    width: 200px;
-    height: 36px;
+    left: ${(props) => props.x - 300}px;
+    width: 600px;
+    display: flex;
+    justify-content: center;
+`;
+
+/**
+ * Styled element for the diagram menu.
+ */
+export const DiagramMenuDiv = styled.div`
+    height: 34px;
     box-sizing: border-box;
     display: flex;
     flex-direction: row;

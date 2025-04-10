@@ -92,17 +92,7 @@ export type DiagramTransformEvent = {
 /**
  * 図形の変更イベントデータ
  */
-export type DiagramChangeData = {
-	x?: number;
-	y?: number;
-	width?: number;
-	height?: number;
-	rotation?: number;
-	scaleX?: number;
-	scaleY?: number;
-	items?: Diagram[];
-	autoRouting?: boolean;
-};
+export type DiagramChangeData = Partial<Diagram>;
 
 /**
  * 図形の変更イベント

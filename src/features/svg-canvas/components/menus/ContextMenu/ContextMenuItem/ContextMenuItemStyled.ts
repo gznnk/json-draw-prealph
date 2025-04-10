@@ -9,6 +9,7 @@ export const ContextMenuItemDiv = styled.div`
     color: #333333;
     padding: 3px 5px;
     cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
     &:hover {
         background-color: #EEEEEE;
     }

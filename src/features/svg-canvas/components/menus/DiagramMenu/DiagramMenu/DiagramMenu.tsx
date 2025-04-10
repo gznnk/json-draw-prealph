@@ -2,6 +2,20 @@
 import type React from "react";
 import { memo } from "react";
 
+// Import components related to SvgCanvas.
+import { AlignCenter } from "../../../icons/AlignCenter";
+import { AlignLeft } from "../../../icons/AlignLeft";
+import { AlignRight } from "../../../icons/AlignRight";
+import { BgColor } from "../../../icons/BgColor";
+import { Border } from "../../../icons/Border";
+import { Bold } from "../../../icons/Bold";
+import { FontColor } from "../../../icons/FontColor";
+import { FontSize } from "../../../icons/FontSize";
+import { VerticalAlignBottom } from "../../../icons/VerticalAlignBottom";
+import { VerticalAlignMiddle } from "../../../icons/VerticalAlignMiddle";
+import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
+import { Group } from "../../../icons/Group";
+
 // Import types related to SvgCanvas.
 import type { RectangleVertices } from "../../../../types/CoordinateTypes";
 
@@ -9,9 +23,13 @@ import type { RectangleVertices } from "../../../../types/CoordinateTypes";
 import { calcRectangleVertices } from "../../../../utils/Math";
 
 // Imports related to this component.
-import { DiagramMenuDiv, DiagramMenuDivider } from "./DiagramMenuStyled";
-import type { DiagramMenuProps } from "./DiagramMenuTypes";
 import { DiagramMenuItem } from "../DiagramMenuItem/DiagramMenuItem";
+import {
+	DiagramMenuDiv,
+	DiagramMenuDivider,
+	DiagramMenuWrapper,
+} from "./DiagramMenuStyled";
+import type { DiagramMenuProps } from "./DiagramMenuTypes";
 
 const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	x,
@@ -22,6 +40,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	scaleX,
 	scaleY,
 	isVisible,
+	menuStateMap,
+	onMenuClick,
 }) => {
 	if (!isVisible) return null;
 
@@ -35,7 +55,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		scaleY,
 	});
 
-	const menuX = x - 100;
 	const menuY =
 		Object.keys(vertices).reduce((max, key) => {
 			const vertex = vertices[key as keyof RectangleVertices];
@@ -43,11 +62,114 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		}, Number.NEGATIVE_INFINITY) + 20;
 
 	return (
-		<DiagramMenuDiv x={menuX} y={menuY}>
-			<DiagramMenuItem>a</DiagramMenuItem>
-			<DiagramMenuDivider />
-			<DiagramMenuItem>b</DiagramMenuItem>
-		</DiagramMenuDiv>
+		<DiagramMenuWrapper x={x} y={menuY}>
+			<DiagramMenuDiv>
+				<DiagramMenuItem
+					menuType="BgColor"
+					tooltip="背景色"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<BgColor />
+				</DiagramMenuItem>
+				<DiagramMenuItem
+					menuType="BorderColor"
+					tooltip="枠線の色"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<Border />
+				</DiagramMenuItem>
+				<DiagramMenuDivider />
+				<DiagramMenuItem
+					menuType="FontSize"
+					tooltip="フォントサイズ"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<FontSize />
+				</DiagramMenuItem>
+				<DiagramMenuItem
+					menuType="Bold"
+					tooltip="太字"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<Bold />
+				</DiagramMenuItem>
+				<DiagramMenuItem
+					menuType="FontColor"
+					tooltip="フォントの色"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<FontColor />
+				</DiagramMenuItem>
+				<DiagramMenuDivider />
+				<DiagramMenuItem
+					menuType="AlignLeft"
+					tooltip="左揃え"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<AlignLeft />
+				</DiagramMenuItem>
+				<DiagramMenuItem
+					menuType="AlignCenter"
+					tooltip="中央揃え"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<AlignCenter />
+				</DiagramMenuItem>
+				<DiagramMenuItem
+					menuType="AlignRight"
+					tooltip="右揃え"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<AlignRight />
+				</DiagramMenuItem>
+				<DiagramMenuDivider />
+				<DiagramMenuItem
+					menuType="AlignTop"
+					tooltip="上揃え"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<VerticalAlignTop />
+				</DiagramMenuItem>
+				<DiagramMenuItem
+					menuType="AlignMiddle"
+					tooltip="中央揃え"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<VerticalAlignMiddle />
+				</DiagramMenuItem>
+				<DiagramMenuItem
+					menuType="AlignBottom"
+					tooltip="下揃え"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<VerticalAlignBottom />
+				</DiagramMenuItem>
+				{menuStateMap.Group !== "Hidden" && (
+					<>
+						<DiagramMenuDivider />
+						<DiagramMenuItem
+							menuType="Group"
+							tooltip="グループ化"
+							menuStateMap={menuStateMap}
+							onMenuClick={onMenuClick}
+						>
+							<Group />
+						</DiagramMenuItem>
+					</>
+				)}
+			</DiagramMenuDiv>
+		</DiagramMenuWrapper>
 	);
 };
 

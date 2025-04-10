@@ -73,7 +73,7 @@ export const useContextMenu = (canvasProps: SvgCanvasProps) => {
 			}
 			setContextMenuState({ x: 0, y: 0, isVisible: false });
 		},
-		[onUndo, onRedo, onSelectAll, onGroup, onUngroup, onDelete],
+		[onUndo, onRedo, onSelectAll, onGroup, onUngroup, onDelete], // TODO: refBus使う
 	);
 
 	/**

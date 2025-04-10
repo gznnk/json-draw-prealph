@@ -101,7 +101,7 @@ export const useSvgCanvas = (
 				items: applyRecursive(prevState.items, (item) =>
 					item.id === e.id ? { ...item, x: e.endX, y: e.endY } : item,
 				),
-				isDiagramChanging: e.eventType !== "End",
+				isDiagramChanging: e.eventType !== "End" && e.eventType !== "Immediate",
 			};
 
 			if (e.eventType === "End") {
@@ -139,7 +139,7 @@ export const useSvgCanvas = (
 				items: applyRecursive(prevState.items, (item) =>
 					item.id === e.id ? { ...item, ...e.endShape } : item,
 				),
-				isDiagramChanging: e.eventType !== "End",
+				isDiagramChanging: e.eventType !== "End" && e.eventType !== "Immediate",
 			};
 
 			if (e.eventType === "End") {
@@ -157,37 +157,39 @@ export const useSvgCanvas = (
 	 * 図形の変更イベントハンドラ
 	 */
 	const onDiagramChange = useCallback((e: DiagramChangeEvent) => {
-		// 接続ポイントの移動データを取得
-		const connectPoints: ConnectPointMoveData[] = [];
-		const findRecursive = (data: Partial<Diagram>) => {
-			if (isItemableData(data) && !data.isMultiSelectSource) {
-				for (const item of data.items ?? []) {
-					if (item.type === "ConnectPoint") {
-						connectPoints.push({
-							id: item.id,
-							x: item.x,
-							y: item.y,
-							ownerId: data.id,
-							ownerShape: {
-								...data,
-							},
-						});
-					}
-					if (isItemableData(item)) {
-						findRecursive(item);
+		if (e.eventType !== "Immediate") {
+			// 接続ポイントの移動データを取得
+			const connectPoints: ConnectPointMoveData[] = [];
+			const findRecursive = (data: Partial<Diagram>) => {
+				if (isItemableData(data) && !data.isMultiSelectSource) {
+					for (const item of data.items ?? []) {
+						if (item.type === "ConnectPoint") {
+							connectPoints.push({
+								id: item.id,
+								x: item.x,
+								y: item.y,
+								ownerId: data.id,
+								ownerShape: {
+									...data,
+								},
+							});
+						}
+						if (isItemableData(item)) {
+							findRecursive(item);
+						}
 					}
 				}
-			}
-		};
-		findRecursive(e.endDiagram);
+			};
+			findRecursive(e.endDiagram);
 
-		if (0 < connectPoints.length) {
-			// 接続ポイントの移動を通知
-			notifyConnectPointsMove({
-				eventId: e.eventId,
-				eventType: e.eventType,
-				points: connectPoints,
-			});
+			if (0 < connectPoints.length) {
+				// 接続ポイントの移動を通知
+				notifyConnectPointsMove({
+					eventId: e.eventId,
+					eventType: e.eventType,
+					points: connectPoints,
+				});
+			}
 		}
 
 		// 図形の変更を反映
@@ -204,24 +206,26 @@ export const useSvgCanvas = (
 
 				items = applyRecursive(prevState.items, (item) => {
 					// 元図形に対応する複数選択グループ側の変更データを取得
-					const changedItem = (e.endDiagram.items ?? []).find(
-						(i) => i.id === item.id,
-					);
-					if (
-						changedItem &&
-						isSelectableData(item) &&
-						isSelectableData(changedItem)
-					) {
-						// Remove the properties that are not needed for the update.
-						const { isSelected, isMultiSelectSource, ...updateItem } =
-							changedItem;
+					if (isItemableData(e.endDiagram)) {
+						const changedItem = (e.endDiagram.items ?? []).find(
+							(i) => i.id === item.id,
+						);
+						if (
+							changedItem &&
+							isSelectableData(item) &&
+							isSelectableData(changedItem)
+						) {
+							// Remove the properties that are not needed for the update.
+							const { isSelected, isMultiSelectSource, ...updateItem } =
+								changedItem;
 
-						const newItem = {
-							...item,
-							...updateItem,
-						};
+							const newItem = {
+								...item,
+								...updateItem,
+							};
 
-						return newItem;
+							return newItem;
+						}
 					}
 
 					// 対応する変更データがない場合はそのまま
@@ -238,7 +242,7 @@ export const useSvgCanvas = (
 			let newState = {
 				...prevState,
 				items,
-				isDiagramChanging: e.eventType !== "End",
+				isDiagramChanging: e.eventType !== "End" && e.eventType !== "Immediate",
 				multiSelectGroup,
 			} as SvgCanvasState;
 
@@ -353,6 +357,7 @@ export const useSvgCanvas = (
 	 */
 	const onSelectAll = useCallback(() => {
 		setCanvasState((prevState) => {
+			// TODO: グループの場合はグループ内の図形は選択状態にしない.してないことが原因で、グループ化後のドラッグ時エラーがでてると思われる
 			const items = applyRecursive(prevState.items, (item) => {
 				if (isSelectableData(item)) {
 					return {

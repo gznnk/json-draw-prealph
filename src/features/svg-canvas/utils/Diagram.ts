@@ -11,6 +11,7 @@ import type {
 	RectangleData,
 	SelectableData,
 	Shape,
+	TextableData,
 	TransformativeData,
 } from "../types/DiagramTypes";
 import { nanToZero } from "./Math";
@@ -125,6 +126,18 @@ export const isTransformativeData = (obj: any): obj is TransformativeData => {
 		typeof obj.scaleX === "number" &&
 		typeof obj.scaleY === "number" &&
 		typeof obj.keepProportion === "boolean"
+	);
+};
+
+// biome-ignore lint/suspicious/noExplicitAny: 型チェック関数のため
+export const isTextableData = (obj: any): obj is TextableData => {
+	return (
+		obj &&
+		typeof obj.text === "string" &&
+		typeof obj.fontSize === "number" &&
+		typeof obj.fontColor === "string" &&
+		typeof obj.fontFamily === "string" &&
+		typeof obj.isTextEditing === "boolean"
 	);
 };
 

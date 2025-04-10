@@ -6,8 +6,14 @@ export const DiagramMenuItemDiv = styled.div`
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 4px 4px;
+    padding: 3px 3px;
     cursor: pointer;
     user-select: none;
     transition: background-color 0.2s ease-in-out;
+    &:hover {
+        background-color: #EEEEEE;
+    }
+    &.active {
+        background-color: #DDDDDD;
+    }
 `;
