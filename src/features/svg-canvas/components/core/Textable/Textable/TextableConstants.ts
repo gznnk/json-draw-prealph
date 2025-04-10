@@ -1,5 +1,5 @@
 // Import types related to SvgCanvas.
-import type { TextAlign, VerticalAlign } from "../../../types/DiagramTypes";
+import type { TextAlign, VerticalAlign } from "../../../../types/DiagramTypes";
 
 /**
  * Map of horizontal text alignment to CSS `text-align` values.

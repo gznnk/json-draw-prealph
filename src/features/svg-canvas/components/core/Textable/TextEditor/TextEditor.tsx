@@ -2,115 +2,20 @@
 import type React from "react";
 import { memo, useEffect, useRef, useState } from "react";
 
-// Import types related to SvgCanvas.
-import type {
-	TextableData,
-	TextableType,
-	TextAlign,
-	VerticalAlign,
-} from "../../../types/DiagramTypes";
-import type { DiagramTextChangeEvent } from "../../../types/EventTypes";
-
 // Import functions related to SvgCanvas.
-import { newEventId } from "../../../utils/Util";
-import { createSvgTransform } from "../../../utils/Diagram";
-import { degreesToRadians } from "../../../utils/Math";
+import { createSvgTransform } from "../../../../utils/Diagram";
+import { degreesToRadians } from "../../../../utils/Math";
+import { newEventId } from "../../../../utils/Util";
 
 // Imports related to this component.
-import {
-	Text,
-	TextEditorInput,
-	TextEditorTextArea,
-	TextWrapper,
-} from "./styled";
+import { TextEditorInput, TextEditorTextArea } from "./TextEditorStyled";
+import type { TextEditorProps } from "./TextEditorTypes";
 
-/**
- * Props for rendering editable text inside the SVG shape.
- */
-type TextableProps = TextableData & {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-	transform: string;
-};
-
-/**
- * React component for rendering editable text inside the SVG shape.
- */
-const TextableComponent: React.FC<TextableProps> = ({
-	x,
-	y,
-	width,
-	height,
-	transform,
-	text,
-	textType,
-	textAlign,
-	verticalAlign,
-	fontColor,
-	fontSize,
-	fontFamily,
-	isTextEditing,
-}) => {
-	if (!text) return null;
-	if (isTextEditing) return null;
-
-	return (
-		<foreignObject
-			className="diagram"
-			x={x}
-			y={y}
-			width={width}
-			height={height}
-			transform={transform}
-			pointerEvents="none"
-		>
-			<TextWrapper verticalAlign={verticalAlign}>
-				<Text
-					textAlign={textAlign}
-					color={fontColor}
-					fontSize={fontSize}
-					fontFamily={fontFamily}
-					wordBreak={textType === "textarea" ? "break-word" : "normal"}
-					whiteSpace={textType === "textarea" ? "pre-wrap" : "nowrap"}
-				>
-					{text}
-				</Text>
-			</TextWrapper>
-		</foreignObject>
-	);
-};
-
-export const Textable = memo(TextableComponent);
-
-/**
- * テキストエディタのプロパティ
- */
-export type TextEditorProps = {
-	id: string;
-	text: string;
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-	scaleX: number;
-	scaleY: number;
-	rotation: number;
-	textType: TextableType;
-	textAlign: TextAlign;
-	verticalAlign: VerticalAlign;
-	fontColor: string;
-	fontSize: number;
-	fontFamily: string;
-	isActive: boolean;
-	onTextChange?: (e: DiagramTextChangeEvent) => void;
-};
-
+// TODO: きれいにする
 /**
  * テキストエディタコンポーネント
  */
-export const TextEditor: React.FC<TextEditorProps> = memo(
+const TextEditorComponent: React.FC<TextEditorProps> = memo(
 	({
 		id,
 		text,
@@ -224,3 +129,5 @@ export const TextEditor: React.FC<TextEditorProps> = memo(
 		);
 	},
 );
+
+export const TextEditor = memo(TextEditorComponent);

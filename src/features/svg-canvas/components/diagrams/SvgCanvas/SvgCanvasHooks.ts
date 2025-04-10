@@ -49,11 +49,11 @@ import {
 	getSelectedItems,
 	removeGroupedRecursive,
 	ungroupSelectedGroupsRecursive,
-} from "./functions";
+} from "./SvgCanvasFunctions";
 import { deepCopy, newEventId } from "../../../utils/Util";
 
 // Imports related to this component.
-import type { SvgCanvasState } from "./types";
+import type { SvgCanvasState } from "./SvgCanvasTypes";
 
 // TODO: 精査
 type UpdateItem = Omit<PartiallyRequired<Diagram, "id">, "type" | "isSelected">;

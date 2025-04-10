@@ -482,7 +482,7 @@ const testItems7 = [
 		fontSize: 16,
 		fontFamily: "Arial",
 		textAlign: "left",
-		verticalAlign: "top",
+		verticalAlign: "bottom",
 		isTextEditing: false,
 	},
 ] as Diagram[];

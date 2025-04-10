@@ -6,8 +6,8 @@ import { isItemableData, isSelectableData } from "../../../utils/Diagram";
 import { deepCopy } from "../../../utils/Util";
 
 // Imports related to this component.
-import { MAX_HISTORY_SIZE } from "./constants";
-import type { SvgCanvasHistory, SvgCanvasState } from "./types";
+import { MAX_HISTORY_SIZE } from "./SvgCanvasConstants";
+import type { SvgCanvasHistory, SvgCanvasState } from "./SvgCanvasTypes";
 
 /**
  * Get the diagram by ID from the list of diagrams.
