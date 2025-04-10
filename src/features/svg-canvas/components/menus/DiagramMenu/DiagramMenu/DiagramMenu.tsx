@@ -160,7 +160,9 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 						<DiagramMenuDivider />
 						<DiagramMenuItem
 							menuType="Group"
-							tooltip="グループ化"
+							tooltip={
+								menuStateMap.Group === "Active" ? "グループ解除" : "グループ化"
+							}
 							menuStateMap={menuStateMap}
 							onMenuClick={onMenuClick}
 						>
