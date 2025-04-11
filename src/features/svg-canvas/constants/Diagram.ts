@@ -76,6 +76,7 @@ export const DEFAULT_TEXTABLE_DATA = {
 	fontColor: "#000000",
 	fontSize: 16,
 	fontFamily: "Arial",
+	fontWeight: "normal",
 	textAlign: "center",
 	verticalAlign: "center",
 	isTextEditing: false,

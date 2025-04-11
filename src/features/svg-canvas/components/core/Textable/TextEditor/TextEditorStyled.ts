@@ -15,6 +15,7 @@ type TextEditorStyledProps = {
 	color: string;
 	fontSize: number;
 	fontFamily: string;
+	fontWeight: string;
 };
 
 /**
@@ -32,6 +33,7 @@ export const Input = styled.input<TextEditorStyledProps>`
     color: ${(props) => props.color};
     font-size: ${(props) => props.fontSize}px;
     font-family: ${(props) => props.fontFamily};
+    font-weight: ${(props) => props.fontWeight};
     background: transparent;
     border: none;
     outline: none;

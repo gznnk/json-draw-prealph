@@ -25,6 +25,7 @@ export type TextEditorProps = {
 	fontColor: string;
 	fontSize: number;
 	fontFamily: string;
+	fontWeight: string;
 	isActive: boolean;
 	onTextChange?: (e: DiagramTextChangeEvent) => void;
 };

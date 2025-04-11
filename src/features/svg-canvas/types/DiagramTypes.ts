@@ -131,6 +131,7 @@ export type TextableData = {
 	fontColor: string;
 	fontSize: number;
 	fontFamily: string;
+	fontWeight: string;
 	isTextEditing: boolean; // 永続化されないプロパティ TODO: 永続化されるプロパティと分ける
 };
 

@@ -75,6 +75,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 	fontColor,
 	fontSize,
 	fontFamily,
+	fontWeight,
 	textAlign,
 	verticalAlign,
 	isTextEditing,
@@ -321,6 +322,7 @@ const Rectangle: React.FC<RectangleProps> = ({
 				fontColor={fontColor}
 				fontSize={fontSize}
 				fontFamily={fontFamily}
+				fontWeight={fontWeight}
 				textAlign={textAlign}
 				verticalAlign={verticalAlign}
 				isTextEditing={isTextEditing}

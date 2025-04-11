@@ -137,6 +137,7 @@ export const isTextableData = (obj: any): obj is TextableData => {
 		typeof obj.fontSize === "number" &&
 		typeof obj.fontColor === "string" &&
 		typeof obj.fontFamily === "string" &&
+		typeof obj.fontWeight === "string" &&
 		typeof obj.isTextEditing === "boolean"
 	);
 };

@@ -35,6 +35,7 @@ const TextableComponent: React.FC<TextableProps> = ({
 	fontColor,
 	fontSize,
 	fontFamily,
+	fontWeight,
 	isTextEditing,
 }) => {
 	if (!text) return null;
@@ -56,6 +57,7 @@ const TextableComponent: React.FC<TextableProps> = ({
 					color={fontColor}
 					fontSize={fontSize}
 					fontFamily={fontFamily}
+					fontWeight={fontWeight}
 					wordBreak={textType === "textarea" ? "break-word" : "normal"}
 					whiteSpace={textType === "textarea" ? "pre-wrap" : "nowrap"}
 				>

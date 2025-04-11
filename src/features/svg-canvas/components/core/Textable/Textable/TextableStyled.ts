@@ -32,6 +32,7 @@ type TextProps = {
 	color: string;
 	fontSize: number;
 	fontFamily: string;
+	fontWeight: string;
 	wordBreak: string;
 	whiteSpace: string;
 };
@@ -45,6 +46,7 @@ export const Text = styled.div<TextProps>`
     color: ${(props) => props.color};
     font-size: ${(props) => props.fontSize}px;
     font-family: ${(props) => props.fontFamily};
+    font-weight: ${(props) => props.fontWeight};
     border: none;
     outline: none;
     background: transparent;

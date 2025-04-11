@@ -73,6 +73,7 @@ const Ellipse: React.FC<EllipseProps> = ({
 	fontColor,
 	fontSize,
 	fontFamily,
+	fontWeight,
 	textAlign,
 	verticalAlign,
 	isTextEditing,
@@ -319,6 +320,7 @@ const Ellipse: React.FC<EllipseProps> = ({
 				fontColor={fontColor}
 				fontSize={fontSize}
 				fontFamily={fontFamily}
+				fontWeight={fontWeight}
 				textAlign={textAlign}
 				verticalAlign={verticalAlign}
 				isTextEditing={isTextEditing}

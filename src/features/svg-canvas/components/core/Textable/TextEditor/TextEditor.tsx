@@ -30,6 +30,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	fontColor,
 	fontSize,
 	fontFamily,
+	fontWeight,
 	isActive,
 	onTextChange,
 }) => {
@@ -120,6 +121,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 		color: fontColor,
 		fontSize,
 		fontFamily,
+		fontWeight,
 	};
 
 	return textType === "textarea" ? (
