@@ -13,10 +13,10 @@ import type {
 import type { DiagramDragEvent, EventType } from "../../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import DragLine from "../DragLine/DragLine";
-import DragPoint from "../DragPoint/DragPoint";
-import RotatePoint from "../RotatePoint/RotatePoint";
-import BottomLabel from "../BottomLabel/BottomLabel";
+import { DragLine } from "../DragLine";
+import { DragPoint } from "../DragPoint";
+import { RotatePoint } from "../RotatePoint";
+import { BottomLabel } from "../BottomLabel";
 
 // SvgCanvas関連関数をインポート
 import { createSvgTransform, getCursorFromAngle } from "../../../utils/Diagram";
@@ -908,7 +908,7 @@ const Transformative: React.FC<Props> = ({
 					/>
 				</>
 			)}
-			{/* 回転 */}
+			{/* Rotate point. */}
 			{!isResizing && (
 				<RotatePoint
 					id={`rotation-${id}`}

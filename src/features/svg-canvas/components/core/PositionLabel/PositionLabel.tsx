@@ -6,7 +6,7 @@ import { memo } from "react";
 import type { RectangleVertices } from "../../../types/CoordinateTypes";
 
 // Import components related to SvgCanvas.
-import { calcBottomLabelPosition } from "../BottomLabel/BottomLabel";
+import { calcBottomLabelPosition } from "../BottomLabel";
 
 // Import functions related to SvgCanvas.
 import { calcRectangleVertices } from "../../../utils/Math";
@@ -27,7 +27,7 @@ type PositionLabelProps = {
 /**
  * PositionLabel component.
  */
-const PositionLabel: React.FC<PositionLabelProps> = ({
+const PositionLabelComponent: React.FC<PositionLabelProps> = ({
 	x,
 	y,
 	width,
@@ -60,7 +60,7 @@ const PositionLabel: React.FC<PositionLabelProps> = ({
 		<text
 			x={labelX}
 			y={labelY}
-			fill="#555555"
+			fill="#555555" // Font color
 			fontSize="12px"
 			textAnchor="middle"
 		>
@@ -69,4 +69,4 @@ const PositionLabel: React.FC<PositionLabelProps> = ({
 	);
 };
 
-export default memo(PositionLabel);
+export const PositionLabel = memo(PositionLabelComponent);

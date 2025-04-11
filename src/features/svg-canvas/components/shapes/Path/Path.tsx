@@ -3,10 +3,10 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import components related to SvgCanvas.
-import ArrowHead from "../../core/ArrowHead/ArrowHead";
-import DragLine from "../../core/DragLine/DragLine";
-import DragPoint from "../../core/DragPoint/DragPoint";
-import PositionLabel from "../../core/PositionLabel/PositionLabel";
+import { ArrowHead } from "../../core/ArrowHead";
+import { DragLine } from "../../core/DragLine";
+import { DragPoint } from "../../core/DragPoint";
+import { PositionLabel } from "../../core/PositionLabel";
 import Group from "../Group/Group";
 
 // Import types related to SvgCanvas.

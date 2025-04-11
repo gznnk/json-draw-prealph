@@ -2,11 +2,11 @@
 import type React from "react";
 import { memo } from "react";
 
-// Import types related to SvgCanvas.
-import type { RectangleVertices } from "../../../types/CoordinateTypes";
-
 // Import functions related to SvgCanvas.
 import { calcRectangleVertices } from "../../../utils/Math";
+
+// Imports related to this component.
+import { calcBottomLabelPosition } from "./BottomLabelFunctions";
 
 /**
  * Properties of BottomLabel component.
@@ -25,7 +25,7 @@ type BottomLabelProps = {
 /**
  * BottomLabel component.
  */
-const BottomLabel: React.FC<BottomLabelProps> = ({
+const BottomLabelComponent: React.FC<BottomLabelProps> = ({
 	x,
 	y,
 	width,
@@ -60,35 +60,4 @@ const BottomLabel: React.FC<BottomLabelProps> = ({
 	);
 };
 
-export default memo(BottomLabel);
-
-/**
- * Calculate the position of the bottom label.
- *
- * @param vertices - Rectangle vertices.
- * @returns The position of the bottom label.
- */
-export const calcBottomLabelPosition = (vertices: RectangleVertices) => {
-	let labelX = Number.NEGATIVE_INFINITY;
-	let labelY = Number.NEGATIVE_INFINITY;
-	const minYPosXList: number[] = [];
-	for (const key of Object.keys(vertices)) {
-		const vertex = vertices[key as keyof RectangleVertices];
-		if (labelY < vertex.y) {
-			labelY = vertex.y;
-			labelX = vertex.x;
-			// Clear the list if a new minimum Y position is found.
-			minYPosXList.length = 0;
-			minYPosXList.push(vertex.x);
-		} else if (labelY === vertex.y) {
-			minYPosXList.push(vertex.x);
-		}
-	}
-
-	labelY += 23; // Add some margin to the label position.
-	if (1 < minYPosXList.length) {
-		// If there are multiple minimum Y positions, calculate the average X position.
-		labelX = minYPosXList.reduce((acc, x) => acc + x, 0) / minYPosXList.length;
-	}
-	return { labelX, labelY };
-};
+export const BottomLabel = memo(BottomLabelComponent);

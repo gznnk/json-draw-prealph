@@ -1,13 +1,13 @@
-// Reactのインポート
+// Import React.
 import type React from "react";
 import { memo, useRef } from "react";
 
-// SvgCanvas関連コンポーネントをインポート
+// Import components related to SvgCanvas.
 import type { DragProps } from "../../../hooks/dragHooks";
 import { useDrag } from "../../../hooks/dragHooks";
 
 /**
- * 辺ドラッグ用の線のプロパティ
+ * Props for the DragLine component.
  */
 type DragLineProps = Omit<DragProps, "ref"> & {
 	startX: number;
@@ -18,9 +18,9 @@ type DragLineProps = Omit<DragProps, "ref"> & {
 };
 
 /**
- * 辺ドラッグ用の線コンポーネント
+ * Draggable line component.
  */
-const DragLine: React.FC<DragLineProps> = ({
+const DragLineComponent: React.FC<DragLineProps> = ({
 	id,
 	x,
 	y,
@@ -63,4 +63,4 @@ const DragLine: React.FC<DragLineProps> = ({
 	);
 };
 
-export default memo(DragLine);
+export const DragLine = memo(DragLineComponent);

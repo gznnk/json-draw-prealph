@@ -1,8 +1,8 @@
-// Reactのインポート
+// Import React.
 import type React from "react";
 import { memo, useCallback, useRef, useState } from "react";
 
-// SvgCanvas関連カスタムフックをインポート
+// Import hooks related to SvgCanvas.
 import type { DragProps } from "../../../hooks/dragHooks";
 import { useDrag } from "../../../hooks/dragHooks";
 import type { DiagramDragEvent } from "../../../types/EventTypes";
@@ -11,18 +11,18 @@ import type { DiagramDragEvent } from "../../../types/EventTypes";
 import { RotateRight } from "../../icons/RotateRight";
 
 /**
- * 回転ポイントコンポーネントのプロパティ
+ * Props for RotatePoint component.
  */
-export type RotatePointProps = Omit<DragProps, "ref"> & {
+type RotatePointProps = Omit<DragProps, "ref"> & {
 	rotation?: number;
 	color?: string;
 	hidden?: boolean;
 };
 
 /**
- * 回転ポイントコンポーネント
+ * The rotate point component.
  */
-const RotatePoint: React.FC<RotatePointProps> = ({
+const RotatePointComponent: React.FC<RotatePointProps> = ({
 	id,
 	type,
 	x,
@@ -97,4 +97,4 @@ const RotatePoint: React.FC<RotatePointProps> = ({
 	);
 };
 
-export default memo(RotatePoint);
+export const RotatePoint = memo(RotatePointComponent);

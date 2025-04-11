@@ -1,33 +1,16 @@
-// Reactのインポート
+// Import React.
 import type React from "react";
 import { memo, useRef } from "react";
 
-// ライブラリのインポート
-import styled from "@emotion/styled";
-
-// SvgCanvas関連カスタムフックをインポート
+// Import hooks related to SvgCanvas.
 import type { DragProps } from "../../../hooks/dragHooks";
 import { useDrag } from "../../../hooks/dragHooks";
 
-/**
- * SVGのcircle要素のProps型定義
- */
-type CircleProps = {
-	outline: string;
-};
+// Imports related to this component.
+import { Circle } from "./DragPointStyled";
 
 /**
- * SVGのcircle要素のスタイル定義
- */
-const Circle = styled.circle<CircleProps>`
-  :focus {
-    outline: ${(props) => props.outline};
-	outline-offset: 3px;
-  }
-`;
-
-/**
- * ドラッグポイントコンポーネントのプロパティ
+ * Props for the DragPoint component.
  */
 export type DragPointProps = Omit<DragProps, "ref"> & {
 	radius?: number;
@@ -40,9 +23,9 @@ export type DragPointProps = Omit<DragProps, "ref"> & {
 };
 
 /**
- * ドラッグポイントコンポーネント
+ * Draggable point component.
  */
-const DragPoint: React.FC<DragPointProps> = ({
+const DragPointComponent: React.FC<DragPointProps> = ({
 	id,
 	type,
 	x,
@@ -61,8 +44,6 @@ const DragPoint: React.FC<DragPointProps> = ({
 	isTransparent = false,
 	hidden = false,
 }) => {
-	window.profiler.call(`DragPoint render: ${id}`);
-
 	const svgRef = useRef<SVGCircleElement>({} as SVGCircleElement);
 
 	const dragProps = useDrag({
@@ -101,4 +82,4 @@ const DragPoint: React.FC<DragPointProps> = ({
 	);
 };
 
-export default memo(DragPoint);
+export const DragPoint = memo(DragPointComponent);

@@ -22,7 +22,7 @@ import type {
 
 // SvgCanvas関連コンポーネントをインポート
 import ConnectPoint from "../ConnectPoint/ConnectPoint";
-import PositionLabel from "../../core/PositionLabel/PositionLabel";
+import { PositionLabel } from "../../core/PositionLabel";
 import { Textable } from "../../core/Textable";
 import Transformative from "../../core/Transformative/Transformative";
 

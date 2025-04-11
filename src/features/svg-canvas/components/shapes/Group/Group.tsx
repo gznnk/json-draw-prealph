@@ -19,7 +19,7 @@ import type {
 } from "../../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import PositionLabel from "../../core/PositionLabel/PositionLabel";
+import { PositionLabel } from "../../core/PositionLabel";
 import Transformative from "../../core/Transformative/Transformative";
 
 // SvgCanvas関連関数をインポート

@@ -5,12 +5,9 @@ import { memo } from "react";
 // Import functions related to SvgCanvas.
 import { createSvgTransform } from "../../../utils/Diagram";
 
-/**
- * Shape of ArrowHead.
- */
-export type ArrowHeadType = "Triangle" | "ConcaveTriangle" | "None";
-
-const ARROW_HEAD_SIZE = 11;
+// Imports related to this component.
+import { ARROW_HEAD_SIZE } from "./ArrowHeadConstants";
+import type { ArrowHeadType } from "./ArrowHeadTypes";
 
 /**
  * Properties of ArrowHead component.
@@ -26,7 +23,7 @@ type ArrowHeadProps = {
 /**
  * ArrowHead component.
  */
-const ArrowHead: React.FC<ArrowHeadProps> = ({
+const ArrowHeadComponent: React.FC<ArrowHeadProps> = ({
 	type,
 	x,
 	y,
@@ -47,4 +44,4 @@ const ArrowHead: React.FC<ArrowHeadProps> = ({
 	return <polygon points={points} fill={color} transform={transform} />;
 };
 
-export default memo(ArrowHead);
+export const ArrowHead = memo(ArrowHeadComponent);
