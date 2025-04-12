@@ -5,6 +5,7 @@ import { useCallback, useRef } from "react";
 import { getSelectedItems } from "../../../diagrams/SvgCanvas/SvgCanvasFunctions";
 
 // Import types related to SvgCanvas.
+import type { Diagram } from "../../../../types/DiagramTypes";
 import type { SvgCanvasProps } from "../../../diagrams/SvgCanvas/SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
@@ -17,7 +18,7 @@ import { newEventId } from "../../../../utils/Util";
 
 // Imports related to this component.
 import type { DiagramMenuProps, DiagramMenuStateMap } from "./DiagramMenuTypes";
-import type { Diagram } from "../../../../types/DiagramTypes";
+import { findFirstTextableRecursive } from "./DiagramMenuFunctions";
 
 export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 	// Extract properties from canvasProps.
@@ -60,23 +61,6 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 
 	// If the diagram menu should be shown, set the properties for the menu.
 	if (showDiagramMenu) {
-		// TODO: 共通化するか移動する
-		const findFirstTextableRecursive = (
-			items: Diagram[],
-		): Diagram | undefined => {
-			for (const item of items) {
-				if (isTextableData(item)) {
-					return item;
-				}
-				if (isItemableData(item)) {
-					const foundItem = findFirstTextableRecursive(item.items);
-					if (foundItem) {
-						return foundItem;
-					}
-				}
-			}
-			return undefined;
-		};
 		const firstTextableItem = findFirstTextableRecursive(selectedItems);
 
 		if (firstTextableItem) {
