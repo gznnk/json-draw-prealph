@@ -220,6 +220,7 @@ export const useSvgCanvas = (
 							const { isSelected, isMultiSelectSource, ...updateItem } =
 								changedItem;
 
+							// Apply updated properties to the original item.
 							const newItem = {
 								...item,
 								...updateItem,
@@ -237,6 +238,22 @@ export const useSvgCanvas = (
 				items = applyRecursive(prevState.items, (item) =>
 					item.id === e.id ? { ...item, ...e.endDiagram } : item,
 				);
+
+				if (multiSelectGroup) {
+					// Propagate the original diagram changes to the items in the multi-select group.
+					multiSelectGroup.items = applyRecursive(
+						multiSelectGroup.items,
+						(item) =>
+							item.id === e.id
+								? {
+										...item,
+										...e.endDiagram,
+										isSelected: false,
+										isMultiSelectSource: false,
+									}
+								: item,
+					);
+				}
 			}
 
 			// 新しい状態を作成

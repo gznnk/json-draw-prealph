@@ -292,7 +292,6 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 						id: multiSelectGroup.id,
 						startDiagram: multiSelectGroup,
 						endDiagram: {
-							...multiSelectGroup,
 							keepProportion: menuStateMap.KeepAspectRatio !== "Active",
 						},
 					});
