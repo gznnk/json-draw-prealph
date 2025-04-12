@@ -49,3 +49,12 @@ export const DiagramMenuDivider = styled.div`
     margin-right: 3px;
     background-color: #E0E0E0;
 `;
+
+/**
+ * Styled element for the diagram menu controll positioning.
+ */
+export const DiagramMenuPositioner = styled.div`
+    position: relative;
+    display: flex;
+    flex-direction: row;
+`;

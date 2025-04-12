@@ -3,19 +3,19 @@ import type React from "react";
 import { memo } from "react";
 
 // Import components related to SvgCanvas.
-import { AspectRatio } from "../../../icons/AspectRatio";
 import { AlignCenter } from "../../../icons/AlignCenter";
 import { AlignLeft } from "../../../icons/AlignLeft";
 import { AlignRight } from "../../../icons/AlignRight";
+import { AspectRatio } from "../../../icons/AspectRatio";
 import { BgColor } from "../../../icons/BgColor";
-import { Border } from "../../../icons/Border";
 import { Bold } from "../../../icons/Bold";
+import { Border } from "../../../icons/Border";
 import { FontColor } from "../../../icons/FontColor";
 import { FontSize } from "../../../icons/FontSize";
+import { Group } from "../../../icons/Group";
 import { VerticalAlignBottom } from "../../../icons/VerticalAlignBottom";
 import { VerticalAlignMiddle } from "../../../icons/VerticalAlignMiddle";
 import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
-import { Group } from "../../../icons/Group";
 
 // Import types related to SvgCanvas.
 import type { RectangleVertices } from "../../../../types/CoordinateTypes";
@@ -24,10 +24,12 @@ import type { RectangleVertices } from "../../../../types/CoordinateTypes";
 import { calcRectangleVertices } from "../../../../utils/Math";
 
 // Imports related to this component.
-import { DiagramMenuItem } from "../DiagramMenuItem/DiagramMenuItem";
+import { DiagramMenuItem } from "../DiagramMenuItem";
+import { FontSizeSelector } from "../FontSizeSelector";
 import {
 	DiagramMenuDiv,
 	DiagramMenuDivider,
+	DiagramMenuPositioner,
 	DiagramMenuWrapper,
 } from "./DiagramMenuStyled";
 import type { DiagramMenuProps } from "./DiagramMenuTypes";
@@ -42,7 +44,9 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	scaleY,
 	isVisible,
 	menuStateMap,
+	fontSize,
 	onMenuClick,
+	onFontSizeChange,
 }) => {
 	if (!isVisible) return null;
 
@@ -82,14 +86,22 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					<Border />
 				</DiagramMenuItem>
 				<DiagramMenuDivider />
-				<DiagramMenuItem
-					menuType="FontSize"
-					tooltip="フォントサイズ"
-					menuStateMap={menuStateMap}
-					onMenuClick={onMenuClick}
-				>
-					<FontSize />
-				</DiagramMenuItem>
+				<DiagramMenuPositioner>
+					<DiagramMenuItem
+						menuType="FontSize"
+						tooltip="フォントサイズ"
+						menuStateMap={menuStateMap}
+						onMenuClick={onMenuClick}
+					>
+						<FontSize />
+					</DiagramMenuItem>
+					{menuStateMap.FontSize === "Active" && (
+						<FontSizeSelector
+							fontSize={fontSize}
+							onFontSizeChange={onFontSizeChange}
+						/>
+					)}
+				</DiagramMenuPositioner>
 				<DiagramMenuItem
 					menuType="Bold"
 					tooltip="太字"

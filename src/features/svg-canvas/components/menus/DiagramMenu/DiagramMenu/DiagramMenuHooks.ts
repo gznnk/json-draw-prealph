@@ -1,11 +1,11 @@
 // Import React.
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // TODO: 場所
 import { getSelectedItems } from "../../../diagrams/SvgCanvas/SvgCanvasFunctions";
 
 // Import types related to SvgCanvas.
-import type { Diagram } from "../../../../types/DiagramTypes";
+import type { Diagram, TextableData } from "../../../../types/DiagramTypes";
 import type { SvgCanvasProps } from "../../../diagrams/SvgCanvas/SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
@@ -17,12 +17,15 @@ import {
 import { newEventId } from "../../../../utils/Util";
 
 // Imports related to this component.
-import type { DiagramMenuProps, DiagramMenuStateMap } from "./DiagramMenuTypes";
 import { findFirstTextableRecursive } from "./DiagramMenuFunctions";
+import type { DiagramMenuProps, DiagramMenuStateMap } from "./DiagramMenuTypes";
 
 export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 	// Extract properties from canvasProps.
 	const { items, isDiagramChanging, multiSelectGroup } = canvasProps;
+
+	// Diagram menu controls open/close state.
+	const [isFontSizeSelectorOpen, setIsFontSizeSelectorOpen] = useState(false);
 
 	// Default menu props (invisible).
 	let diagramMenuProps = {
@@ -35,6 +38,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 		scaleY: 1,
 		isVisible: false,
 		onMenuClick: (_menuType: string) => {},
+		onFontSizeChange: (_fontSize: number) => {},
 	} as DiagramMenuProps;
 
 	// Default menu state map.
@@ -59,9 +63,18 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 	const showDiagramMenu = 0 < selectedItems.length && !isDiagramChanging;
 	const singleSelectedItem = selectedItems[0];
 
+	// If the diagram menu is not shown, close controls.
+	useEffect(() => {
+		if (!showDiagramMenu) {
+			setIsFontSizeSelectorOpen(false);
+		}
+	}, [showDiagramMenu]);
+
 	// If the diagram menu should be shown, set the properties for the menu.
 	if (showDiagramMenu) {
-		const firstTextableItem = findFirstTextableRecursive(selectedItems);
+		const firstTextableItem = findFirstTextableRecursive(
+			selectedItems,
+		) as TextableData;
 
 		if (firstTextableItem) {
 			menuStateMap.FontSize = "Show";
@@ -73,6 +86,10 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 			menuStateMap.AlignTop = "Show";
 			menuStateMap.AlignMiddle = "Show";
 			menuStateMap.AlignBottom = "Show";
+
+			if (isFontSizeSelectorOpen) {
+				menuStateMap.FontSize = "Active";
+			}
 
 			if (isTextableData(firstTextableItem)) {
 				if (firstTextableItem.fontWeight === "bold") {
@@ -136,7 +153,10 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				scaleY,
 				isVisible: true,
 				menuStateMap,
-				onMenuClick: (_menuType: string) => {}, // Temporarily empty.
+				fontSize: firstTextableItem?.fontSize || 0,
+				// Temporarily empty.
+				onMenuClick: (_menuType: string) => {},
+				onFontSizeChange: (_fontSize: number) => {},
 			};
 		} else {
 			// When a single item is selected, use the properties of the selected item.
@@ -151,7 +171,12 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 					scaleY: singleSelectedItem.scaleY,
 					isVisible: true,
 					menuStateMap,
-					onMenuClick: (_menuType: string) => {}, // Temporarily empty.
+					fontSize: isTextableData(singleSelectedItem)
+						? singleSelectedItem.fontSize
+						: 0,
+					// Temporarily empty.
+					onMenuClick: (_menuType: string) => {},
+					onFontSizeChange: (_fontSize: number) => {},
 				};
 			}
 		}
@@ -217,7 +242,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				// Handle border color change.
 				break;
 			case "FontSize":
-				// Handle font size change.
+				setIsFontSizeSelectorOpen((prev) => !prev);
 				break;
 			case "Bold":
 				changeItems(selectedItems, {
@@ -288,6 +313,15 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				}
 				break;
 		}
+	}, []);
+
+	diagramMenuProps.onFontSizeChange = useCallback((fontSize: number) => {
+		// Bypass references to avoid function creation in every render.
+		const { selectedItems, changeItems } = refBus.current;
+
+		changeItems(selectedItems, {
+			fontSize,
+		});
 	}, []);
 
 	return {
