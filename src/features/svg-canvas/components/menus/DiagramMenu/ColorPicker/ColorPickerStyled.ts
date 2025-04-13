@@ -46,7 +46,7 @@ type ColorInputProps = {
 };
 
 export const ColorInput = styled.input<ColorInputProps>`
-	width: 80px;
+	width: 100px;
 	padding: 4px 6px;
 	box-sizing: border-box;
 	border: 1px solid ${({ isValid }) => (isValid ? "#e0e0e0" : "#f00")};

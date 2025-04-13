@@ -26,7 +26,7 @@ import Group from "../../shapes/Group/Group";
 
 // SvgCanvas関連関数をインポート
 import { newEventId } from "../../../utils/Util";
-import CanvasMenu from "../../menus/CanvasMenu/CanvasMenu";
+import { CanvasMenu } from "../../menus/CanvasMenu";
 import UserMenu from "../../menus/UserMenu/UserMenu";
 import { getDiagramById } from "./SvgCanvasFunctions";
 

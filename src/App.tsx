@@ -634,7 +634,7 @@ function App() {
 					left: 0,
 					right: 0,
 					bottom: 0,
-					backgroundColor: "white",
+					backgroundColor: "#eeeeee",
 				}}
 			>
 				<SvgCanvas {...canvasProps} />

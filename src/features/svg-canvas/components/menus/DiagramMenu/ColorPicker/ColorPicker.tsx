@@ -1,7 +1,7 @@
 import type React from "react";
 import { memo, useEffect, useState } from "react";
 
-// Import styled components
+// Imports related to this component.
 import { DiagramMenuControl } from "../DiagramMenuControl";
 import { PRESET_COLORS } from "./ColorPickerConstants";
 import {
