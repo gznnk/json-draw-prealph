@@ -10,6 +10,7 @@ import AIChat from "./components/organisms/AIChat";
 import { Profiler } from "./utils/Profiler";
 
 import { svgDataToDiagram } from "./features/svg-canvas/utils/Diagram";
+import { loadCanvasDataFromLocalStorage } from "./features/svg-canvas/components/diagrams/SvgCanvas/SvgCanvasFunctions";
 // const logger = getLogger("App");
 declare global {
 	interface Window {
@@ -498,6 +499,8 @@ const devData = {
 };
 
 function App() {
+	const loadedCanvasState = loadCanvasDataFromLocalStorage();
+
 	const {
 		state: [_canvasState, setCanvasState],
 		canvasProps,
@@ -505,7 +508,7 @@ function App() {
 	} = useSvgCanvas(
 		document.documentElement.clientWidth,
 		document.documentElement.clientHeight,
-		devData.item4,
+		loadedCanvasState?.items ?? devData.item4,
 	);
 
 	// const {

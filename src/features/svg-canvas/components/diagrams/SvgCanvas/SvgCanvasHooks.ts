@@ -46,16 +46,18 @@ import {
 	applyMultiSelectSourceRecursive,
 	applyRecursive,
 	clearMultiSelectSourceRecursive,
+	clearSelectedRecursive,
 	getDiagramById,
 	getSelectedItems,
 	removeGroupedRecursive,
+	saveCanvasDataToLocalStorage,
 	ungroupSelectedGroupsRecursive,
 } from "./SvgCanvasFunctions";
 
 // Imports related to this component.
+import { createPathData } from "../../shapes/Path";
 import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
 import type { SvgCanvasState } from "./SvgCanvasTypes";
-import { createPathData } from "../../shapes/Path";
 
 // TODO: 精査
 type UpdateItem = Omit<PartiallyRequired<Diagram, "id">, "type" | "isSelected">;
@@ -452,11 +454,7 @@ export const useSvgCanvas = (
 	const onAllSelectionClear = useCallback(() => {
 		setCanvasState((prevState) => ({
 			...prevState,
-			items: applyRecursive(prevState.items, (item) =>
-				isSelectableData(item)
-					? { ...item, isSelected: false, isMultiSelectSource: false } // 全ての図形の選択状態を解除し、かつ表示状態を元に戻す
-					: item,
-			),
+			items: clearSelectedRecursive(prevState.items),
 			multiSelectGroup: undefined,
 			selectedItemId: undefined,
 		}));
@@ -803,11 +801,15 @@ export const useSvgCanvas = (
 
 			// console.log("undo", prevHistory.lastHistoryEventId);
 
-			return {
+			const ret = {
 				...prevState,
 				...prevHistory, // Overwrite the current state with the previous history.
 				historyIndex: prevIndex,
 			};
+
+			saveCanvasDataToLocalStorage(ret); // Save the canvas data to local storage.
+
+			return ret;
 		});
 	}, []);
 
@@ -826,11 +828,15 @@ export const useSvgCanvas = (
 
 			// console.log("redo", nextHistory.lastHistoryEventId);
 
-			return {
+			const ret = {
 				...prevState,
 				...nextHistory, // Overwrite the current state with the next history.
 				historyIndex: nextIndex,
 			};
+
+			saveCanvasDataToLocalStorage(ret); // Save the canvas data to local storage.
+
+			return ret;
 		});
 	}, []);
 

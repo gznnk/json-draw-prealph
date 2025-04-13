@@ -3,7 +3,7 @@ import type { Diagram } from "../../../types/DiagramTypes";
 
 // Import functions related to SvgCanvas.
 import { isItemableData, isSelectableData } from "../../../utils/Diagram";
-import { deepCopy } from "../../../utils/Util";
+import { deepCopy, newEventId } from "../../../utils/Util";
 
 // Imports related to this component.
 import { MAX_HISTORY_SIZE } from "./SvgCanvasConstants";
@@ -122,6 +122,20 @@ export const applyMultiSelectSourceRecursive = (
 		}
 		return newItem;
 	});
+};
+
+/**
+ * Recursively clear the selection state of all items.
+ *
+ * @param items - The list of items to process.
+ * @returns {Diagram[]} - The updated list of items with the selection state cleared.
+ */
+export const clearSelectedRecursive = (items: Diagram[]) => {
+	return applyRecursive(items, (item) =>
+		isSelectableData(item)
+			? { ...item, isSelected: false, isMultiSelectSource: false } // 全ての図形の選択状態を解除し、かつ表示状態を元に戻す
+			: item,
+	);
 };
 
 /**
@@ -256,6 +270,8 @@ export const addHistory = (
 	// console.log("history", JSON.stringify(ret, null, 2));
 	// console.log("history", ret);
 
+	saveCanvasDataToLocalStorage(ret);
+
 	return ret;
 };
 
@@ -279,4 +295,41 @@ const canvasStateToHistory = (
 		height: copiedState.height,
 		items: copiedState.items,
 	} as const satisfies SvgCanvasHistory;
+};
+
+export const saveCanvasDataToLocalStorage = (
+	canvasState: SvgCanvasState,
+): void => {
+	// Save the canvas state to local storage
+	const canvasData = {
+		...canvasState,
+		items: clearSelectedRecursive(canvasState.items), // Clear selected items before saving
+		multiSelectGroup: undefined, // Exclude multiSelectGroup from local storage
+		history: undefined, // Exclude history from local storage
+		historyIndex: undefined, // Exclude history index from local storage
+		lastHistoryEventId: undefined, // Exclude last history event ID from local storage
+	};
+	localStorage.setItem("canvasData", JSON.stringify(canvasData));
+};
+
+export const loadCanvasDataFromLocalStorage = ():
+	| SvgCanvasState
+	| undefined => {
+	// Load the canvas state from local storage
+	const canvasData = localStorage.getItem("canvasData");
+	if (canvasData) {
+		const canvasState = JSON.parse(canvasData) as SvgCanvasState;
+		// Create a new history entry for the loaded state
+		const historyEntry = canvasStateToHistory(canvasState);
+		const newHistory = [historyEntry];
+		const historyIndex = 0; // Set the history index to the first entry
+		const lastHistoryEventId = newEventId(); // Generate a new event ID for the loaded state
+		return {
+			...canvasState,
+			history: newHistory,
+			historyIndex,
+			lastHistoryEventId,
+		};
+	}
+	return undefined;
 };
