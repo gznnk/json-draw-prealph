@@ -46,9 +46,11 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	isVisible,
 	menuStateMap,
 	bgColor,
+	borderColor,
 	fontSize,
 	onMenuClick,
 	onBgColorChange,
+	onBorderColorChange,
 	onFontSizeChange,
 }) => {
 	if (!isVisible) return null;
@@ -85,14 +87,22 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 						<ColorPicker color={bgColor} onColorChange={onBgColorChange} />
 					)}
 				</DiagramMenuPositioner>
-				<DiagramMenuItem
-					menuType="BorderColor"
-					tooltip="枠線の色"
-					menuStateMap={menuStateMap}
-					onMenuClick={onMenuClick}
-				>
-					<Border />
-				</DiagramMenuItem>
+				<DiagramMenuPositioner>
+					<DiagramMenuItem
+						menuType="BorderColor"
+						tooltip="枠線の色"
+						menuStateMap={menuStateMap}
+						onMenuClick={onMenuClick}
+					>
+						<Border />
+					</DiagramMenuItem>
+					{menuStateMap.BorderColor === "Active" && (
+						<ColorPicker
+							color={borderColor}
+							onColorChange={onBorderColorChange}
+						/>
+					)}
+				</DiagramMenuPositioner>
 				<DiagramMenuDivider />
 				<DiagramMenuPositioner>
 					<DiagramMenuItem

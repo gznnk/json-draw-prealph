@@ -143,7 +143,7 @@ export const isTextableData = (obj: any): obj is TextableData => {
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: 型チェック関数のため
-export const isStrokable = (obj: any): obj is Shape => {
+export const isStrokableData = (obj: any): obj is Shape => {
 	return (
 		obj && typeof obj.stroke === "string" && typeof obj.strokeWidth === "string"
 	);

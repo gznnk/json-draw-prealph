@@ -5,6 +5,7 @@ import type { Diagram } from "../../../../types/DiagramTypes";
 import {
 	isFillableData,
 	isItemableData,
+	isStrokableData,
 	isTextableData,
 } from "../../../../utils/Diagram";
 
@@ -17,6 +18,23 @@ export const findFirstFillableRecursive = (
 		}
 		if (isItemableData(item)) {
 			const foundItem = findFirstFillableRecursive(item.items);
+			if (foundItem) {
+				return foundItem;
+			}
+		}
+	}
+	return undefined;
+};
+
+export const findFirstStrokableRecursive = (
+	items: Diagram[],
+): Diagram | undefined => {
+	for (const item of items) {
+		if (isStrokableData(item)) {
+			return item;
+		}
+		if (isItemableData(item)) {
+			const foundItem = findFirstStrokableRecursive(item.items);
 			if (foundItem) {
 				return foundItem;
 			}
