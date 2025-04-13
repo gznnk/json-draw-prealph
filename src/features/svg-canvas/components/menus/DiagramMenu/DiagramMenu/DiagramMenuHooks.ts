@@ -8,6 +8,7 @@ import { getSelectedItems } from "../../../diagrams/SvgCanvas/SvgCanvasFunctions
 import type {
 	Diagram,
 	FillableData,
+	RectangleData,
 	StrokableData,
 	TextableData,
 } from "../../../../types/DiagramTypes";
@@ -24,6 +25,7 @@ import { newEventId } from "../../../../utils/Util";
 // Imports related to this component.
 import {
 	findFirstFillableRecursive,
+	findFirstRectangleRecursive,
 	findFirstStrokableRecursive,
 	findFirstTextableRecursive,
 } from "./DiagramMenuFunctions";
@@ -40,6 +42,8 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 	// Diagram menu controls open/close state.
 	const [isBgColorPickerOpen, setIsBgColorPickerOpen] = useState(false);
 	const [isBorderColorPickerOpen, setIsBorderColorPickerOpen] = useState(false);
+	const [isBorderRadiusSelectorOpen, setIsBorderRadiusSelectorOpen] =
+		useState(false);
 	const [isFontSizeSelectorOpen, setIsFontSizeSelectorOpen] = useState(false);
 	const [isFontColorPickerOpen, setIsFontColorPickerOpen] = useState(false);
 
@@ -52,6 +56,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 	const menuStateMap = {
 		BgColor: "Hidden",
 		BorderColor: "Hidden",
+		BorderRadius: "Hidden",
 		FontSize: "Hidden",
 		Bold: "Hidden",
 		FontColor: "Hidden",
@@ -79,6 +84,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 		if (!showDiagramMenu) {
 			setIsBgColorPickerOpen(false);
 			setIsBorderColorPickerOpen(false);
+			setIsBorderRadiusSelectorOpen(false);
 			setIsFontSizeSelectorOpen(false);
 			setIsFontColorPickerOpen(false);
 		}
@@ -109,6 +115,19 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 
 			if (isBorderColorPickerOpen) {
 				menuStateMap.BorderColor = "Active";
+			}
+		}
+
+		// Find the first rectangle item in the selected items.
+		// This is used to determine the border radius menu state.
+		const firstRectangleItem = findFirstRectangleRecursive(selectedItems) as
+			| RectangleData
+			| undefined;
+		if (firstRectangleItem) {
+			menuStateMap.BorderRadius = "Show";
+
+			if (isBorderRadiusSelectorOpen) {
+				menuStateMap.BorderRadius = "Active";
 			}
 		}
 
@@ -211,6 +230,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				menuStateMap,
 				bgColor: firstFillableItem?.fill || "transparent",
 				borderColor: firstStrokableItem?.stroke || "transparent",
+				borderRadius: firstRectangleItem?.radius || 0,
 				fontSize: firstTextableItem?.fontSize || 0,
 				fontColor: firstTextableItem?.fontColor || "transparent",
 			} as DiagramMenuProps;
@@ -229,6 +249,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 					menuStateMap,
 					bgColor: firstFillableItem?.fill || "transparent",
 					borderColor: firstStrokableItem?.stroke || "transparent",
+					borderRadius: firstRectangleItem?.radius || 0,
 					fontSize: firstTextableItem?.fontSize ?? 0,
 					fontColor: firstTextableItem?.fontColor || "transparent",
 				} as DiagramMenuProps;
@@ -271,6 +292,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 		const newControlsStateMap = {
 			BgColor: false,
 			BorderColor: false,
+			BorderRadius: false,
 			FontSize: false,
 			FontColor: false,
 		} as {
@@ -280,6 +302,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 
 		setIsBgColorPickerOpen(newControlsStateMap.BgColor);
 		setIsBorderColorPickerOpen(newControlsStateMap.BorderColor);
+		setIsBorderRadiusSelectorOpen(newControlsStateMap.BorderRadius);
 		setIsFontSizeSelectorOpen(newControlsStateMap.FontSize);
 		setIsFontColorPickerOpen(newControlsStateMap.FontColor);
 	};
@@ -321,6 +344,9 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				break;
 			case "BorderColor":
 				openControl("BorderColor");
+				break;
+			case "BorderRadius":
+				openControl("BorderRadius");
 				break;
 			case "FontSize":
 				openControl("FontSize");
@@ -419,15 +445,6 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 		}
 	}, []);
 
-	diagramMenuProps.onFontSizeChange = useCallback((fontSize: number) => {
-		// Bypass references to avoid function creation in every render.
-		const { selectedItems, changeItems } = refBus.current;
-
-		changeItems(selectedItems, {
-			fontSize,
-		});
-	}, []);
-
 	diagramMenuProps.onBorderColorChange = useCallback((borderColor: string) => {
 		// Bypass references to avoid function creation in every render.
 		const { selectedItems, changeItems } = refBus.current;
@@ -443,6 +460,27 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 
 		changeItems(selectedItems, {
 			fill: bgColor,
+		});
+	}, []);
+
+	diagramMenuProps.onBorderRadiusChange = useCallback(
+		(borderRadius: number) => {
+			// Bypass references to avoid function creation in every render.
+			const { selectedItems, changeItems } = refBus.current;
+
+			changeItems(selectedItems, {
+				radius: borderRadius,
+			});
+		},
+		[],
+	);
+
+	diagramMenuProps.onFontSizeChange = useCallback((fontSize: number) => {
+		// Bypass references to avoid function creation in every render.
+		const { selectedItems, changeItems } = refBus.current;
+
+		changeItems(selectedItems, {
+			fontSize,
 		});
 	}, []);
 

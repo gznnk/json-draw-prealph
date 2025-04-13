@@ -13,11 +13,13 @@ export type DiagramMenuProps = {
 	menuStateMap: DiagramMenuStateMap;
 	bgColor: string;
 	borderColor: string;
+	borderRadius: number;
 	fontSize: number;
 	fontColor: string;
 	onMenuClick: (menuType: DiagramMenuType) => void;
 	onBgColorChange: (bgColor: string) => void;
 	onBorderColorChange: (borderColor: string) => void;
+	onBorderRadiusChange: (borderRadius: number) => void;
 	onFontSizeChange: (fontSize: number) => void;
 	onFontColorChange: (fontColor: string) => void;
 };
@@ -28,6 +30,7 @@ export type DiagramMenuProps = {
 export type DiagramMenuType =
 	| "BgColor"
 	| "BorderColor"
+	| "BorderRadius"
 	| "FontSize"
 	| "Bold"
 	| "FontColor"

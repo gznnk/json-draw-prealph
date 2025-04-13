@@ -43,6 +43,23 @@ export const findFirstStrokableRecursive = (
 	return undefined;
 };
 
+export const findFirstRectangleRecursive = (
+	items: Diagram[],
+): Diagram | undefined => {
+	for (const item of items) {
+		if (item.type === "Rectangle") {
+			return item;
+		}
+		if (isItemableData(item)) {
+			const foundItem = findFirstRectangleRecursive(item.items);
+			if (foundItem) {
+				return foundItem;
+			}
+		}
+	}
+	return undefined;
+};
+
 export const findFirstTextableRecursive = (
 	items: Diagram[],
 ): Diagram | undefined => {

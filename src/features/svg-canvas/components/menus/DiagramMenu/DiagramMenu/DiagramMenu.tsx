@@ -9,17 +9,18 @@ import { AlignRight } from "../../../icons/AlignRight";
 import { AspectRatio } from "../../../icons/AspectRatio";
 import { BgColor } from "../../../icons/BgColor";
 import { Bold } from "../../../icons/Bold";
-import { BringToFront } from "../../../icons/BringToFront";
+import { BorderRadius } from "../../../icons/BorderRadius";
 import { BringForward } from "../../../icons/BringForward";
+import { BringToFront } from "../../../icons/BringToFront";
 import { Edit } from "../../../icons/Edit";
 import { FontColor } from "../../../icons/FontColor";
 import { FontSize } from "../../../icons/FontSize";
 import { Group } from "../../../icons/Group";
+import { SendBackward } from "../../../icons/SendBackward";
 import { SendToBack } from "../../../icons/SendToBack";
 import { VerticalAlignBottom } from "../../../icons/VerticalAlignBottom";
 import { VerticalAlignMiddle } from "../../../icons/VerticalAlignMiddle";
 import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
-import { SendBackward } from "../../../icons/SendBackward";
 
 // Import types related to SvgCanvas.
 import type { RectangleVertices } from "../../../../types/CoordinateTypes";
@@ -30,7 +31,13 @@ import { calcRectangleVertices } from "../../../../utils/Math";
 // Imports related to this component.
 import { ColorPicker } from "../ColorPicker";
 import { DiagramMenuItem } from "../DiagramMenuItem";
-import { FontSizeSelector } from "../FontSizeSelector";
+import { NumberStepper } from "../NumberStepper";
+import {
+	MAX_BORDER_RADIUS,
+	MAX_FONT_SIZE,
+	MIN_BORDER_RADIUS,
+	MIN_FONT_SIZE,
+} from "./DiagramMenuConstants";
 import {
 	DiagramMenuDiv,
 	DiagramMenuDivider,
@@ -51,11 +58,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	menuStateMap,
 	bgColor,
 	borderColor,
+	borderRadius,
 	fontSize,
 	fontColor,
 	onMenuClick,
 	onBgColorChange,
 	onBorderColorChange,
+	onBorderRadiusChange,
 	onFontSizeChange,
 	onFontColorChange,
 }) => {
@@ -81,7 +90,11 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		return menuTypes.some((menuType) => menuStateMap[menuType] !== "Hidden");
 	};
 
-	const showFillableAndStrokableSection = showSection("BgColor", "BorderColor");
+	const showFillableAndStrokableSection = showSection(
+		"BgColor",
+		"BorderColor",
+		"BorderRadius",
+	);
 	const showTextAppearanceSection = showSection(
 		"FontSize",
 		"FontColor",
@@ -141,6 +154,27 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 								/>
 							)}
 						</DiagramMenuPositioner>
+						<DiagramMenuPositioner>
+							<DiagramMenuItem
+								menuType="BorderRadius"
+								tooltip="角丸"
+								viewBox="0 0 24 24"
+								menuStateMap={menuStateMap}
+								onMenuClick={onMenuClick}
+							>
+								<BorderRadius />
+							</DiagramMenuItem>
+							{menuStateMap.BorderRadius === "Active" && (
+								<NumberStepper
+									value={borderRadius}
+									min={MIN_BORDER_RADIUS}
+									max={MAX_BORDER_RADIUS}
+									minusTooltip="角丸を縮小"
+									plusTooltip="角丸を拡大"
+									onChange={onBorderRadiusChange}
+								/>
+							)}
+						</DiagramMenuPositioner>
 					</>
 				)}
 
@@ -158,9 +192,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 								<FontSize />
 							</DiagramMenuItem>
 							{menuStateMap.FontSize === "Active" && (
-								<FontSizeSelector
-									fontSize={fontSize}
-									onFontSizeChange={onFontSizeChange}
+								<NumberStepper
+									value={fontSize}
+									min={MIN_FONT_SIZE}
+									max={MAX_FONT_SIZE}
+									minusTooltip="フォントサイズを縮小"
+									plusTooltip="フォントサイズを拡大"
+									onChange={onFontSizeChange}
 								/>
 							)}
 						</DiagramMenuPositioner>

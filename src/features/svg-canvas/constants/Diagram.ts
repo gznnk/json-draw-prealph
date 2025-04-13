@@ -93,8 +93,7 @@ export const DEFAULT_RECTANGLE_DATA = {
 	...DEFAULT_FILLABLE_DATA,
 	...DEFAULT_TEXTABLE_DATA,
 	type: "Rectangle",
-	rx: 0,
-	ry: 0,
+	radius: 0,
 } as const satisfies RectangleData;
 
 /**

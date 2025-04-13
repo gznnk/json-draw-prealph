@@ -183,8 +183,7 @@ export type RectangleData = CreateDiagramType<{
 	fillable: true;
 	textable: true;
 }> & {
-	rx: number;
-	ry: number;
+	radius: number;
 };
 
 /**
