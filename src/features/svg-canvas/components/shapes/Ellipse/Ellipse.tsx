@@ -26,7 +26,7 @@ import { Transformative } from "../../core/Transformative";
 import { ConnectPoint } from "../ConnectPoint";
 
 // SvgCanvas関連カスタムフックをインポート
-import { useDrag } from "../../../hooks/dragHooks";
+import { useDrag } from "../../../hooks/useDrag";
 
 // SvgCanvas関連関数をインポート
 import { createSvgTransform } from "../../../utils/Diagram";

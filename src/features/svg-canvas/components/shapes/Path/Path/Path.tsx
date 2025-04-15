@@ -25,7 +25,7 @@ import type {
 } from "../../../../types/EventTypes";
 
 // Import SvgCanvas related hooks.
-import { useDrag } from "../../../../hooks/dragHooks";
+import { useDrag } from "../../../../hooks/useDrag";
 
 // Import functions related to SvgCanvas.
 import {
