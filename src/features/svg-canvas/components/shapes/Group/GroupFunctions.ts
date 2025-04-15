@@ -1,5 +1,5 @@
 // SvgCanvas関連型定義をインポート
-import type { Diagram } from "../../../types/DiagramTypes";
+import type { Diagram } from "../../../types/DiagramCatalog";
 
 // SvgCanvas関連関数をインポート
 import {

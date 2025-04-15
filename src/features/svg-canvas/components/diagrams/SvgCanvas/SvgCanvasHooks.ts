@@ -5,13 +5,7 @@ import { useCallback, useState } from "react";
 import type { PartiallyRequired } from "../../../../../types/ParticallyRequired";
 
 // Import types related to SvgCanvas.
-import type {
-	ConnectLineData,
-	Diagram,
-	DiagramType,
-	GroupData,
-	PathPointData,
-} from "../../../types/DiagramTypes";
+import type { Diagram, DiagramType } from "../../../types/DiagramCatalog";
 import type {
 	ConnectPointMoveData,
 	ConnectPointsMoveEvent,
@@ -27,6 +21,9 @@ import type {
 	StackOrderChangeEvent,
 	SvgCanvasResizeEvent,
 } from "../../../types/EventTypes";
+import type { ConnectLineData } from "../../shapes/ConnectLine";
+import type { GroupData } from "../../shapes/Group";
+import type { PathPointData } from "../../shapes/Path";
 
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../../shapes/ConnectLine";

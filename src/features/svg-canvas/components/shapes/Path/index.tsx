@@ -1,2 +1,2 @@
-export { Path, DEFAULT_PATH_DATA, createPathData } from "./Path";
-export { PathPoint } from "./PathPoint";
+export { createPathData, DEFAULT_PATH_DATA, Path, type PathData } from "./Path";
+export { PathPoint, type PathPointData } from "./PathPoint";

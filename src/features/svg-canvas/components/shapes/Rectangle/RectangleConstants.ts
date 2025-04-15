@@ -1,4 +1,4 @@
-import type { RectangleData } from "../../../types/DiagramTypes";
+import type { RectangleData } from "./RectangleTypes";
 
 import {
 	DEFAULT_DIAGRAM_BASE_DATA,

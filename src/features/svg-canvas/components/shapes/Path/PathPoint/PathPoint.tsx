@@ -6,10 +6,10 @@ import { memo } from "react";
 import { DragPoint } from "../../../core/DragPoint";
 
 // Import types related to SvgCanvas.
-import type {
-	CreateDiagramProps,
-	PathPointData,
-} from "../../../../types/DiagramTypes";
+import type { CreateDiagramProps } from "../../../../types/DiagramTypes";
+
+// Import related to this component.
+import type { PathPointData } from "./PathPointTypes";
 
 /**
  * 折れ線の頂点プロパティ

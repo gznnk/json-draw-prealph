@@ -1,4 +1,4 @@
-import type { EllipseData } from "../../../types/DiagramTypes";
+import type { EllipseData } from "./EllipseTypes";
 
 import {
 	DEFAULT_DIAGRAM_BASE_DATA,

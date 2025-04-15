@@ -1,5 +1,5 @@
+import type { Diagram } from "../types/DiagramCatalog";
 import type {
-	Diagram,
 	DiagramBaseData,
 	SelectableData,
 	TransformativeData,

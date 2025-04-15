@@ -8,11 +8,8 @@ import { PositionLabel } from "../../../core/PositionLabel";
 import { Group } from "../../Group";
 
 // Import types related to SvgCanvas.
-import type {
-	CreateDiagramProps,
-	Diagram,
-	PathData,
-} from "../../../../types/DiagramTypes";
+import type { Diagram } from "../../../../types/DiagramCatalog";
+import type { CreateDiagramProps } from "../../../../types/DiagramTypes";
 import type {
 	DiagramChangeEvent,
 	DiagramClickEvent,
@@ -31,6 +28,7 @@ import { calcPointsOuterShape, calcRadians } from "../../../../utils/Math";
 import { NewVertexList } from "../NewVertexList";
 import { SegmentList } from "../SegmentList";
 import { createDValue } from "./PathFunctions";
+import type { PathData } from "./PathTypes";
 
 /**
  * 折れ線コンポーネントのプロパティ

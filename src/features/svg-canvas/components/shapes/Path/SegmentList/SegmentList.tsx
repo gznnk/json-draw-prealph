@@ -3,7 +3,7 @@ import type React from "react";
 import { memo, useCallback, useRef, useState } from "react";
 
 // Import types related to SvgCanvas.
-import type { Diagram, PathPointData } from "../../../../types/DiagramTypes";
+import type { Diagram } from "../../../../types/DiagramCatalog";
 import type {
 	DiagramChangeEvent,
 	DiagramClickEvent,
@@ -16,6 +16,7 @@ import { newId } from "../../../../utils/Diagram";
 
 // Imports related to this component.
 import { Segment, type SegmentData } from "../Segment";
+import type { PathPointData } from "../PathPoint";
 
 /**
  * 線分リストプロパティ

@@ -2,12 +2,9 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
-import type {
-	CreateDiagramProps,
-	Diagram,
-	GroupData,
-} from "../../../types/DiagramTypes";
-import { DiagramTypeComponentMap } from "../../../types/DiagramTypes";
+import type { Diagram } from "../../../types/DiagramCatalog";
+import { DiagramComponentCatalog } from "../../../types/DiagramCatalog";
+import type { CreateDiagramProps } from "../../../types/DiagramTypes";
 import type {
 	ConnectPointsMoveEvent,
 	DiagramChangeEvent,
@@ -32,6 +29,7 @@ import {
 	getChildDiagramById,
 	getSelectedChildDiagram,
 } from "./GroupFunctions";
+import type { GroupData } from "./GroupTypes";
 
 /**
  * グループのプロパティ
@@ -560,7 +558,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 
 	// グループ内の図形の作成
 	const children = items.map((item) => {
-		const itemType = DiagramTypeComponentMap[item.type];
+		const component = DiagramComponentCatalog[item.type];
 		const props = {
 			...item,
 			key: item.id,
@@ -576,7 +574,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			onTextEdit: handleChildDiagramTextEdit,
 		};
 
-		return React.createElement(itemType, props);
+		return React.createElement(component, props);
 	});
 
 	return (

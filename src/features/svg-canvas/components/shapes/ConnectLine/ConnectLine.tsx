@@ -3,12 +3,8 @@ import type React from "react";
 import { memo, useCallback, useContext, useEffect, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type {
-	ConnectLineData,
-	CreateDiagramProps,
-	Diagram,
-	Shape,
-} from "../../../types/DiagramTypes";
+import type { Diagram } from "../../../types/DiagramCatalog";
+import type { CreateDiagramProps, Shape } from "../../../types/DiagramTypes";
 import type {
 	ConnectPointMoveData,
 	ConnectPointsMoveEvent,
@@ -26,6 +22,7 @@ import { calcRadians, radiansToDegrees } from "../../../utils/Math";
 
 // Imports related to this component.
 import { EVENT_NAME_CONNECT_POINTS_MOVE } from "./ConnectLineConstants";
+import type { ConnectLineData } from "./ConnectLineTypes";
 
 /**
  * Properties of ConnectLine component.

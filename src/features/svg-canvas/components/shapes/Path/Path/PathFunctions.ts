@@ -1,15 +1,13 @@
 // Import types related to SvgCanvas.
-import type {
-	Diagram,
-	PathData,
-	PathPointData,
-} from "../../../../types/DiagramTypes";
+import type { Diagram } from "../../../../types/DiagramCatalog";
 
 // Import functions related to SvgCanvas.
 import { newId } from "../../../../utils/Diagram";
 
 // Imports related to this component.
+import type { PathPointData } from "../PathPoint";
 import { DEFAULT_PATH_DATA } from "./PathConstants";
+import type { PathData } from "./PathTypes";
 
 export const createDValue = (items: Diagram[]) => {
 	let d = "";

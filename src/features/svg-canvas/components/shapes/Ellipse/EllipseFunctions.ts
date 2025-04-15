@@ -1,6 +1,6 @@
 // SvgCanvas関連型定義をインポート
 import type { EllipseVertices } from "../../../types/CoordinateTypes";
-import type { Diagram, EllipseData } from "../../../types/DiagramTypes";
+import type { Diagram } from "../../../types/DiagramCatalog";
 
 // SvgCanvas関連関数をインポート
 import { newId } from "../../../utils/Diagram";
@@ -8,6 +8,7 @@ import { calcEllipseVertices } from "../../../utils/Math";
 
 // Imports related to this component.
 import { DEFAULT_ELLIPSE_DATA } from "./EllipseConstants";
+import type { EllipseData } from "./EllipseTypes";
 
 /**
  * 楕円データ作成

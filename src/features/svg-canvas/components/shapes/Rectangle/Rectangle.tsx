@@ -4,12 +4,7 @@ import { memo, useCallback, useMemo, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
 import type { RectangleVertices } from "../../../types/CoordinateTypes";
-import type {
-	ConnectPointData,
-	CreateDiagramProps,
-	RectangleData,
-	Shape,
-} from "../../../types/DiagramTypes";
+import type { CreateDiagramProps, Shape } from "../../../types/DiagramTypes";
 import type {
 	ConnectPointMoveData,
 	DiagramDragEvent,
@@ -20,10 +15,10 @@ import type {
 } from "../../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import { ConnectPoint } from "../ConnectPoint";
 import { PositionLabel } from "../../core/PositionLabel";
 import { Textable } from "../../core/Textable";
 import { Transformative } from "../../core/Transformative";
+import { ConnectPoint, type ConnectPointData } from "../ConnectPoint";
 
 // SvgCanvas関連カスタムフックをインポート
 import { useDrag } from "../../../hooks/useDrag";
@@ -31,6 +26,9 @@ import { useDrag } from "../../../hooks/useDrag";
 // SvgCanvas関連関数をインポート
 import { createSvgTransform } from "../../../utils/Diagram";
 import { calcRectangleVertices, degreesToRadians } from "../../../utils/Math";
+
+// Imports related to this component.
+import type { RectangleData } from "./RectangleTypes";
 
 /**
  * 四角形コンポーネントのプロパティ

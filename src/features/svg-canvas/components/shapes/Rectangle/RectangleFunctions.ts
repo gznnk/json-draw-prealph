@@ -1,6 +1,6 @@
 // SvgCanvas関連型定義をインポート
 import type { RectangleVertices } from "../../../types/CoordinateTypes";
-import type { Diagram, RectangleData } from "../../../types/DiagramTypes";
+import type { Diagram } from "../../../types/DiagramCatalog";
 
 // SvgCanvas関連関数をインポート
 import { newId } from "../../../utils/Diagram";
@@ -8,6 +8,7 @@ import { calcRectangleVertices } from "../../../utils/Math";
 
 // Imports related to this component.
 import { DEFAULT_RECTANGLE_DATA } from "./RectangleConstants";
+import type { RectangleData } from "./RectangleTypes";
 
 /**
  * 四角形データ作成
