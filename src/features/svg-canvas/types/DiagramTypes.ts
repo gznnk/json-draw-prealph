@@ -20,7 +20,7 @@ import type {
 // SvgCanvas関連コンポーネントをインポート
 import ConnectLine from "../components/shapes/ConnectLine/ConnectLine";
 import type { ArrowHeadType } from "../components/core/ArrowHead";
-import Ellipse from "../components/shapes/Ellipse/Ellipse";
+import { Ellipse } from "../components/shapes/Ellipse";
 import Group from "../components/shapes/Group/Group";
 import { Path, PathPoint } from "../components/shapes/Path";
 import { Rectangle } from "../components/shapes/Rectangle";
