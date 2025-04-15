@@ -7,7 +7,6 @@ import type { RectangleVertices } from "../../../types/CoordinateTypes";
 import type {
 	ConnectPointData,
 	CreateDiagramProps,
-	Diagram,
 	RectangleData,
 	Shape,
 } from "../../../types/DiagramTypes";
@@ -30,8 +29,7 @@ import { Transformative } from "../../core/Transformative";
 import { useDrag } from "../../../hooks/dragHooks";
 
 // SvgCanvas関連関数をインポート
-import { DEFAULT_RECTANGLE_DATA } from "../../../constants/Diagram";
-import { createSvgTransform, newId } from "../../../utils/Diagram";
+import { createSvgTransform } from "../../../utils/Diagram";
 import { calcRectangleVertices, degreesToRadians } from "../../../utils/Math";
 
 /**
@@ -50,7 +48,7 @@ export type RectangleProps = CreateDiagramProps<
 /**
  * 四角形コンポーネント
  */
-const Rectangle: React.FC<RectangleProps> = ({
+const RectangleComponent: React.FC<RectangleProps> = ({
 	id,
 	x,
 	y,
@@ -372,77 +370,4 @@ const Rectangle: React.FC<RectangleProps> = ({
 	);
 };
 
-export default memo(Rectangle);
-
-/**
- * 四角形データ作成
- */
-export const createRectangleData = ({
-	x,
-	y,
-	width = 100,
-	height = 100,
-	radius = 0,
-	rotation = 0,
-	scaleX = 1,
-	scaleY = 1,
-	keepProportion = false,
-	fill = "transparent",
-	stroke = "black",
-	strokeWidth = "1px",
-}: {
-	x: number;
-	y: number;
-	width?: number;
-	height?: number;
-	radius?: number;
-	rotation?: number;
-	scaleX?: number;
-	scaleY?: number;
-	keepProportion?: boolean;
-	fill?: string;
-	stroke?: string;
-	strokeWidth?: string;
-}): RectangleData => {
-	// 接続ポイントを生成
-	const vertices = calcRectangleVertices({
-		x,
-		y,
-		width,
-		height,
-		rotation,
-		scaleX,
-		scaleY,
-	});
-
-	const items: Diagram[] = [];
-	for (const key of Object.keys(vertices)) {
-		const point = vertices[key as keyof RectangleVertices];
-		items.push({
-			id: newId(),
-			type: "ConnectPoint",
-			x: point.x,
-			y: point.y,
-			isSelected: false,
-			name: key,
-		});
-	}
-
-	return {
-		...DEFAULT_RECTANGLE_DATA,
-		id: newId(),
-		x,
-		y,
-		width,
-		height,
-		radius,
-		rotation,
-		scaleX,
-		scaleY,
-		keepProportion,
-		fill,
-		stroke,
-		strokeWidth,
-		items,
-	} as RectangleData;
-};
+export const Rectangle = memo(RectangleComponent);

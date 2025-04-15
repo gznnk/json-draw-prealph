@@ -1,6 +1,6 @@
 import { createEllipseData } from "../components/shapes/Ellipse/Ellipse";
 import { calcGroupBoxOfNoRotation } from "../components/shapes/Group/Group";
-import { createRectangleData } from "../components/shapes/Rectangle/Rectangle";
+import { createRectangleData } from "../components/shapes/Rectangle";
 import { DEFAULT_PATH_DATA } from "../components/shapes/Path";
 import type {
 	Diagram,

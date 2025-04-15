@@ -2,7 +2,7 @@ import { SvgCanvas, useSvgCanvas } from "./features/svg-canvas";
 import Button from "./components/atoms/Button";
 // import Input from "./components/atoms/Input";
 import type { Diagram } from "./features/svg-canvas/types/DiagramTypes";
-import { createRectangleData } from "./features/svg-canvas/components/shapes/Rectangle/Rectangle";
+import { createRectangleData } from "./features/svg-canvas/components/shapes/Rectangle";
 import { createEllipseData } from "./features/svg-canvas/components/shapes/Ellipse/Ellipse";
 import AIChat from "./components/organisms/AIChat";
 
