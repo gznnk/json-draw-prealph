@@ -22,7 +22,7 @@ import {
 import { TextEditor, useTextEditor } from "../../core/Textable";
 import { ContextMenu, useContextMenu } from "../../menus/ContextMenu";
 import { DiagramMenu, useDiagramMenu } from "../../menus/DiagramMenu";
-import Group from "../../shapes/Group/Group";
+import { Group } from "../../shapes/Group";
 
 // SvgCanvas関連関数をインポート
 import { newEventId } from "../../../utils/Util";

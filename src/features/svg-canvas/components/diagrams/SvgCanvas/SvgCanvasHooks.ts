@@ -31,7 +31,7 @@ import type {
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../../shapes/ConnectLine/ConnectLine";
 import { createEllipseData } from "../../shapes/Ellipse";
-import { calcGroupBoxOfNoRotation } from "../../shapes/Group/Group";
+import { calcGroupBoxOfNoRotation } from "../../shapes/Group";
 import { createRectangleData } from "../../shapes/Rectangle";
 
 // Import functions related to SvgCanvas.

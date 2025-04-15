@@ -21,7 +21,7 @@ import type {
 import ConnectLine from "../components/shapes/ConnectLine/ConnectLine";
 import type { ArrowHeadType } from "../components/core/ArrowHead";
 import { Ellipse } from "../components/shapes/Ellipse";
-import Group from "../components/shapes/Group/Group";
+import { Group } from "../components/shapes/Group";
 import { Path, PathPoint } from "../components/shapes/Path";
 import { Rectangle } from "../components/shapes/Rectangle";
 

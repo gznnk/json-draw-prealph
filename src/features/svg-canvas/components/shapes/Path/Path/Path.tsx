@@ -7,7 +7,7 @@ import { ArrowHead } from "../../../core/ArrowHead";
 import { DragLine } from "../../../core/DragLine";
 import { DragPoint } from "../../../core/DragPoint";
 import { PositionLabel } from "../../../core/PositionLabel";
-import Group from "../../Group/Group";
+import { Group } from "../../Group";
 
 // Import types related to SvgCanvas.
 import type { Point } from "../../../../types/CoordinateTypes";
