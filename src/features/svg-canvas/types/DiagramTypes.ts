@@ -18,7 +18,7 @@ import type {
 } from "./EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import ConnectLine from "../components/shapes/ConnectLine/ConnectLine";
+import { ConnectLine } from "../components/shapes/ConnectLine";
 import type { ArrowHeadType } from "../components/core/ArrowHead";
 import { Ellipse } from "../components/shapes/Ellipse";
 import { Group } from "../components/shapes/Group";
