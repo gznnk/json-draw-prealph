@@ -5,11 +5,7 @@ import { useCallback, useState } from "react";
 import type { PartiallyRequired } from "../../../../../types/ParticallyRequired";
 
 // Import types related to SvgCanvas.
-import {
-	DiagramConnectPointCalculators,
-	type Diagram,
-	type DiagramType,
-} from "../../../types/DiagramCatalog";
+import type { Diagram, DiagramType } from "../../../types/DiagramCatalog";
 import type {
 	ConnectPointMoveData,
 	DiagramChangeEvent,
@@ -36,7 +32,6 @@ import { createRectangleData } from "../../shapes/Rectangle";
 
 // Import functions related to SvgCanvas.
 import {
-	isConnectableData,
 	isItemableData,
 	isSelectableData,
 	newId,
@@ -54,14 +49,15 @@ import {
 	removeGroupedRecursive,
 	saveCanvasDataToLocalStorage,
 	ungroupSelectedGroupsRecursive,
-	updateConnectPoints,
+	updateConnectPointsAndCollect,
+	updateConnectPointsAndCollectRecursive,
+	updateConnectPointsAndNotifyMove,
 } from "./SvgCanvasFunctions";
 
 // Imports related to this component.
 import { createPathData } from "../../shapes/Path";
 import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
 import type { SvgCanvasState } from "./SvgCanvasTypes";
-import type { ConnectPointData } from "../../shapes/ConnectPoint";
 
 // TODO: 精査
 type UpdateItem = Omit<PartiallyRequired<Diagram, "id">, "type" | "isSelected">;
@@ -113,7 +109,11 @@ export const useSvgCanvas = (
 							x: e.endX,
 							y: e.endY,
 						};
-						return updateConnectPoints(e.eventId, e.eventType, newItem);
+						return updateConnectPointsAndNotifyMove(
+							e.eventId,
+							e.eventType,
+							newItem,
+						);
 					}
 					return item;
 				}),
@@ -158,7 +158,14 @@ export const useSvgCanvas = (
 							...item,
 							...e.endShape,
 						};
-						return updateConnectPoints(e.eventId, e.eventType, newItem);
+
+						// Update the connect points of the diagram.
+						// And notify the connect points move event to ConnectLine.
+						return updateConnectPointsAndNotifyMove(
+							e.eventId,
+							e.eventType,
+							newItem,
+						);
 					}
 					return item;
 				}),
@@ -186,39 +193,6 @@ export const useSvgCanvas = (
 			let multiSelectGroup: GroupData | undefined = prevState.multiSelectGroup;
 
 			const connectPointMoveDataList: ConnectPointMoveData[] = [];
-
-			/**
-			 * Update the connect points of the diagram when it changes.
-			 *
-			 * @param newItem - The new diagram item.
-			 * @returns The updated diagram item with connect points.
-			 */
-			const updateConnectPointsOnDiagramChange = (newItem: Diagram) => {
-				if (isConnectableData(newItem)) {
-					const connectPoints =
-						DiagramConnectPointCalculators[newItem.type](newItem);
-					if (connectPoints.length > 0) {
-						newItem.connectPoints = connectPoints.map((c) => ({
-							...c,
-							type: "ConnectPoint",
-						})) as ConnectPointData[];
-
-						for (const connectPoint of newItem.connectPoints) {
-							connectPointMoveDataList.push({
-								id: connectPoint.id,
-								x: connectPoint.x,
-								y: connectPoint.y,
-								name: connectPoint.name,
-								ownerId: newItem.id,
-								ownerShape: {
-									...newItem,
-								},
-							});
-						}
-					}
-				}
-				return newItem;
-			};
 
 			if (e.id === MULTI_SELECT_GROUP) {
 				// 複数選択グループの変更の場合、複数選択グループ内の図形を更新
@@ -253,7 +227,9 @@ export const useSvgCanvas = (
 						};
 					}
 
-					newItem = updateConnectPointsOnDiagramChange(newItem);
+					// Update the connect points of the diagram.
+					// And collect the connect points move data.
+					updateConnectPointsAndCollect(newItem, connectPointMoveDataList);
 
 					return newItem;
 				});
@@ -264,13 +240,20 @@ export const useSvgCanvas = (
 					if (item.id !== e.id) return item;
 
 					// If the id matches, update the item with the new properties.
-					let newItem = { ...item, ...e.endDiagram };
-					newItem = updateConnectPointsOnDiagramChange(newItem); // TODO: 再帰的に接続ポイントを更新するようにする
+					const newItem = { ...item, ...e.endDiagram };
+
+					// Update the connect points of the diagram.
+					updateConnectPointsAndCollectRecursive(
+						newItem,
+						connectPointMoveDataList,
+					);
+
+					// Return the updated item.
 					return newItem;
 				});
 
 				if (multiSelectGroup) {
-					// TODO: 接続ポイントの更新
+					// TODO: 接続ポイントの更新（現時点では該当ルートで接続ポイントの移動はない）
 					// Propagate the original diagram changes to the items in the multi-select group.
 					multiSelectGroup.items = applyRecursive(
 						multiSelectGroup.items,
