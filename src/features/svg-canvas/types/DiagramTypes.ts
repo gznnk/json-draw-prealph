@@ -27,6 +27,16 @@ export type Shape = {
 };
 
 /**
+ * Bounds of a diagram.
+ */
+export type Bounds = {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+};
+
+/**
  * 図形の基本データ
  */
 export type DiagramBaseData = {
@@ -161,7 +171,7 @@ export type TransformativeProps = {
 };
 
 /**
- * Properties of having child diagrams component.
+ * Props for having child diagrams component.
  *
  * @property {function} onDiagramChange - Event handler for diagram change.
  *                                        Trigger this handler when notifying changes in the properties of a diagram.
@@ -171,7 +181,7 @@ export type ItemableProps = {
 };
 
 /**
- * Properties of connectable component.
+ * Props for connectable component.
  *
  * @property {boolean} showConnectPoints - Visibility of owned ConnectPoint components.
  *                                         When false, the connectable component must not render ConnectPoint components.
@@ -184,7 +194,7 @@ export type ConnectableProps = {
 };
 
 /**
- * Properties of textable component.
+ * Props for textable component.
  */
 export type TextableProps = {
 	onTextEdit?: (e: DiagramTextEditEvent) => void;

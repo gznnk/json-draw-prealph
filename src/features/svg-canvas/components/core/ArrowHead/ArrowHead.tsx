@@ -10,7 +10,7 @@ import { ARROW_HEAD_SIZE } from "./ArrowHeadConstants";
 import type { ArrowHeadType } from "./ArrowHeadTypes";
 
 /**
- * Properties of ArrowHead component.
+ * Props for ArrowHead component.
  */
 type ArrowHeadProps = {
 	type: ArrowHeadType;

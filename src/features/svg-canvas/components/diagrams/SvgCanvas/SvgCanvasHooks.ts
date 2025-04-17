@@ -27,7 +27,10 @@ import type { PathPointData } from "../../shapes/Path";
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../../shapes/ConnectLine";
 import { createEllipseData } from "../../shapes/Ellipse";
-import { calcGroupBoxOfNoRotation } from "../../shapes/Group";
+import {
+	calcGroupBoxOfNoRotation,
+	calcBoundsOfGroup,
+} from "../../shapes/Group";
 import { createRectangleData } from "../../shapes/Rectangle";
 
 // Import functions related to SvgCanvas.
@@ -51,6 +54,7 @@ import {
 	ungroupSelectedGroupsRecursive,
 	updateConnectPointsAndCollectRecursive,
 	updateConnectPointsAndNotifyMove,
+	isHistoryEvent,
 } from "./SvgCanvasFunctions";
 
 // Imports related to this component.
@@ -122,7 +126,7 @@ export const useSvgCanvas = (
 				isDiagramChanging: e.eventType !== "End" && e.eventType !== "Instant",
 			};
 
-			if (e.eventType === "End") {
+			if (isHistoryEvent(e.eventType)) {
 				// console.log(
 				// 	"onDrag",
 				// 	prevState.lastHistoryEventId,
@@ -174,7 +178,7 @@ export const useSvgCanvas = (
 				isDiagramChanging: e.eventType !== "End" && e.eventType !== "Instant",
 			};
 
-			if (e.eventType === "End") {
+			if (isHistoryEvent(e.eventType)) {
 				// 終了時に履歴を追加
 				newState.lastHistoryEventId = e.eventId;
 				newState = addHistory(prevState, newState);
@@ -197,11 +201,14 @@ export const useSvgCanvas = (
 			const connectPointMoveDataList: ConnectPointMoveData[] = [];
 
 			if (e.id === MULTI_SELECT_GROUP) {
-				// 複数選択グループの変更の場合、複数選択グループ内の図形を更新
+				// The case of multi-select group change.
+
+				// Update the multi-select group with the new properties.
 				multiSelectGroup = {
 					...multiSelectGroup,
 					...e.endDiagram,
 				} as GroupData;
+
 				// Update the connect points of the multi-select group.
 				if (e.changeType !== "Appearance") {
 					updateConnectPointsAndCollectRecursive(
@@ -278,6 +285,22 @@ export const useSvgCanvas = (
 				}
 			}
 
+			// Update outline of all groups.
+			items = applyRecursive(items, (item) => {
+				if (isItemableData(item)) {
+					// Update the group bounds.
+					const box = calcBoundsOfGroup(item);
+					return {
+						...item,
+						x: box.x,
+						y: box.y,
+						width: box.width,
+						height: box.height,
+					};
+				}
+				return item;
+			});
+
 			// 新しい状態を作成
 			let newState = {
 				...prevState,
@@ -286,7 +309,7 @@ export const useSvgCanvas = (
 				multiSelectGroup,
 			} as SvgCanvasState;
 
-			if (e.eventType === "End") {
+			if (isHistoryEvent(e.eventType)) {
 				// 終了時に履歴を追加
 				newState.lastHistoryEventId = e.eventId;
 				newState = addHistory(prevState, newState);

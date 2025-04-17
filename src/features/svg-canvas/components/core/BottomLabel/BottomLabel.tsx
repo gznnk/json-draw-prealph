@@ -9,7 +9,7 @@ import { calcRectangleVertices } from "../../../utils/Math";
 import { calcBottomLabelPosition } from "./BottomLabelFunctions";
 
 /**
- * Properties of BottomLabel component.
+ * Props for BottomLabel component.
  */
 type BottomLabelProps = {
 	x: number;

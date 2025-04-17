@@ -8,6 +8,7 @@ import {
 	isTransformativeData,
 } from "../../../utils/Diagram";
 import { degreesToRadians, nanToZero, rotatePoint } from "../../../utils/Math";
+import type { GroupData } from "./GroupTypes";
 
 /**
  * 選択されたグループ内の図形を、配下のグループも含めて再帰的に取得する
@@ -192,5 +193,20 @@ export const calcGroupBoxOfNoRotation = (
 		bottom,
 		left,
 		right,
+	};
+};
+
+export const calcBoundsOfGroup = (group: GroupData) => {
+	const { items, x, y, rotation } = group;
+	const radians = degreesToRadians(rotation);
+	const box = calcGroupBoxOfNoRotation(items, x, y, rotation);
+	const leftTop = rotatePoint(box.left, box.top, x, y, radians);
+	const rightBottom = rotatePoint(box.right, box.bottom, x, y, radians);
+
+	return {
+		x: leftTop.x + nanToZero(rightBottom.x - leftTop.x) / 2,
+		y: leftTop.y + nanToZero(rightBottom.y - leftTop.y) / 2,
+		width: box.right - box.left,
+		height: box.bottom - box.top,
 	};
 };

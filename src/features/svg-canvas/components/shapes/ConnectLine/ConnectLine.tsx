@@ -25,7 +25,7 @@ import { EVENT_NAME_CONNECT_POINTS_MOVE } from "./ConnectLineConstants";
 import type { ConnectLineData } from "./ConnectLineTypes";
 
 /**
- * Properties of ConnectLine component.
+ * Props for ConnectLine component.
  */
 type ConnectLineProps = CreateDiagramProps<
 	ConnectLineData,

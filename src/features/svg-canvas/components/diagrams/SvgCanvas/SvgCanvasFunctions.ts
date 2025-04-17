@@ -473,3 +473,7 @@ export const updateConnectPointsAndCollectRecursive = (
 		}
 	}
 };
+
+export const isHistoryEvent = (eventType: EventType): boolean => {
+	return eventType === "End" || eventType === "Instant";
+};

@@ -1,7 +1,7 @@
-// Reactのインポート
+// Import React.
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 
-// SvgCanvas関連型定義をインポート
+// Import types related to SvgCanvas.
 import type { Diagram } from "../../../types/DiagramCatalog";
 import { DiagramComponentCatalog } from "../../../types/DiagramCatalog";
 import type { CreateDiagramProps } from "../../../types/DiagramTypes";
@@ -14,13 +14,13 @@ import type {
 	DiagramTransformEvent,
 } from "../../../types/EventTypes";
 
-// SvgCanvas関連コンポーネントをインポート
+// Import components related to SvgCanvas.
 import { PositionLabel } from "../../core/PositionLabel";
 import { Transformative } from "../../core/Transformative";
 
-// SvgCanvas関連関数をインポート
+// Import functions related to SvgCanvas.
 import { isItemableData, isTransformativeData } from "../../../utils/Diagram";
-import { degreesToRadians, rotatePoint } from "../../../utils/Math";
+import { degreesToRadians, nanToZero, rotatePoint } from "../../../utils/Math";
 
 // Imports related to this component.
 import {
@@ -31,7 +31,7 @@ import {
 import type { GroupData } from "./GroupTypes";
 
 /**
- * グループのプロパティ
+ * Props for Group component.
  */
 export type GroupProps = CreateDiagramProps<
 	GroupData,
@@ -45,7 +45,7 @@ export type GroupProps = CreateDiagramProps<
 >;
 
 /**
- * グループコンポーネント
+ * Group component.
  */
 const GroupComponent: React.FC<GroupProps> = ({
 	id,
@@ -70,18 +70,23 @@ const GroupComponent: React.FC<GroupProps> = ({
 	onConnect,
 	onTextEdit,
 }) => {
-	// グループ全体のドラッグ中かどうかのフラグ（このグループが選択中でかつドラッグ中の場合のみtrueにする）
+	// Flag indicating whether the entire group is being dragged.
+	// Set to true only when this group is selected and currently being dragged.
 	const [isGroupDragging, setIsGroupDragging] = useState(false);
-	// グループ全体の変形中かのフラグ
+
+	// Flag indicating whether the entire group is being transformed.
 	const [isGroupTransforming, setIsGroupTransforming] = useState(false);
 
-	// グループ連続選択フラグ。グループ連続選択とは、グループ内の図形（同じ図形でなくてよい）を連続して選択する操作のこと。
-	// このグループが選択中でかつ再度グループ内の図形でポインター押下された場合のみtrueにする
+	// Flag for sequential selection.
+	// Sequential selection refers to the operation of selecting shape within the same group in succession,
+	// even if the shape are not the same.
+	// This is set to true only when the group is already selected and the pointer is pressed again on a shape inside the group.
 	const isSequentialSelection = useRef(false);
 
-	// ドラッグ・変形開始時の子図形のリスト
+	// List of child shapes at the start of a drag or transform.
 	const startItems = useRef<Diagram[]>(items);
-	// ドラッグ・変形開始時のグループの形状
+
+	// Group's bounding box at the start of a drag or transform.
 	const startBox = useRef({ x, y, width, height });
 
 	/**
@@ -109,8 +114,8 @@ const GroupComponent: React.FC<GroupProps> = ({
 				scaleY,
 			},
 			endShape: {
-				x: leftTop.x + (rightBottom.x - leftTop.x) / 2,
-				y: leftTop.y + (rightBottom.y - leftTop.y) / 2,
+				x: leftTop.x + nanToZero(rightBottom.x - leftTop.x) / 2,
+				y: leftTop.y + nanToZero(rightBottom.y - leftTop.y) / 2,
 				width: box.right - box.left,
 				height: box.bottom - box.top,
 				rotation,
@@ -148,11 +153,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	 * グループ内の図形の選択イベントハンドラ
 	 */
 	const handleChildDiagramSelect = useCallback((e: DiagramSelectEvent) => {
-		const { id, isSelected, items, onSelect, transformGroupOutline } =
-			refBus.current;
-
-		// 複数選択時の移動・変形でアウトラインがずれるので、選択時にアウトラインを更新する
-		transformGroupOutline(e.eventId);
+		const { id, isSelected, items, onSelect } = refBus.current;
 
 		const selectedChild = getSelectedChildDiagram(items);
 		if (!selectedChild) {
