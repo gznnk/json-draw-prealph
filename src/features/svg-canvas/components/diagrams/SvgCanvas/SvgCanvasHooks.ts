@@ -27,10 +27,7 @@ import type { PathPointData } from "../../shapes/Path";
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../../shapes/ConnectLine";
 import { createEllipseData } from "../../shapes/Ellipse";
-import {
-	calcGroupBoxOfNoRotation,
-	calcBoundsOfGroup,
-} from "../../shapes/Group";
+import { calcGroupBoxOfNoRotation } from "../../shapes/Group";
 import { createRectangleData } from "../../shapes/Rectangle";
 
 // Import functions related to SvgCanvas.
@@ -55,6 +52,7 @@ import {
 	updateConnectPointsAndCollectRecursive,
 	updateConnectPointsAndNotifyMove,
 	isHistoryEvent,
+	updateOutlineOfAllGroups,
 } from "./SvgCanvasFunctions";
 
 // Imports related to this component.
@@ -126,6 +124,9 @@ export const useSvgCanvas = (
 				isDiagramChanging: e.eventType !== "End" && e.eventType !== "Instant",
 			};
 
+			// Update outline of all groups.
+			newState.items = updateOutlineOfAllGroups(newState.items);
+
 			if (isHistoryEvent(e.eventType)) {
 				// console.log(
 				// 	"onDrag",
@@ -177,6 +178,9 @@ export const useSvgCanvas = (
 				}),
 				isDiagramChanging: e.eventType !== "End" && e.eventType !== "Instant",
 			};
+
+			// Update outline of all groups.
+			newState.items = updateOutlineOfAllGroups(newState.items);
 
 			if (isHistoryEvent(e.eventType)) {
 				// 終了時に履歴を追加
@@ -286,20 +290,7 @@ export const useSvgCanvas = (
 			}
 
 			// Update outline of all groups.
-			items = applyRecursive(items, (item) => {
-				if (isItemableData(item)) {
-					// Update the group bounds.
-					const box = calcBoundsOfGroup(item);
-					return {
-						...item,
-						x: box.x,
-						y: box.y,
-						width: box.width,
-						height: box.height,
-					};
-				}
-				return item;
-			});
+			items = updateOutlineOfAllGroups(items);
 
 			// 新しい状態を作成
 			let newState = {

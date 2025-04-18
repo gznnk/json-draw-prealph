@@ -20,14 +20,10 @@ import { Transformative } from "../../core/Transformative";
 
 // Import functions related to SvgCanvas.
 import { isItemableData, isTransformativeData } from "../../../utils/Diagram";
-import { degreesToRadians, nanToZero, rotatePoint } from "../../../utils/Math";
+import { degreesToRadians, rotatePoint } from "../../../utils/Math";
 
 // Imports related to this component.
-import {
-	calcGroupBoxOfNoRotation,
-	getChildDiagramById,
-	getSelectedChildDiagram,
-} from "./GroupFunctions";
+import { getSelectedChildDiagram } from "./GroupFunctions";
 import type { GroupData } from "./GroupTypes";
 
 /**
@@ -89,42 +85,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 	// Group's bounding box at the start of a drag or transform.
 	const startBox = useRef({ x, y, width, height });
 
-	/**
-	 * 子図形の変更時にグループのアウトラインを更新する
-	 *
-	 * @param changeItem - 変更された子図形
-	 */
-	const transformGroupOutline = (eventId: string, changeItem?: Diagram) => {
-		const radians = degreesToRadians(rotation);
-		const box = calcGroupBoxOfNoRotation(items, x, y, rotation, changeItem);
-		const leftTop = rotatePoint(box.left, box.top, x, y, radians);
-		const rightBottom = rotatePoint(box.right, box.bottom, x, y, radians);
-
-		onTransform?.({
-			eventId,
-			eventType: "Instant",
-			id,
-			startShape: {
-				x,
-				y,
-				width,
-				height,
-				rotation,
-				scaleX,
-				scaleY,
-			},
-			endShape: {
-				x: leftTop.x + nanToZero(rightBottom.x - leftTop.x) / 2,
-				y: leftTop.y + nanToZero(rightBottom.y - leftTop.y) / 2,
-				width: box.right - box.left,
-				height: box.bottom - box.top,
-				rotation,
-				scaleX,
-				scaleY,
-			},
-		});
-	};
-
 	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
 	const refBusVal = {
 		// プロパティ
@@ -144,7 +104,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 		onTextEdit,
 		// 内部変数・内部関数
 		isGroupDragging,
-		transformGroupOutline,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -222,7 +181,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 			onDrag,
 			onDiagramChange,
 			isGroupDragging,
-			transformGroupOutline,
 		} = refBus.current;
 
 		// ドラッグ開始時の処理
@@ -262,19 +220,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 
 		// 以降ドラッグ中・ドラッグ終了時の処理
 		if (!isGroupDragging) {
-			if (e.eventType === "End") {
-				// グループ全体のドラッグでない場合、ドラッグ終了時に
-				// 子図形のドラッグに伴うアウトラインの更新を行う
-				const changeItem = getChildDiagramById(items, e.id);
-				if (changeItem) {
-					transformGroupOutline(e.eventId, {
-						...changeItem,
-						x: e.endX,
-						y: e.endY,
-					} as Diagram);
-				}
-			}
-
 			// グループ全体のドラッグでなければ、ドラッグイベントをそのまま伝番し、
 			// 選択されている図形のみ移動を行う
 			onDrag?.(e);
@@ -329,24 +274,10 @@ const GroupComponent: React.FC<GroupProps> = ({
 	 */
 	const handleChildDiagramTransfrom = useCallback(
 		(e: DiagramTransformEvent) => {
-			const { items, onTransform, isGroupDragging, transformGroupOutline } =
-				refBus.current;
+			const { onTransform } = refBus.current;
 
-			if (e.eventType === "End" && !isGroupDragging) {
-				// グループ内の図形の変形完了時にアウトラインの更新を行う
-				// ただし、グループ全体のドラッグ中に来る変形通知は子供のグループのアウトライン更新通知で、
-				// ここでアウトライン更新するとドラッグ側のアウトライン更新と競合してしまうため、
-				// グループ全体のドラッグ中はアウトライン更新を行わない
-				const changeItem = getChildDiagramById(items, e.id);
-				if (changeItem) {
-					transformGroupOutline(e.eventId, {
-						...changeItem,
-						...e.endShape,
-					} as Diagram);
-				}
-			}
-
-			// アウトライン以外はグループへの影響はないので、変形イベントをそのまま伝番する
+			// 変形イベントをそのまま伝番する
+			// アウトライン更新はCanvas側で行うので、ここでは何もしない
 			onTransform?.(e);
 		},
 		[],
@@ -357,19 +288,10 @@ const GroupComponent: React.FC<GroupProps> = ({
 	 */
 	const handleChildDiagramChange = useCallback(
 		(e: DiagramChangeEvent) => {
-			const { id, isSelected, items, transformGroupOutline, onDiagramChange } =
-				refBus.current;
-
-			// グループ内の図形の変更完了時にアウトラインの更新を行う
-			const changeItem = getChildDiagramById(items, e.id);
-			if (changeItem) {
-				transformGroupOutline(e.eventId, {
-					...changeItem,
-					...e,
-				} as Diagram);
-			}
+			const { id, isSelected, onDiagramChange } = refBus.current;
 
 			if (isSelected) {
+				// TODO: 必要か？
 				// グループ選択時の場合、ここに来るのはドラッグ相当の操作の場合なので、ドラッグイベントに変換して伝番する
 				const dragEvent = {
 					eventType: e.eventType,

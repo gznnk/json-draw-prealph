@@ -4,13 +4,14 @@ import {
 	type Diagram,
 } from "../../../types/DiagramCatalog";
 import type {
-	EventType,
 	ConnectPointMoveData,
+	EventType,
 } from "../../../types/EventTypes";
 
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../../shapes/ConnectLine";
 import type { ConnectPointData } from "../../shapes/ConnectPoint";
+import { calcBoundsOfGroup } from "../../shapes/Group";
 
 // Import functions related to SvgCanvas.
 import {
@@ -21,9 +22,9 @@ import {
 import { deepCopy, newEventId } from "../../../utils/Util";
 
 // Imports related to this component.
+import type { ConnectableData } from "../../../types/DiagramTypes";
 import { MAX_HISTORY_SIZE } from "./SvgCanvasConstants";
 import type { SvgCanvasHistory, SvgCanvasState } from "./SvgCanvasTypes";
-import type { ConnectableData } from "../../../types/DiagramTypes";
 
 /**
  * Get the diagram by ID from the list of diagrams.
@@ -474,6 +475,35 @@ export const updateConnectPointsAndCollectRecursive = (
 	}
 };
 
+/**
+ * Check if the event type is a history event.
+ *
+ * @param eventType - The type of the event to check.
+ * @returns {boolean} - True if the event type is a history event, false otherwise.
+ */
 export const isHistoryEvent = (eventType: EventType): boolean => {
 	return eventType === "End" || eventType === "Instant";
+};
+
+/**
+ * Update the outline of all groups in the diagram.
+ *
+ * @param items - The list of diagrams to update.
+ * @returns {Diagram[]} - The updated list of diagrams with the outline of all groups updated.
+ */
+export const updateOutlineOfAllGroups = (items: Diagram[]): Diagram[] => {
+	return applyRecursive(items, (item) => {
+		if (isItemableData(item)) {
+			// Update the group bounds.
+			const box = calcBoundsOfGroup(item);
+			return {
+				...item,
+				x: box.x,
+				y: box.y,
+				width: box.width,
+				height: box.height,
+			};
+		}
+		return item;
+	});
 };
