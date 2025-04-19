@@ -36,16 +36,13 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 			});
 
 			try {
-				const response = await openai.chat.completions.create({
+				const response = await openai.responses.create({
 					model: "gpt-4o",
-					messages: [
-						{ role: "system", content: props.text },
-						{ role: "user", content: e.data.text },
-						// { role: "assistant", content: "申し訳ありませんが、天気情報にはアクセスできません。" }
-					],
+					instructions: props.text,
+					input: e.data.text,
 				});
 
-				const responseText = response.choices[0].message.content;
+				const responseText = response.output_text;
 				if (responseText) {
 					props.onExecute({
 						id: props.id,

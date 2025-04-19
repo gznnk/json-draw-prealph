@@ -283,6 +283,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
+		textEditorProps,
 		onDelete,
 		onSelectAll,
 		onAllSelectionClear,
@@ -296,8 +297,14 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 	useEffect(() => {
 		const onDocumentKeyDown = (e: KeyboardEvent) => {
 			// Bypass references to avoid function creation in every render.
-			const { onDelete, onSelectAll, onAllSelectionClear, onUndo, onRedo } =
-				refBus.current;
+			const {
+				textEditorProps,
+				onDelete,
+				onSelectAll,
+				onAllSelectionClear,
+				onUndo,
+				onRedo,
+			} = refBus.current;
 
 			if (e.key === "Control") {
 				isCtrlDown.current = true;
@@ -319,7 +326,8 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 					// Redo the last action when Ctrl+Y is pressed.
 					onRedo?.();
 				}
-				if (e.key === "a") {
+				console.log(textEditorProps.isActive);
+				if (e.key === "a" && !textEditorProps.isActive) {
 					// Select all items when Ctrl+A is pressed.
 					e.preventDefault();
 					onSelectAll?.();
