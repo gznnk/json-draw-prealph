@@ -36,9 +36,12 @@ export const useDelete = (props: CanvasHooksProps) => {
 					return item;
 				}
 				if (isItemableData(item)) {
-					item.items = item.items?.filter(
-						(i) => !isSelectableData(i) || !i.isSelected,
-					);
+					return {
+						...item,
+						items: item.items?.filter(
+							(i) => !isSelectableData(i) || !i.isSelected,
+						),
+					};
 				}
 				return item;
 			}).filter((item) => !isSelectableData(item) || !item.isSelected);
