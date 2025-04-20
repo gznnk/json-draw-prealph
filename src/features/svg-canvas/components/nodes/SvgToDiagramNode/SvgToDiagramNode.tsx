@@ -5,6 +5,8 @@ import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
 import type { ExecuteEvent, NewItemEvent } from "../../../types/EventTypes";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 import { svgDataToDiagram } from "../../../utils/Diagram";
+import { createSvgDataFromText } from "../../shapes/Svg/SvgFunctions";
+import type { Diagram } from "../../../types/DiagramCatalog";
 
 type SvgToDiagramProps = RectangleProps & {
 	onExecute: (e: ExecuteEvent) => void;
@@ -22,8 +24,11 @@ const SvgToDiagramNodeComponent: React.FC<SvgToDiagramProps> = (props) => {
 			const item = svgDataToDiagram(data);
 			if (!item) return;
 
+			const svgData = createSvgDataFromText(data);
+			if (!svgData) return;
+
 			props.onNewItem({
-				item,
+				item: svgData as Diagram,
 			});
 		},
 	});

@@ -175,13 +175,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 								/>
 							)}
 						</DiagramMenuPositioner>
+						<DiagramMenuDivider />
 					</>
 				)}
 
 				{/* Section for text appearance */}
 				{showTextAppearanceSection && (
 					<>
-						<DiagramMenuDivider />
 						<DiagramMenuPositioner>
 							<DiagramMenuItem
 								menuType="FontSize"
@@ -226,13 +226,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 								/>
 							)}
 						</DiagramMenuPositioner>
+						<DiagramMenuDivider />
 					</>
 				)}
 
 				{/* Section for text allignment */}
 				{showTextAlignmentSection && (
 					<>
-						<DiagramMenuDivider />
 						<DiagramMenuItem
 							menuType="AlignLeft"
 							tooltip="左揃え"
@@ -257,13 +257,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 						>
 							<AlignRight />
 						</DiagramMenuItem>
+						<DiagramMenuDivider />
 					</>
 				)}
 
 				{/* Section for text vertical allignment */}
 				{showTextVerticalAlignmentSection && (
 					<>
-						<DiagramMenuDivider />
 						<DiagramMenuItem
 							menuType="AlignTop"
 							tooltip="上揃え"
@@ -288,13 +288,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 						>
 							<VerticalAlignBottom />
 						</DiagramMenuItem>
+						<DiagramMenuDivider />
 					</>
 				)}
 
 				{/* Section for bring to front and send to back */}
 				{showBringToFrontSection && (
 					<>
-						<DiagramMenuDivider />
 						<DiagramMenuItem
 							menuType="BringToFront"
 							tooltip="最前面に移動"
@@ -327,13 +327,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 						>
 							<SendToBack />
 						</DiagramMenuItem>
+						<DiagramMenuDivider />
 					</>
 				)}
 
 				{/* Section for keep aspect ratio */}
 				{showKeepAspectRatioSection && (
 					<>
-						<DiagramMenuDivider />
 						<DiagramMenuItem
 							menuType="KeepAspectRatio"
 							tooltip="アスペクト比維持"
@@ -343,23 +343,21 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 						>
 							<AspectRatio />
 						</DiagramMenuItem>
+						<DiagramMenuDivider />
 					</>
 				)}
 				{/* Section for group and ungroup */}
 				{showGroupSection && (
-					<>
-						<DiagramMenuDivider />
-						<DiagramMenuItem
-							menuType="Group"
-							tooltip={
-								menuStateMap.Group === "Active" ? "グループ解除" : "グループ化"
-							}
-							menuStateMap={menuStateMap}
-							onMenuClick={onMenuClick}
-						>
-							<Group />
-						</DiagramMenuItem>
-					</>
+					<DiagramMenuItem
+						menuType="Group"
+						tooltip={
+							menuStateMap.Group === "Active" ? "グループ解除" : "グループ化"
+						}
+						menuStateMap={menuStateMap}
+						onMenuClick={onMenuClick}
+					>
+						<Group />
+					</DiagramMenuItem>
 				)}
 			</DiagramMenuDiv>
 		</DiagramMenuWrapper>

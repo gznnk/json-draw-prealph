@@ -1,0 +1,68 @@
+// Import functions related to SvgCanvas.
+import { newId } from "../../../utils/Diagram";
+
+// Imports related to this component.
+import { DEFAULT_SVG_DATA } from "./SvgConstants";
+import type { SvgData } from "./SvgTypes";
+
+export const createSvgData = ({
+	x,
+	y,
+	svgText,
+	width = 100,
+	height = 100,
+	radius = 0,
+	rotation = 0,
+	scaleX = 1,
+	scaleY = 1,
+	keepProportion = false,
+}: {
+	x: number;
+	y: number;
+	svgText: string;
+	width?: number;
+	height?: number;
+	radius?: number;
+	rotation?: number;
+	scaleX?: number;
+	scaleY?: number;
+	keepProportion?: boolean;
+}) => {
+	return {
+		...DEFAULT_SVG_DATA,
+		id: newId(),
+		x,
+		y,
+		svgText,
+		width,
+		height,
+		radius,
+		rotation,
+		scaleX,
+		scaleY,
+		keepProportion,
+		initialWidth: width,
+		initialHeight: height,
+	} as SvgData;
+};
+
+export const createSvgDataFromText = (data: string) => {
+	try {
+		const parser = new DOMParser();
+		const svgDoc = parser.parseFromString(data, "image/svg+xml");
+		const svgElement = svgDoc.documentElement;
+		const width = svgElement.getAttribute("width") || "100";
+		const height = svgElement.getAttribute("height") || "100";
+		const innerText = svgElement.innerHTML;
+		return createSvgData({
+			x: 0,
+			y: 0,
+			svgText: innerText,
+			width: Number.parseFloat(width),
+			height: Number.parseFloat(height),
+		});
+	} catch (e) {
+		console.error("Error parsing SVG data:", e);
+		return undefined;
+	}
+};
