@@ -222,9 +222,10 @@ export type ExecuteEvent = {
 	data: ExecuteResult;
 };
 
-export const PROPAGATION_EVENT_NAME = "PropagationEvent" as const;
+export const EXECUTION_PROPAGATION_EVENT_NAME =
+	"ExecutionPropagationEvent" as const;
 
-export type PropagationEvent = {
+export type ExecutionPropagationEvent = {
 	eventId: string;
 	id: string;
 	targetId: string[];

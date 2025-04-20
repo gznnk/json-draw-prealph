@@ -1,14 +1,8 @@
 // Import React.
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 // Import types related to SvgCanvas.
-import type { ConnectLineData } from "../components/shapes/ConnectLine";
 import type { Diagram } from "../types/DiagramCatalog";
-import {
-	PROPAGATION_EVENT_NAME,
-	type ExecuteEvent,
-	type PropagationEvent,
-} from "../types/EventTypes";
 
 // Import functions related to SvgCanvas.
 import { deepCopy } from "../utils/Util";
@@ -36,6 +30,7 @@ import { useTextEdit } from "./hooks/useTextEdit";
 import { useTransform } from "./hooks/useTransform";
 import { useUndo } from "./hooks/useUndo";
 import { useUngroup } from "./hooks/useUngroup";
+import { useExecute } from "./hooks/useExecute";
 
 /**
  * The SvgCanvas state and functions.
@@ -129,32 +124,12 @@ export const useSvgCanvas = (
 	// Handler for the new diagram event.
 	const onNewDiagram = useNewDiagram(canvasHooksProps);
 
+	// Handler for the execute event.
+	const onExecute = useExecute(canvasHooksProps);
+
 	// --- Functions for accessing the canvas state and modifying the canvas. --- //
 
 	const addItem = useAddItem(canvasHooksProps);
-
-	const onExecute = useCallback(
-		(e: ExecuteEvent) => {
-			const lines = canvasState.items.filter((i) => {
-				if (i.type !== "ConnectLine") return false;
-
-				const connectLine = i as ConnectLineData;
-				return connectLine.startOwnerId === e.id;
-			}) as ConnectLineData[];
-
-			const detail = {
-				...e,
-				targetId: lines.map((i) => i.endOwnerId),
-			} as PropagationEvent;
-
-			document.dispatchEvent(
-				new CustomEvent(PROPAGATION_EVENT_NAME, {
-					detail,
-				}),
-			);
-		},
-		[canvasState.items],
-	);
 
 	const canvasProps = {
 		...canvasState,

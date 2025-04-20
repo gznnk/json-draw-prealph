@@ -3,7 +3,7 @@ import type React from "react";
 import { memo, useEffect, useRef } from "react";
 import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
 import type { ExecuteEvent } from "../../../types/EventTypes";
-import { usePropagation } from "../../../hooks/usePropagation";
+import { useExecutionChain } from "../../../hooks/useExecutionChain";
 import { newEventId } from "../../../utils/Util";
 
 type TextAreaProps = RectangleProps & {
@@ -26,7 +26,7 @@ const TextAreaNodeComponent: React.FC<TextAreaProps> = (props) => {
 		text.current = props.text;
 	}, [props.text, props.onExecute, props.id]);
 
-	usePropagation({
+	useExecutionChain({
 		id: props.id,
 		onPropagation: (e) => {
 			props.onDiagramChange?.({

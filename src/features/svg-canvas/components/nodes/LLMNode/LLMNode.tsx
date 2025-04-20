@@ -3,7 +3,7 @@ import type React from "react";
 import { memo, useEffect, useState } from "react";
 // import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
 import type { ExecuteEvent } from "../../../types/EventTypes";
-import { usePropagation } from "../../../hooks/usePropagation";
+import { useExecutionChain } from "../../../hooks/useExecutionChain";
 import { newEventId } from "../../../utils/Util";
 import { Ellipse, type EllipseProps } from "../../shapes/Ellipse/Ellipse";
 import { OpenAI } from "openai";
@@ -25,7 +25,7 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 		}
 	}, []);
 
-	usePropagation({
+	useExecutionChain({
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;

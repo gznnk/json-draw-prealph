@@ -3,16 +3,16 @@ import { useEffect, useRef } from "react";
 
 // Import types related to SvgCanvas.
 import {
-	PROPAGATION_EVENT_NAME,
-	type PropagationEvent,
+	EXECUTION_PROPAGATION_EVENT_NAME,
+	type ExecutionPropagationEvent,
 } from "../types/EventTypes";
 
-type PropagationProps = {
+type ExecutionChainProps = {
 	id: string;
-	onPropagation: (e: PropagationEvent) => void;
+	onPropagation: (e: ExecutionPropagationEvent) => void;
 };
 
-export const usePropagation = (props: PropagationProps) => {
+export const useExecutionChain = (props: ExecutionChainProps) => {
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		...props,
@@ -22,7 +22,7 @@ export const usePropagation = (props: PropagationProps) => {
 
 	useEffect(() => {
 		const handlePropagation = (e: Event) => {
-			const customEvent = e as CustomEvent<PropagationEvent>;
+			const customEvent = e as CustomEvent<ExecutionPropagationEvent>;
 			// If the event is triggered by itself, do nothing.
 			if (customEvent.detail.id === refBus.current.id) return;
 
@@ -34,11 +34,17 @@ export const usePropagation = (props: PropagationProps) => {
 			}
 		};
 		// Add the event listener to the document object.
-		document.addEventListener(PROPAGATION_EVENT_NAME, handlePropagation);
+		document.addEventListener(
+			EXECUTION_PROPAGATION_EVENT_NAME,
+			handlePropagation,
+		);
 
 		return () => {
 			// Remove the event listener from the document object.
-			document.removeEventListener(PROPAGATION_EVENT_NAME, handlePropagation);
+			document.removeEventListener(
+				EXECUTION_PROPAGATION_EVENT_NAME,
+				handlePropagation,
+			);
 		};
 	}, []);
 };

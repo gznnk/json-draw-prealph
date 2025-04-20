@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
 import type { ExecuteEvent, NewItemEvent } from "../../../types/EventTypes";
-import { usePropagation } from "../../../hooks/usePropagation";
+import { useExecutionChain } from "../../../hooks/useExecutionChain";
 import { svgDataToDiagram } from "../../../utils/Diagram";
 
 type SvgToDiagramProps = RectangleProps & {
@@ -12,7 +12,7 @@ type SvgToDiagramProps = RectangleProps & {
 };
 
 const SvgToDiagramNodeComponent: React.FC<SvgToDiagramProps> = (props) => {
-	usePropagation({
+	useExecutionChain({
 		id: props.id,
 		onPropagation: (e) => {
 			const data = e.data.text
