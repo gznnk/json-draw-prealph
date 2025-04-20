@@ -6,6 +6,7 @@ import type { Diagram } from "../types/DiagramCatalog";
 
 // Import functions related to SvgCanvas.
 import { deepCopy } from "../utils/Util";
+import { calcOptimalCanvasSize } from "./SvgCanvasFunctions";
 
 // Imports related to this component.
 import type { SvgCanvasState } from "./SvgCanvasTypes";
@@ -33,31 +34,43 @@ import { useUngroup } from "./hooks/useUngroup";
 import { useExecute } from "./hooks/useExecute";
 
 /**
+ * Props for the useSvgCanvas hook.
+ */
+type SvgCanvasHooksProps = {
+	minX: number;
+	minY: number;
+	width: number;
+	height: number;
+	items: Diagram[];
+};
+
+/**
  * The SvgCanvas state and functions.
  *
  * @param initialItems - The initial items to be displayed on the canvas.
  * @returns The state and functions of the SvgCanvas.
  */
-export const useSvgCanvas = (
-	initialWidth: number,
-	initialHeight: number,
-	initialItems: Diagram[],
-) => {
+export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
+	// Calculate the initial bounds of the canvas.
+	let initialBounds = {
+		minX: props.minX,
+		minY: props.minY,
+		width: props.width,
+		height: props.height,
+	};
+	if (props.items.length > 0) {
+		initialBounds = calcOptimalCanvasSize(props.items);
+	}
+
 	// The state of the canvas.
 	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
-		minX: 0,
-		minY: 0,
-		width: initialWidth,
-		height: initialHeight,
-		items: initialItems,
+		...initialBounds,
+		items: props.items,
 		isDiagramChanging: false,
 		history: [
 			{
-				minX: 0,
-				minY: 0,
-				width: initialWidth,
-				height: initialHeight,
-				items: deepCopy(initialItems),
+				...initialBounds,
+				items: deepCopy(props.items),
 			},
 		],
 		historyIndex: 0,

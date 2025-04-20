@@ -467,11 +467,23 @@ const devData = {
 function App() {
 	const loadedCanvasState = loadCanvasDataFromLocalStorage();
 
-	const { canvasProps } = useSvgCanvas(
-		window.screen.width,
-		window.screen.height,
-		loadedCanvasState?.items ?? devData.item4,
-	);
+	const canvasInitialState = {
+		minX: 0,
+		minY: 0,
+		width: window.screen.width,
+		height: window.screen.height,
+		items: devData.item4,
+	};
+
+	if (loadedCanvasState) {
+		canvasInitialState.minX = loadedCanvasState.minX;
+		canvasInitialState.minY = loadedCanvasState.minY;
+		canvasInitialState.width = loadedCanvasState.width;
+		canvasInitialState.height = loadedCanvasState.height;
+		canvasInitialState.items = loadedCanvasState.items;
+	}
+
+	const { canvasProps } = useSvgCanvas(canvasInitialState);
 
 	// const {
 	// 	state: [canvasState, setCanvasState],
