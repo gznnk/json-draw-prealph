@@ -75,7 +75,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		onDrop,
 		onSelect,
 		onSelectAll,
-		onAllSelectionClear,
+		onClearAllSelection,
 		onDelete,
 		onConnect,
 		onUndo,
@@ -195,13 +195,13 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		(e: React.PointerEvent<SVGSVGElement>) => {
 			if (e.target === e.currentTarget) {
 				// Clear the selection when pointer is down on the canvas.
-				onAllSelectionClear?.();
+				onClearAllSelection?.();
 			}
 
 			// Close the context menu.
 			contextMenuFunctions.closeContextMenu();
 		},
-		[contextMenuFunctions, onAllSelectionClear],
+		[contextMenuFunctions, onClearAllSelection],
 	);
 
 	/**
@@ -285,7 +285,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		textEditorProps,
 		onDelete,
 		onSelectAll,
-		onAllSelectionClear,
+		onClearAllSelection,
 		onUndo,
 		onRedo,
 	};
@@ -300,7 +300,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 				textEditorProps,
 				onDelete,
 				onSelectAll,
-				onAllSelectionClear,
+				onClearAllSelection,
 				onUndo,
 				onRedo,
 			} = refBus.current;
@@ -310,7 +310,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 			}
 			if (e.key === "Escape") {
 				// Clear selection when Escape key is pressed.
-				onAllSelectionClear?.();
+				onClearAllSelection?.();
 			}
 			if (e.key === "Delete") {
 				// Delete selected items when Delete key is pressed.

@@ -7,12 +7,9 @@ import type { PartiallyRequired } from "../../../types/ParticallyRequired";
 // Import types related to SvgCanvas.
 import type { ConnectLineData } from "../components/shapes/ConnectLine";
 import type { GroupData } from "../components/shapes/Group";
-import type { PathPointData } from "../components/shapes/Path";
 import type { Diagram, DiagramType } from "../types/DiagramCatalog";
 import {
 	PROPAGATION_EVENT_NAME,
-	type DiagramConnectEvent,
-	type DiagramSelectEvent,
 	type DiagramTextChangeEvent,
 	type DiagramTextEditEvent,
 	type ExecuteEvent,
@@ -26,20 +23,15 @@ import {
 // Import components related to SvgCanvas.
 import { createTextAreaNodeData } from "../components/nodes/TextAreaNode";
 import { createEllipseData } from "../components/shapes/Ellipse";
-import { calcGroupBoxOfNoRotation } from "../components/shapes/Group";
 import { createRectangleData } from "../components/shapes/Rectangle";
 
 // Import functions related to SvgCanvas.
-import { isItemableData, isSelectableData, newId } from "../utils/Diagram";
-import { calcPointsOuterShape } from "../utils/Math";
+import { isItemableData, newId } from "../utils/Diagram";
 import { deepCopy, newEventId } from "../utils/Util";
 import {
 	addHistory,
-	applyMultiSelectSourceRecursive,
 	applyRecursive,
 	clearMultiSelectSourceRecursive,
-	clearSelectedRecursive,
-	getDiagramById,
 	getSelectedItems,
 	removeGroupedRecursive,
 	saveCanvasDataToLocalStorage,
@@ -50,13 +42,18 @@ import {
 import { createLLMNodeData } from "../components/nodes/LLMNode";
 import { createSvgToDiagramNodeData } from "../components/nodes/SvgToDiagramNode";
 import { createPathData } from "../components/shapes/Path";
-import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
 import type { SvgCanvasState } from "./SvgCanvasTypes";
 
 // Import canvas custom hooks.
 import { useDiagramChange } from "./hooks/useDiagramChange";
 import { useDrag } from "./hooks/useDrag";
 import { useTransform } from "./hooks/useTransform";
+import { useSelect } from "./hooks/useSelect";
+import { useSelectAll } from "./hooks/useSelectAll";
+import { useClearAllSelection } from "./hooks/useClearAllSelection";
+import { useDelete } from "./hooks/useDelete";
+import { useAddItem } from "./hooks/useAddItem";
+import { useConnect } from "./hooks/useConnect";
 
 // TODO: 精査
 type UpdateItem = Omit<PartiallyRequired<Diagram, "id">, "type" | "isSelected">;
@@ -108,264 +105,24 @@ export const useSvgCanvas = (
 	// Handler for the diagram change event.
 	const onDiagramChange = useDiagramChange(canvasHooksProps);
 
-	/**
-	 * 図形の選択イベントハンドラ
-	 */
-	const onSelect = useCallback((e: DiagramSelectEvent) => {
-		// 複数選択グループ自身の選択イベントは無視
-		if (e.id === MULTI_SELECT_GROUP) return;
+	// Handler for the select event.
+	const onSelect = useSelect(canvasHooksProps);
 
-		setCanvasState((prevState) => {
-			let items = applyRecursive(prevState.items, (item) => {
-				if (!isSelectableData(item)) {
-					// 選択不可能な図形は無視
-					return item;
-				}
+	// Handler for the select all event.
+	const onSelectAll = useSelectAll(canvasHooksProps);
 
-				if (item.id === e.id) {
-					if (e.isMultiSelect) {
-						// 複数選択の場合は、選択された図形の選択状態を反転
-						return {
-							...item,
-							isSelected: !item.isSelected,
-						};
-					}
+	// Handler for the clear all selection event.
+	const onClearAllSelection = useClearAllSelection(canvasHooksProps);
 
-					// 図形を選択状態にする
-					return { ...item, isSelected: true };
-				}
+	// Handler for the delete event.
+	const onDelete = useDelete(canvasHooksProps);
 
-				if (e.isMultiSelect && item.isSelected) {
-					// 複数選択の場合は、選択されている図形の選択状態を解除しない
-					return item;
-				}
+	// Handler for the diagram connect event.
+	const onConnect = useConnect(canvasHooksProps);
 
-				return {
-					...item,
-					// 複数選択でない場合は、選択された図形以外の選択状態を解除
-					isSelected: false,
-					isMultiSelectSource: false,
-				};
-			});
+	// --- Functions for accessing the canvas state and modifying the canvas. --- //
 
-			// 選択されたアイテムを取得
-			const selectedItems = getSelectedItems(items);
-
-			// 複数選択の場合は、選択されている図形をグループ化
-			let multiSelectGroup: GroupData | undefined = undefined;
-			if (1 < selectedItems.length) {
-				if (selectedItems.some((item) => item.type === "ConnectLine")) {
-					// 複数選択の中に接続線が含まれている場合はグループ化させず、選択状態を変更しない
-					return prevState;
-				}
-
-				// 複数選択グループの初期値を作成
-				const box = calcGroupBoxOfNoRotation(selectedItems);
-				multiSelectGroup = {
-					id: MULTI_SELECT_GROUP,
-					x: box.left + (box.right - box.left) / 2,
-					y: box.top + (box.bottom - box.top) / 2,
-					width: box.right - box.left,
-					height: box.bottom - box.top,
-					rotation: 0,
-					scaleX: 1,
-					scaleY: 1,
-					keepProportion: prevState.multiSelectGroup?.keepProportion ?? true,
-					isSelected: true, // 複数選択用のグループは常に選択状態にする
-					isMultiSelectSource: false, // 複数選択の選択元ではないと設定
-					items: applyRecursive(selectedItems, (item) => {
-						if (!isSelectableData(item)) {
-							return item;
-						}
-						return {
-							...item,
-							isSelected: false, // 複数選択用のグループ内の図形は選択状態を解除
-							isMultiSelectSource: false, // 複数選択の選択元ではないと設定
-						};
-					}),
-				} as GroupData;
-
-				// Set `isMultiSelectSource` to true to hide the transform outline of the original diagrams during multi-selection.
-				items = applyMultiSelectSourceRecursive(items);
-			} else {
-				// 複数選択でない場合は、全図形に対して複数選択の選択元ではないと設定
-				items = applyRecursive(items, (item) => {
-					if (isSelectableData(item)) {
-						return {
-							...item,
-							isMultiSelectSource: false,
-						};
-					}
-					return item;
-				});
-			}
-
-			return {
-				...prevState,
-				items,
-				multiSelectGroup,
-				selectedItemId: e.id,
-			};
-		});
-	}, []);
-
-	/**
-	 * Handle select all action.
-	 */
-	const onSelectAll = useCallback(() => {
-		setCanvasState((prevState) => {
-			let items = prevState.items.map((item) => {
-				if (!isSelectableData(item)) {
-					// Ignore non-selectable items.
-					return item;
-				}
-				if (item.type === "ConnectLine") {
-					return {
-						...item,
-						isSelected: false, // Deselect ConnectLine items.
-					};
-				}
-				return {
-					...item,
-					isSelected: true,
-				};
-			});
-
-			// Set `isMultiSelectSource` to true to hide the transform outline of the original diagrams during multi-selection.
-			items = applyMultiSelectSourceRecursive(items);
-
-			// Create a multi-select group's items.
-			const multiSelectGroupItems = items.filter(
-				(item) => item.type !== "ConnectLine",
-			) as Diagram[]; // Filter out ConnectLine items.
-			if (multiSelectGroupItems.length < 2) {
-				// If there are less than 2 items, do not create a multi-select group.
-				return prevState;
-			}
-
-			const box = calcGroupBoxOfNoRotation(multiSelectGroupItems);
-
-			const multiSelectGroup = {
-				id: MULTI_SELECT_GROUP,
-				x: box.left + (box.right - box.left) / 2,
-				y: box.top + (box.bottom - box.top) / 2,
-				width: box.right - box.left,
-				height: box.bottom - box.top,
-				rotation: 0,
-				scaleX: 1,
-				scaleY: 1,
-				keepProportion: prevState.multiSelectGroup?.keepProportion ?? true,
-				isSelected: true, // 複数選択用のグループは常に選択状態にする
-				isMultiSelectSource: false, // 複数選択の選択元ではないと設定
-				items: applyRecursive(multiSelectGroupItems, (item) => {
-					if (!isSelectableData(item)) {
-						return item;
-					}
-					return {
-						...item,
-						isSelected: false, // 複数選択用のグループ内の図形は選択状態を解除
-						isMultiSelectSource: false, // 複数選択の選択元ではないと設定
-					};
-				}),
-			} as GroupData;
-
-			return {
-				...prevState,
-				items,
-				multiSelectGroup,
-				selectedItemId: undefined,
-			};
-		});
-	}, []);
-
-	/**
-	 * 選択状態の全解除イベントハンドラ
-	 */
-	const onAllSelectionClear = useCallback(() => {
-		setCanvasState((prevState) => ({
-			...prevState,
-			items: clearSelectedRecursive(prevState.items),
-			multiSelectGroup: undefined,
-			selectedItemId: undefined,
-		}));
-	}, []);
-
-	/**
-	 * Handle delete action.
-	 */
-	const onDelete = useCallback(() => {
-		setCanvasState((prevState) => {
-			// Remove selected items.
-			let items = applyRecursive(prevState.items, (item) => {
-				if (!isSelectableData(item)) {
-					return item;
-				}
-				if (isItemableData(item)) {
-					item.items = item.items?.filter(
-						(i) => !isSelectableData(i) || !i.isSelected,
-					);
-				}
-				return item;
-			}).filter((item) => !isSelectableData(item) || !item.isSelected);
-
-			// Find all ConnectLine components.
-			const connectLines = items.filter(
-				(item) => item.type === "ConnectLine",
-			) as ConnectLineData[];
-
-			// Remove ConnectLine components whose owner was deleted."
-			for (const connectLine of connectLines) {
-				if (
-					!getDiagramById(items, connectLine.startOwnerId) ||
-					!getDiagramById(items, connectLine.endOwnerId)
-				) {
-					items = items.filter((item) => item.id !== connectLine.id);
-				}
-			}
-
-			// Create new state.
-			let newState = {
-				...prevState,
-				items, // Apply new items after removing the selected items.
-				multiSelectGroup: undefined, // Hide the multi-select group because the selected items were deleted.
-			} as SvgCanvasState;
-
-			// Add history.
-			newState.lastHistoryEventId = newEventId();
-			newState = addHistory(prevState, newState);
-			// console.log("addHistory caused by Delete");
-
-			return newState;
-		});
-	}, []);
-
-	/**
-	 * 図形の接続イベントハンドラ
-	 */
-	const onConnect = useCallback((e: DiagramConnectEvent) => {
-		const shape = calcPointsOuterShape(
-			e.points.map((p) => ({ x: p.x, y: p.y })),
-		);
-
-		addItem({
-			id: newId(),
-			type: "ConnectLine",
-			x: shape.x,
-			y: shape.y,
-			width: shape.width,
-			height: shape.height,
-			isSelected: false,
-			keepProportion: false,
-			items: e.points.map((p) => ({
-				...p,
-				type: "PathPoint",
-			})) as PathPointData[],
-			startOwnerId: e.startOwnerId,
-			endOwnerId: e.endOwnerId,
-			autoRouting: true,
-			endArrowHead: "ConcaveTriangle",
-		} as ConnectLineData);
-	}, []);
+	const addItem = useAddItem(canvasHooksProps);
 
 	/**
 	 * テキスト編集イベントハンドラ（開始時のみ発火する）
@@ -535,12 +292,21 @@ export const useSvgCanvas = (
 				);
 			}
 		},
-		[canvasState.minX, canvasState.minY, canvasState.width, canvasState.height],
+		[
+			canvasState.minX,
+			canvasState.minY,
+			canvasState.width,
+			canvasState.height,
+			addItem,
+		],
 	);
 
-	const onNewItem = useCallback((e: NewItemEvent) => {
-		addItem(e.item);
-	}, []);
+	const onNewItem = useCallback(
+		(e: NewItemEvent) => {
+			addItem(e.item);
+		},
+		[addItem],
+	);
 
 	const onStackOrderChange = useCallback((e: StackOrderChangeEvent) => {
 		setCanvasState((prevState) => {
@@ -644,7 +410,7 @@ export const useSvgCanvas = (
 		onDrag,
 		onSelect,
 		onSelectAll,
-		onAllSelectionClear,
+		onClearAllSelection,
 		onDelete,
 		onConnect,
 		onTransform,
@@ -663,28 +429,6 @@ export const useSvgCanvas = (
 	};
 
 	// --- Functions for accessing the canvas state and modifying the canvas. --- //
-
-	const addItem = useCallback((item: Diagram) => {
-		setCanvasState((prevState) => {
-			let newState = {
-				...prevState,
-				items: [
-					...prevState.items.map((item) => ({ ...item, isSelected: false })),
-					{
-						...item,
-						isSelected: true,
-					},
-				],
-			} as SvgCanvasState;
-
-			// 履歴を追加
-			newState.lastHistoryEventId = newEventId();
-			newState = addHistory(prevState, newState);
-			// console.log("addHistory caused by addItem");
-
-			return newState;
-		});
-	}, []);
 
 	const updateItem = useCallback((item: UpdateItem) => {
 		setCanvasState((prevState) => ({
