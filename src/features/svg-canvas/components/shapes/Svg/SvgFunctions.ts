@@ -53,11 +53,10 @@ export const createSvgDataFromText = (data: string) => {
 		const svgElement = svgDoc.documentElement;
 		const width = svgElement.getAttribute("width") || "100";
 		const height = svgElement.getAttribute("height") || "100";
-		const innerText = svgElement.innerHTML;
 		return createSvgData({
 			x: 0,
 			y: 0,
-			svgText: innerText,
+			svgText: data,
 			width: Number.parseFloat(width),
 			height: Number.parseFloat(height),
 			keepProportion: true,

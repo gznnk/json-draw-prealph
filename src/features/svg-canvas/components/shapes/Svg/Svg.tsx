@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useRef, useState, useMemo } from "react";
 
 // Import other libraries.
 import DOMPurify from "dompurify";
@@ -117,6 +117,23 @@ const SvgComponent: React.FC<SvgProps> = ({
 		y,
 	);
 
+	// Cache the inner text and viewBox of the SVG element.
+	// This is done to avoid parsing the SVG text on every render.
+	const { innerText, viewBox } = useMemo(() => {
+		const parser = new DOMParser();
+		const sanitizedSvgText = DOMPurify.sanitize(svgText, {
+			NAMESPACE: "http://www.w3.org/2000/svg",
+		});
+		const svgDoc = parser.parseFromString(sanitizedSvgText, "image/svg+xml");
+		const svgElement = svgDoc.documentElement;
+		const innerText = svgElement.innerHTML;
+		const viewBox = svgElement.getAttribute("viewBox") || undefined;
+		return {
+			innerText,
+			viewBox,
+		};
+	}, [svgText]);
+
 	// Flag to show the transformative element.
 	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
 
@@ -127,10 +144,9 @@ const SvgComponent: React.FC<SvgProps> = ({
 					className="diagram"
 					// biome-ignore lint/security/noDangerouslySetInnerHtml: This is the only way to set SVG content.
 					dangerouslySetInnerHTML={{
-						__html: DOMPurify.sanitize(svgText, {
-							NAMESPACE: "http://www.w3.org/2000/svg",
-						}),
+						__html: innerText,
 					}}
+					viewBox={viewBox}
 					transform={`translate(${-width / 2}, ${-height / 2}) scale(${(scaleX * width) / initialWidth}, ${(scaleY * height) / initialHeight})`}
 				/>
 				{/* Element for handle pointer events */}

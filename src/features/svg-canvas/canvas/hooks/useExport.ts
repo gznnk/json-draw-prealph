@@ -31,20 +31,7 @@ export const useExport = (props: CanvasHooksProps) => {
 			// Export the selected item as SVG.
 			const selectedItem = selectedItems[0];
 			if (isSvgData(selectedItem)) {
-				const svgElement = document.createElementNS(
-					"http://www.w3.org/2000/svg",
-					"svg",
-				);
-				svgElement.setAttribute("width", selectedItem.width.toString());
-				svgElement.setAttribute("height", selectedItem.height.toString());
-				svgElement.setAttribute(
-					"viewBox",
-					`0 0 ${selectedItem.width} ${selectedItem.height}`,
-				);
-				svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-				svgElement.innerHTML = selectedItem.svgText || ""; // Assuming svgText contains the SVG content.
-
-				const svgBlob = new Blob([svgElement.outerHTML], {
+				const svgBlob = new Blob([selectedItem.svgText], {
 					type: "image/svg+xml",
 				});
 				const url = URL.createObjectURL(svgBlob);
