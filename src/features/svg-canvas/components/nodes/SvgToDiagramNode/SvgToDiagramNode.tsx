@@ -4,7 +4,6 @@ import { memo } from "react";
 import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
 import type { ExecuteEvent, NewItemEvent } from "../../../types/EventTypes";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
-import { svgDataToDiagram } from "../../../utils/Diagram";
 import { createSvgDataFromText } from "../../shapes/Svg/SvgFunctions";
 import type { Diagram } from "../../../types/DiagramCatalog";
 
@@ -21,11 +20,12 @@ const SvgToDiagramNodeComponent: React.FC<SvgToDiagramProps> = (props) => {
 				.replace("```svg", "")
 				.replace("```xml", "")
 				.replace("```", "");
-			const item = svgDataToDiagram(data);
-			if (!item) return;
 
 			const svgData = createSvgDataFromText(data);
 			if (!svgData) return;
+
+			svgData.x = props.x + (Math.random() - 0.5) * 300;
+			svgData.y = props.y + (Math.random() - 0.5) * 300;
 
 			props.onNewItem({
 				item: svgData as Diagram,

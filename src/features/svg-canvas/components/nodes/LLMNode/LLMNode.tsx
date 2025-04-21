@@ -37,6 +37,7 @@ type LLMProps = RectangleProps & {
  */
 const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 	const [apiKey, setApiKey] = useState<string>("");
+	const [processIdList, setProcessIdList] = useState<string[]>([]);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
@@ -58,6 +59,9 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
+
+			const processId = newEventId();
+			setProcessIdList((prev) => [...prev, processId]);
 
 			const openai = new OpenAI({
 				apiKey: apiKey,
@@ -87,6 +91,8 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 				console.error("Error fetching data from OpenAI API:", error);
 				alert("APIリクエスト中にエラーが発生しました。");
 			}
+
+			setProcessIdList((prev) => prev.filter((id) => id !== processId));
 		},
 	});
 
@@ -104,7 +110,7 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 					iconWidth={80}
 					iconHeight={80}
 				>
-					<CPU_1 />
+					<CPU_1 blink={processIdList.length !== 0} />
 				</IconContainer>
 			)}
 			<RectangleWrapper visible={props.isTextEditing}>
