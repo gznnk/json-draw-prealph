@@ -3,9 +3,11 @@ import { useState } from "react";
 
 // Import types related to SvgCanvas.
 import type { Diagram } from "../types/DiagramCatalog";
+import type { TextEditorState } from "../components/core/Textable";
 
 // Import functions related to SvgCanvas.
 import { deepCopy } from "../utils/Util";
+import { calcOptimalCanvasSize } from "./SvgCanvasFunctions";
 
 // Imports related to this component.
 import type { SvgCanvasState } from "./SvgCanvasTypes";
@@ -31,6 +33,18 @@ import { useTransform } from "./hooks/useTransform";
 import { useUndo } from "./hooks/useUndo";
 import { useUngroup } from "./hooks/useUngroup";
 import { useExecute } from "./hooks/useExecute";
+import { useExport } from "./hooks/useExport";
+
+/**
+ * Props for the useSvgCanvas hook.
+ */
+type SvgCanvasHooksProps = {
+	minX: number;
+	minY: number;
+	width: number;
+	height: number;
+	items: Diagram[];
+};
 
 /**
  * The SvgCanvas state and functions.
@@ -38,30 +52,32 @@ import { useExecute } from "./hooks/useExecute";
  * @param initialItems - The initial items to be displayed on the canvas.
  * @returns The state and functions of the SvgCanvas.
  */
-export const useSvgCanvas = (
-	initialWidth: number,
-	initialHeight: number,
-	initialItems: Diagram[],
-) => {
+export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
+	// Calculate the initial bounds of the canvas.
+	let initialBounds = {
+		minX: props.minX,
+		minY: props.minY,
+		width: props.width,
+		height: props.height,
+	};
+	if (props.items.length > 0) {
+		initialBounds = calcOptimalCanvasSize(props.items);
+	}
+
 	// The state of the canvas.
 	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
-		minX: 0,
-		minY: 0,
-		width: initialWidth,
-		height: initialHeight,
-		items: initialItems,
+		...initialBounds,
+		items: props.items,
 		isDiagramChanging: false,
 		history: [
 			{
-				minX: 0,
-				minY: 0,
-				width: initialWidth,
-				height: initialHeight,
-				items: deepCopy(initialItems),
+				...initialBounds,
+				items: deepCopy(props.items),
 			},
 		],
 		historyIndex: 0,
 		lastHistoryEventId: "",
+		textEditorState: { isActive: false } as TextEditorState,
 	});
 
 	// Create props for the canvas hooks.
@@ -127,6 +143,9 @@ export const useSvgCanvas = (
 	// Handler for the execute event.
 	const onExecute = useExecute(canvasHooksProps);
 
+	// Handler for the export event.
+	const onExport = useExport(canvasHooksProps);
+
 	// --- Functions for accessing the canvas state and modifying the canvas. --- //
 
 	const addItem = useAddItem(canvasHooksProps);
@@ -152,6 +171,7 @@ export const useSvgCanvas = (
 		onNewItem,
 		onStackOrderChange,
 		onExecute,
+		onExport,
 	};
 
 	// --- Functions for accessing the canvas state and modifying the canvas. --- //

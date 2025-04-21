@@ -25,7 +25,7 @@ import { newEventId } from "../../../../utils/Util";
 // Imports related to this component.
 import {
 	findFirstFillableRecursive,
-	findFirstRectangleRecursive,
+	findFirstBorderRadiusRecursive,
 	findFirstStrokableRecursive,
 	findFirstTextableRecursive,
 } from "./DiagramMenuFunctions";
@@ -118,9 +118,9 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 			}
 		}
 
-		// Find the first rectangle item in the selected items.
+		// Find the first border radius item in the selected items.
 		// This is used to determine the border radius menu state.
-		const firstRectangleItem = findFirstRectangleRecursive(selectedItems) as
+		const firstRectangleItem = findFirstBorderRadiusRecursive(selectedItems) as
 			| RectangleData
 			| undefined;
 		if (firstRectangleItem) {

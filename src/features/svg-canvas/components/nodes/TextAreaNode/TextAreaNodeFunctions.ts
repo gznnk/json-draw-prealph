@@ -10,12 +10,16 @@ export const createTextAreaNodeData = ({
 	const data = createRectangleData({
 		x,
 		y,
-		radius: 4,
-		stroke: "#A9A9A9",
+		width: 400,
+		height: 200,
+		radius: 0,
+		stroke: "transparent",
+		strokeWidth: "1px",
 		fill: "#ffffff",
 		textType: "textarea",
 		textAlign: "left",
 		verticalAlign: "top",
+		fontSize: 12,
 		fontColor: "#333333",
 	});
 

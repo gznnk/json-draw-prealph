@@ -7,9 +7,9 @@ import type {
 import type { DiagramTextChangeEvent } from "../../../../types/EventTypes";
 
 /**
- * Props for the TextEditor component.
+ * Type for the state of the TextEditor.
  */
-export type TextEditorProps = {
+export type TextEditorState = {
 	id: string;
 	text: string;
 	x: number;
@@ -27,5 +27,11 @@ export type TextEditorProps = {
 	fontFamily: string;
 	fontWeight: string;
 	isActive: boolean;
+};
+
+/**
+ * Props for the TextEditor component.
+ */
+export type TextEditorProps = TextEditorState & {
 	onTextChange?: (e: DiagramTextChangeEvent) => void;
 };

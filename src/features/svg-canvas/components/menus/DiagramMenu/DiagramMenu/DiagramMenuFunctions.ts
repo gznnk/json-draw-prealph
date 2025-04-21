@@ -60,6 +60,23 @@ export const findFirstRectangleRecursive = (
 	return undefined;
 };
 
+export const findFirstBorderRadiusRecursive = (
+	items: Diagram[],
+): Diagram | undefined => {
+	for (const item of items) {
+		if ("radius" in item) {
+			return item;
+		}
+		if (isItemableData(item)) {
+			const foundItem = findFirstBorderRadiusRecursive(item.items);
+			if (foundItem) {
+				return foundItem;
+			}
+		}
+	}
+	return undefined;
+};
+
 export const findFirstTextableRecursive = (
 	items: Diagram[],
 ): Diagram | undefined => {

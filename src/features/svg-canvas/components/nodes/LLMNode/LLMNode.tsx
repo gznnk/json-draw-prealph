@@ -1,23 +1,52 @@
 // Import React.
 import type React from "react";
-import { memo, useEffect, useState } from "react";
-// import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
-import type { ExecuteEvent } from "../../../types/EventTypes";
-import { useExecutionChain } from "../../../hooks/useExecutionChain";
-import { newEventId } from "../../../utils/Util";
-import { Ellipse, type EllipseProps } from "../../shapes/Ellipse/Ellipse";
+import { memo, useEffect, useState, useRef } from "react";
+
+// Import other libraries.
 import { OpenAI } from "openai";
+
+// Import types related to SvgCanvas.
+import type { ExecuteEvent } from "../../../types/EventTypes";
+
+// Import components related to SvgCanvas.
+import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
+import { IconContainer } from "../../core/IconContainer";
+import { CPU_1 } from "../../icons/CPU_1";
+
+// Import hooks related to SvgCanvas.
+import { useExecutionChain } from "../../../hooks/useExecutionChain";
+
+// Import functions related to SvgCanvas.
+import { newEventId } from "../../../utils/Util";
 
 // Import utilities.
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 
-type LLMProps = EllipseProps & {
+// Import related to this component.
+import { RectangleWrapper } from "./LLMNodeStyled";
+
+/**
+ * Props for the LLMNode component.
+ */
+type LLMProps = RectangleProps & {
 	onExecute: (e: ExecuteEvent) => void;
 };
 
+/**
+ * LLMNode component.
+ */
 const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 	const [apiKey, setApiKey] = useState<string>("");
+	const [processIdList, setProcessIdList] = useState<string[]>([]);
 
+	// Create references bypass to avoid function creation in every render.
+	const refBusVal = {
+		props,
+	};
+	const refBus = useRef(refBusVal);
+	refBus.current = refBusVal;
+
+	// Load the API key from local storage when the component mounts.
 	useEffect(() => {
 		const storedApiKey = OpenAiKeyManager.loadKey();
 		if (storedApiKey) {
@@ -25,10 +54,14 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 		}
 	}, []);
 
+	// Handle execution events for the LLM node.
 	useExecutionChain({
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
+
+			const processId = newEventId();
+			setProcessIdList((prev) => [...prev, processId]);
 
 			const openai = new OpenAI({
 				apiKey: apiKey,
@@ -58,10 +91,33 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 				console.error("Error fetching data from OpenAI API:", error);
 				alert("APIリクエスト中にエラーが発生しました。");
 			}
+
+			setProcessIdList((prev) => prev.filter((id) => id !== processId));
 		},
 	});
 
-	return <Ellipse {...props} />;
+	return (
+		<>
+			{!props.isTextEditing && (
+				<IconContainer
+					x={props.x}
+					y={props.y}
+					width={props.width}
+					height={props.height}
+					rotation={props.rotation}
+					scaleX={props.scaleX}
+					scaleY={props.scaleY}
+					iconWidth={80}
+					iconHeight={80}
+				>
+					<CPU_1 blink={processIdList.length !== 0} />
+				</IconContainer>
+			)}
+			<RectangleWrapper visible={props.isTextEditing}>
+				<Rectangle {...props} />
+			</RectangleWrapper>
+		</>
+	);
 };
 
 export const LLMNode = memo(LLMNodeComponent);

@@ -36,6 +36,7 @@ import {
 	createSvgToDiagramNodeData,
 	SvgToDiagramNode,
 } from "../components/nodes/SvgToDiagramNode";
+import { Svg, type SvgData } from "../components/shapes/Svg";
 
 /**
  * Types of diagram components.
@@ -49,6 +50,7 @@ export type DiagramType =
 	| "Path"
 	| "PathPoint"
 	| "Rectangle"
+	| "Svg"
 	// Nodes
 	| "SvgToDiagramNode"
 	| "LLMNode"
@@ -64,7 +66,8 @@ export type Diagram =
 	| GroupData
 	| PathData
 	| PathPointData
-	| RectangleData;
+	| RectangleData
+	| SvgData;
 
 /**
  * Dummy component. This is used by components that are always wrapped by another component.
@@ -86,6 +89,7 @@ export const DiagramComponentCatalog: {
 	Path: Path,
 	PathPoint: PathPoint,
 	Rectangle: Rectangle,
+	Svg: Svg,
 	// Nodes
 	SvgToDiagramNode: SvgToDiagramNode,
 	LLMNode: LLMNode,
@@ -106,9 +110,10 @@ export const DiagramConnectPointCalculators: {
 	Path: () => [],
 	PathPoint: () => [],
 	Rectangle: calcRectangleConnectPointPosition,
+	Svg: () => [],
 	// Nodes
 	SvgToDiagramNode: calcRectangleConnectPointPosition,
-	LLMNode: calcEllipseConnectPointPosition,
+	LLMNode: calcRectangleConnectPointPosition,
 	TextAreaNode: calcRectangleConnectPointPosition,
 };
 
@@ -129,6 +134,7 @@ export const DiagramCreateFunctions: {
 	Path: (props) => createPathData(props),
 	PathPoint: () => undefined,
 	Rectangle: (props) => createRectangleData(props),
+	Svg: () => undefined,
 	// Nodes
 	SvgToDiagramNode: (props) => createSvgToDiagramNodeData(props),
 	LLMNode: (props) => createLLMNodeData(props),

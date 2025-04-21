@@ -43,6 +43,8 @@ export const useConnect = (props: CanvasHooksProps) => {
 			y: shape.y,
 			width: shape.width,
 			height: shape.height,
+			stroke: "#fed579",
+			strokeWidth: "3px",
 			isSelected: false,
 			keepProportion: false,
 			items: e.points.map((p) => ({
@@ -52,7 +54,7 @@ export const useConnect = (props: CanvasHooksProps) => {
 			startOwnerId: e.startOwnerId,
 			endOwnerId: e.endOwnerId,
 			autoRouting: true,
-			endArrowHead: "ConcaveTriangle",
+			endArrowHead: "Circle",
 		} as ConnectLineData);
 	}, []);
 };

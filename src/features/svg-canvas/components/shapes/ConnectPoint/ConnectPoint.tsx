@@ -340,15 +340,15 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 					rotation={0}
 					scaleX={1}
 					scaleY={1}
-					stroke="black"
-					strokeWidth="1px"
+					stroke="#fed579"
+					strokeWidth="3px"
 					keepProportion={false}
 					isSelected={false}
 					isMultiSelectSource={false}
 					dragEnabled={false}
 					segmentDragEnabled={false}
 					newVertexEnabled={false}
-					endArrowHead="ConcaveTriangle"
+					endArrowHead="Circle"
 					items={pathPoints as Diagram[]}
 				/>
 			)}

@@ -9,6 +9,16 @@ export type Point = {
 };
 
 /**
+ * Type for positions of each side.
+ */
+export type Frame = {
+	top: number;
+	left: number;
+	right: number;
+	bottom: number;
+};
+
+/**
  * 矩形の枠の型定義
  */
 export type Box = {

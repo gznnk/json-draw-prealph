@@ -4,6 +4,7 @@ import {
 	type Diagram,
 } from "../types/DiagramCatalog";
 import type { ConnectPointMoveData, EventType } from "../types/EventTypes";
+import type { Frame } from "../types/CoordinateTypes";
 
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../components/shapes/ConnectLine";
@@ -15,12 +16,14 @@ import {
 	isConnectableData,
 	isItemableData,
 	isSelectableData,
+	isTransformativeData,
 } from "../utils/Diagram";
 import { deepCopy, newEventId } from "../utils/Util";
 
 // Imports related to this component.
 import type { ConnectableData } from "../types/DiagramTypes";
-import { MAX_HISTORY_SIZE } from "./SvgCanvasConstants";
+import { degreesToRadians, rotatePoint } from "../utils/Math";
+import { CANVAS_EXPANSION_SIZE, MAX_HISTORY_SIZE } from "./SvgCanvasConstants";
 import type { SvgCanvasHistory, SvgCanvasState } from "./SvgCanvasTypes";
 
 /**
@@ -525,4 +528,102 @@ export const updateOutlineOfAllGroups = (items: Diagram[]): Diagram[] => {
 		}
 		return item;
 	});
+};
+
+/**
+ * Calculate the bounds of all items in the diagram.
+ *
+ * @param items - The list of items to calculate the bounds for.
+ * @returns - The bounds of all items.
+ */
+export const calcBoundsOfAllItems = (items: Diagram[]): Frame => {
+	const bounds = {
+		top: Number.MAX_VALUE,
+		left: Number.MAX_VALUE,
+		right: Number.MIN_VALUE,
+		bottom: Number.MIN_VALUE,
+	};
+
+	for (const item of items) {
+		if (isItemableData(item) && item.type === "Group") {
+			// Calculate the bounds of the group.
+			const box = calcBoundsOfGroup(item);
+			bounds.top = Math.min(bounds.top, box.y);
+			bounds.left = Math.min(bounds.left, box.x);
+			bounds.right = Math.max(bounds.right, box.x + box.width);
+			bounds.bottom = Math.max(bounds.bottom, box.y + box.height);
+		} else if (isTransformativeData(item)) {
+			const radians = degreesToRadians(item.rotation);
+			const leftTop = rotatePoint(
+				item.x - item.width / 2,
+				item.y - item.height / 2,
+				item.x,
+				item.y,
+				radians,
+			);
+			const rightBottom = rotatePoint(
+				item.x + item.width / 2,
+				item.y + item.height / 2,
+				item.x,
+				item.y,
+				radians,
+			);
+			bounds.top = Math.min(bounds.top, leftTop.y);
+			bounds.left = Math.min(bounds.left, leftTop.x);
+			bounds.right = Math.max(bounds.right, rightBottom.x);
+			bounds.bottom = Math.max(bounds.bottom, rightBottom.y);
+		}
+	}
+
+	return bounds;
+};
+
+/**
+ * Calculate the optimal canvas size based on the items.
+ *
+ * @param items - The list of items to calculate the canvas size for.
+ * @returns - The optimal canvas size.
+ */
+export const calcOptimalCanvasSize = (items: Diagram[]) => {
+	const bounds = calcBoundsOfAllItems(items);
+
+	let minX = 0;
+	if (bounds.left < 0) {
+		const minXMultiplier =
+			Math.floor(Math.abs(bounds.left) / CANVAS_EXPANSION_SIZE) + 1;
+		minX = -minXMultiplier * CANVAS_EXPANSION_SIZE;
+	}
+
+	let minY = 0;
+	if (bounds.top < 0) {
+		const minYMultiplier =
+			Math.floor(Math.abs(bounds.top) / CANVAS_EXPANSION_SIZE) + 1;
+		minY = -minYMultiplier * CANVAS_EXPANSION_SIZE;
+	}
+
+	const widthMultiplier =
+		Math.floor((bounds.right - bounds.left) / CANVAS_EXPANSION_SIZE) + 1;
+	let width = widthMultiplier * CANVAS_EXPANSION_SIZE;
+
+	const heightMultiplier =
+		Math.floor((bounds.bottom - bounds.top) / CANVAS_EXPANSION_SIZE) + 1;
+	let height = heightMultiplier * CANVAS_EXPANSION_SIZE;
+
+	if (width < window.screen.width) {
+		width =
+			(Math.floor(window.screen.width / CANVAS_EXPANSION_SIZE) + 1) *
+			CANVAS_EXPANSION_SIZE;
+	}
+	if (height < window.screen.height) {
+		height =
+			(Math.floor(window.screen.height / CANVAS_EXPANSION_SIZE) + 1) *
+			CANVAS_EXPANSION_SIZE;
+	}
+
+	return {
+		minX,
+		minY,
+		width,
+		height,
+	};
 };
