@@ -2,8 +2,10 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
+import type { Diagram } from "../../types/DiagramCatalog";
 import type { DiagramTextEditEvent } from "../../types/EventTypes";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
+import type { TextEditorState } from "../../components/core/Textable";
 
 // Import functions related to SvgCanvas.
 import { applyRecursive } from "../SvgCanvasFunctions";
@@ -23,11 +25,31 @@ export const useTextEdit = (props: CanvasHooksProps) => {
 		// Bypass references to avoid function creation in every render.
 		const { setCanvasState } = refBus.current.props;
 
-		setCanvasState((prevState) => ({
-			...prevState,
-			items: applyRecursive(prevState.items, (item) =>
-				item.id === e.id ? { ...item, isTextEditing: true } : item,
-			),
-		}));
+		setCanvasState((prevState) => {
+			let targetItem: Diagram | undefined = undefined;
+
+			const newState = {
+				...prevState,
+				items: applyRecursive(prevState.items, (item) => {
+					if (item.id === e.id) {
+						targetItem = item;
+						return {
+							...item,
+							isTextEditing: true,
+						};
+					}
+					return item;
+				}),
+			};
+
+			if (!targetItem) return prevState;
+
+			newState.textEditorState = {
+				...(targetItem as Diagram),
+				isActive: true,
+			} as TextEditorState;
+
+			return newState;
+		});
 	}, []);
 };

@@ -3,6 +3,7 @@ import { useState } from "react";
 
 // Import types related to SvgCanvas.
 import type { Diagram } from "../types/DiagramCatalog";
+import type { TextEditorState } from "../components/core/Textable";
 
 // Import functions related to SvgCanvas.
 import { deepCopy } from "../utils/Util";
@@ -76,6 +77,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		],
 		historyIndex: 0,
 		lastHistoryEventId: "",
+		textEditorState: { isActive: false } as TextEditorState,
 	});
 
 	// Create props for the canvas hooks.

@@ -146,9 +146,9 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	const handleDoubleClick = useCallback(() => {
 		const { id, isSelected, onTextEdit } = refBus.current;
 
-		// テキスト編集イベントを発火
 		if (!isSelected) return;
 
+		// テキスト編集イベントを発火
 		onTextEdit?.({
 			id,
 		});

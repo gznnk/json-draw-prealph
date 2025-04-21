@@ -19,7 +19,7 @@ import {
 } from "../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import { TextEditor, useTextEditor } from "../components/core/Textable";
+import { TextEditor } from "../components/core/Textable";
 import { ContextMenu, useContextMenu } from "../components/menus/ContextMenu";
 import { DiagramMenu, useDiagramMenu } from "../components/menus/DiagramMenu";
 import { CanvasMenu } from "../components/menus/CanvasMenu";
@@ -69,6 +69,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		height,
 		items,
 		multiSelectGroup,
+		textEditorState,
 		onTransform,
 		onDiagramChange,
 		onDrag,
@@ -81,6 +82,8 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		onUndo,
 		onRedo,
 		onCanvasResize,
+		onTextEdit,
+		onTextChange,
 		onNewDiagram,
 		onNewItem,
 		onExecute,
@@ -102,9 +105,6 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 	);
 	stateProvider.current.setState({ items } as SvgCanvasState);
 
-	// Use the text editor hook to handle text editing events.
-	const { textEditorProps, textEditorHandlers } = useTextEditor(props);
-
 	// Use the context menu hook to handle context menu events.
 	const { contextMenuProps, contextMenuHandlers, contextMenuFunctions } =
 		useContextMenu(props);
@@ -112,87 +112,121 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 	// Use the diagram menu hook to handle diagram menu events.
 	const { diagramMenuProps } = useDiagramMenu(props);
 
+	// Create references bypass to avoid function creation in every render.
+	const refBusValForCanvasResize = {
+		onCanvasResize,
+		minX,
+		minY,
+		width,
+		height,
+	};
+	const refBusForCanvasResize = useRef(refBusValForCanvasResize);
+	refBusForCanvasResize.current = refBusValForCanvasResize;
+
 	/**
 	 * Resize the canvas when the pointer is moved to the edges of the canvas.
 	 */
-	const canvasResize = useCallback(
-		(p: Point) => {
-			if (p.x <= minX) {
-				if (containerRef.current && svgRef.current) {
-					// SVGの幅を増やす
-					const newMinX = minX - CANVAS_EXPANSION_SIZE;
-					const newWidth = width - newMinX + CANVAS_EXPANSION_SIZE;
+	const canvasResize = useCallback((p: Point) => {
+		// Bypass references to avoid function creation in every render.
+		const { onCanvasResize, minX, minY, width, height } =
+			refBusForCanvasResize.current;
 
-					// Notify the new minX and width to the canvasHooks.
-					onCanvasResize?.({
-						minX: newMinX,
-						minY,
-						width: newWidth,
-						height,
-					} as SvgCanvasResizeEvent);
+		if (p.x <= minX) {
+			if (containerRef.current && svgRef.current) {
+				// SVGの幅を増やす
+				const newMinX = minX - CANVAS_EXPANSION_SIZE;
+				const newWidth = width - newMinX + CANVAS_EXPANSION_SIZE;
 
-					// スクロール位置の設定がDOMの直接更新である一方、state変更によるSVG要素の更新は次のReactの描画処理時であることにより、
-					// 描画タイミングのずれが発生してしまうので、一度SVGのviewBoxを直接更新し、ずれが発生しないようにする
-					svgRef.current.setAttribute("width", `${newWidth}`);
-					svgRef.current.setAttribute(
-						"viewBox",
-						`${newMinX} ${minY} ${newWidth} ${height}`,
-					);
-
-					// Scroll position adjustment.
-					containerRef.current.scrollLeft = CANVAS_EXPANSION_SIZE;
-				}
-			} else if (p.y <= minY) {
-				if (containerRef.current && svgRef.current) {
-					// SVGの高さを増やす
-					const newMinY = minY - CANVAS_EXPANSION_SIZE;
-					const newHeight = height - newMinY;
-
-					// Notify the new minY and height to the hooks.
-					onCanvasResize?.({
-						minX,
-						minY: newMinY,
-						width,
-						height: newHeight,
-					} as SvgCanvasResizeEvent);
-
-					// スクロール位置の設定がDOMの直接更新である一方、state変更によるSVG要素の更新は次のReactの描画処理時であることにより、
-					// 描画タイミングのずれが発生してしまうので、一度SVGのviewBoxを直接更新し、ずれが発生しないようにする
-					svgRef.current.setAttribute("height", `${newHeight}`);
-					svgRef.current.setAttribute(
-						"viewBox",
-						`${minX} ${newMinY} ${width} ${newHeight}`,
-					);
-
-					// Scroll position adjustment.
-					containerRef.current.scrollTop = CANVAS_EXPANSION_SIZE;
-				}
-			} else if (p.x >= minX + width) {
-				// Notify the new width to the hooks.
+				// Notify the new minX and width to the canvasHooks.
 				onCanvasResize?.({
-					minX,
+					minX: newMinX,
 					minY,
-					width: width - minX + CANVAS_EXPANSION_SIZE,
+					width: newWidth,
 					height,
 				} as SvgCanvasResizeEvent);
-			} else if (p.y >= minY + height) {
-				// Notify the new height to the hooks.
+
+				// スクロール位置の設定がDOMの直接更新である一方、state変更によるSVG要素の更新は次のReactの描画処理時であることにより、
+				// 描画タイミングのずれが発生してしまうので、一度SVGのviewBoxを直接更新し、ずれが発生しないようにする
+				svgRef.current.setAttribute("width", `${newWidth}`);
+				svgRef.current.setAttribute(
+					"viewBox",
+					`${newMinX} ${minY} ${newWidth} ${height}`,
+				);
+
+				// Scroll position adjustment.
+				containerRef.current.scrollLeft = CANVAS_EXPANSION_SIZE;
+			}
+		} else if (p.y <= minY) {
+			if (containerRef.current && svgRef.current) {
+				// SVGの高さを増やす
+				const newMinY = minY - CANVAS_EXPANSION_SIZE;
+				const newHeight = height - newMinY;
+
+				// Notify the new minY and height to the hooks.
 				onCanvasResize?.({
 					minX,
-					minY,
+					minY: newMinY,
 					width,
-					height: height - minY + CANVAS_EXPANSION_SIZE,
+					height: newHeight,
 				} as SvgCanvasResizeEvent);
+
+				// スクロール位置の設定がDOMの直接更新である一方、state変更によるSVG要素の更新は次のReactの描画処理時であることにより、
+				// 描画タイミングのずれが発生してしまうので、一度SVGのviewBoxを直接更新し、ずれが発生しないようにする
+				svgRef.current.setAttribute("height", `${newHeight}`);
+				svgRef.current.setAttribute(
+					"viewBox",
+					`${minX} ${newMinY} ${width} ${newHeight}`,
+				);
+
+				// Scroll position adjustment.
+				containerRef.current.scrollTop = CANVAS_EXPANSION_SIZE;
 			}
-		},
-		[onCanvasResize, minX, minY, width, height],
-	);
+		} else if (p.x >= minX + width) {
+			// Notify the new width to the hooks.
+			onCanvasResize?.({
+				minX,
+				minY,
+				width: width - minX + CANVAS_EXPANSION_SIZE,
+				height,
+			} as SvgCanvasResizeEvent);
+		} else if (p.y >= minY + height) {
+			// Notify the new height to the hooks.
+			onCanvasResize?.({
+				minX,
+				minY,
+				width,
+				height: height - minY + CANVAS_EXPANSION_SIZE,
+			} as SvgCanvasResizeEvent);
+		}
+	}, []);
+
+	// Create references bypass to avoid function creation in every render.
+	const refBusVal = {
+		// Component properties
+		textEditorState,
+		onDrag,
+		onDiagramChange,
+		onDelete,
+		onSelect,
+		onSelectAll,
+		onClearAllSelection,
+		onUndo,
+		onRedo,
+		// Internal variables and functions
+		contextMenuFunctions,
+		canvasResize,
+	};
+	const refBus = useRef(refBusVal);
+	refBus.current = refBusVal;
 
 	/**
 	 * Handle the pointer down event on the SVG canvas.
 	 */
 	const handlePointerDown = useCallback(
 		(e: React.PointerEvent<SVGSVGElement>) => {
+			// Bypass references to avoid function creation in every render.
+			const { onClearAllSelection, contextMenuFunctions } = refBus.current;
+
 			if (e.target === e.currentTarget) {
 				// Clear the selection when pointer is down on the canvas.
 				onClearAllSelection?.();
@@ -201,7 +235,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 			// Close the context menu.
 			contextMenuFunctions.closeContextMenu();
 		},
-		[contextMenuFunctions, onClearAllSelection],
+		[],
 	);
 
 	/**
@@ -217,49 +251,49 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 	/**
 	 * Handle the drag event to resize the canvas.
 	 */
-	const handleDrag = useCallback(
-		(e: DiagramDragEvent) => {
-			canvasResize({
-				x: e.endX,
-				y: e.endY,
-			});
+	const handleDrag = useCallback((e: DiagramDragEvent) => {
+		// Bypass references to avoid function creation in every render.
+		const { canvasResize, onDrag } = refBus.current;
 
-			onDrag?.(e);
-		},
-		[canvasResize, onDrag],
-	);
+		canvasResize({
+			x: e.endX,
+			y: e.endY,
+		});
+
+		onDrag?.(e);
+	}, []);
 
 	/**
 	 * Handle the diagram change event to resize the canvas.
 	 */
-	const handleDiagramChange = useCallback(
-		(e: DiagramChangeEvent) => {
-			if (e.changeType === "Drag" && e.endDiagram.x && e.endDiagram.y) {
-				canvasResize({
-					x: e.endDiagram.x,
-					y: e.endDiagram.y,
-				});
-			}
+	const handleDiagramChange = useCallback((e: DiagramChangeEvent) => {
+		// Bypass references to avoid function creation in every render.
+		const { canvasResize, onDiagramChange } = refBus.current;
 
-			onDiagramChange?.(e);
-		},
-		[onDiagramChange, canvasResize],
-	);
+		if (e.changeType === "Drag" && e.endDiagram.x && e.endDiagram.y) {
+			canvasResize({
+				x: e.endDiagram.x,
+				y: e.endDiagram.y,
+			});
+		}
+
+		onDiagramChange?.(e);
+	}, []);
 
 	/**
 	 * 図形選択イベントハンドラ
 	 */
-	const handleSelect = useCallback(
-		(e: DiagramSelectEvent) => {
-			// Ctrlキーの押下状態を付与して、処理をHooksに委譲
-			onSelect?.({
-				eventId: newEventId(),
-				id: e.id,
-				isMultiSelect: isCtrlDown.current,
-			});
-		},
-		[onSelect],
-	);
+	const handleSelect = useCallback((e: DiagramSelectEvent) => {
+		// Bypass references to avoid function creation in every render.
+		const { onSelect } = refBus.current;
+
+		// Ctrlキーの押下状態を付与して、処理をHooksに委譲
+		onSelect?.({
+			eventId: newEventId(),
+			id: e.id,
+			isMultiSelect: isCtrlDown.current,
+		});
+	}, []);
 
 	/**
 	 * Handle scroll event to dispatch a custom event with scroll position.
@@ -280,24 +314,12 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		[],
 	);
 
-	// Create references bypass to avoid function creation in every render.
-	const refBusVal = {
-		textEditorProps,
-		onDelete,
-		onSelectAll,
-		onClearAllSelection,
-		onUndo,
-		onRedo,
-	};
-	const refBus = useRef(refBusVal);
-	refBus.current = refBusVal;
-
 	// Monitor keyboard events.
 	useEffect(() => {
 		const onDocumentKeyDown = (e: KeyboardEvent) => {
 			// Bypass references to avoid function creation in every render.
 			const {
-				textEditorProps,
+				textEditorState,
 				onDelete,
 				onSelectAll,
 				onClearAllSelection,
@@ -325,7 +347,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 					// Redo the last action when Ctrl+Y is pressed.
 					onRedo?.();
 				}
-				if (e.key === "a" && !textEditorProps.isActive) {
+				if (e.key === "a" && !textEditorState.isActive) {
 					// Select all items when Ctrl+A is pressed.
 					e.preventDefault();
 					onSelectAll?.();
@@ -377,7 +399,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 			onDrop,
 			onSelect: handleSelect,
 			onConnect,
-			onTextEdit: textEditorHandlers.onTextEdit,
+			onTextEdit,
 			onNewItem,
 			onExecute,
 		};
@@ -426,7 +448,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 					width={width + minX}
 					height={height + minY}
 				>
-					<TextEditor {...textEditorProps} />
+					<TextEditor {...textEditorState} onTextChange={onTextChange} />
 					<DiagramMenu {...diagramMenuProps} />
 				</HTMLElementsContainer>
 				{/* Container for HTML elements fixed to the viewport. */}

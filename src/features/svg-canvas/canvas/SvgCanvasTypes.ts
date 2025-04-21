@@ -1,4 +1,6 @@
 // Import types related to SvgCanvas.
+import type { TextEditorState } from "../components/core/Textable";
+import type { GroupData } from "../components/shapes/Group/GroupTypes";
 import type { Diagram } from "../types/DiagramCatalog";
 import type {
 	DiagramChangeEvent,
@@ -15,7 +17,6 @@ import type {
 	StackOrderChangeEvent,
 	SvgCanvasResizeEvent,
 } from "../types/EventTypes";
-import type { GroupData } from "../components/shapes/Group/GroupTypes";
 
 /**
  * Type for the data of the SvgCanvas.
@@ -37,6 +38,7 @@ export type SvgCanvasState = {
 	history: SvgCanvasHistory[];
 	historyIndex: number;
 	lastHistoryEventId: string;
+	textEditorState: TextEditorState;
 } & SvgCanvasData;
 
 /**
@@ -55,17 +57,8 @@ export type CanvasHooksProps = {
 /**
  * Props for the SvgCanvas component.
  */
-export type SvgCanvasProps = {
+export type SvgCanvasProps = SvgCanvasState & {
 	title?: string;
-	minX: number;
-	minY: number;
-	width: number;
-	height: number;
-	items: Diagram[];
-	isDiagramChanging: boolean;
-	multiSelectGroup?: GroupData;
-	history: SvgCanvasHistory[];
-	historyIndex: number;
 	onTransform?: (e: DiagramTransformEvent) => void;
 	onDiagramChange?: (e: DiagramChangeEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;

@@ -92,7 +92,6 @@ const TextAreaNodeComponent: React.FC<TextAreaProps> = (props) => {
 						fontSize="14px"
 						fill="#ffffff"
 						pointerEvents="none"
-						onPointerUp={handleButtonClick}
 					>
 						Go
 					</TextAreaButtonText>

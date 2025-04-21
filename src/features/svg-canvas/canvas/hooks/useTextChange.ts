@@ -4,6 +4,7 @@ import { useCallback, useRef } from "react";
 // Import types related to SvgCanvas.
 import type { DiagramTextChangeEvent } from "../../types/EventTypes";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
+import type { TextEditorState } from "../../components/core/Textable";
 
 // Import functions related to SvgCanvas.
 import { addHistory, applyRecursive } from "../SvgCanvasFunctions";
@@ -32,6 +33,9 @@ export const useTextChange = (props: CanvasHooksProps) => {
 						? { ...item, text: e.text, isTextEditing: false }
 						: item,
 				),
+				textEditorState: {
+					isActive: false,
+				} as TextEditorState,
 			};
 
 			// Add a new history entry.
