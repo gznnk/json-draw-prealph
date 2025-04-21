@@ -32,16 +32,22 @@ const ArrowHeadComponent: React.FC<ArrowHeadProps> = ({
 }) => {
 	if (type === "None") return null;
 
-	let points = undefined;
-	if (type === "Triangle") {
-		points = `0,0 ${ARROW_HEAD_SIZE / 2},${-ARROW_HEAD_SIZE} ${-ARROW_HEAD_SIZE / 2},${-ARROW_HEAD_SIZE}`;
-	} else if (type === "ConcaveTriangle") {
-		points = `0,0 ${ARROW_HEAD_SIZE / 2},${-ARROW_HEAD_SIZE} 0,${-ARROW_HEAD_SIZE * 0.86} ${-ARROW_HEAD_SIZE / 2},${-ARROW_HEAD_SIZE}`;
-	}
-
 	const transform = createSvgTransform(1, 1, radians, x, y);
 
-	return <polygon points={points} fill={color} transform={transform} />;
+	if (type === "Triangle") {
+		const points = `0,0 ${ARROW_HEAD_SIZE / 2},${-ARROW_HEAD_SIZE} ${-ARROW_HEAD_SIZE / 2},${-ARROW_HEAD_SIZE}`;
+		return <polygon points={points} fill={color} transform={transform} />;
+	}
+	if (type === "ConcaveTriangle") {
+		const points = `0,0 ${ARROW_HEAD_SIZE / 2},${-ARROW_HEAD_SIZE} 0,${-ARROW_HEAD_SIZE * 0.86} ${-ARROW_HEAD_SIZE / 2},${-ARROW_HEAD_SIZE}`;
+		return <polygon points={points} fill={color} transform={transform} />;
+	}
+	if (type === "Circle") {
+		const radius = ARROW_HEAD_SIZE / 2;
+		return (
+			<circle cx={0} cy={0} r={radius} fill={color} transform={transform} />
+		);
+	}
 };
 
 export const ArrowHead = memo(ArrowHeadComponent);
