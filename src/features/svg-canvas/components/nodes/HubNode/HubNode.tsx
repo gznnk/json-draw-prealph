@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { memo } from "react";
+import { memo, useState } from "react";
 
 // Import types related to this component.
 import type { ExecuteEvent } from "../../../types/EventTypes";
@@ -18,9 +18,14 @@ type HubNodeProps = EllipseProps & {
 };
 
 const HubNodeComponent: React.FC<HubNodeProps> = (props) => {
+	const [isFlashing, setIsFlashing] = useState(false);
+
 	useExecutionChain({
 		id: props.id,
 		onPropagation: (e) => {
+			setIsFlashing(true);
+			setTimeout(() => setIsFlashing(false), 500); // アニメ終了でリセット
+
 			props.onExecute?.({
 				id: props.id,
 				eventId: e.eventId,
@@ -45,7 +50,7 @@ const HubNodeComponent: React.FC<HubNodeProps> = (props) => {
 				iconHeight={100}
 				pointerEvents="none"
 			>
-				<Hub />
+				<Hub flash={isFlashing} />
 			</IconContainer>
 			<Ellipse {...props} />
 		</>
