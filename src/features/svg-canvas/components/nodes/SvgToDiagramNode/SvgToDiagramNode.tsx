@@ -17,12 +17,12 @@ import { useExecutionChain } from "../../../hooks/useExecutionChain";
 // Import functions related to SvgCanvas.
 import { createSvgDataFromText } from "../../shapes/Svg/SvgFunctions";
 
-type SvgToDiagramProps = RectangleProps & {
+type SvgToDiagramNodeProps = RectangleProps & {
 	onExecute: (e: ExecuteEvent) => void;
 	onNewItem: (e: NewItemEvent) => void;
 };
 
-const SvgToDiagramNodeComponent: React.FC<SvgToDiagramProps> = (props) => {
+const SvgToDiagramNodeComponent: React.FC<SvgToDiagramNodeProps> = (props) => {
 	useExecutionChain({
 		id: props.id,
 		onPropagation: (e) => {

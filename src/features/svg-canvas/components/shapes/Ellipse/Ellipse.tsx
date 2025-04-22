@@ -3,7 +3,6 @@ import type React from "react";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
-import type { CreateDiagramProps } from "../../../types/DiagramTypes";
 import type {
 	DiagramDragEvent,
 	DiagramHoverEvent,
@@ -25,20 +24,7 @@ import { createSvgTransform } from "../../../utils/Diagram";
 import { degreesToRadians } from "../../../utils/Math";
 
 // Imports related to this component.
-import type { EllipseData } from "./EllipseTypes";
-
-/**
- * 楕円コンポーネントのプロパティ
- */
-export type EllipseProps = CreateDiagramProps<
-	EllipseData,
-	{
-		selectable: true;
-		transformative: true;
-		connectable: true;
-		textable: true;
-	}
->;
+import type { EllipseProps } from "./EllipseTypes";
 
 /**
  * 楕円コンポーネント

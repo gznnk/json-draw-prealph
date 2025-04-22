@@ -84,6 +84,15 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({ onNewDiagram }) => {
 			>
 				図
 			</CanvasMenuItem>
+			<CanvasMenuItem
+				onClick={() =>
+					onNewDiagram?.({
+						diagramType: "HubNode",
+					})
+				}
+			>
+				※
+			</CanvasMenuItem>
 		</CanvasMenuDiv>
 	);
 };

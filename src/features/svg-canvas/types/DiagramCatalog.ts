@@ -2,16 +2,26 @@
 import type { ConnectPointMoveData } from "./EventTypes";
 
 // Import components related to SvgCanvas.
+import { createHubNodeData, HubNode } from "../components/nodes/HubNode";
+import { createLLMNodeData, LLMNode } from "../components/nodes/LLMNode";
+import {
+	createSvgToDiagramNodeData,
+	SvgToDiagramNode,
+} from "../components/nodes/SvgToDiagramNode";
+import {
+	createTextAreaNodeData,
+	TextAreaNode,
+} from "../components/nodes/TextAreaNode";
 import {
 	ConnectLine,
 	type ConnectLineData,
 } from "../components/shapes/ConnectLine";
 import type { ConnectPointData } from "../components/shapes/ConnectPoint";
 import {
-	Ellipse,
-	type EllipseData,
 	calcEllipseConnectPointPosition,
 	createEllipseData,
+	Ellipse,
+	type EllipseData,
 } from "../components/shapes/Ellipse";
 import { Group, type GroupData } from "../components/shapes/Group";
 import {
@@ -22,20 +32,11 @@ import {
 	type PathPointData,
 } from "../components/shapes/Path";
 import {
-	Rectangle,
-	type RectangleData,
 	calcRectangleConnectPointPosition,
 	createRectangleData,
+	Rectangle,
+	type RectangleData,
 } from "../components/shapes/Rectangle";
-import {
-	createTextAreaNodeData,
-	TextAreaNode,
-} from "../components/nodes/TextAreaNode";
-import { createLLMNodeData, LLMNode } from "../components/nodes/LLMNode";
-import {
-	createSvgToDiagramNodeData,
-	SvgToDiagramNode,
-} from "../components/nodes/SvgToDiagramNode";
 import { Svg, type SvgData } from "../components/shapes/Svg";
 
 /**
@@ -52,6 +53,7 @@ export type DiagramType =
 	| "Rectangle"
 	| "Svg"
 	// Nodes
+	| "HubNode"
 	| "SvgToDiagramNode"
 	| "LLMNode"
 	| "TextAreaNode";
@@ -91,6 +93,7 @@ export const DiagramComponentCatalog: {
 	Rectangle: Rectangle,
 	Svg: Svg,
 	// Nodes
+	HubNode: HubNode,
 	SvgToDiagramNode: SvgToDiagramNode,
 	LLMNode: LLMNode,
 	TextAreaNode: TextAreaNode,
@@ -112,6 +115,7 @@ export const DiagramConnectPointCalculators: {
 	Rectangle: calcRectangleConnectPointPosition,
 	Svg: () => [],
 	// Nodes
+	HubNode: calcEllipseConnectPointPosition,
 	SvgToDiagramNode: calcRectangleConnectPointPosition,
 	LLMNode: calcRectangleConnectPointPosition,
 	TextAreaNode: calcRectangleConnectPointPosition,
@@ -136,6 +140,7 @@ export const DiagramCreateFunctions: {
 	Rectangle: (props) => createRectangleData(props),
 	Svg: () => undefined,
 	// Nodes
+	HubNode: (props) => createHubNodeData(props),
 	SvgToDiagramNode: (props) => createSvgToDiagramNodeData(props),
 	LLMNode: (props) => createLLMNodeData(props),
 	TextAreaNode: (props) => createTextAreaNodeData(props),

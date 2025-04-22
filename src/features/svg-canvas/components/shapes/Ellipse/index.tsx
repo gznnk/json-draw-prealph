@@ -3,4 +3,4 @@ export {
 	calcEllipseConnectPointPosition,
 	createEllipseData,
 } from "./EllipseFunctions";
-export type { EllipseData } from "./EllipseTypes";
+export type { EllipseData, EllipseProps } from "./EllipseTypes";
