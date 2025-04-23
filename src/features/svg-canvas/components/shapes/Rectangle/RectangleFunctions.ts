@@ -65,6 +65,51 @@ export const calcRectangleConnectPointPosition = (
 };
 
 /**
+ * Create connection points for a rectangle.
+ */
+export const createRectangleConnectPoint = ({
+	x,
+	y,
+	width,
+	height,
+	rotation,
+	scaleX,
+	scaleY,
+}: {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	rotation: number;
+	scaleX: number;
+	scaleY: number;
+}): ConnectPointData[] => {
+	const vertices = calcRectangleVertices({
+		x,
+		y,
+		width,
+		height,
+		rotation,
+		scaleX,
+		scaleY,
+	});
+
+	const connectPoints: ConnectPointData[] = [];
+	for (const key of Object.keys(vertices)) {
+		const point = vertices[key as keyof RectangleVertices];
+		connectPoints.push({
+			id: newId(),
+			type: "ConnectPoint",
+			x: point.x,
+			y: point.y,
+			name: key,
+		});
+	}
+
+	return connectPoints;
+};
+
+/**
  * 四角形データ作成
  */
 export const createRectangleData = ({
@@ -110,8 +155,7 @@ export const createRectangleData = ({
 	fontFamily?: string;
 	fontWeight?: string;
 }): RectangleData => {
-	// 接続ポイントを生成
-	const vertices = calcRectangleVertices({
+	const connectPoints = createRectangleConnectPoint({
 		x,
 		y,
 		width,
@@ -120,18 +164,6 @@ export const createRectangleData = ({
 		scaleX,
 		scaleY,
 	});
-
-	const connectPoints: ConnectPointData[] = [];
-	for (const key of Object.keys(vertices)) {
-		const point = vertices[key as keyof RectangleVertices];
-		connectPoints.push({
-			id: newId(),
-			type: "ConnectPoint",
-			x: point.x,
-			y: point.y,
-			name: key,
-		});
-	}
 
 	return {
 		...DEFAULT_RECTANGLE_DATA,

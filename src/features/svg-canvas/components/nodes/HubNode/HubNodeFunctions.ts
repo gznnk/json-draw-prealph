@@ -1,5 +1,6 @@
 import { newId } from "../../../utils/Diagram";
 import { createEllipseConnectPoint } from "../../shapes/Ellipse";
+import type { HubNodeData } from "./HubNodeTypes";
 
 export const createHubNodeData = ({
 	x,
@@ -30,5 +31,5 @@ export const createHubNodeData = ({
 		scaleY: 1,
 		keepProportion: true,
 		connectPoints,
-	};
+	} as HubNodeData;
 };

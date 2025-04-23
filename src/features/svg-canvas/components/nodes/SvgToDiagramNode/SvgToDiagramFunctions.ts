@@ -1,4 +1,6 @@
-import { createRectangleData } from "../../shapes/Rectangle";
+import { newId } from "../../../utils/Diagram";
+import { createRectangleConnectPoint } from "../../shapes/Rectangle";
+import type { SvgToDiagramNodeData } from "./SvgToDiagramNodeTypes";
 
 export const createSvgToDiagramNodeData = ({
 	x,
@@ -7,14 +9,27 @@ export const createSvgToDiagramNodeData = ({
 	x: number;
 	y: number;
 }) => {
-	const data = createRectangleData({
+	const connectPoints = createRectangleConnectPoint({
 		x,
 		y,
-		stroke: "transparent",
-		fill: "transparent",
+		width: 100,
+		height: 100,
+		rotation: 0,
+		scaleX: 1,
+		scaleY: 1,
 	});
 
-	data.type = "SvgToDiagramNode";
-
-	return data;
+	return {
+		id: newId(),
+		type: "SvgToDiagramNode",
+		x,
+		y,
+		width: 100,
+		height: 100,
+		rotation: 0,
+		scaleX: 1,
+		scaleY: 1,
+		keepProportion: true,
+		connectPoints,
+	} as SvgToDiagramNodeData;
 };
