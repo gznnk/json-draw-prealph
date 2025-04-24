@@ -13,8 +13,9 @@ import type { ConnectPointMoveData } from "../../../types/EventTypes";
 import type { ConnectPointData } from "../ConnectPoint";
 
 // Import functions related to SvgCanvas.
-import { isConnectableData, newId } from "../../../utils/Diagram";
+import { newId } from "../../../utils/Diagram";
 import { calcRectangleVertices } from "../../../utils/Math";
+import { isConnectableData } from "../../../utils/TypeUtils";
 
 // Imports related to this component.
 import { DEFAULT_RECTANGLE_DATA } from "./RectangleConstants";

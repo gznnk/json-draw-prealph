@@ -10,7 +10,7 @@ import type { CanvasHooksProps } from "../SvgCanvasTypes";
 import { calcGroupBoxOfNoRotation } from "../../components/shapes/Group";
 
 // Import functions related to SvgCanvas.
-import { isSelectableData } from "../../utils/Diagram";
+import { isSelectableData } from "../../utils/TypeUtils";
 import {
 	applyMultiSelectSourceRecursive,
 	applyRecursive,

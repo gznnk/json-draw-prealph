@@ -1,10 +1,10 @@
 // Import types related to SvgCanvas.
+import type { Frame } from "../types/CoordinateTypes";
 import {
 	DiagramConnectPointCalculators,
 	type Diagram,
 } from "../types/DiagramCatalog";
 import type { ConnectPointMoveData, EventType } from "../types/EventTypes";
-import type { Frame } from "../types/CoordinateTypes";
 
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../components/shapes/ConnectLine";
@@ -17,7 +17,7 @@ import {
 	isItemableData,
 	isSelectableData,
 	isTransformativeData,
-} from "../utils/Diagram";
+} from "../utils/TypeUtils";
 import { deepCopy, newEventId } from "../utils/Util";
 
 // Imports related to this component.

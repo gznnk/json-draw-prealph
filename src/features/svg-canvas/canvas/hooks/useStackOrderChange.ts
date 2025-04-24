@@ -7,7 +7,7 @@ import type { StackOrderChangeEvent } from "../../types/EventTypes";
 import type { CanvasHooksProps, SvgCanvasState } from "../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { isItemableData } from "../../utils/Diagram";
+import { isItemableData } from "../../utils/TypeUtils";
 import { newEventId } from "../../utils/Util";
 import { addHistory } from "../SvgCanvasFunctions";
 
