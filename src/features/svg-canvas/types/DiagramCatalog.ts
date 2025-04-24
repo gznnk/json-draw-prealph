@@ -42,6 +42,10 @@ import {
 	type RectangleData,
 } from "../components/shapes/Rectangle";
 import { Svg, type SvgData } from "../components/shapes/Svg";
+import {
+	createImageGenNodeData,
+	ImageGenNode,
+} from "../components/nodes/ImageGenNode";
 
 /**
  * Types of diagram components.
@@ -58,6 +62,7 @@ export type DiagramType =
 	| "Svg"
 	// Nodes
 	| "HubNode"
+	| "ImageGenNode"
 	| "SvgToDiagramNode"
 	| "LLMNode"
 	| "TextAreaNode";
@@ -101,6 +106,7 @@ export const DiagramComponentCatalog: {
 	Svg: Svg,
 	// Nodes
 	HubNode: HubNode,
+	ImageGenNode: ImageGenNode,
 	SvgToDiagramNode: SvgToDiagramNode,
 	LLMNode: LLMNode,
 	TextAreaNode: TextAreaNode,
@@ -123,6 +129,7 @@ export const DiagramConnectPointCalculators: {
 	Svg: () => [],
 	// Nodes
 	HubNode: calcEllipseConnectPointPosition,
+	ImageGenNode: calcRectangleConnectPointPosition,
 	SvgToDiagramNode: calcRectangleConnectPointPosition,
 	LLMNode: calcRectangleConnectPointPosition,
 	TextAreaNode: calcRectangleConnectPointPosition,
@@ -148,6 +155,7 @@ export const DiagramCreateFunctions: {
 	Svg: () => undefined,
 	// Nodes
 	HubNode: (props) => createHubNodeData(props),
+	ImageGenNode: (props) => createImageGenNodeData(props),
 	SvgToDiagramNode: (props) => createSvgToDiagramNodeData(props),
 	LLMNode: (props) => createLLMNodeData(props),
 	TextAreaNode: (props) => createTextAreaNodeData(props),

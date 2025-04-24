@@ -93,6 +93,15 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({ onNewDiagram }) => {
 			>
 				※
 			</CanvasMenuItem>
+			<CanvasMenuItem
+				onClick={() =>
+					onNewDiagram?.({
+						diagramType: "ImageGenNode",
+					})
+				}
+			>
+				画
+			</CanvasMenuItem>
 		</CanvasMenuDiv>
 	);
 };
