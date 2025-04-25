@@ -10,8 +10,12 @@ import type { ExecuteEvent, NewItemEvent } from "../../../types/EventTypes";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";
-import { CPU_1 } from "../../icons/CPU_1";
-import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
+import { Picture } from "../../icons/Picture";
+import {
+	DEFAULT_RECTANGLE_DATA,
+	Rectangle,
+	type RectangleProps,
+} from "../../shapes/Rectangle";
 
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
@@ -24,7 +28,6 @@ import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 
 // Import related to this component.
 import { createImageData } from "../../shapes/Image";
-import { ImageGenNodeWrapper } from "./ImageGenNodeStyled";
 
 type ImageGenProps = RectangleProps & {
 	onExecute: (e: ExecuteEvent) => void;
@@ -61,9 +64,9 @@ const ImageGenNodeComponent: React.FC<ImageGenProps> = (props) => {
 
 			try {
 				const response = await openai.images.generate({
+					model: "gpt-image-1",
 					prompt: e.data.text,
-					size: "512x512",
-					response_format: "b64_json",
+					size: "1024x1024",
 				});
 
 				const base64Image = response.data[0].b64_json;
@@ -78,6 +81,8 @@ const ImageGenNodeComponent: React.FC<ImageGenProps> = (props) => {
 						item: createImageData({
 							x: props.x,
 							y: props.y,
+							width: 512,
+							height: 512,
 							base64Data: base64Image,
 						}),
 					});
@@ -104,15 +109,18 @@ const ImageGenNodeComponent: React.FC<ImageGenProps> = (props) => {
 					rotation={props.rotation}
 					scaleX={props.scaleX}
 					scaleY={props.scaleY}
-					iconWidth={80}
-					iconHeight={80}
+					iconWidth={60}
+					iconHeight={60}
 				>
-					<CPU_1 blink={processIdList.length !== 0} />
+					<Picture animation={processIdList.length !== 0} />
 				</IconContainer>
 			)}
-			<ImageGenNodeWrapper visible={props.isTextEditing}>
-				<Rectangle {...props} />
-			</ImageGenNodeWrapper>
+			<Rectangle
+				{...DEFAULT_RECTANGLE_DATA}
+				{...props}
+				isTransparent
+				isTextEditEnabled={false}
+			/>
 		</>
 	);
 };

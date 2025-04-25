@@ -1,4 +1,6 @@
-import { createRectangleData } from "../../shapes/Rectangle";
+import { newId } from "../../../utils/Diagram";
+import { createRectangleConnectPoint } from "../../shapes/Rectangle";
+import type { ImageGenNodeData } from "./ImageGenNodeTypes";
 
 export const createImageGenNodeData = ({
 	x,
@@ -7,20 +9,27 @@ export const createImageGenNodeData = ({
 	x: number;
 	y: number;
 }) => {
-	const data = createRectangleData({
+	const connectPoints = createRectangleConnectPoint({
 		x,
 		y,
-		stroke: "transparent",
-		fill: "#0A0A37",
-		textType: "textarea",
-		textAlign: "center",
-		verticalAlign: "center",
-		fontColor: "white",
-		fontSize: 12,
-		keepProportion: true,
+		width: 100,
+		height: 100,
+		rotation: 0,
+		scaleX: 1,
+		scaleY: 1,
 	});
 
-	data.type = "ImageGenNode";
-
-	return data;
+	return {
+		id: newId(),
+		type: "ImageGenNode",
+		x,
+		y,
+		width: 100,
+		height: 100,
+		rotation: 0,
+		scaleX: 1,
+		scaleY: 1,
+		keepProportion: true,
+		connectPoints,
+	} as ImageGenNodeData;
 };
