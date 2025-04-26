@@ -27,10 +27,8 @@ export const useExport = (props: CanvasHooksProps) => {
 
 		const selectedItems = getSelectedItems(items);
 
-		if (selectedItems.length === 1) {
-			// Export the selected item.
-			const selectedItem = selectedItems[0];
-			const blob = DiagramExportFunctions[selectedItem.type]?.(selectedItem);
+		for (const item of selectedItems) {
+			const blob = DiagramExportFunctions[item.type]?.(item);
 			if (blob) {
 				const url = URL.createObjectURL(blob);
 
@@ -51,7 +49,7 @@ export const useExport = (props: CanvasHooksProps) => {
 				// Create a link element to download the SVG.
 				const link = document.createElement("a");
 				link.href = url;
-				link.download = `${selectedItem.id}.${ext}`;
+				link.download = `${item.id}.${ext}`;
 				document.body.appendChild(link);
 				link.click();
 				document.body.removeChild(link);

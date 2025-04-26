@@ -173,22 +173,22 @@ export const DiagramCreateFunctions: {
 };
 
 export const DiagramExportFunctions: {
-	[key in DiagramType]: (diagram: Diagram) => Blob | undefined;
+	[key in DiagramType]: ((diagram: Diagram) => Blob | undefined) | undefined;
 } = {
 	// Shapes
-	ConnectLine: () => undefined,
-	ConnectPoint: () => undefined,
-	Ellipse: () => undefined,
-	Group: () => undefined,
+	ConnectLine: undefined,
+	ConnectPoint: undefined,
+	Ellipse: undefined,
+	Group: undefined,
 	Image: imageToBlob,
-	Path: () => undefined,
-	PathPoint: () => undefined,
-	Rectangle: () => undefined,
+	Path: undefined,
+	PathPoint: undefined,
+	Rectangle: undefined,
 	Svg: svgToBlob,
 	// Nodes
-	HubNode: () => undefined,
-	ImageGenNode: () => undefined,
-	SvgToDiagramNode: () => undefined,
-	LLMNode: () => undefined,
-	TextAreaNode: () => undefined,
+	HubNode: undefined,
+	ImageGenNode: undefined,
+	SvgToDiagramNode: undefined,
+	LLMNode: undefined,
+	TextAreaNode: undefined,
 };

@@ -1,4 +1,8 @@
 // 型チェック関数を集約したユーティリティ
+import {
+	DiagramExportFunctions,
+	type DiagramType,
+} from "../types/DiagramCatalog";
 import type {
 	Shape,
 	SelectableData,
@@ -75,4 +79,13 @@ export const isStrokableData = (obj: any): obj is Shape => {
 // biome-ignore lint/suspicious/noExplicitAny: 型チェック関数のため
 export const isFillableData = (obj: any): obj is Shape => {
 	return obj && typeof obj.fill === "string";
+};
+
+export const isExportable = (obj: unknown): boolean => {
+	return (
+		obj !== null &&
+		typeof obj === "object" &&
+		"type" in obj &&
+		DiagramExportFunctions[obj.type as DiagramType] !== undefined
+	);
 };
