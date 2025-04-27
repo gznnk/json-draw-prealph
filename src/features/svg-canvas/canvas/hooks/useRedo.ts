@@ -5,7 +5,10 @@ import { useCallback, useRef } from "react";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { saveCanvasDataToLocalStorage } from "../SvgCanvasFunctions";
+import {
+	clearSelectedRecursive,
+	saveCanvasDataToLocalStorage,
+} from "../SvgCanvasFunctions";
 
 /**
  * Custom hook to handle redo events on the canvas.
@@ -36,6 +39,9 @@ export const useRedo = (props: CanvasHooksProps) => {
 				...nextHistory, // Overwrite the current state with the next history.
 				historyIndex: nextIndex,
 			};
+
+			// Clear the selected items.
+			ret.items = clearSelectedRecursive(ret.items);
 
 			saveCanvasDataToLocalStorage(ret); // Save the canvas data to local storage.
 

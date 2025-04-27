@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { memo, useCallback, useRef } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types related to SvgCanvas.
 import type { ExecuteEvent } from "../../../types/EventTypes";
@@ -22,6 +22,14 @@ type TextAreaProps = RectangleProps & {
 };
 
 const TextAreaNodeComponent: React.FC<TextAreaProps> = (props) => {
+	// State to manage the text content of the TextArea node.
+	const [text, setText] = useState<string>(props.text);
+
+	// Apply the props.text to the state when the component mounts or when props.text changes.
+	useEffect(() => {
+		setText(props.text);
+	}, [props.text]);
+
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
@@ -50,19 +58,22 @@ const TextAreaNodeComponent: React.FC<TextAreaProps> = (props) => {
 	useExecutionChain({
 		id: props.id,
 		onPropagation: (e) => {
-			props.onDiagramChange?.({
-				id: props.id,
-				eventId: e.eventId,
-				eventType: e.eventType,
-				changeType: "Appearance",
-				startDiagram: {
-					text: props.text,
-				},
-				endDiagram: {
-					text: e.data.text,
-				},
-			});
 			if (e.eventType === "End" || e.eventType === "Instant") {
+				// Update the text state with the new text from the event data.
+				props.onDiagramChange?.({
+					id: props.id,
+					eventId: e.eventId,
+					eventType: e.eventType,
+					changeType: "Appearance",
+					startDiagram: {
+						text: props.text,
+					},
+					endDiagram: {
+						text: e.data.text,
+					},
+				});
+
+				// Propagate the event.
 				props.onExecute?.({
 					id: props.id,
 					eventId: e.eventId,
@@ -71,13 +82,15 @@ const TextAreaNodeComponent: React.FC<TextAreaProps> = (props) => {
 						text: e.data.text,
 					},
 				});
+			} else {
+				setText(e.data.text);
 			}
 		},
 	});
 
 	return (
 		<>
-			<Rectangle {...props} />
+			<Rectangle {...props} text={text} />
 			{!props.isTextEditing && (
 				<>
 					<TextAreaButton
