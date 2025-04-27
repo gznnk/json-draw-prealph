@@ -1,12 +1,17 @@
 // Import React.
-import { useEffect, useState, memo } from "react";
+import { memo, useEffect, useState } from "react";
 
 // Import functions related to SvgCanvas.
-import { createDValue } from "../../shapes/Path/Path/PathFunctions";
+import {
+	createDValue,
+	createEndPointArrowHead,
+	createStartPointArrowHead,
+	type PathData,
+} from "../../shapes/Path";
 
 // Import related to this component.
-import { FlashPath } from "./FlashConnectLineStyled";
 import { FLASH_CONNECT_LINE_EVENT_NAME } from "./FlashConnectConstants";
+import { FlashGroup } from "./FlashConnectLineStyled";
 import type { FlashConnectLineEvent } from "./FlashConnectLineTypes";
 
 export const FlashConnectLineComponent = () => {
@@ -45,15 +50,20 @@ export const FlashConnectLineComponent = () => {
 	}, []);
 
 	return connectLineList.map((connectLine) => (
-		<FlashPath
-			key={`${connectLine.data.id}-${connectLine.eventId}`}
-			d={createDValue(connectLine.data.items)}
+		<FlashGroup
 			$flash={true}
-			strokeWidth={connectLine.data.strokeWidth}
-			stroke={connectLine.data.stroke}
-			fill="none"
-			pointerEvents="none"
-		/>
+			key={`${connectLine.data.id}-${connectLine.eventId}`}
+		>
+			<path
+				d={createDValue(connectLine.data.items)}
+				strokeWidth={connectLine.data.strokeWidth}
+				stroke={connectLine.data.stroke}
+				fill="none"
+				pointerEvents="none"
+			/>
+			{createStartPointArrowHead(connectLine.data as PathData)}
+			{createEndPointArrowHead(connectLine.data as PathData)}
+		</FlashGroup>
 	));
 };
 

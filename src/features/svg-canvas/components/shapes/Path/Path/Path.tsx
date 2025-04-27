@@ -3,7 +3,6 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import components related to SvgCanvas.
-import { ArrowHead } from "../../../core/ArrowHead";
 import { PositionLabel } from "../../../core/PositionLabel";
 import { Group } from "../../Group";
 
@@ -21,13 +20,17 @@ import type {
 import { useDrag } from "../../../../hooks/useDrag";
 
 // Import functions related to SvgCanvas.
-import { calcPointsOuterShape, calcRadians } from "../../../../utils/Math";
+import { calcPointsOuterShape } from "../../../../utils/Math";
 import { isItemableData } from "../../../../utils/TypeUtils";
 
 // Imports related to this component.
 import { NewVertexList } from "../NewVertexList";
 import { SegmentList } from "../SegmentList";
-import { createDValue } from "./PathFunctions";
+import {
+	createDValue,
+	createEndPointArrowHead,
+	createStartPointArrowHead,
+} from "./PathFunctions";
 import type { PathData } from "./PathTypes";
 
 /**
@@ -343,49 +346,19 @@ const PathComponent: React.FC<PathProps> = ({
 	// Flag to show the position label.
 	const showPositionLabel = isSelected && isDragging;
 
-	// ArrowHead.
-	let startArrowHeadComp = undefined;
-	let endArrowHeadComp = undefined;
-	if (1 < items.length) {
-		if (startArrowHead && startArrowHead !== "None") {
-			const startPoint = items[0];
-			const start2thPoint = items[1];
-			const startArrowHeadRadians = calcRadians(
-				startPoint.x,
-				startPoint.y,
-				start2thPoint.x,
-				start2thPoint.y,
-			);
-			startArrowHeadComp = (
-				<ArrowHead
-					type={startArrowHead}
-					color={stroke}
-					x={startPoint.x}
-					y={startPoint.y}
-					radians={startArrowHeadRadians}
-				/>
-			);
-		}
-		if (endArrowHead && endArrowHead !== "None") {
-			const endPoint = items[items.length - 1];
-			const end2thPoint = items[items.length - 2];
-			const endArrowHeadRadians = calcRadians(
-				endPoint.x,
-				endPoint.y,
-				end2thPoint.x,
-				end2thPoint.y,
-			);
-			endArrowHeadComp = (
-				<ArrowHead
-					type={endArrowHead}
-					color={stroke}
-					x={endPoint.x}
-					y={endPoint.y}
-					radians={endArrowHeadRadians}
-				/>
-			);
-		}
-	}
+	// Start ArrowHead.
+	const startArrowHeadComp = createStartPointArrowHead({
+		items,
+		stroke,
+		startArrowHead,
+	} as PathData);
+
+	// End ArrowHead.
+	const endArrowHeadComp = createEndPointArrowHead({
+		items,
+		stroke,
+		endArrowHead,
+	} as PathData);
 
 	return (
 		<>
