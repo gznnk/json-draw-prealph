@@ -17,6 +17,7 @@ import { newEventId } from "../../../utils/Util";
 // Imports related to this component.
 import { TextAreaButton, TextAreaButtonText } from "./TextAreaNodeStyled";
 
+// TODO: CreateDiagramPropsで生成
 type TextAreaProps = RectangleProps & {
 	onExecute: (e: ExecuteEvent) => void;
 };

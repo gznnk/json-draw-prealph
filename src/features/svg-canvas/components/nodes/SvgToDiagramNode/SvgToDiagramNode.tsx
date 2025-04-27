@@ -21,6 +21,7 @@ import { useExecutionChain } from "../../../hooks/useExecutionChain";
 // Import functions related to SvgCanvas.
 import { createSvgDataFromText } from "../../shapes/Svg/SvgFunctions";
 
+// TODO: CreateDiagramPropsで生成
 type SvgToDiagramNodeProps = RectangleProps & {
 	onExecute: (e: ExecuteEvent) => void;
 	onNewItem: (e: NewItemEvent) => void;

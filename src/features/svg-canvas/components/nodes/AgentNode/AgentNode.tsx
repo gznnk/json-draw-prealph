@@ -6,12 +6,11 @@ import { memo, useEffect, useState, useRef } from "react";
 import { OpenAI } from "openai";
 
 // Import types related to SvgCanvas.
-import type { ExecuteEvent } from "../../../types/EventTypes";
+import type { ExecuteEvent, NewItemEvent } from "../../../types/EventTypes";
 
 // Import components related to SvgCanvas.
 import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
 import { IconContainer } from "../../core/IconContainer";
-import { CPU_1 } from "../../icons/CPU_1";
 
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
@@ -23,20 +22,23 @@ import { newEventId } from "../../../utils/Util";
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 
 // Import related to this component.
-import { RectangleWrapper } from "./LLMNodeStyled";
+import { RectangleWrapper } from "./AgentNodeStyled";
+import { Agent } from "../../icons/Agent";
+import { createLLMNodeData } from "../LLMNode";
 
 /**
- * Props for the LLMNode component.
+ * Props for the AgentNode component.
  */
 // TODO: CreateDiagramPropsで生成
-type LLMProps = RectangleProps & {
+type AgentProps = RectangleProps & {
 	onExecute: (e: ExecuteEvent) => void;
+	onNewItem: (e: NewItemEvent) => void;
 };
 
 /**
- * LLMNode component.
+ * AgentNode component.
  */
-const LLMNodeComponent: React.FC<LLMProps> = (props) => {
+const AgentNodeComponent: React.FC<AgentProps> = (props) => {
 	const [apiKey, setApiKey] = useState<string>("");
 	const [processIdList, setProcessIdList] = useState<string[]>([]);
 
@@ -55,7 +57,7 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 		}
 	}, []);
 
-	// Handle execution events for the LLM node.
+	// Handle execution events for the Agent node.
 	useExecutionChain({
 		id: props.id,
 		onPropagation: async (e) => {
@@ -73,9 +75,31 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 			try {
 				const stream = await openai.responses.create({
 					model: "gpt-4o",
-					instructions: props.text,
+					// instructions: props.text,
+					instructions:
+						"You are a ai agent. You can call functions to perform tasks.",
 					input: e.data.text,
-					stream: true,
+					stream: true, // 必須！
+					tools: [
+						{
+							type: "function",
+							name: "add_llm_node",
+							description: "Adds a new LLM node to the canvas.",
+							parameters: {
+								type: "object",
+								properties: {
+									instructions: {
+										type: "string",
+										description:
+											"Inserts a system message as the first item in the model's context.",
+									},
+								},
+								additionalProperties: false,
+								required: ["instructions"],
+							},
+							strict: true,
+						},
+					],
 				});
 
 				let fullOutput = "";
@@ -90,18 +114,27 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 				});
 
 				for await (const event of stream) {
-					if (event.type === "response.output_text.delta") {
+					console.log(event);
+					if (event.type === "response.function_call_arguments.delta") {
 						const delta = event.delta;
 						fullOutput += delta;
-
-						props.onExecute({
-							id: props.id,
-							eventId: newEventId(),
-							eventType: "InProgress",
-							data: {
-								text: fullOutput,
-							},
-						});
+					}
+					if (
+						event.type === "response.output_item.done" &&
+						event.item?.type === "function_call"
+					) {
+						const functionName = event.item.name;
+						const functionCallArguments = JSON.parse(event.item.arguments);
+						if (functionName === "add_llm_node") {
+							const llmNode = createLLMNodeData({
+								x: props.x + (Math.random() - 0.5) * 300,
+								y: props.y + (Math.random() - 0.5) * 300,
+								text: functionCallArguments.instructions,
+							});
+							props.onNewItem({
+								item: llmNode,
+							});
+						}
 					}
 				}
 
@@ -136,7 +169,7 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 					iconWidth={80}
 					iconHeight={80}
 				>
-					<CPU_1 blink={processIdList.length !== 0} />
+					<Agent width={80} height={80} animate={processIdList.length !== 0} />
 				</IconContainer>
 			)}
 			<RectangleWrapper visible={props.isTextEditing}>
@@ -146,4 +179,4 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 	);
 };
 
-export const LLMNode = memo(LLMNodeComponent);
+export const AgentNode = memo(AgentNodeComponent);

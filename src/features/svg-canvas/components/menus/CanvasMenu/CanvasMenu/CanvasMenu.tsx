@@ -110,6 +110,16 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({ onNewDiagram }) => {
 			>
 				画
 			</CanvasMenuItem>
+			<CanvasMenuItem
+				onClick={() =>
+					onNewDiagram?.({
+						diagramType: "AgentNode",
+						isSelected: true,
+					})
+				}
+			>
+				AG
+			</CanvasMenuItem>
 		</CanvasMenuDiv>
 	);
 };

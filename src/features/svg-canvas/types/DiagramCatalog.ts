@@ -2,6 +2,7 @@
 import type { ConnectPointMoveData } from "./EventTypes";
 
 // Import components related to SvgCanvas.
+import { AgentNode, createAgentNodeData } from "../components/nodes/AgentNode";
 import {
 	createHubNodeData,
 	HubNode,
@@ -68,6 +69,7 @@ export type DiagramType =
 	| "Rectangle"
 	| "Svg"
 	// Nodes
+	| "AgentNode"
 	| "HubNode"
 	| "ImageGenNode"
 	| "SvgToDiagramNode"
@@ -114,6 +116,7 @@ export const DiagramComponentCatalog: {
 	Rectangle: Rectangle,
 	Svg: Svg,
 	// Nodes
+	AgentNode: AgentNode,
 	HubNode: HubNode,
 	ImageGenNode: ImageGenNode,
 	SvgToDiagramNode: SvgToDiagramNode,
@@ -138,6 +141,7 @@ export const DiagramConnectPointCalculators: {
 	Rectangle: calcRectangleConnectPointPosition,
 	Svg: () => [],
 	// Nodes
+	AgentNode: calcRectangleConnectPointPosition,
 	HubNode: calcEllipseConnectPointPosition,
 	ImageGenNode: calcRectangleConnectPointPosition,
 	SvgToDiagramNode: calcRectangleConnectPointPosition,
@@ -157,7 +161,7 @@ export const DiagramCreateFunctions: {
 	// Shapes
 	ConnectLine: () => undefined,
 	ConnectPoint: () => undefined,
-	Ellipse: (props) => createEllipseData(props),
+	Ellipse: (props) => createEllipseData(props), // TODO: 関数をそのまま指定
 	Group: () => undefined,
 	Image: (props) => createImageData(props),
 	Path: (props) => createPathData(props),
@@ -165,6 +169,7 @@ export const DiagramCreateFunctions: {
 	Rectangle: (props) => createRectangleData(props),
 	Svg: () => undefined,
 	// Nodes
+	AgentNode: (props) => createAgentNodeData(props),
 	HubNode: (props) => createHubNodeData(props),
 	ImageGenNode: (props) => createImageGenNodeData(props),
 	SvgToDiagramNode: (props) => createSvgToDiagramNodeData(props),
@@ -186,6 +191,7 @@ export const DiagramExportFunctions: {
 	Rectangle: undefined,
 	Svg: svgToBlob,
 	// Nodes
+	AgentNode: undefined,
 	HubNode: undefined,
 	ImageGenNode: undefined,
 	SvgToDiagramNode: undefined,
