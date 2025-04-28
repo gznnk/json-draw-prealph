@@ -28,6 +28,14 @@ export const LLM_NODE_INSTRACTIONS_PARAM_DESCRIPTION = `
 Defines the "instructions" parameter to provide a system prompt that ensures high-quality and appropriate responses from the model. The prompt is inserted as the first message in the context.
 `;
 
+export const ADD_SVG_TO_CANVAS_NODE_DESCRIPTION = `
+Adds an SvgToDiagram node to the canvas.  
+The node receives input from connected LLM or text nodes.  
+If the received output is a valid SVG string, it converts the SVG into a shape and adds it to the canvas.  
+The SvgToDiagram node does not send any output to other nodes.  
+Returns a JSON object containing the node ID and node type.
+`;
+
 export const AI_AGENT_TOOLS = [
 	{
 		type: "function",
@@ -50,6 +58,18 @@ export const AI_AGENT_TOOLS = [
 		type: "function",
 		name: "add_text_node",
 		description: ADD_TEXT_NODE_DESCRIPTION,
+		parameters: {
+			type: "object",
+			properties: {},
+			additionalProperties: false,
+			required: [],
+		},
+		strict: true,
+	},
+	{
+		type: "function",
+		name: "add_svg_to_canvas_node",
+		description: ADD_SVG_TO_CANVAS_NODE_DESCRIPTION,
 		parameters: {
 			type: "object",
 			properties: {},

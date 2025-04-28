@@ -31,6 +31,7 @@ import { Agent } from "../../icons/Agent";
 import { createLLMNodeData } from "../LLMNode";
 import { AI_AGENT_TOOLS, AI_AGENT_INSTRUCTIONS } from "./AgentConstants";
 import { createTextAreaNodeData } from "../TextAreaNode";
+import { createSvgToDiagramNodeData } from "../SvgToDiagramNode";
 
 /**
  * Props for the AgentNode component.
@@ -189,6 +190,25 @@ const AgentNodeComponent: React.FC<AgentProps> = (props) => {
 									output: JSON.stringify({
 										id: textNode.id,
 										type: "TextNode",
+									}),
+								});
+							}
+							if (functionName === "add_svg_to_canvas_node") {
+								currentY += 250; // Move down by 100 pixels for the new node
+								const svgNode = createSvgToDiagramNodeData({
+									x: refBus.current.props.x,
+									y: currentY,
+								});
+								props.onNewItem({
+									item: svgNode,
+								});
+								input.push(event.item);
+								input.push({
+									type: "function_call_output",
+									call_id: event.item.call_id,
+									output: JSON.stringify({
+										id: svgNode.id,
+										type: "SvgToDiagramNode",
 									}),
 								});
 							}
