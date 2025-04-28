@@ -5,7 +5,8 @@ import { keyframes, css } from "@emotion/react";
 // 上下に動くアニメーション
 const moveUpDown = keyframes`
     0% { transform: translateY(0); }
-    25% { transform: translateY(7px); }
+    25% { transform: translateY(-3px); }
+	50% { transform: translateY(7px); }
     100% { transform: translateY(0); }
 `;
 

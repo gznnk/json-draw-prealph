@@ -3,8 +3,9 @@ import type { OpenAI } from "openai";
 
 export const AI_AGENT_INSTRUCTIONS = `
 You are an AI agent responsible for building workflows by calling available functions.  
-Use the provided tools to create and modify workflows based on user input.  
-Always select and call functions appropriately to achieve the user's goals.  
+Use the provided tools to create workflows based strictly on user input.  
+Only create the minimum necessary workflow to achieve the user's request.  
+Always choose functions carefully and avoid unnecessary or redundant calls.  
 Do not invent new functions or tools; only use those that are provided.
 `;
 
@@ -12,14 +13,14 @@ export const ADD_TEXT_NODE_DISCRIPTION = `
 Adds a text node to the canvas that handles text input and output.
 When connected from the text node to an LLM node, it sends input text.
 When connected from an LLM node to the text node, it displays the LLM's output.
-Returns the ID of the created text node.
+Returns a JSON object containing the node ID and node type.
 `;
 
 export const ADD_LLM_NODE_DISCRIPTION = `
 Adds an LLM node to the canvas that communicates with OpenAI's Response API using the GPT-4o model.
 The node accepts text input from connected text nodes and sends generated output to connected text nodes.
 The "instructions" parameter must be provided to define the system prompt for the LLM.
-Returns the ID of the created LLM node.
+Returns a JSON object containing the node ID, node type, and the instructions used.
 `;
 
 export const AI_AGENT_TOOLS = [

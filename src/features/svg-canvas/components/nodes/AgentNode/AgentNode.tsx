@@ -79,74 +79,85 @@ const AgentNodeComponent: React.FC<AgentProps> = (props) => {
 
 				const input = [
 					{
+						role: "system",
+						content: AI_AGENT_INSTRUCTIONS,
+					},
+					{
 						role: "user",
 						content: e.data.text,
 					},
 				] as OpenAI.Responses.ResponseInput;
 
-				const stream = await openai.responses.create({
-					model: "gpt-4o",
-					instructions: AI_AGENT_INSTRUCTIONS,
-					input,
-					stream: true, // 必須！
-					tools: AI_AGENT_TOOLS,
-				});
+				let count = 0;
+				while (count < 10) {
+					const stream = await openai.responses.create({
+						model: "gpt-4o",
+						input,
+						stream: true, // 必須！
+						tools: AI_AGENT_TOOLS,
+					});
 
-				for await (const event of stream) {
-					console.log(event);
-					if (
-						event.type === "response.output_item.done" &&
-						event.item?.type === "function_call"
-					) {
-						const functionName = event.item.name;
-						const functionCallArguments = JSON.parse(event.item.arguments);
-						if (functionName === "add_llm_node") {
-							currentY += 200; // Move down by 100 pixels for the new node
-							const llmNode = createLLMNodeData({
-								x: refBus.current.props.x,
-								y: currentY,
-								text: functionCallArguments.instructions,
-							});
-							props.onNewItem({
-								item: llmNode,
-							});
-							input.push(event.item);
-							input.push({
-								type: "function_call_output",
-								call_id: event.item.call_id,
-								output: llmNode.id,
-							});
-						}
-						if (functionName === "add_text_node") {
-							currentY += 200; // Move down by 100 pixels for the new node
-							const textNode = createTextAreaNodeData({
-								x: refBus.current.props.x,
-								y: currentY,
-							});
-							props.onNewItem({
-								item: textNode,
-							});
-							input.push(event.item);
-							input.push({
-								type: "function_call_output",
-								call_id: event.item.call_id,
-								output: textNode.id,
-							});
+					let foundFunctionCall = false;
+
+					for await (const event of stream) {
+						console.log(event);
+						if (
+							event.type === "response.output_item.done" &&
+							event.item?.type === "function_call"
+						) {
+							foundFunctionCall = true;
+							const functionName = event.item.name;
+							const functionCallArguments = JSON.parse(event.item.arguments);
+							if (functionName === "add_llm_node") {
+								currentY += 250; // Move down by 100 pixels for the new node
+								const llmNode = createLLMNodeData({
+									x: refBus.current.props.x,
+									y: currentY,
+									text: functionCallArguments.instructions,
+								});
+								props.onNewItem({
+									item: llmNode,
+								});
+								input.push(event.item);
+								input.push({
+									type: "function_call_output",
+									call_id: event.item.call_id,
+									output: JSON.stringify({
+										id: llmNode.id,
+										type: "LLMNode",
+										instructions: functionCallArguments.instructions,
+									}),
+								});
+							}
+							if (functionName === "add_text_node") {
+								currentY += 250; // Move down by 100 pixels for the new node
+								const textNode = createTextAreaNodeData({
+									x: refBus.current.props.x,
+									y: currentY,
+								});
+								props.onNewItem({
+									item: textNode,
+								});
+								input.push(event.item);
+								input.push({
+									type: "function_call_output",
+									call_id: event.item.call_id,
+									output: JSON.stringify({
+										id: textNode.id,
+										type: "TextNode",
+									}),
+								});
+							}
 						}
 					}
-				}
 
-				console.log("--------------------");
+					count++;
 
-				const stream2 = await openai.responses.create({
-					model: "gpt-4o",
-					instructions: AI_AGENT_INSTRUCTIONS,
-					input,
-					stream: true, // 必須！
-					tools: AI_AGENT_TOOLS,
-				});
-				for await (const event of stream2) {
-					console.log(event);
+					if (!foundFunctionCall) {
+						break;
+					}
+
+					console.log("Function call found, continuing to next iteration.");
 				}
 			} catch (error) {
 				console.error("Error fetching data from OpenAI API:", error);
