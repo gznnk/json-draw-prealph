@@ -32,6 +32,7 @@ import { createLLMNodeData } from "../LLMNode";
 import { AI_AGENT_TOOLS, AI_AGENT_INSTRUCTIONS } from "./AgentConstants";
 import { createTextAreaNodeData } from "../TextAreaNode";
 import { createSvgToDiagramNodeData } from "../SvgToDiagramNode";
+import { createImageGenNodeData } from "../ImageGenNode";
 
 /**
  * Props for the AgentNode component.
@@ -208,6 +209,25 @@ const AgentNodeComponent: React.FC<AgentProps> = (props) => {
 									call_id: event.item.call_id,
 									output: JSON.stringify({
 										id: svgNode.id,
+										type: "SvgToDiagramNode",
+									}),
+								});
+							}
+							if (functionName === "add_image_gen_node") {
+								currentY += 250; // Move down by 100 pixels for the new node
+								const imageGenNode = createImageGenNodeData({
+									x: refBus.current.props.x,
+									y: currentY,
+								});
+								props.onNewItem({
+									item: imageGenNode,
+								});
+								input.push(event.item);
+								input.push({
+									type: "function_call_output",
+									call_id: event.item.call_id,
+									output: JSON.stringify({
+										id: imageGenNode.id,
 										type: "SvgToDiagramNode",
 									}),
 								});

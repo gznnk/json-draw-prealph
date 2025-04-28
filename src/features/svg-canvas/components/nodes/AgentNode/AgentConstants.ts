@@ -36,6 +36,14 @@ The SvgToDiagram node does not send any output to other nodes.
 Returns a JSON object containing the node ID and node type.
 `;
 
+export const ADD_IMAGE_GEN_NODE_DESCRIPTION = `
+Adds an ImageGeneration node to the canvas.  
+The node receives input from connected LLM or text nodes.  
+It uses the "gpt-image-1" model to generate an image based on the received input and outputs the generated image onto the canvas.  
+The ImageGeneration node does not send any output to other nodes.  
+Returns a JSON object containing the node ID and node type.
+`;
+
 export const AI_AGENT_TOOLS = [
 	{
 		type: "function",
@@ -70,6 +78,18 @@ export const AI_AGENT_TOOLS = [
 		type: "function",
 		name: "add_svg_to_canvas_node",
 		description: ADD_SVG_TO_CANVAS_NODE_DESCRIPTION,
+		parameters: {
+			type: "object",
+			properties: {},
+			additionalProperties: false,
+			required: [],
+		},
+		strict: true,
+	},
+	{
+		type: "function",
+		name: "add_image_gen_node",
+		description: ADD_IMAGE_GEN_NODE_DESCRIPTION,
 		parameters: {
 			type: "object",
 			properties: {},
