@@ -7,6 +7,7 @@ Use the provided tools to create workflows based strictly on user input.
 Only create the minimum necessary workflow to achieve the user's request.  
 Always choose functions carefully and avoid unnecessary or redundant calls.  
 Do not invent new functions or tools; only use those that are provided.
+When generating natural language responses, always use the same language as the user's input.
 `;
 
 export const ADD_TEXT_NODE_DESCRIPTION = `
