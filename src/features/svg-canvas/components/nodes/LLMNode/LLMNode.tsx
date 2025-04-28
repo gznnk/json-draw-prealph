@@ -80,9 +80,11 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 
 				let fullOutput = "";
 
+				const eventId = newEventId();
+
 				props.onExecute({
 					id: props.id,
-					eventId: newEventId(),
+					eventId,
 					eventType: "Start",
 					data: {
 						text: "",
@@ -96,23 +98,25 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 
 						props.onExecute({
 							id: props.id,
-							eventId: newEventId(),
+							eventId,
 							eventType: "InProgress",
 							data: {
 								text: fullOutput,
 							},
 						});
 					}
-				}
 
-				props.onExecute({
-					id: props.id,
-					eventId: newEventId(),
-					eventType: "End",
-					data: {
-						text: fullOutput,
-					},
-				});
+					if (event.type === "response.output_text.done") {
+						props.onExecute({
+							id: props.id,
+							eventId,
+							eventType: "End",
+							data: {
+								text: fullOutput,
+							},
+						});
+					}
+				}
 			} catch (error) {
 				console.error("Error fetching data from OpenAI API:", error);
 				alert("APIリクエスト中にエラーが発生しました。");

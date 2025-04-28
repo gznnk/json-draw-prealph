@@ -93,6 +93,19 @@ const AgentNodeComponent: React.FC<AgentProps> = (props) => {
 					},
 				] as OpenAI.Responses.ResponseInput;
 
+				let fullOutput = "";
+
+				const eventId = newEventId();
+
+				props.onExecute({
+					id: props.id,
+					eventId,
+					eventType: "Start",
+					data: {
+						text: "",
+					},
+				});
+
 				let count = 0;
 				while (count < 10) {
 					const stream = await openai.responses.create({
@@ -106,6 +119,32 @@ const AgentNodeComponent: React.FC<AgentProps> = (props) => {
 
 					for await (const event of stream) {
 						console.log(event);
+
+						if (event.type === "response.output_text.delta") {
+							const delta = event.delta;
+							fullOutput += delta;
+
+							props.onExecute({
+								id: props.id,
+								eventId,
+								eventType: "InProgress",
+								data: {
+									text: fullOutput,
+								},
+							});
+						}
+
+						if (event.type === "response.output_text.done") {
+							props.onExecute({
+								id: props.id,
+								eventId,
+								eventType: "End",
+								data: {
+									text: fullOutput,
+								},
+							});
+						}
+
 						if (
 							event.type === "response.output_item.done" &&
 							event.item?.type === "function_call"
