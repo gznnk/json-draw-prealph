@@ -3,21 +3,22 @@ import type {
 	CreateDiagramProps,
 	CreateDiagramType,
 } from "../../../types/DiagramTypes";
+import type { ConnectNodesEvent } from "../../../types/EventTypes";
 
 /**
- * Type of the ImageGenNode data.
+ * Type of the AgentNode data.
  */
-export type ImageGenNodeData = CreateDiagramType<{
+export type AgentNodeData = CreateDiagramType<{
 	selectable: true;
 	transformative: true;
 	connectable: true;
 }>;
 
 /**
- * Type of the ImageGenNode component props.
+ * Type of the AgentNode component props.
  */
-export type ImageGenNodeProps = CreateDiagramProps<
-	ImageGenNodeData,
+export type AgentNodeProps = CreateDiagramProps<
+	AgentNodeData,
 	{
 		selectable: true;
 		transformative: true;
@@ -25,4 +26,6 @@ export type ImageGenNodeProps = CreateDiagramProps<
 		executable: true;
 		itemCreatable: true;
 	}
->;
+> & {
+	onConnectNodes: (e: ConnectNodesEvent) => void;
+};

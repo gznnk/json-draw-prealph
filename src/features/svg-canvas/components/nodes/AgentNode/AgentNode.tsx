@@ -5,50 +5,33 @@ import { memo, useContext, useEffect, useRef, useState } from "react";
 // Import other libraries.
 import { OpenAI } from "openai";
 
-// Import types related to SvgCanvas.
-import type { ConnectNodesEvent } from "../../../types/EventTypes";
-import type { CreateDiagramProps } from "../../../types/DiagramTypes";
-
 // Import components related to SvgCanvas.
 import { SvgCanvasContext } from "../../../canvas";
 import { IconContainer } from "../../core/IconContainer";
-import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
+import { Agent } from "../../icons/Agent";
+import { DEFAULT_RECTANGLE_DATA, Rectangle } from "../../shapes/Rectangle";
 
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import functions related to SvgCanvas.
 import { newEventId } from "../../../utils/Util";
+import { createImageGenNodeData } from "../ImageGenNode";
+import { createLLMNodeData } from "../LLMNode";
+import { createSvgToDiagramNodeData } from "../SvgToDiagramNode";
+import { createTextAreaNodeData } from "../TextAreaNode";
 
 // Import utilities.
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 
 // Import related to this component.
-import { Agent } from "../../icons/Agent";
-import { createImageGenNodeData } from "../ImageGenNode";
-import { createLLMNodeData } from "../LLMNode";
-import { createSvgToDiagramNodeData } from "../SvgToDiagramNode";
-import { createTextAreaNodeData } from "../TextAreaNode";
 import { AI_AGENT_INSTRUCTIONS, AI_AGENT_TOOLS } from "./AgentConstants";
-import { RectangleWrapper } from "./AgentNodeStyled";
-
-/**
- * Props for the AgentNode component.
- */
-type AgentProps = CreateDiagramProps<
-	RectangleProps,
-	{
-		executable: true;
-		itemCreatable: true;
-	}
-> & {
-	onConnectNodes: (e: ConnectNodesEvent) => void;
-};
+import type { AgentNodeProps } from "./AgentNodeTypes";
 
 /**
  * AgentNode component.
  */
-const AgentNodeComponent: React.FC<AgentProps> = (props) => {
+const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 	const [apiKey, setApiKey] = useState<string>("");
 	const [processIdList, setProcessIdList] = useState<string[]>([]);
 
@@ -297,26 +280,28 @@ const AgentNodeComponent: React.FC<AgentProps> = (props) => {
 
 	return (
 		<>
-			{!props.isTextEditing && (
-				<IconContainer
-					x={props.x}
-					y={props.y}
+			<IconContainer
+				x={props.x}
+				y={props.y}
+				width={props.width}
+				height={props.height}
+				rotation={props.rotation}
+				scaleX={props.scaleX}
+				scaleY={props.scaleY}
+			>
+				<Agent
 					width={props.width}
 					height={props.height}
-					rotation={props.rotation}
-					scaleX={props.scaleX}
-					scaleY={props.scaleY}
-				>
-					<Agent
-						width={props.width}
-						height={props.height}
-						animation={processIdList.length !== 0}
-					/>
-				</IconContainer>
-			)}
-			<RectangleWrapper visible={props.isTextEditing}>
-				<Rectangle {...props} />
-			</RectangleWrapper>
+					animation={processIdList.length !== 0}
+				/>
+			</IconContainer>
+			<Rectangle
+				{...DEFAULT_RECTANGLE_DATA}
+				{...props}
+				isTransparent
+				isTextEditing={false}
+				isTextEditEnabled={false}
+			/>
 		</>
 	);
 };

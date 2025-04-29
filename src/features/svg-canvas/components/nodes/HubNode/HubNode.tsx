@@ -50,8 +50,8 @@ const HubNodeComponent: React.FC<HubNodeProps> = (props) => {
 			<Ellipse
 				{...DEFAULT_ELLIPSE_DATA}
 				{...props}
-				isTextEditing={false}
 				isTransparent
+				isTextEditing={false}
 				isTextEditEnabled={false}
 			/>
 		</>

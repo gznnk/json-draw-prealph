@@ -5,17 +5,10 @@ import { memo, useEffect, useRef, useState } from "react";
 // Import other libraries.
 import { OpenAI } from "openai";
 
-// Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../../../types/DiagramTypes";
-
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";
 import { Picture } from "../../icons/Picture";
-import {
-	DEFAULT_RECTANGLE_DATA,
-	Rectangle,
-	type RectangleProps,
-} from "../../shapes/Rectangle";
+import { DEFAULT_RECTANGLE_DATA, Rectangle } from "../../shapes/Rectangle";
 
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
@@ -28,22 +21,12 @@ import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 
 // Import related to this component.
 import { createImageData } from "../../shapes/Image";
-
-/**
- * Props for the ImageGenNode component.
- */
-type ImageGenProps = CreateDiagramProps<
-	RectangleProps,
-	{
-		executable: true;
-		itemCreatable: true;
-	}
->;
+import type { ImageGenNodeProps } from "./ImageGenNodeTypes";
 
 /**
  * ImageGenNode component.
  */
-const ImageGenNodeComponent: React.FC<ImageGenProps> = (props) => {
+const ImageGenNodeComponent: React.FC<ImageGenNodeProps> = (props) => {
 	const [apiKey, setApiKey] = useState<string>("");
 	const [processIdList, setProcessIdList] = useState<string[]>([]);
 
@@ -112,27 +95,26 @@ const ImageGenNodeComponent: React.FC<ImageGenProps> = (props) => {
 
 	return (
 		<>
-			{!props.isTextEditing && (
-				<IconContainer
-					x={props.x}
-					y={props.y}
+			<IconContainer
+				x={props.x}
+				y={props.y}
+				width={props.width}
+				height={props.height}
+				rotation={props.rotation}
+				scaleX={props.scaleX}
+				scaleY={props.scaleY}
+			>
+				<Picture
 					width={props.width}
 					height={props.height}
-					rotation={props.rotation}
-					scaleX={props.scaleX}
-					scaleY={props.scaleY}
-				>
-					<Picture
-						width={props.width}
-						height={props.height}
-						animation={processIdList.length !== 0}
-					/>
-				</IconContainer>
-			)}
+					animation={processIdList.length !== 0}
+				/>
+			</IconContainer>
 			<Rectangle
 				{...DEFAULT_RECTANGLE_DATA}
 				{...props}
 				isTransparent
+				isTextEditing={false}
 				isTextEditEnabled={false}
 			/>
 		</>
