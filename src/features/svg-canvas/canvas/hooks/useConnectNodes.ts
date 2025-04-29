@@ -93,22 +93,25 @@ export const useConnectNodes = (props: CanvasHooksProps) => {
 			type: "PathPoint",
 		})) as PathPointData[];
 
-		addItem({
-			id: newId(),
-			type: "ConnectLine",
-			x: shape.x,
-			y: shape.y,
-			width: shape.width,
-			height: shape.height,
-			stroke: "#fed579",
-			strokeWidth: "3px",
-			isSelected: false,
-			keepProportion: false,
-			items: pathPoints,
-			startOwnerId: sourceNode.id,
-			endOwnerId: targetNode.id,
-			autoRouting: true,
-			endArrowHead: "Circle",
-		} as ConnectLineData);
+		addItem(
+			{
+				id: newId(),
+				type: "ConnectLine",
+				x: shape.x,
+				y: shape.y,
+				width: shape.width,
+				height: shape.height,
+				stroke: "#fed579",
+				strokeWidth: "3px",
+				isSelected: false,
+				keepProportion: false,
+				items: pathPoints,
+				startOwnerId: sourceNode.id,
+				endOwnerId: targetNode.id,
+				autoRouting: true,
+				endArrowHead: "Circle",
+			} as ConnectLineData,
+			e.eventId,
+		);
 	}, []);
 };
