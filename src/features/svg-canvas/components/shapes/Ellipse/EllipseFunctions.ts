@@ -13,8 +13,9 @@ import type { ConnectPointMoveData } from "../../../types/EventTypes";
 import type { ConnectPointData } from "../ConnectPoint";
 
 // Import functions related to SvgCanvas.
-import { isConnectableData, newId } from "../../../utils/Diagram";
+import { newId } from "../../../utils/Diagram";
 import { calcEllipseVertices } from "../../../utils/Math";
+import { isConnectableData } from "../../../utils/TypeUtils";
 
 // Imports related to this component.
 import { DEFAULT_ELLIPSE_DATA } from "./EllipseConstants";
@@ -65,6 +66,54 @@ export const calcEllipseConnectPointPosition = (
 };
 
 /**
+ * Create connection points for the ellipse.
+ *
+ * @param param0 - The parameters for creating the connection points.
+ * @returns An array of connection point data.
+ */
+export const createEllipseConnectPoint = ({
+	x,
+	y,
+	width,
+	height,
+	rotation,
+	scaleX,
+	scaleY,
+}: {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	rotation: number;
+	scaleX: number;
+	scaleY: number;
+}) => {
+	const vertices = calcEllipseVertices({
+		x,
+		y,
+		width,
+		height,
+		rotation,
+		scaleX,
+		scaleY,
+	});
+
+	const connectPoints: ConnectPointData[] = [];
+	for (const key of Object.keys(vertices)) {
+		const point = vertices[key as keyof EllipseVertices];
+		connectPoints.push({
+			id: newId(),
+			type: "ConnectPoint",
+			x: point.x,
+			y: point.y,
+			name: key,
+		});
+	}
+
+	return connectPoints;
+};
+
+/**
  * 楕円データ作成
  */
 export const createEllipseData = ({
@@ -109,7 +158,7 @@ export const createEllipseData = ({
 	fontWeight?: string;
 }): EllipseData => {
 	// 接続ポイントを生成
-	const vertices = calcEllipseVertices({
+	const connectPoints = createEllipseConnectPoint({
 		x,
 		y,
 		width,
@@ -118,18 +167,6 @@ export const createEllipseData = ({
 		scaleX,
 		scaleY,
 	});
-
-	const connectPoints: ConnectPointData[] = [];
-	for (const key of Object.keys(vertices)) {
-		const point = vertices[key as keyof EllipseVertices];
-		connectPoints.push({
-			id: newId(),
-			type: "ConnectPoint",
-			x: point.x,
-			y: point.y,
-			name: key,
-		});
-	}
 
 	return {
 		...DEFAULT_ELLIPSE_DATA,

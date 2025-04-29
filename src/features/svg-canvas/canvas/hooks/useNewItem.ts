@@ -5,6 +5,9 @@ import { useCallback, useRef } from "react";
 import type { NewItemEvent } from "../../types/EventTypes";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
+// Import functions related to SvgCanvas.
+import { isSelectableData } from "../../utils/TypeUtils";
+
 // Imports related to this component.
 import { useAddItem } from "./useAddItem";
 
@@ -26,6 +29,12 @@ export const useNewItem = (props: CanvasHooksProps) => {
 		// Bypass references to avoid function creation in every render.
 		const { addItem } = refBus.current;
 
-		addItem(e.item);
+		const item = { ...e.item };
+
+		if (e.isSelected && isSelectableData(item)) {
+			item.isSelected = true;
+		}
+
+		addItem(item, e.eventId);
 	}, []);
 };

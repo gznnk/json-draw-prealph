@@ -193,12 +193,15 @@ export type NewDiagramEvent = {
 	diagramType: DiagramType;
 	x?: number;
 	y?: number;
+	isSelected?: boolean;
 };
 
 export type NewItemEvent = {
+	eventId: string;
 	item: Diagram;
 	x?: number;
 	y?: number;
+	isSelected?: boolean;
 };
 
 export type StackOrderChangeType =
@@ -218,6 +221,7 @@ export type ExecuteResult = {
 
 export type ExecuteEvent = {
 	eventId: string;
+	eventType: EventType;
 	id: string;
 	data: ExecuteResult;
 };
@@ -227,7 +231,14 @@ export const EXECUTION_PROPAGATION_EVENT_NAME =
 
 export type ExecutionPropagationEvent = {
 	eventId: string;
+	eventType: EventType;
 	id: string;
 	targetId: string[];
 	data: ExecuteResult;
+};
+
+export type ConnectNodesEvent = {
+	eventId: string;
+	sourceNodeId: string;
+	targetNodeId: string;
 };

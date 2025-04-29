@@ -2,18 +2,43 @@
 import type { ConnectPointMoveData } from "./EventTypes";
 
 // Import components related to SvgCanvas.
+import { AgentNode, createAgentNodeData } from "../components/nodes/AgentNode";
+import {
+	createHubNodeData,
+	HubNode,
+	type HubNodeData,
+} from "../components/nodes/HubNode";
+import {
+	createImageGenNodeData,
+	ImageGenNode,
+} from "../components/nodes/ImageGenNode";
+import { createLLMNodeData, LLMNode } from "../components/nodes/LLMNode";
+import {
+	createSvgToDiagramNodeData,
+	SvgToDiagramNode,
+} from "../components/nodes/SvgToDiagramNode";
+import {
+	createTextAreaNodeData,
+	TextAreaNode,
+} from "../components/nodes/TextAreaNode";
 import {
 	ConnectLine,
 	type ConnectLineData,
 } from "../components/shapes/ConnectLine";
 import type { ConnectPointData } from "../components/shapes/ConnectPoint";
 import {
-	Ellipse,
-	type EllipseData,
 	calcEllipseConnectPointPosition,
 	createEllipseData,
+	Ellipse,
+	type EllipseData,
 } from "../components/shapes/Ellipse";
 import { Group, type GroupData } from "../components/shapes/Group";
+import {
+	createImageData,
+	Image,
+	imageToBlob,
+	type ImageData,
+} from "../components/shapes/Image";
 import {
 	createPathData,
 	Path,
@@ -22,21 +47,12 @@ import {
 	type PathPointData,
 } from "../components/shapes/Path";
 import {
-	Rectangle,
-	type RectangleData,
 	calcRectangleConnectPointPosition,
 	createRectangleData,
+	Rectangle,
+	type RectangleData,
 } from "../components/shapes/Rectangle";
-import {
-	createTextAreaNodeData,
-	TextAreaNode,
-} from "../components/nodes/TextAreaNode";
-import { createLLMNodeData, LLMNode } from "../components/nodes/LLMNode";
-import {
-	createSvgToDiagramNodeData,
-	SvgToDiagramNode,
-} from "../components/nodes/SvgToDiagramNode";
-import { Svg, type SvgData } from "../components/shapes/Svg";
+import { Svg, svgToBlob, type SvgData } from "../components/shapes/Svg";
 
 /**
  * Types of diagram components.
@@ -47,11 +63,15 @@ export type DiagramType =
 	| "ConnectPoint"
 	| "Ellipse"
 	| "Group"
+	| "Image"
 	| "Path"
 	| "PathPoint"
 	| "Rectangle"
 	| "Svg"
 	// Nodes
+	| "AgentNode"
+	| "HubNode"
+	| "ImageGenNode"
 	| "SvgToDiagramNode"
 	| "LLMNode"
 	| "TextAreaNode";
@@ -60,14 +80,18 @@ export type DiagramType =
  * 全図形のデータを統合した型
  */
 export type Diagram =
+	// Shapes
 	| ConnectLineData
 	| ConnectPointData
 	| EllipseData
 	| GroupData
+	| ImageData
 	| PathData
 	| PathPointData
 	| RectangleData
-	| SvgData;
+	| SvgData
+	// Nodes
+	| HubNodeData;
 
 /**
  * Dummy component. This is used by components that are always wrapped by another component.
@@ -86,11 +110,15 @@ export const DiagramComponentCatalog: {
 	ConnectPoint: DummyComponent,
 	Ellipse: Ellipse,
 	Group: Group,
+	Image: Image,
 	Path: Path,
 	PathPoint: PathPoint,
 	Rectangle: Rectangle,
 	Svg: Svg,
 	// Nodes
+	AgentNode: AgentNode,
+	HubNode: HubNode,
+	ImageGenNode: ImageGenNode,
 	SvgToDiagramNode: SvgToDiagramNode,
 	LLMNode: LLMNode,
 	TextAreaNode: TextAreaNode,
@@ -107,11 +135,15 @@ export const DiagramConnectPointCalculators: {
 	ConnectPoint: () => [],
 	Ellipse: calcEllipseConnectPointPosition,
 	Group: () => [],
+	Image: () => [],
 	Path: () => [],
 	PathPoint: () => [],
 	Rectangle: calcRectangleConnectPointPosition,
 	Svg: () => [],
 	// Nodes
+	AgentNode: calcRectangleConnectPointPosition,
+	HubNode: calcEllipseConnectPointPosition,
+	ImageGenNode: calcRectangleConnectPointPosition,
 	SvgToDiagramNode: calcRectangleConnectPointPosition,
 	LLMNode: calcRectangleConnectPointPosition,
 	TextAreaNode: calcRectangleConnectPointPosition,
@@ -129,14 +161,40 @@ export const DiagramCreateFunctions: {
 	// Shapes
 	ConnectLine: () => undefined,
 	ConnectPoint: () => undefined,
-	Ellipse: (props) => createEllipseData(props),
+	Ellipse: createEllipseData,
 	Group: () => undefined,
-	Path: (props) => createPathData(props),
+	Image: createImageData,
+	Path: createPathData,
 	PathPoint: () => undefined,
-	Rectangle: (props) => createRectangleData(props),
+	Rectangle: createRectangleData,
 	Svg: () => undefined,
 	// Nodes
-	SvgToDiagramNode: (props) => createSvgToDiagramNodeData(props),
-	LLMNode: (props) => createLLMNodeData(props),
-	TextAreaNode: (props) => createTextAreaNodeData(props),
+	AgentNode: createAgentNodeData,
+	HubNode: createHubNodeData,
+	ImageGenNode: createImageGenNodeData,
+	SvgToDiagramNode: createSvgToDiagramNodeData,
+	LLMNode: createLLMNodeData,
+	TextAreaNode: createTextAreaNodeData,
+};
+
+export const DiagramExportFunctions: {
+	[key in DiagramType]: ((diagram: Diagram) => Blob | undefined) | undefined;
+} = {
+	// Shapes
+	ConnectLine: undefined,
+	ConnectPoint: undefined,
+	Ellipse: undefined,
+	Group: undefined,
+	Image: imageToBlob,
+	Path: undefined,
+	PathPoint: undefined,
+	Rectangle: undefined,
+	Svg: svgToBlob,
+	// Nodes
+	AgentNode: undefined,
+	HubNode: undefined,
+	ImageGenNode: undefined,
+	SvgToDiagramNode: undefined,
+	LLMNode: undefined,
+	TextAreaNode: undefined,
 };

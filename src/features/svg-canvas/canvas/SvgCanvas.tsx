@@ -9,20 +9,19 @@ import React, {
 
 // SvgCanvas関連型定義をインポート
 import { type Diagram, DiagramComponentCatalog } from "../types/DiagramCatalog";
-import {
-	type DiagramChangeEvent,
-	SVG_CANVAS_SCROLL_EVENT_NAME,
-	type DiagramDragEvent,
-	type DiagramSelectEvent,
-	type SvgCanvasResizeEvent,
-	type SvgCanvasScrollEvent,
+import type {
+	DiagramChangeEvent,
+	DiagramDragEvent,
+	DiagramSelectEvent,
+	SvgCanvasResizeEvent,
 } from "../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
+import { FlashConnectLine } from "../components/core/FlashConnectLine";
 import { TextEditor } from "../components/core/Textable";
+import { CanvasMenu } from "../components/menus/CanvasMenu";
 import { ContextMenu, useContextMenu } from "../components/menus/ContextMenu";
 import { DiagramMenu, useDiagramMenu } from "../components/menus/DiagramMenu";
-import { CanvasMenu } from "../components/menus/CanvasMenu";
 import { Group } from "../components/shapes/Group";
 
 // SvgCanvas関連関数をインポート
@@ -32,6 +31,7 @@ import UserMenu from "../components/menus/UserMenu/UserMenu";
 import { getDiagramById } from "./SvgCanvasFunctions";
 
 // Imports related to this component.
+import type { Point } from "../types/CoordinateTypes";
 import {
 	CANVAS_EXPANSION_SIZE,
 	MULTI_SELECT_GROUP,
@@ -44,7 +44,6 @@ import {
 	ViewportOverlay,
 } from "./SvgCanvasStyled";
 import type { SvgCanvasProps, SvgCanvasState } from "./SvgCanvasTypes";
-import type { Point } from "../types/CoordinateTypes";
 
 // SvgCanvasの状態を階層を跨いで提供するためにSvgCanvasStateProviderを保持するコンテキストを作成
 export const SvgCanvasContext = createContext<SvgCanvasStateProvider | null>(
@@ -68,6 +67,8 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		width,
 		height,
 		items,
+		scrollLeft,
+		scrollTop,
 		multiSelectGroup,
 		textEditorState,
 		onTransform,
@@ -87,6 +88,8 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		onNewDiagram,
 		onNewItem,
 		onExecute,
+		onScroll,
+		onConnectNodes,
 	} = props;
 
 	// SVG要素のコンテナの参照
@@ -101,9 +104,17 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 	// 現時点ではシングルトン的に扱うため、useRefで保持し、以降再作成しない
 	// TODO: レンダリングの負荷が高くなければ、都度インスタンスを更新して再レンダリングさせたい
 	const stateProvider = useRef(
-		new SvgCanvasStateProvider({ items } as SvgCanvasState),
+		new SvgCanvasStateProvider({} as SvgCanvasState),
 	);
-	stateProvider.current.setState({ items } as SvgCanvasState);
+	stateProvider.current.setState({
+		minX,
+		minY,
+		width,
+		height,
+		items,
+		scrollLeft,
+		scrollTop,
+	} as SvgCanvasState);
 
 	// Use the context menu hook to handle context menu events.
 	const { contextMenuProps, contextMenuHandlers, contextMenuFunctions } =
@@ -203,6 +214,8 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		// Component properties
+		scrollLeft,
+		scrollTop,
 		textEditorState,
 		onDrag,
 		onDiagramChange,
@@ -212,6 +225,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		onClearAllSelection,
 		onUndo,
 		onRedo,
+		onScroll,
 		// Internal variables and functions
 		contextMenuFunctions,
 		canvasResize,
@@ -295,25 +309,6 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		});
 	}, []);
 
-	/**
-	 * Handle scroll event to dispatch a custom event with scroll position.
-	 */
-	const handleScroll = useCallback(
-		(e: React.UIEvent<HTMLDivElement, UIEvent>) => {
-			// Dispatch a custom event with scroll position.
-			document.dispatchEvent(
-				new CustomEvent(SVG_CANVAS_SCROLL_EVENT_NAME, {
-					bubbles: true,
-					detail: {
-						scrollTop: e.currentTarget.scrollTop,
-						scrollLeft: e.currentTarget.scrollLeft,
-					} as SvgCanvasScrollEvent,
-				}),
-			);
-		},
-		[],
-	);
-
 	// Monitor keyboard events.
 	useEffect(() => {
 		const onDocumentKeyDown = (e: KeyboardEvent) => {
@@ -372,6 +367,14 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 	}, []);
 
 	useEffect(() => {
+		if (containerRef.current) {
+			const { scrollLeft, scrollTop } = refBus.current;
+			containerRef.current.scrollLeft = scrollLeft;
+			containerRef.current.scrollTop = scrollTop;
+		}
+	}, []);
+
+	useEffect(() => {
 		const el = containerRef.current;
 
 		const handleTouchMove = (e: TouchEvent) => {
@@ -402,6 +405,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 			onTextEdit,
 			onNewItem,
 			onExecute,
+			onConnectNodes,
 		};
 
 		return React.createElement(component, props);
@@ -409,7 +413,7 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 
 	return (
 		<>
-			<Container ref={containerRef} onScroll={handleScroll}>
+			<Container ref={containerRef} onScroll={onScroll}>
 				<SvgCanvasContext.Provider value={stateProvider.current}>
 					<Svg
 						width={width}
@@ -439,6 +443,8 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 								/>
 							</MultiSelectGroupContainer>
 						)}
+						{/* Render flash connect lines */}
+						<FlashConnectLine />
 					</Svg>
 				</SvgCanvasContext.Provider>
 				{/* Container for HTML elements that follow the scroll of the SVG canvas. */}

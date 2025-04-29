@@ -7,7 +7,7 @@ import {
 	isItemableData,
 	isStrokableData,
 	isTextableData,
-} from "../../../../utils/Diagram";
+} from "../../../../utils/TypeUtils";
 
 export const findFirstFillableRecursive = (
 	items: Diagram[],

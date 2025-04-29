@@ -13,8 +13,9 @@ import type { ConnectPointMoveData } from "../../../types/EventTypes";
 import type { ConnectPointData } from "../ConnectPoint";
 
 // Import functions related to SvgCanvas.
-import { isConnectableData, newId } from "../../../utils/Diagram";
+import { newId } from "../../../utils/Diagram";
 import { calcRectangleVertices } from "../../../utils/Math";
+import { isConnectableData } from "../../../utils/TypeUtils";
 
 // Imports related to this component.
 import { DEFAULT_RECTANGLE_DATA } from "./RectangleConstants";
@@ -65,6 +66,51 @@ export const calcRectangleConnectPointPosition = (
 };
 
 /**
+ * Create connection points for a rectangle.
+ */
+export const createRectangleConnectPoint = ({
+	x,
+	y,
+	width,
+	height,
+	rotation,
+	scaleX,
+	scaleY,
+}: {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	rotation: number;
+	scaleX: number;
+	scaleY: number;
+}): ConnectPointData[] => {
+	const vertices = calcRectangleVertices({
+		x,
+		y,
+		width,
+		height,
+		rotation,
+		scaleX,
+		scaleY,
+	});
+
+	const connectPoints: ConnectPointData[] = [];
+	for (const key of Object.keys(vertices)) {
+		const point = vertices[key as keyof RectangleVertices];
+		connectPoints.push({
+			id: newId(),
+			type: "ConnectPoint",
+			x: point.x,
+			y: point.y,
+			name: key,
+		});
+	}
+
+	return connectPoints;
+};
+
+/**
  * 四角形データ作成
  */
 export const createRectangleData = ({
@@ -110,8 +156,7 @@ export const createRectangleData = ({
 	fontFamily?: string;
 	fontWeight?: string;
 }): RectangleData => {
-	// 接続ポイントを生成
-	const vertices = calcRectangleVertices({
+	const connectPoints = createRectangleConnectPoint({
 		x,
 		y,
 		width,
@@ -120,18 +165,6 @@ export const createRectangleData = ({
 		scaleX,
 		scaleY,
 	});
-
-	const connectPoints: ConnectPointData[] = [];
-	for (const key of Object.keys(vertices)) {
-		const point = vertices[key as keyof RectangleVertices];
-		connectPoints.push({
-			id: newId(),
-			type: "ConnectPoint",
-			x: point.x,
-			y: point.y,
-			name: key,
-		});
-	}
 
 	return {
 		...DEFAULT_RECTANGLE_DATA,

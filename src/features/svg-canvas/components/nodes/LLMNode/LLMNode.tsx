@@ -6,7 +6,7 @@ import { memo, useEffect, useState, useRef } from "react";
 import { OpenAI } from "openai";
 
 // Import types related to SvgCanvas.
-import type { ExecuteEvent } from "../../../types/EventTypes";
+import type { CreateDiagramProps } from "../../../types/DiagramTypes";
 
 // Import components related to SvgCanvas.
 import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
@@ -28,9 +28,12 @@ import { RectangleWrapper } from "./LLMNodeStyled";
 /**
  * Props for the LLMNode component.
  */
-type LLMProps = RectangleProps & {
-	onExecute: (e: ExecuteEvent) => void;
-};
+type LLMProps = CreateDiagramProps<
+	RectangleProps,
+	{
+		executable: true;
+	}
+>;
 
 /**
  * LLMNode component.
@@ -59,6 +62,7 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
+			if (e.eventType !== "Instant" && e.eventType !== "End") return;
 
 			const processId = newEventId();
 			setProcessIdList((prev) => [...prev, processId]);
@@ -69,23 +73,51 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 			});
 
 			try {
-				const response = await openai.responses.create({
+				const stream = await openai.responses.create({
 					model: "gpt-4o",
 					instructions: props.text,
 					input: e.data.text,
+					stream: true,
 				});
 
-				const responseText = response.output_text;
-				if (responseText) {
-					props.onExecute({
-						id: props.id,
-						eventId: newEventId(),
-						data: {
-							text: responseText,
-						},
-					});
-				} else {
-					alert("APIからの応答が空です。");
+				let fullOutput = "";
+
+				const eventId = newEventId();
+
+				props.onExecute?.({
+					id: props.id,
+					eventId,
+					eventType: "Start",
+					data: {
+						text: "",
+					},
+				});
+
+				for await (const event of stream) {
+					if (event.type === "response.output_text.delta") {
+						const delta = event.delta;
+						fullOutput += delta;
+
+						props.onExecute?.({
+							id: props.id,
+							eventId,
+							eventType: "InProgress",
+							data: {
+								text: fullOutput,
+							},
+						});
+					}
+
+					if (event.type === "response.output_text.done") {
+						props.onExecute?.({
+							id: props.id,
+							eventId,
+							eventType: "End",
+							data: {
+								text: fullOutput,
+							},
+						});
+					}
 				}
 			} catch (error) {
 				console.error("Error fetching data from OpenAI API:", error);
@@ -107,10 +139,12 @@ const LLMNodeComponent: React.FC<LLMProps> = (props) => {
 					rotation={props.rotation}
 					scaleX={props.scaleX}
 					scaleY={props.scaleY}
-					iconWidth={80}
-					iconHeight={80}
 				>
-					<CPU_1 blink={processIdList.length !== 0} />
+					<CPU_1
+						width={props.width}
+						height={props.height}
+						animation={processIdList.length !== 0}
+					/>
 				</IconContainer>
 			)}
 			<RectangleWrapper visible={props.isTextEditing}>

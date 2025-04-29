@@ -12,6 +12,7 @@ import type {
 	DiagramTextEditEvent,
 	DiagramTransformEvent,
 	ExecuteEvent,
+	NewItemEvent,
 } from "./EventTypes";
 
 /**
@@ -151,6 +152,7 @@ export type CreateDiagramType<T extends DiagramDataOptions> = DiagramBaseData &
  * 図形の基本プロパティ
  */
 export type DiagramBaseProps = {
+	isTransparent?: boolean;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDrop?: (e: DiagramDragDropEvent) => void;
 	onClick?: (e: DiagramClickEvent) => void;
@@ -198,6 +200,7 @@ export type ConnectableProps = {
  * Props for textable component.
  */
 export type TextableProps = {
+	isTextEditEnabled?: boolean;
 	onTextEdit?: (e: DiagramTextEditEvent) => void;
 	onDiagramChange?: (e: DiagramChangeEvent) => void;
 };
@@ -210,7 +213,14 @@ export type ExecutableProps = {
 };
 
 /**
- * 図形のプロパティ作成オプション
+ * Props for item creatable component.
+ */
+export type ItemCreatableProps = {
+	onNewItem?: (e: NewItemEvent) => void;
+};
+
+/**
+ * Options for diagram properties creation.
  */
 type DiagramPropsOptions = {
 	selectable?: boolean;
@@ -219,10 +229,12 @@ type DiagramPropsOptions = {
 	connectable?: boolean;
 	textable?: boolean;
 	executable?: boolean;
+	itemCreatable?: boolean;
 };
 
 /**
- * 図形のデータ型を作成する型
+ * Create diagram props type.
+ * This type is used to create props for diagram components.
  */
 export type CreateDiagramProps<T, U extends DiagramPropsOptions> = Omit<
 	T,
@@ -234,4 +246,5 @@ export type CreateDiagramProps<T, U extends DiagramPropsOptions> = Omit<
 	(U["itemable"] extends true ? ItemableProps : object) &
 	(U["connectable"] extends true ? ConnectableProps : object) &
 	(U["textable"] extends true ? TextableProps : object) &
-	(U["executable"] extends true ? ExecutableProps : object);
+	(U["executable"] extends true ? ExecutableProps : object) &
+	(U["itemCreatable"] extends true ? ItemCreatableProps : object);

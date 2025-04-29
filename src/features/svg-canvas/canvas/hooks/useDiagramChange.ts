@@ -15,7 +15,7 @@ import type {
 import { notifyConnectPointsMove } from "../../components/shapes/ConnectLine";
 
 // Import functions related to SvgCanvas.
-import { isItemableData, isSelectableData } from "../../utils/Diagram";
+import { isItemableData, isSelectableData } from "../../utils/TypeUtils";
 import {
 	addHistory,
 	applyRecursive,

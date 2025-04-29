@@ -1,4 +1,5 @@
 // Import functions related to SvgCanvas.
+import type { Diagram } from "../../../types/DiagramCatalog";
 import { newId } from "../../../utils/Diagram";
 
 // Imports related to this component.
@@ -46,17 +47,12 @@ export const createSvgData = ({
 
 export const createSvgDataFromText = (data: string) => {
 	try {
-		const parser = new DOMParser();
-		const svgDoc = parser.parseFromString(data, "image/svg+xml");
-		const svgElement = svgDoc.documentElement;
-		const width = svgElement.getAttribute("width") || "100";
-		const height = svgElement.getAttribute("height") || "100";
 		return createSvgData({
 			x: 0,
 			y: 0,
 			svgText: data,
-			width: Number.parseFloat(width),
-			height: Number.parseFloat(height),
+			width: 100,
+			height: 100,
 			keepProportion: true,
 		});
 	} catch (e) {
@@ -69,11 +65,21 @@ export const isSvgData = (data: unknown): data is SvgData => {
 	return (
 		typeof data === "object" &&
 		data !== null &&
+		"type" in data &&
+		data.type === "Svg" &&
 		"svgText" in data &&
 		"width" in data &&
 		"height" in data &&
 		"initialWidth" in data &&
-		"initialHeight" in data &&
-		"svgText" in data
+		"initialHeight" in data
 	);
+};
+
+export const svgToBlob = (data: Diagram): Blob | undefined => {
+	if (isSvgData(data)) {
+		return new Blob([data.svgText], {
+			type: "image/svg+xml",
+		});
+	}
+	return undefined;
 };

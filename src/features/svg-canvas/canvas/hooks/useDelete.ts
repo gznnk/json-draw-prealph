@@ -6,7 +6,7 @@ import type { ConnectLineData } from "../../components/shapes/ConnectLine";
 import type { CanvasHooksProps, SvgCanvasState } from "../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { isItemableData, isSelectableData } from "../../utils/Diagram";
+import { isItemableData, isSelectableData } from "../../utils/TypeUtils";
 import { newEventId } from "../../utils/Util";
 import {
 	addHistory,

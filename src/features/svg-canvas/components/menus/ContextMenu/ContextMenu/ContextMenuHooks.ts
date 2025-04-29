@@ -7,6 +7,9 @@ import { getSelectedItems } from "../../../../canvas/SvgCanvasFunctions";
 // Import types related to SvgCanvas.
 import type { SvgCanvasProps } from "../../../../canvas/SvgCanvasTypes";
 
+// Import functions related to SvgCanvas.
+import { isExportable } from "../../../../utils/TypeUtils";
+
 // Imports related to this component.
 import type { ContextMenuStateMap, ContextMenuType } from "./ContextMenuTypes";
 
@@ -37,13 +40,14 @@ export const useContextMenu = (canvasProps: SvgCanvasProps) => {
 	const selectedItems = getSelectedItems(items);
 	const isItemSelected = selectedItems.length > 0;
 	const isGroupSelected = selectedItems.some((item) => item.type === "Group");
+	const isExportableSelected = selectedItems.some((item) => isExportable(item));
 	const menuStateMap = {
 		Undo: historyIndex > 0 ? "Enable" : "Disable",
 		Redo: historyIndex < history.length - 1 ? "Enable" : "Disable",
 		SelectAll: items.length > 0 ? "Enable" : "Disable",
 		Group: multiSelectGroup ? "Enable" : "Disable",
 		Ungroup: isGroupSelected ? "Enable" : "Disable",
-		Export: isItemSelected ? "Enable" : "Disable", // TODO: ちゃんと制御する
+		Export: isExportableSelected ? "Enable" : "Disable",
 		Delete: isItemSelected ? "Enable" : "Disable",
 	} as ContextMenuStateMap;
 

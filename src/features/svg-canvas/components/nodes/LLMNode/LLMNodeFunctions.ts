@@ -3,9 +3,11 @@ import { createRectangleData } from "../../shapes/Rectangle";
 export const createLLMNodeData = ({
 	x,
 	y,
+	text,
 }: {
 	x: number;
 	y: number;
+	text?: string;
 }) => {
 	const data = createRectangleData({
 		x,
@@ -17,6 +19,7 @@ export const createLLMNodeData = ({
 		verticalAlign: "center",
 		fontColor: "white",
 		fontSize: 12,
+		text: text ?? "",
 		keepProportion: true,
 	});
 

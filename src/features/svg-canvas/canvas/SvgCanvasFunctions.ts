@@ -1,10 +1,10 @@
 // Import types related to SvgCanvas.
+import type { Frame } from "../types/CoordinateTypes";
 import {
 	DiagramConnectPointCalculators,
 	type Diagram,
 } from "../types/DiagramCatalog";
 import type { ConnectPointMoveData, EventType } from "../types/EventTypes";
-import type { Frame } from "../types/CoordinateTypes";
 
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../components/shapes/ConnectLine";
@@ -17,7 +17,7 @@ import {
 	isItemableData,
 	isSelectableData,
 	isTransformativeData,
-} from "../utils/Diagram";
+} from "../utils/TypeUtils";
 import { deepCopy, newEventId } from "../utils/Util";
 
 // Imports related to this component.
@@ -258,7 +258,7 @@ export const addHistory = (
 		const ret = {
 			...newState,
 			history: newHistory,
-			historyIndex: prevState.historyIndex,
+			historyIndex: newHistory.length - 1,
 			lastHistoryEventId: prevState.lastHistoryEventId,
 		};
 
@@ -270,18 +270,16 @@ export const addHistory = (
 	// Add a new history entry.
 	let newHistory = prevState.history.slice(0, prevState.historyIndex + 1);
 	newHistory.push(canvasStateToHistory(newState));
-	let historyIndex = prevState.historyIndex + 1;
 
 	// Remove the oldest history if the size exceeds the maximum limit.
-	if (MAX_HISTORY_SIZE <= newHistory.length) {
+	if (MAX_HISTORY_SIZE < newHistory.length) {
 		newHistory = newHistory.slice(1);
-		historyIndex = MAX_HISTORY_SIZE - 1;
 	}
 
 	const ret = {
 		...newState,
 		history: newHistory,
-		historyIndex,
+		historyIndex: newHistory.length - 1,
 	};
 
 	// console.log("history", JSON.stringify(ret, null, 2));
