@@ -5,8 +5,12 @@ import { memo, useEffect, useRef } from "react";
 // Import other libraries.
 import DOMPurify from "dompurify";
 import hljs from "highlight.js";
+import katex from "katex";
+import { marked, type Tokens } from "marked";
+
+// Import other libraries css.
 import "highlight.js/styles/github.css";
-import { marked } from "marked";
+import "katex/dist/katex.min.css";
 
 // Import types related to SvgCanvas.
 import type { TextableData } from "../../../../types/DiagramTypes";
@@ -24,6 +28,36 @@ type TextableProps = TextableData & {
 	height: number;
 	transform: string;
 };
+
+// 共通のmath拡張を生成
+const createMathExtension = (
+	name: string,
+	level: "inline" | "block",
+	pattern: RegExp,
+	displayMode = false,
+) => ({
+	name,
+	level,
+	start: (src: string) => src.match(pattern)?.index,
+	tokenizer: (src: string) => {
+		const match = src.match(pattern);
+		if (match) {
+			return {
+				type: name,
+				raw: match[0],
+				text: match[1],
+				tokens: [],
+			};
+		}
+	},
+	renderer: (token: Tokens.Generic) =>
+		displayMode
+			? `<div class="math-block">${katex.renderToString(token.text, {
+					displayMode: true,
+					throwOnError: false,
+				})}</div>`
+			: katex.renderToString(token.text, { throwOnError: false }),
+});
 
 marked.use({
 	renderer: {
@@ -43,6 +77,12 @@ marked.use({
 			return `<a href="${href}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
 		},
 	},
+	extensions: [
+		createMathExtension("math", "inline", /^\$([^$]+?)\$/),
+		createMathExtension("mathBlock", "block", /^\$\$([^$]+?)\$\$/s, true),
+		createMathExtension("mathInline", "inline", /^\\\((.+?)\\\)/),
+		createMathExtension("mathBlockAlt", "block", /^\\\[(.+?)\\\]/s, true),
+	],
 });
 
 /**
@@ -69,9 +109,11 @@ const TextableComponent: React.FC<TextableProps> = ({
 	useEffect(() => {
 		if (textRef.current && !isTextEditing) {
 			textRef.current.innerHTML = ""; // Clear the previous content
-			textRef.current.innerHTML = marked(DOMPurify.sanitize(text), {
-				async: false,
-			}); // Set the new content
+			textRef.current.innerHTML = DOMPurify.sanitize(
+				marked(text, {
+					async: false,
+				}),
+			); // Set the new content
 		}
 	}, [text, isTextEditing]);
 
