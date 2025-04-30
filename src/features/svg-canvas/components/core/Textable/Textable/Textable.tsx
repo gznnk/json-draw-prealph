@@ -1,6 +1,10 @@
 // Import React.
 import type React from "react";
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
+
+// Import other libraries.
+import DOMPurify from "dompurify";
+import { marked } from "marked";
 
 // Import types related to SvgCanvas.
 import type { TextableData } from "../../../../types/DiagramTypes";
@@ -38,6 +42,21 @@ const TextableComponent: React.FC<TextableProps> = ({
 	fontWeight,
 	isTextEditing,
 }) => {
+	const textRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (textRef.current && !isTextEditing) {
+			textRef.current.innerHTML = ""; // Clear the previous content
+			textRef.current.innerHTML = marked(DOMPurify.sanitize(text), {
+				async: false,
+			}); // Set the new content
+			for (const link of textRef.current.querySelectorAll("a")) {
+				link.setAttribute("target", "_blank");
+				link.setAttribute("rel", "noopener noreferrer");
+			}
+		}
+	}, [text, isTextEditing]);
+
 	if (!text) return null;
 	if (isTextEditing) return null;
 
@@ -52,17 +71,30 @@ const TextableComponent: React.FC<TextableProps> = ({
 			pointerEvents="none"
 		>
 			<TextWrapper verticalAlign={verticalAlign}>
-				<Text
-					textAlign={textAlign}
-					color={fontColor}
-					fontSize={fontSize}
-					fontFamily={fontFamily}
-					fontWeight={fontWeight}
-					wordBreak={textType === "textarea" ? "break-word" : "normal"}
-					whiteSpace={textType === "textarea" ? "pre-wrap" : "nowrap"}
-				>
-					{text}
-				</Text>
+				{textType === "markdown" ? (
+					<Text
+						textAlign={textAlign}
+						color={fontColor}
+						fontSize={fontSize}
+						fontFamily={fontFamily}
+						fontWeight={fontWeight}
+						wordBreak="break-word"
+						whiteSpace="pre-wrap"
+						ref={textRef}
+					/>
+				) : (
+					<Text
+						textAlign={textAlign}
+						color={fontColor}
+						fontSize={fontSize}
+						fontFamily={fontFamily}
+						fontWeight={fontWeight}
+						wordBreak={textType === "text" ? "normal" : "break-word"}
+						whiteSpace={textType === "text" ? "nowrap" : "pre-wrap"}
+					>
+						{text}
+					</Text>
+				)}
 			</TextWrapper>
 		</foreignObject>
 	);

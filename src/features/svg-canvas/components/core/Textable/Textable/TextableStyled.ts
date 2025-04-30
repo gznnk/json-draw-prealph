@@ -57,4 +57,36 @@ export const Text = styled.div<TextProps>`
     white-space: ${(props) => props.whiteSpace};
     padding: 2px 6px;
     box-sizing: border-box;
+    & p {
+        margin: 0;
+    }
+    & ul {
+        margin: 0;
+        padding-inline-start: 1.8em;
+    }
+    & ol {
+        margin: 0;
+        padding-inline-start: 1.8em;
+    }
+    & h1 {
+        margin: 0;
+    }
+    & h2 {
+        margin: 0;
+    }
+    & h3 {
+        margin: 0;
+    }
+    & h4 {
+        margin: 0;
+    }
+    & h5 {
+        margin: 0;
+    }
+    & h6 {
+        margin: 0;
+    }
+    & a {
+        pointer-events: auto;
+    }
 `;

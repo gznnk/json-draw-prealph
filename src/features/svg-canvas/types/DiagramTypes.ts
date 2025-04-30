@@ -96,7 +96,7 @@ export type FillableData = {
 /**
  * Type of textable component.
  */
-export type TextableType = "text" | "textarea";
+export type TextableType = "text" | "textarea" | "markdown";
 
 /**
  * テキストの水平位置揃え
