@@ -29,7 +29,15 @@ type TextableProps = TextableData & {
 	transform: string;
 };
 
-// 共通のmath拡張を生成
+/**
+ * Function to create a math extension for marked.js.
+ *
+ * @param name - The name of the extension.
+ * @param level - The level of the extension (inline or block).
+ * @param pattern - The regex pattern to match the math expression.
+ * @param displayMode - Whether to display the math in block mode.
+ * @returns - The math extension object.
+ */
 const createMathExtension = (
 	name: string,
 	level: "inline" | "block",
@@ -59,6 +67,7 @@ const createMathExtension = (
 			: katex.renderToString(token.text, { throwOnError: false }),
 });
 
+// Configure marked.js to use the math extension and highlight.js for code highlighting.
 marked.use({
 	renderer: {
 		code({ text, lang }) {
@@ -66,9 +75,14 @@ marked.use({
 			if (!lang) return `<pre><code>${text}</code></pre>`;
 
 			// If a language is specified, use highlight.js to highlight the code.
-			const validLang = hljs.getLanguage(lang ? lang : "plaintext");
+			const validLang = hljs.getLanguage(lang);
+
+			// If the language is not valid, return the text as plaintext.
+			if (!validLang) return `<pre><code>${text}</code></pre>`;
+
+			// Highlight the code using highlight.js.
 			const highlighted = hljs.highlight(text, {
-				language: lang ?? "plaintext",
+				language: lang,
 			}).value;
 			return `<pre><code class="hljs language-${validLang}">${highlighted}</code></pre>`;
 		},
@@ -104,12 +118,16 @@ const TextableComponent: React.FC<TextableProps> = ({
 
 	useEffect(() => {
 		if (textRef.current && !isTextEditing) {
-			textRef.current.innerHTML = ""; // Clear the previous content
+			// Clear the previous content
+			textRef.current.innerHTML = "";
+			// Set the new content with sanitized HTML
 			textRef.current.innerHTML = DOMPurify.sanitize(
 				marked(text, {
 					async: false,
 				}),
-			); // Set the new content
+			);
+
+			// Manage the links to open in a new tab and prevent security issues with rel attribute
 			for (const link of textRef.current.querySelectorAll("a")) {
 				link.setAttribute("target", "_blank");
 				link.setAttribute("rel", "noopener noreferrer");
