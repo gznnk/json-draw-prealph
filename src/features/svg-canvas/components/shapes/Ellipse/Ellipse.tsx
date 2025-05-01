@@ -219,7 +219,11 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 
 	// 接続ポイントを表示するかのフラグ
 	const doShowConnectPoints =
-		showConnectPoints && !isMultiSelectSource && !isDragging && !isTransformimg;
+		showConnectPoints &&
+		!isSelected &&
+		!isMultiSelectSource &&
+		!isDragging &&
+		!isTransformimg;
 
 	return (
 		<>
