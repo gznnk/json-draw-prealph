@@ -1,6 +1,6 @@
 // SvgCanvas関連型定義をインポート
-import type { Box, Point } from "../../../types/CoordinateTypes";
-import type { Shape } from "../../../types/DiagramTypes";
+import type { Box, Point } from "../../../../types/CoordinateTypes";
+import type { Shape } from "../../../../types/DiagramTypes";
 
 // SvgCanvas関連関数をインポート
 import {
@@ -11,7 +11,7 @@ import {
 	isLineIntersectingBox,
 	lineIntersects,
 	radiansToDegrees,
-} from "../../../utils/Math";
+} from "../../../../utils/Math";
 
 // Imports related to this component.
 import { CONNECT_LINE_MARGIN } from "./ConnectPointConstants";

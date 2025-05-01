@@ -22,6 +22,7 @@ import { TextEditor } from "../components/core/Textable";
 import { CanvasMenu } from "../components/menus/CanvasMenu";
 import { ContextMenu, useContextMenu } from "../components/menus/ContextMenu";
 import { DiagramMenu, useDiagramMenu } from "../components/menus/DiagramMenu";
+import { NewConnectLine } from "../components/shapes/ConnectPoint";
 import { Group } from "../components/shapes/Group";
 
 // SvgCanvas関連関数をインポート
@@ -44,7 +45,6 @@ import {
 	ViewportOverlay,
 } from "./SvgCanvasStyled";
 import type { SvgCanvasProps, SvgCanvasState } from "./SvgCanvasTypes";
-import { NewConnectLine } from "../components/core/NewConnectLine";
 
 // SvgCanvasの状態を階層を跨いで提供するためにSvgCanvasStateProviderを保持するコンテキストを作成
 export const SvgCanvasContext = createContext<SvgCanvasStateProvider | null>(

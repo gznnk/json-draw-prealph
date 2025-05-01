@@ -2,7 +2,7 @@
 import { memo, useEffect, useState } from "react";
 
 // Import components related to SvgCanvas.
-import { Path, type PathData } from "../../shapes/Path";
+import { Path, type PathData } from "../../Path";
 
 // Import related to this component.
 import { NEW_CONNECT_LINE_EVENT_NAME } from "./NewConnectLineConstants";

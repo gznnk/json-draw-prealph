@@ -3,25 +3,25 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
-import type { Point } from "../../../types/CoordinateTypes";
-import type { CreateDiagramProps, Shape } from "../../../types/DiagramTypes";
+import type { Point } from "../../../../types/CoordinateTypes";
+import type { CreateDiagramProps, Shape } from "../../../../types/DiagramTypes";
 import type {
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
 	DiagramDragEvent,
 	DiagramHoverEvent,
-} from "../../../types/EventTypes";
+} from "../../../../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
-import { DragPoint } from "../../core/DragPoint";
-import type { PathPointData } from "../Path";
+import { DragPoint } from "../../../core/DragPoint";
+import type { PathPointData } from "../../Path";
 
 // SvgCanvas関連関数をインポート
-import { newId } from "../../../utils/Diagram";
-import { calcRectangleOuterBox } from "../../../utils/Math";
+import { newId } from "../../../../utils/Diagram";
+import { calcRectangleOuterBox } from "../../../../utils/Math";
 
 // Imports related to this component.
-import { triggerNewConnectLine } from "../../core/NewConnectLine";
+import { triggerNewConnectLine } from "../NewConnectLine";
 import { EVENT_NAME_CONNECTTION } from "./ConnectPointConstants";
 import {
 	createBestConnectPath,
