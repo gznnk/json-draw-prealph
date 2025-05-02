@@ -91,6 +91,8 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		onExecute,
 		onScroll,
 		onConnectNodes,
+		onCopy,
+		onPaste,
 	} = props;
 
 	// SVG要素のコンテナの参照
@@ -227,6 +229,8 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 		onUndo,
 		onRedo,
 		onScroll,
+		onCopy,
+		onPaste,
 		// Internal variables and functions
 		contextMenuFunctions,
 		canvasResize,
@@ -321,6 +325,8 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 				onClearAllSelection,
 				onUndo,
 				onRedo,
+				onCopy,
+				onPaste,
 			} = refBus.current;
 
 			if (e.key === "Control") {
@@ -347,6 +353,16 @@ const SvgCanvasComponent: React.FC<SvgCanvasProps> = (props) => {
 					// Select all items when Ctrl+A is pressed.
 					e.preventDefault();
 					onSelectAll?.();
+				}
+				if (e.key === "c" && !textEditorState.isActive) {
+					// Copy selected items when Ctrl+C is pressed.
+					e.preventDefault();
+					onCopy?.();
+				}
+				if (e.key === "v" && !textEditorState.isActive) {
+					// Paste items from clipboard when Ctrl+V is pressed.
+					e.preventDefault();
+					onPaste?.();
 				}
 			}
 		};
