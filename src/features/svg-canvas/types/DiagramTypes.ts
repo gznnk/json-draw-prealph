@@ -12,6 +12,7 @@ import type {
 	DiagramTextEditEvent,
 	DiagramTransformEvent,
 	ExecuteEvent,
+	FileDropEvent,
 	NewItemEvent,
 } from "./EventTypes";
 
@@ -220,6 +221,13 @@ export type ItemCreatableProps = {
 };
 
 /**
+ * Props for file droppable component.
+ */
+export type FileDroppableProps = {
+	onFileDrop?: (e: FileDropEvent) => void;
+};
+
+/**
  * Options for diagram properties creation.
  */
 type DiagramPropsOptions = {
@@ -230,6 +238,7 @@ type DiagramPropsOptions = {
 	textable?: boolean;
 	executable?: boolean;
 	itemCreatable?: boolean;
+	fileDroppable?: boolean;
 };
 
 /**
@@ -247,4 +256,5 @@ export type CreateDiagramProps<T, U extends DiagramPropsOptions> = Omit<
 	(U["connectable"] extends true ? ConnectableProps : object) &
 	(U["textable"] extends true ? TextableProps : object) &
 	(U["executable"] extends true ? ExecutableProps : object) &
-	(U["itemCreatable"] extends true ? ItemCreatableProps : object);
+	(U["itemCreatable"] extends true ? ItemCreatableProps : object) &
+	(U["fileDroppable"] extends true ? FileDroppableProps : object);

@@ -48,6 +48,15 @@ export type DiagramDragDropEvent = {
 };
 
 /**
+ * 図形のファイルドロップイベント
+ */
+export type FileDropEvent = {
+	eventId: string;
+	id: string;
+	files: FileList;
+};
+
+/**
  * 図形のクリックイベント
  */
 export type DiagramClickEvent = {

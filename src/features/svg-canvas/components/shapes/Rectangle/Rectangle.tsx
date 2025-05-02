@@ -18,6 +18,7 @@ import { ConnectPoint } from "../ConnectPoint";
 
 // Import hooks related to SvgCanvas.
 import { useDrag } from "../../../hooks/useDrag";
+import useFileDrop from "../../../hooks/useFileDrop";
 
 // Import functions related to SvgCanvas.
 import { createSvgTransform } from "../../../utils/Diagram";
@@ -66,6 +67,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	onTransform,
 	onConnect,
 	onTextEdit,
+	onFileDrop,
 }) => {
 	// ドラッグ中かのフラグ
 	const [isDragging, setIsDragging] = useState(false);
@@ -190,6 +192,9 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		onDragLeave: handleDragLeave,
 	});
 
+	// ファイルドロップ用のプロパティを生成
+	const fileDropProps = useFileDrop({ id, onFileDrop });
+
 	// memo化によりConnectPointの再描画を抑制
 	// keyで分解してばらばらにpropsで渡すと、各ConnectPoint側それぞれで各keyに対して
 	// 比較処理が走り非効率なので、ここでまとめてShapeの差異を検知する
@@ -248,6 +253,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					ref={svgRef}
 					onDoubleClick={handleDoubleClick}
 					{...dragProps}
+					{...fileDropProps}
 				/>
 			</g>
 			{isTextEditEnabled && (
