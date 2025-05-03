@@ -2,9 +2,9 @@
 import { memo } from "react";
 
 /**
- * Props for AlignLeft icon
+ * Props for TextAlign icon
  */
-type AlignLeftProps = {
+type TextAlignProps = {
 	width?: number;
 	height?: number;
 	fill?: string;
@@ -12,9 +12,9 @@ type AlignLeftProps = {
 };
 
 /**
- * Left alignment icon component
+ * Text alignment icon component
  */
-export const AlignLeft = memo<AlignLeftProps>(
+export const TextAlign = memo<TextAlignProps>(
 	({ width = 24, height = 24, fill = "#333333", title }) => {
 		return (
 			<svg

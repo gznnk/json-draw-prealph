@@ -2,19 +2,19 @@
 import { memo } from "react";
 
 /**
- * Props for SendBackward icon
+ * Props for Italic icon
  */
-type SendBackwardProps = {
+type ItalicProps = {
 	width?: number;
 	height?: number;
-	fill?: string;
 	title?: string;
+	fill?: string;
 };
 
 /**
- * Send backward icon component
+ * Italic icon component
  */
-export const SendBackward = memo<SendBackwardProps>(
+export const Italic = memo<ItalicProps>(
 	({ width = 24, height = 24, fill = "#333333", title }) => {
 		return (
 			<svg
@@ -25,9 +25,8 @@ export const SendBackward = memo<SendBackwardProps>(
 			>
 				<title>{title}</title>
 				<path
-					d="M715.8 493.5L335 165.1c-14.2-12.2-35-1.2-35 18.5v656.8c0 19.7 20.8 30.7 35 18.5l380.8-328.4c10.9-9.4 10.9-27.6 0-37z"
+					d="M798 160H366c-4.4 0-8 3.6-8 8v64c0 4.4 3.6 8 8 8h181.2l-156 480H229c-4.4 0-8 3.6-8 8v64c0 4.4 3.6 8 8 8h432c4.4 0 8-3.6 8-8v-64c0-4.4-3.6-8-8-8H474.4l156-480H798c4.4 0 8-3.6 8-8v-64c0-4.4-3.6-8-8-8z"
 					fill={fill}
-					transform="rotate(90 512 512)"
 				/>
 			</svg>
 		);

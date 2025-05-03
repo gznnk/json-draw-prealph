@@ -1,12 +1,12 @@
-// Import React.
+// Import React
 import { memo } from "react";
 
-// Import Emotion for styling.
+// Import Emotion for styling
 import styled from "@emotion/styled";
 import { keyframes, css } from "@emotion/react";
 
 /**
- * Animation for the flashing effect.
+ * Animation for flash brightness effect
  */
 const flashBrightness = keyframes`
     0%   { filter: brightness(1); }
@@ -15,7 +15,7 @@ const flashBrightness = keyframes`
 `;
 
 /**
- * Styled component for the group of flash.
+ * Styled component for flash effect group
  */
 export const FlashGroup = styled.g<{ $flash: boolean }>`
     ${({ $flash }) =>
@@ -26,7 +26,7 @@ export const FlashGroup = styled.g<{ $flash: boolean }>`
 `;
 
 /**
- * Props for the VectorStore icon.
+ * Props for VectorStore icon
  */
 type VectorStoreProps = {
 	width?: number;
@@ -35,7 +35,7 @@ type VectorStoreProps = {
 };
 
 /**
- * VectorStore component that renders a vector store icon.
+ * Vector Store icon component
  */
 export const VectorStore = memo<VectorStoreProps>(
 	({ width = 80, height = 80, animation = false }) => {

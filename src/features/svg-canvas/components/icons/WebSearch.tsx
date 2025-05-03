@@ -1,10 +1,13 @@
-// Import React.
+// Import React
 import { memo } from "react";
 
-// Import Emotion for styling.
+// Import Emotion for styling
 import { keyframes, css } from "@emotion/react";
 import styled from "@emotion/styled";
 
+/**
+ * Animation for rotation effect
+ */
 const orbit = keyframes`
   from {
     transform: rotate(0deg);
@@ -14,6 +17,9 @@ const orbit = keyframes`
   }
 `;
 
+/**
+ * Counter rotation animation
+ */
 const counterOrbit = keyframes`
   from {
     transform: rotate(0deg);
@@ -23,6 +29,9 @@ const counterOrbit = keyframes`
   }
 `;
 
+/**
+ * Styled component for orbit group
+ */
 const OrbitGroup = styled.g<{ $animation: boolean }>`
   ${({ $animation }) =>
 		$animation &&
@@ -32,6 +41,9 @@ const OrbitGroup = styled.g<{ $animation: boolean }>`
   `}
 `;
 
+/**
+ * Styled component for counter-rotating elements within orbit
+ */
 const CounterRotate = styled.g<{ $animation: boolean }>`
   ${({ $animation }) =>
 		$animation &&
@@ -41,12 +53,18 @@ const CounterRotate = styled.g<{ $animation: boolean }>`
   `}
 `;
 
+/**
+ * Props for WebSearch icon
+ */
 type WebSearchProps = {
 	width?: number;
 	height?: number;
 	animation?: boolean;
 };
 
+/**
+ * Web Search icon component
+ */
 export const WebSearch = memo<WebSearchProps>(
 	({ width = 100, height = 100, animation = false }) => {
 		return (
