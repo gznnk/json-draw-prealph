@@ -7,33 +7,8 @@ import type { Diagram } from "../../types/DiagramCatalog";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { isItemableData, isSelectableData } from "../../utils/TypeUtils";
+import { isItemableData } from "../../utils/TypeUtils";
 import { getSelectedItems } from "../SvgCanvasFunctions";
-
-/**
- * コピー用に図形の不要なプロパティをクリーンアップする
- *
- * @param item コピーする図形
- * @returns クリーンアップされた図形
- */
-const cleanupItemForCopy = (item: Diagram): Diagram => {
-	// 元のアイテムをコピー
-	const cleanItem = { ...item };
-
-	// 選択可能な要素の場合、isMultiSelectSourceをfalseに設定
-	if (isSelectableData(cleanItem)) {
-		cleanItem.isMultiSelectSource = false;
-	}
-
-	// 子要素を持つ場合は再帰的にクリーンアップ
-	if (isItemableData(cleanItem)) {
-		cleanItem.items = cleanItem.items.map((childItem) =>
-			cleanupItemForCopy(childItem),
-		);
-	}
-
-	return cleanItem;
-};
 
 /**
  * 指定されたIDのリストに含まれる図形IDを全て集める
@@ -118,11 +93,7 @@ export const useCopy = (props: CanvasHooksProps) => {
 			// コピー対象に接続線を追加
 			const itemsToCopy = [...selectedItems, ...connectLines];
 
-			// コピー前に各アイテムをクリーンアップ
-			const cleanedItems = itemsToCopy.map((item) => cleanupItemForCopy(item));
-
-			// Convert the cleaned items to JSON string.
-			const clipboardData = JSON.stringify(cleanedItems);
+			const clipboardData = JSON.stringify(itemsToCopy);
 
 			// Copy the data to the clipboard.
 			navigator.clipboard

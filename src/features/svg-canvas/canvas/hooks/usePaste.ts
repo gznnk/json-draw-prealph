@@ -315,6 +315,7 @@ export const usePaste = (props: CanvasHooksProps) => {
 								items: pastedNormalItems.map((item) => ({
 									...item,
 									isSelected: false, // マルチセレクトグループ内ではfalse
+									isMultiSelectSource: false, // useSelectAll.tsと同様に設定する
 								})),
 							} as GroupData;
 						}
