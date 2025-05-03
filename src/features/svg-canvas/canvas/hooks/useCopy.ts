@@ -5,10 +5,19 @@ import { useCallback, useRef } from "react";
 import type { ConnectLineData } from "../../components/shapes/ConnectLine";
 import type { Diagram } from "../../types/DiagramCatalog";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
+import type { GroupData } from "../../components/shapes/Group";
 
 // Import functions related to SvgCanvas.
 import { isItemableData } from "../../utils/TypeUtils";
 import { getSelectedItems } from "../SvgCanvasFunctions";
+
+/**
+ * クリップボードデータの型定義
+ */
+type ClipboardData = {
+	items: Diagram[];
+	multiSelectGroup?: GroupData;
+};
 
 /**
  * Collects all shape IDs contained in the specified list
@@ -90,14 +99,19 @@ export const useCopy = (props: CanvasHooksProps) => {
 				selectedIds,
 			);
 
-			// Add connection lines to copy targets
-			const itemsToCopy = [...selectedItems, ...connectLines];
+			// Create clipboard data
+			// Include selected items and connection lines, and multiSelectGroup if it exists
+			const clipboardData: ClipboardData = {
+				items: [...selectedItems, ...connectLines],
+				multiSelectGroup: multiSelectGroup || undefined,
+			};
 
-			const clipboardData = JSON.stringify(itemsToCopy);
+			// Convert clipboard data to JSON string
+			const clipboardJson = JSON.stringify(clipboardData);
 
 			// Copy the data to the clipboard
 			navigator.clipboard
-				.writeText(clipboardData)
+				.writeText(clipboardJson)
 				.then(() => {
 					console.log("Selected items copied to clipboard.");
 				})
