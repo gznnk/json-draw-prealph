@@ -21,13 +21,17 @@ import { MULTI_SELECT_GROUP } from "../SvgCanvasConstants";
 import { getDiagramById } from "../SvgCanvasFunctions";
 
 /**
- * 図形をペーストする際の移動量を計算
+ * 図形をペーストする際の移動量
+ */
+const PASTE_OFFSET = 20;
+
+/**
+ * 図形をペーストする際の座標を計算
  * @param x 元の座標
- * @param offsetX 移動量
  * @returns 移動後の座標
  */
-const applyOffset = (x: number, offset: number): number => {
-	return x + offset;
+const applyOffset = (x: number): number => {
+	return x + PASTE_OFFSET;
 };
 
 /**
@@ -36,44 +40,45 @@ const applyOffset = (x: number, offset: number): number => {
 type IdMap = { [oldId: string]: string };
 
 /**
- * 図形とその子要素に対して再帰的に新しいIDを割り当てる
- * グループ階層を考慮して選択状態を設定する
- *
- * @param item ペーストする図形
+ * 図形の座標を移動する
+ * @param item 移動する図形
+ * @returns 移動後の図形
+ */
+const applyOffsetToItem = (item: Diagram): Diagram => {
+	const newItem = { ...item };
+
+	// 座標を持つ要素の場合は移動
+	if ("x" in newItem && "y" in newItem) {
+		newItem.x = applyOffset(newItem.x as number);
+		newItem.y = applyOffset(newItem.y as number);
+	}
+
+	// 接続ポイントを持つ場合は接続ポイントも移動
+	if (isConnectableData(newItem) && newItem.connectPoints) {
+		newItem.connectPoints = newItem.connectPoints.map((connectPoint) => ({
+			...connectPoint,
+			x: applyOffset(connectPoint.x),
+			y: applyOffset(connectPoint.y),
+		})) as ConnectPointData[];
+	}
+
+	return newItem;
+};
+
+/**
+ * 図形の選択状態を設定する
+ * @param item 対象の図形
  * @param isTopLevel この図形が最上位かどうか
  * @param isMultiSelect 複数選択モードかどうか
- * @param offsetX X座標の移動量
- * @param offsetY Y座標の移動量
- * @param idMap 旧IDと新IDのマッピング (オプション)
- * @returns 新しいIDが割り当てられた図形
+ * @returns 選択状態が設定された図形
  */
-const assignNewIdsRecursively = (
+const setSelectionState = (
 	item: Diagram,
 	isTopLevel: boolean,
 	isMultiSelect: boolean,
-	offsetX: number,
-	offsetY: number,
-	idMap?: IdMap,
 ): Diagram => {
-	const newItemId = newId();
+	const newItem = { ...item };
 
-	// IDのマッピングを記録
-	if (idMap) {
-		idMap[item.id] = newItemId;
-	}
-
-	const newItem = {
-		...item,
-		id: newItemId,
-	};
-
-	// 座標を移動
-	if ("x" in newItem && "y" in newItem) {
-		newItem.x = applyOffset(newItem.x as number, offsetX);
-		newItem.y = applyOffset(newItem.y as number, offsetY);
-	}
-
-	// 選択可能な要素の場合の選択状態設定
 	if (isSelectableData(newItem)) {
 		if (isMultiSelect) {
 			// 複数選択モードの場合
@@ -87,39 +92,76 @@ const assignNewIdsRecursively = (
 		}
 	}
 
-	// 接続ポイントを持つ場合は接続ポイントも移動
-	if (isConnectableData(newItem)) {
-		if (newItem.connectPoints) {
-			newItem.connectPoints = newItem.connectPoints.map((connectPoint) => {
-				const connectPointNewId = newId();
+	return newItem;
+};
 
-				// 接続ポイントのIDもマッピングに追加
-				if (idMap) {
-					idMap[connectPoint.id] = connectPointNewId;
-				}
+/**
+ * 図形と接続ポイントに新しいIDを割り当てる
+ * @param item 対象の図形
+ * @param idMap 旧IDと新IDのマッピング (オプション)
+ * @returns 新しいIDが割り当てられた図形
+ */
+const assignNewIds = (item: Diagram, idMap?: IdMap): Diagram => {
+	const newItemId = newId();
 
-				return {
-					...connectPoint,
-					id: connectPointNewId, // 接続ポイントにも新しいIDを割り当てる
-					x: applyOffset(connectPoint.x, offsetX),
-					y: applyOffset(connectPoint.y, offsetY),
-				};
-			}) as ConnectPointData[];
-		}
+	// IDのマッピングを記録
+	if (idMap) {
+		idMap[item.id] = newItemId;
 	}
 
-	// グループやPath等の子アイテムを持つ要素の場合、子要素にも再帰的にIDを割り当てる
+	const newItem = {
+		...item,
+		id: newItemId,
+	};
+
+	// 接続ポイントを持つ場合は接続ポイントにも新しいIDを割り当てる
+	if (isConnectableData(newItem) && newItem.connectPoints) {
+		newItem.connectPoints = newItem.connectPoints.map((connectPoint) => {
+			const connectPointNewId = newId();
+
+			// 接続ポイントのIDもマッピングに追加
+			if (idMap) {
+				idMap[connectPoint.id] = connectPointNewId;
+			}
+
+			return {
+				...connectPoint,
+				id: connectPointNewId,
+			};
+		}) as ConnectPointData[];
+	}
+
+	return newItem;
+};
+
+/**
+ * 図形とその子要素に対して再帰的に処理を行う
+ * - 新しいIDの割り当て
+ * - 座標の移動
+ * - 選択状態の設定
+ *
+ * @param item ペーストする図形
+ * @param isTopLevel この図形が最上位かどうか
+ * @param isMultiSelect 複数選択モードかどうか
+ * @param idMap 旧IDと新IDのマッピング (オプション)
+ * @returns 処理後の図形
+ */
+const processDiagramForPasteRecursively = (
+	item: Diagram,
+	isTopLevel: boolean,
+	isMultiSelect: boolean,
+	idMap?: IdMap,
+): Diagram => {
+	// 各機能を順番に適用
+	let newItem = assignNewIds(item, idMap);
+	newItem = applyOffsetToItem(newItem);
+	newItem = setSelectionState(newItem, isTopLevel, isMultiSelect);
+
+	// グループやPath等の子アイテムを持つ要素の場合、子要素にも再帰的に処理を適用
 	if (isItemableData(newItem)) {
 		newItem.items = newItem.items.map((childItem) =>
 			// 子要素は常に最上位ではない
-			assignNewIdsRecursively(
-				childItem,
-				false,
-				isMultiSelect,
-				offsetX,
-				offsetY,
-				idMap,
-			),
+			processDiagramForPasteRecursively(childItem, false, isMultiSelect, idMap),
 		);
 	}
 
@@ -132,16 +174,12 @@ const assignNewIdsRecursively = (
  *
  * @param connectLine ペーストする接続線
  * @param idMap 旧IDと新IDのマッピング
- * @param offsetX X座標の移動量
- * @param offsetY Y座標の移動量
  * @param items ペースト後のアイテム全体
  * @returns 更新後の接続線
  */
 const processConnectLineForPaste = (
 	connectLine: ConnectLineData,
 	idMap: IdMap,
-	offsetX: number,
-	offsetY: number,
 	items: Diagram[],
 ): ConnectLineData | null => {
 	// 両端の接続先が含まれているか確認
@@ -169,8 +207,8 @@ const processConnectLineForPaste = (
 	const newConnectLine: ConnectLineData = {
 		...connectLine,
 		id: newConnectLineId,
-		x: applyOffset(connectLine.x, offsetX),
-		y: applyOffset(connectLine.y, offsetY),
+		x: applyOffset(connectLine.x),
+		y: applyOffset(connectLine.y),
 		startOwnerId: newStartOwnerId,
 		endOwnerId: newEndOwnerId,
 		isSelected: false, // ペーストした接続線は非選択状態に
@@ -188,8 +226,8 @@ const processConnectLineForPaste = (
 			return {
 				...point,
 				id: pointId,
-				x: applyOffset(point.x, offsetX),
-				y: applyOffset(point.y, offsetY),
+				x: applyOffset(point.x),
+				y: applyOffset(point.y),
 			};
 		}),
 	};
@@ -236,10 +274,6 @@ export const usePaste = (props: CanvasHooksProps) => {
 					// 複数選択モードかどうか判定（接続線を除く）
 					const isMultiSelect = normalItems.length > 1;
 
-					// ペーストする際の移動量
-					const offsetX = 20;
-					const offsetY = 20;
-
 					// 古いIDと新しいIDのマッピングを保持
 					const idMap: IdMap = {};
 
@@ -247,12 +281,10 @@ export const usePaste = (props: CanvasHooksProps) => {
 					const pastedNormalItems = normalItems.map((item) => {
 						// 再帰的にIDを割り当て、アイテムが最上位であることを指定
 						// 同時に座標を少しずらす
-						return assignNewIdsRecursively(
+						return processDiagramForPasteRecursively(
 							item,
 							true,
 							isMultiSelect,
-							offsetX,
-							offsetY,
 							idMap,
 						);
 					});
@@ -279,13 +311,10 @@ export const usePaste = (props: CanvasHooksProps) => {
 							// 接続線を処理（接続元と接続先の更新・座標の再計算）
 							const pastedConnectLines = connectLines
 								.map((connectLine) =>
-									processConnectLineForPaste(
-										connectLine,
-										idMap,
-										offsetX,
-										offsetY,
-										[...updatedItems, ...pastedNormalItems],
-									),
+									processConnectLineForPaste(connectLine, idMap, [
+										...updatedItems,
+										...pastedNormalItems,
+									]),
 								)
 								.filter((line): line is ConnectLineData => line !== null);
 
