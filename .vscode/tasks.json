@@ -28,7 +28,6 @@
 			"label": "git-commit-push",
 			"type": "shell",
 			"command": "${workspaceFolder}\\.vscode\\scripts\\git-commit-push.bat",
-			"args": ["${input:commitMessage}"],
 			"presentation": {
 				"echo": true,
 				"reveal": "always",
@@ -46,12 +45,6 @@
 			"type": "command",
 			"command": "workbench.action.tasks.terminate",
 			"args": "terminateAll"
-		},
-		{
-			"id": "commitMessage",
-			"description": "コミットメッセージを入力してください",
-			"type": "promptString",
-			"default": "Update files"
 		}
 	]
 }

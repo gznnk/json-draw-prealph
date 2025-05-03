@@ -1,5 +1,5 @@
-const { execSync } = require("node:child_process");
-const path = require("node:path");
+const { execSync } = require("child_process");
+const path = require("path");
 
 /**
  * Get list of changed files from git
@@ -46,7 +46,7 @@ function categorizeFiles(files) {
 		other: [],
 	};
 
-	for (const file of files) {
+	files.forEach((file) => {
 		const ext = path.extname(file).toLowerCase();
 
 		// Config files
@@ -100,7 +100,7 @@ function categorizeFiles(files) {
 		else {
 			categories.other.push(file);
 		}
-	}
+	});
 
 	return categories;
 }

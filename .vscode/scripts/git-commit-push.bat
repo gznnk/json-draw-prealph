@@ -4,7 +4,7 @@ set COMMIT_MSG=%1
 REM 引数が空の場合は自動生成メッセージを使用
 if "%COMMIT_MSG%"=="" (
   echo Generating commit message based on changes...
-  for /f "tokens=*" %%a in ('node "%~dp0generate-commit-message.js"') do set AUTO_MSG=%%a
+  for /f "tokens=*" %%a in ('node "%~dp0generate-commit-message.cjs"') do set AUTO_MSG=%%a
   set COMMIT_MSG="%AUTO_MSG%"
   echo Using auto-generated message: %COMMIT_MSG%
 )
