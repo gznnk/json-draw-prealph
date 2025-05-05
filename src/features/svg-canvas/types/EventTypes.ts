@@ -26,6 +26,8 @@ export type DiagramDragEvent = {
 	startY: number;
 	endX: number;
 	endY: number;
+	cursorX?: number;
+	cursorY?: number;
 };
 
 /**
@@ -91,6 +93,8 @@ export type DiagramTransformEvent = {
 	eventType: EventType;
 	startShape: Shape;
 	endShape: Shape;
+	cursorX?: number;
+	cursorY?: number;
 };
 
 /**
@@ -113,6 +117,8 @@ export type DiagramChangeEvent = {
 	id: string;
 	startDiagram: DiagramChangeData;
 	endDiagram: DiagramChangeData;
+	cursorX?: number;
+	cursorY?: number;
 };
 
 /**
