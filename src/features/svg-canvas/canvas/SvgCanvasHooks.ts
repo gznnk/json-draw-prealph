@@ -1,5 +1,5 @@
 // Import React.
-import { useState } from "react";
+import { useState, type RefObject } from "react";
 
 // Import types related to SvgCanvas.
 import type { Diagram } from "../types/DiagramCatalog";
@@ -10,11 +10,9 @@ import { deepCopy } from "../utils/Util";
 import { calcOptimalCanvasSize } from "./SvgCanvasFunctions";
 
 // Imports related to this component.
-import type { SvgCanvasState } from "./SvgCanvasTypes";
+import type { SvgCanvasState, SvgCanvasRef } from "./SvgCanvasTypes";
 
 // Import canvas custom hooks.
-import { useAddItem } from "./hooks/useAddItem";
-import { useCanvasResize } from "./hooks/useCanvasResize";
 import { useClearAllSelection } from "./hooks/useClearAllSelection";
 import { useConnect } from "./hooks/useConnect";
 import { useCopy } from "./hooks/useCopy";
@@ -50,13 +48,14 @@ type SvgCanvasHooksProps = {
 	items: Diagram[];
 	scrollLeft: number;
 	scrollTop: number;
+	canvasRef: RefObject<SvgCanvasRef | null>;
 };
 
 /**
  * The SvgCanvas state and functions.
  *
- * @param initialItems - The initial items to be displayed on the canvas.
- * @returns The state and functions of the SvgCanvas.
+ * @param props - Initial properties for the SVG canvas
+ * @returns The state, props and functions of the SvgCanvas
  */
 export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Calculate the initial bounds of the canvas.
@@ -92,6 +91,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const canvasHooksProps = {
 		canvasState,
 		setCanvasState,
+		canvasRef: props.canvasRef.current,
 	};
 
 	// Handler for the drag event.
@@ -136,9 +136,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the redo event.
 	const onRedo = useRedo(canvasHooksProps);
 
-	// Handler for the canvas resize event.
-	const onCanvasResize = useCanvasResize(canvasHooksProps);
-
 	// Handler for the stack order change event.
 	const onStackOrderChange = useStackOrderChange(canvasHooksProps);
 
@@ -166,10 +163,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the paste event.
 	const onPaste = usePaste(canvasHooksProps);
 
-	// --- Functions for accessing the canvas state and modifying the canvas. --- //
-
-	const addItem = useAddItem(canvasHooksProps);
-
 	const canvasProps = {
 		...canvasState,
 		onDrag,
@@ -186,7 +179,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onUngroup,
 		onUndo,
 		onRedo,
-		onCanvasResize,
 		onNewDiagram,
 		onNewItem,
 		onStackOrderChange,
@@ -198,15 +190,8 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onPaste,
 	};
 
-	// --- Functions for accessing the canvas state and modifying the canvas. --- //
-
-	const canvasFunctions = {
-		addItem,
-	};
-
 	return {
-		state: [canvasState, setCanvasState],
+		state: [canvasState, setCanvasState] as const,
 		canvasProps,
-		canvasFunctions,
-	} as const;
+	};
 };

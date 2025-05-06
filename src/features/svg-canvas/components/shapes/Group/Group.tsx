@@ -222,6 +222,8 @@ const GroupComponent: React.FC<GroupProps> = ({
 						y,
 						items,
 					},
+					cursorX: e.cursorX,
+					cursorY: e.cursorY,
 				});
 			}
 			return;
@@ -266,6 +268,8 @@ const GroupComponent: React.FC<GroupProps> = ({
 					y: startBox.current.y + dy,
 					items: moveRecursive(startItems.current),
 				},
+				cursorX: e.cursorX,
+				cursorY: e.cursorY,
 			};
 
 			// グループ内の全ての図形の移動をまとめて通知

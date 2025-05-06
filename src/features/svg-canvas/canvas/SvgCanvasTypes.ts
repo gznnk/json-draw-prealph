@@ -1,3 +1,6 @@
+// Import React.
+import type { RefObject } from "react";
+
 // Import types related to SvgCanvas.
 import type { TextEditorState } from "../components/core/Textable";
 import type { GroupData } from "../components/shapes/Group/GroupTypes";
@@ -50,11 +53,23 @@ export type SvgCanvasState = {
 export type SvgCanvasHistory = SvgCanvasData;
 
 /**
+ * Type definition for SVG canvas references that can be used across hooks.
+ * This allows direct access to DOM elements without using Context API.
+ */
+export interface SvgCanvasRef {
+	/** Reference to the container div element */
+	containerRef: RefObject<HTMLDivElement | null>;
+	/** Reference to the SVG element */
+	svgRef: RefObject<SVGSVGElement | null>;
+}
+
+/**
  * Type for canvas custom hooks.
  */
 export type CanvasHooksProps = {
 	canvasState: SvgCanvasState;
 	setCanvasState: React.Dispatch<React.SetStateAction<SvgCanvasState>>;
+	canvasRef?: SvgCanvasRef | null;
 };
 
 /**

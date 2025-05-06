@@ -2,17 +2,18 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type { CanvasHooksProps } from "../SvgCanvasTypes";
-
-// Import types related to SvgCanvas.
 import type { GroupData } from "../../components/shapes/Group";
 import type {
 	ConnectPointMoveData,
 	DiagramChangeEvent,
 } from "../../types/EventTypes";
+import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../../components/shapes/ConnectLine";
+
+// Import hooks related to SvgCanvas.
+import { useCanvasResize } from "./useCanvasResize";
 
 // Import functions related to SvgCanvas.
 import { isItemableData, isSelectableData } from "../../utils/TypeUtils";
@@ -33,16 +34,23 @@ import type { SvgCanvasState } from "../SvgCanvasTypes";
  * Custom hook to handle diagram change events on the canvas.
  */
 export const useDiagramChange = (props: CanvasHooksProps) => {
+	// Get the canvas resize function to handle canvas resizing.
+	const canvasResize = useCanvasResize(props);
+
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
+		canvasResize,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	return useCallback((e: DiagramChangeEvent) => {
 		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current.props;
+		const {
+			props: { setCanvasState },
+			canvasResize,
+		} = refBus.current;
 
 		setCanvasState((prevState) => {
 			let items = prevState.items;
@@ -162,6 +170,12 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 			}
 
 			return newState;
+		});
+
+		// Resize the canvas if the cursor is near the edges.
+		canvasResize({
+			cursorX: e.cursorX ?? e.endDiagram.x ?? 100,
+			cursorY: e.cursorY ?? e.endDiagram.y ?? 100,
 		});
 	}, []);
 };
