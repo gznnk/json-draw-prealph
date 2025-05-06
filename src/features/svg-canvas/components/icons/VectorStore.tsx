@@ -67,7 +67,7 @@ export const VectorStore = memo<VectorStoreProps>(
 						strokeWidth="1.5"
 					/>
 					<path
-						d="M20 30v45c0 6.6 13.5 12 30 12s30-5.4 30-12V30"
+						d="M20 30v43c0 6.6 13.5 12 30 12s30-5.4 30-12V30"
 						fill="none"
 						stroke="#333"
 						strokeWidth="1.5"

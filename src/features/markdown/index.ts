@@ -19,9 +19,11 @@ import "katex/dist/katex.min.css";
 const normalizeMath = (text: string): string => {
 	return (
 		text
-			// Convert \[...\] to $$\n...\n$$ for block math
+			// Convert \[...\] to block math
 			.replace(/\\\[(.*?)\\\]/gs, (_, inner) => `\n$$\n${inner}\n$$\n`)
-			// Ensure existing $$ expressions are properly isolated with line breaks
+			// Convert \(...\) to inline math
+			.replace(/\\\((.+?)\\\)/gs, (_, inner) => `$${inner}$`)
+			// Ensure $$...$$ is on its own line
 			.replace(/\$\$([^$\n]+?)\$\$/gs, (_, inner) => `\n$$\n${inner}\n$$\n`)
 	);
 };
@@ -39,22 +41,27 @@ const katexLite = (md: MarkdownIt): void => {
 	 * Processes inline math expressions surrounded by single dollar signs
 	 */
 	md.inline.ruler.after("escape", "math_inline", (state, silent) => {
-		// Check if the current character is a dollar sign
-		if (state.src[state.pos] !== "$") return false;
+		const start = state.pos;
+		if (state.src[start] !== "$") return false;
 
-		// Find the position of the closing dollar sign
-		const start = state.pos + 1;
-		const end = state.src.indexOf("$", start);
+		let match = start + 1;
+		match = state.src.indexOf("$", match);
+		while (match !== -1) {
+			// Ignore escaped \$ or empty
+			if (state.src[match - 1] === "\\" || match === start + 1) {
+				match++;
+				continue;
+			}
+			const content = state.src.slice(start + 1, match);
+			if (content.includes("\n")) return false;
+			if (silent) return true;
 
-		// Reject if no closing dollar sign or empty math expression
-		if (end === -1 || end === start) return false;
-		if (silent) return false;
-
-		// Create a token for the inline math expression
-		const token = state.push("math_inline", "", 0);
-		token.content = state.src.slice(start, end);
-		state.pos = end + 1;
-		return true;
+			const token = state.push("math_inline", "", 0);
+			token.content = content;
+			state.pos = match + 1;
+			return true;
+		}
+		return false;
 	});
 
 	/**
