@@ -3,17 +3,17 @@ import {
 	useSvgCanvas,
 	type SvgCanvasRef,
 } from "./features/svg-canvas";
-// import Input from "./components/atoms/Input";
+import { ChatUI } from "./features/chat";
 import type { Diagram } from "./features/svg-canvas/types/DiagramCatalog";
 import { createRectangleData } from "./features/svg-canvas/components/shapes/Rectangle";
 import { createEllipseData } from "./features/svg-canvas/components/shapes/Ellipse";
 
-// import { getLogger } from "./utils/Logger";
 import { Profiler } from "./utils/Profiler";
+import { OpenAiKeyManager } from "./utils/KeyManager";
 
 import { loadCanvasDataFromLocalStorage } from "./features/svg-canvas/canvas/SvgCanvasFunctions";
-import { useRef } from "react";
-// const logger = getLogger("App");
+import { useRef, useState, useEffect } from "react";
+
 declare global {
 	interface Window {
 		profiler: Profiler;
@@ -22,10 +22,6 @@ declare global {
 
 if (!window.profiler) {
 	window.profiler = new Profiler();
-
-	// setInterval(() => {
-	// 	window.profiler.summary();
-	// }, 5000);
 }
 
 const testItems1 = [
@@ -471,6 +467,13 @@ const devData = {
 
 function App() {
 	const loadedCanvasState = loadCanvasDataFromLocalStorage();
+	const [apiKey, setApiKey] = useState<string | null>(null);
+
+	// Load OpenAI API key from KeyManager on component mount
+	useEffect(() => {
+		const savedApiKey = OpenAiKeyManager.loadKey();
+		setApiKey(savedApiKey);
+	}, []);
 
 	const canvasRef = useRef<SvgCanvasRef | null>(null);
 
@@ -497,11 +500,25 @@ function App() {
 
 	const { canvasProps } = useSvgCanvas(canvasInitialState);
 
-	// const {
-	// 	state: [canvasState, setCanvasState],
-	// 	canvasProps,
-	// 	canvasFunctions,
-	// } = useSvgCanvas([]);
+	// SVGキャンバスの表示領域を2/3に設定
+	const canvasWidth = "66.67%";
+
+	// チャットUIの設定
+	const chatConfig = {
+		height: "100%",
+		width: "100%",
+		apiKey: apiKey,
+		openAIConfig: {
+			model: "gpt-4",
+		},
+		inputPlaceholder: "質問を入力してください...",
+	};
+
+	// Handle saving new API key
+	const handleSaveApiKey = (newKey: string) => {
+		OpenAiKeyManager.saveKey(newKey);
+		setApiKey(newKey);
+	};
 
 	return (
 		<div className="App">
@@ -510,12 +527,29 @@ function App() {
 					position: "absolute",
 					top: 0,
 					left: 0,
-					right: 0,
+					right: "33.33%",
 					bottom: 0,
 					backgroundColor: "#eeeeee",
 				}}
 			>
-				<SvgCanvas {...canvasProps} ref={canvasRef} />
+				{/* SVGキャンバスエリア (2/3) */}
+				<div style={{ width: canvasWidth, height: "100%" }}>
+					<SvgCanvas {...canvasProps} ref={canvasRef} />
+				</div>
+			</div>
+			{/* チャットエリア (1/3) */}
+			<div
+				style={{
+					position: "absolute",
+					top: 0,
+					left: "66.67%",
+					right: 0,
+					bottom: 0,
+					borderLeft: "1px solid #ccc",
+					boxSizing: "border-box",
+				}}
+			>
+				<ChatUI {...chatConfig} onApiKeyChange={handleSaveApiKey} />
 			</div>
 		</div>
 	);
