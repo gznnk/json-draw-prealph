@@ -1,15 +1,20 @@
+// Import React.
 import React from "react";
-import { renderMarkdown } from "../../markdown";
-import type { Message } from "../types";
+
+// Import other features.
+import { renderMarkdown } from "../../../markdown";
+
+// Import related to this component.
+import type { Message } from "../../types";
 import {
 	UserMessageContainer,
 	AssistantMessageContainer,
 	MessageContent,
-} from "../styles/MessageItemStyles";
+} from "./MessageItemStyled";
 
-interface MessageItemProps {
+type MessageItemProps = {
 	message: Message;
-}
+};
 
 /**
  * Safe markdown renderer component that uses a ref to set innerHTML.

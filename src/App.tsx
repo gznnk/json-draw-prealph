@@ -3,7 +3,7 @@ import {
 	useSvgCanvas,
 	type SvgCanvasRef,
 } from "./features/svg-canvas";
-import { ChatUI } from "./features/chat";
+import { ChatUI } from "./features/llm-chat-ui";
 import type { Diagram } from "./features/svg-canvas/types/DiagramCatalog";
 import { createRectangleData } from "./features/svg-canvas/components/shapes/Rectangle";
 import { createEllipseData } from "./features/svg-canvas/components/shapes/Ellipse";

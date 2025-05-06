@@ -1,15 +1,19 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { OpenAIService } from "./services/OpenAIService";
-import { MessageItem } from "./components/MessageItem";
-import type { Message, ChatUIProps } from "./types";
+// Import React.
+import React, { useCallback, useEffect, useRef, useState } from "react";
+
+// Import related to this component.
+import { OpenAIService } from "../../services/OpenAIService";
+import type { Message } from "../../types";
+import { MessageItem } from "../MessageItem/MessageItem";
 import {
 	ChatContainer,
-	MessagesContainer,
 	InputContainer,
-	MessageInput,
-	SendButton,
 	LoadingIndicator,
-} from "./styles/ChatUIStyles";
+	MessageInput,
+	MessagesContainer,
+	SendButton,
+} from "./ChatUIStyled";
+import type { ChatUIProps } from "./ChatUITypes";
 
 /**
  * Main ChatUI component that provides a ChatGPT-like interface.
