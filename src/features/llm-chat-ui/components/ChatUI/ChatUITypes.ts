@@ -17,10 +17,6 @@ export interface ChatUIProps {
 	onMessagesChange?: (messages: Message[]) => void;
 	/** Optional initial messages to populate the chat */
 	initialMessages?: Message[];
-	/** Optional placeholder for the input field */
-	inputPlaceholder?: string;
-	/** Whether the AI is currently generating a response */
-	isLoading?: boolean;
 	/** Callback for when the send button is clicked */
 	onSendMessage?: (message: string) => void;
 }

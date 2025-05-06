@@ -511,7 +511,6 @@ function App() {
 		openAIConfig: {
 			model: "gpt-4",
 		},
-		inputPlaceholder: "質問を入力してください...",
 	};
 
 	return (

@@ -34,9 +34,7 @@ export const ChatUI = React.memo(
 		apiKey,
 		openAIConfig,
 		initialMessages = [],
-		inputPlaceholder = "Type a message...",
 		onMessagesChange,
-		isLoading: externalIsLoading,
 		onSendMessage,
 	}: ChatUIProps) => {
 		// State for managing messages and UI state
@@ -51,6 +49,53 @@ export const ChatUI = React.memo(
 		const messagesEndRef = useRef<HTMLDivElement>(null);
 		const inputRef = useRef<HTMLTextAreaElement>(null);
 
+		// Function to scroll to the bottom of the chat
+		const scrollToBottom = useCallback(() => {
+			if (messagesEndRef.current) {
+				messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+			}
+		}, []);
+
+		/**
+		 * Adjust textarea height based on content.
+		 * Sets height to fit content or minimum height if empty.
+		 */
+		const adjustTextareaHeight = useCallback(() => {
+			if (inputRef.current) {
+				// Reset height to auto first to get accurate scrollHeight
+				inputRef.current.style.height = "auto";
+				// Set height to scrollHeight or minimum height (e.g. 36px)
+				const minHeight = 36;
+				const newHeight = Math.max(inputRef.current.scrollHeight, minHeight);
+				inputRef.current.style.height = `${newHeight}px`;
+			}
+		}, []);
+
+		/**
+		 * Handle input changes and resize textarea
+		 */
+		const handleInputChange = useCallback(
+			(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+				setInput(e.target.value);
+				adjustTextareaHeight();
+			},
+			[adjustTextareaHeight],
+		);
+
+		/**
+		 * Handles keyboard events in the textarea.
+		 * Submits on Ctrl+Enter or Cmd+Enter.
+		 */
+		const handleKeyDown = useCallback(
+			(e: React.KeyboardEvent) => {
+				if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+					e.preventDefault();
+					handleSendMessage();
+				}
+			},
+			[handleSendMessage],
+		);
+
 		// Initialize OpenAI service if API key provided
 		useEffect(() => {
 			if (apiKey && openAIConfig) {
@@ -59,14 +104,6 @@ export const ChatUI = React.memo(
 				setOpenAIService(null);
 			}
 		}, [apiKey, openAIConfig]);
-
-		// Scroll to bottom when messages change
-		useEffect(() => {
-			if (messagesEndRef.current) {
-				messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-			}
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, []);
 
 		// Notify parent component of message changes
 		useEffect(() => {
@@ -80,7 +117,7 @@ export const ChatUI = React.memo(
 		 * Adds the user message to the chat and triggers OpenAI request if available.
 		 */
 		const handleSendMessage = useCallback(async () => {
-			if (!input.trim() || isLoading || externalIsLoading) return;
+			if (!input.trim() || isLoading) return;
 
 			const userMessage: Message = {
 				role: "user",
@@ -131,9 +168,7 @@ export const ChatUI = React.memo(
 								return updated;
 							});
 
-							if (messagesEndRef.current) {
-								messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-							}
+							scrollToBottom();
 						},
 					);
 				} catch (error) {
@@ -155,46 +190,11 @@ export const ChatUI = React.memo(
 		}, [
 			input,
 			isLoading,
-			externalIsLoading,
 			messages,
 			onSendMessage,
 			openAIService,
+			scrollToBottom,
 		]);
-
-		/**
-		 * Handles keyboard events in the textarea.
-		 * Submits on Ctrl+Enter or Cmd+Enter.
-		 */
-		const handleKeyDown = useCallback(
-			(e: React.KeyboardEvent) => {
-				if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-					e.preventDefault();
-					handleSendMessage();
-				}
-			},
-			[handleSendMessage],
-		);
-
-		/**
-		 * Adjust textarea height based on content
-		 */
-		const adjustTextareaHeight = useCallback(() => {
-			if (inputRef.current) {
-				inputRef.current.style.height = "auto";
-				inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
-			}
-		}, []);
-
-		/**
-		 * Handle input changes and resize textarea
-		 */
-		const handleInputChange = useCallback(
-			(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-				setInput(e.target.value);
-				adjustTextareaHeight();
-			},
-			[adjustTextareaHeight],
-		);
 
 		return (
 			<ChatContainer width={width} height={height}>
@@ -206,9 +206,7 @@ export const ChatUI = React.memo(
 						/>
 					))}
 
-					{(isLoading || externalIsLoading) && (
-						<LoadingIndicator>AI is thinking</LoadingIndicator>
-					)}
+					{isLoading && <LoadingIndicator>AI is thinking</LoadingIndicator>}
 
 					{/* Empty div for scrolling to bottom */}
 					<div ref={messagesEndRef} />
@@ -220,14 +218,14 @@ export const ChatUI = React.memo(
 						value={input}
 						onChange={handleInputChange}
 						onKeyDown={handleKeyDown}
-						placeholder={inputPlaceholder}
+						placeholder="Type a message..."
 						rows={1}
-						disabled={isLoading || externalIsLoading}
+						disabled={isLoading}
 					/>
 					<SendButton
 						onClick={handleSendMessage}
-						isDisabled={!input.trim() || isLoading || !!externalIsLoading}
-						disabled={!input.trim() || isLoading || !!externalIsLoading}
+						isDisabled={!input.trim() || isLoading}
+						disabled={!input.trim() || isLoading}
 					>
 						<svg
 							viewBox="0 0 24 24"
