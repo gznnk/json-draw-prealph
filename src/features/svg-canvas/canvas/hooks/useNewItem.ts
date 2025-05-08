@@ -1,5 +1,5 @@
 // Import React.
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
 import type { NewItemEvent } from "../../types/EventTypes";
@@ -10,7 +10,7 @@ import { isSelectableData } from "../../utils/TypeUtils";
 import { addHistory } from "../SvgCanvasFunctions";
 
 // Event name for adding a new item to the canvas.
-const ADD_NEW_ITEM_EVENT_NAME = "addNewItem";
+export const ADD_NEW_ITEM_EVENT_NAME = "addNewItem";
 
 /**
  * Function to trigger a new item event on the canvas.
@@ -36,7 +36,7 @@ export const useNewItem = (props: CanvasHooksProps) => {
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	const addNewItem = useCallback((e: NewItemEvent) => {
+	return useCallback((e: NewItemEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const { setCanvasState } = refBus.current.props;
 
@@ -67,20 +67,4 @@ export const useNewItem = (props: CanvasHooksProps) => {
 			return newState;
 		});
 	}, []);
-
-	// Use the useEffect hook to add an event listener for the new item event.
-	useEffect(() => {
-		// Add an event listener for the new item event.
-		const addNewItemListener = (e: Event) => {
-			addNewItem((e as CustomEvent<NewItemEvent>).detail);
-		};
-		window.addEventListener(ADD_NEW_ITEM_EVENT_NAME, addNewItemListener);
-
-		// Cleanup the event listener on component unmount.
-		return () => {
-			window.removeEventListener(ADD_NEW_ITEM_EVENT_NAME, addNewItemListener);
-		};
-	}, [addNewItem]);
-
-	return addNewItem;
 };

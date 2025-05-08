@@ -1,5 +1,7 @@
 import OpenAI from "openai";
 import type { Message, OpenAIConfig } from "../types";
+import { AI_AGENT_INSTRUCTIONS } from "../../svg-canvas/components/nodes/AgentNode/AgentConstants";
+import { AI_TOOLS, handleChunk } from "../../../ai-tools";
 
 /**
  * Service for handling communication with OpenAI's API.
@@ -38,27 +40,60 @@ export class OpenAIService {
 			throw new Error("OpenAI client is not initialized");
 		}
 
+		const input = messages.map((msg) => ({
+			role: msg.role,
+			content: msg.content,
+		})) as OpenAI.Responses.ResponseInput;
+
 		try {
-			const stream = await this.client.responses.create({
-				model: this.config.model,
-				temperature: this.config.temperature,
-				instructions:
-					"You are a general-purpose assistant that outputs responses in Markdown format. When including LaTeX expressions, do not use code blocks (e.g., triple backticks or indentation). Instead, use inline LaTeX syntax like $...$ for inline math and $$...$$ for block math.",
-				input: messages.map((msg) => ({
-					role: msg.role,
-					content: msg.content,
-				})),
-				stream: true,
-			});
+			let count = 0;
+			while (count < 10) {
+				let foundFunctionCall = false;
+				const stream = await this.client.responses.create({
+					model: "gpt-4o",
+					// temperature: this.config.temperature,
+					instructions: AI_AGENT_INSTRUCTIONS,
+					// "You are a general-purpose assistant that outputs responses in Markdown format. When including LaTeX expressions, do not use code blocks (e.g., triple backticks or indentation). Instead, use inline LaTeX syntax like $...$ for inline math and $$...$$ for block math.",
+					input: input,
+					stream: true,
+					tools: AI_TOOLS,
+				});
 
-			for await (const chunk of stream) {
-				if (chunk.type === "response.output_text.delta") {
-					const delta = chunk.delta;
+				for await (const chunk of stream) {
+					console.log(chunk);
 
-					if (delta) {
-						onChunk(delta);
+					if (chunk.type === "response.output_text.delta") {
+						const delta = chunk.delta;
+
+						if (delta) {
+							onChunk(delta);
+						}
+					}
+
+					if (
+						chunk.type === "response.output_item.done" &&
+						chunk.item?.type === "function_call"
+					) {
+						const reuslt = handleChunk(chunk);
+						if (reuslt) {
+							foundFunctionCall = true;
+							input.push(chunk.item);
+							input.push({
+								type: "function_call_output",
+								call_id: chunk.item.call_id,
+								output: JSON.stringify(reuslt),
+							});
+						}
 					}
 				}
+
+				count++;
+
+				if (!foundFunctionCall) {
+					break;
+				}
+
+				console.log("Function call found, continuing to next iteration.");
 			}
 		} catch (error) {
 			console.error("Error streaming chat completion:", error);

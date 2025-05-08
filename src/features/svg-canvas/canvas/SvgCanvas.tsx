@@ -11,7 +11,11 @@ import React, {
 
 // SvgCanvas関連型定義をインポート
 import { type Diagram, DiagramComponentCatalog } from "../types/DiagramCatalog";
-import type { DiagramSelectEvent } from "../types/EventTypes";
+import type {
+	ConnectNodesEvent,
+	DiagramSelectEvent,
+	NewItemEvent,
+} from "../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
 import { TextEditor } from "../components/core/Textable";
@@ -42,6 +46,8 @@ import type {
 	SvgCanvasRef,
 	SvgCanvasState,
 } from "./SvgCanvasTypes";
+import { ADD_NEW_ITEM_EVENT_NAME } from "./hooks/useNewItem";
+import { CONNECT_NODES_EVENT_NAME } from "./hooks/useConnectNodes";
 
 // SvgCanvasの状態を階層を跨いで提供するためにSvgCanvasStateProviderを保持するコンテキストを作成
 export const SvgCanvasContext = createContext<SvgCanvasStateProvider | null>(
@@ -144,6 +150,8 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onScroll,
 			onCopy,
 			onPaste,
+			onNewItem,
+			onConnectNodes,
 			contextMenuFunctions,
 		};
 		const refBus = useRef(refBusVal);
@@ -283,6 +291,43 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			return () => {
 				document.removeEventListener("keydown", onDocumentKeyDown);
 				document.removeEventListener("keyup", onDocumentKeyUp);
+			};
+		}, []);
+
+		// Use the useEffect hook to add an event listener for the new item event.
+		useEffect(() => {
+			// Bypass references to avoid function creation in every render.
+			const { onNewItem } = refBus.current;
+
+			// Add an event listener for the new item event.
+			const addNewItemListener = (e: Event) => {
+				onNewItem?.((e as CustomEvent<NewItemEvent>).detail);
+			};
+			window.addEventListener(ADD_NEW_ITEM_EVENT_NAME, addNewItemListener);
+
+			// Cleanup the event listener on component unmount.
+			return () => {
+				window.removeEventListener(ADD_NEW_ITEM_EVENT_NAME, addNewItemListener);
+			};
+		}, []);
+
+		// Use the useEffect hook to add an event listener for the connect nodes event.
+		useEffect(() => {
+			// Bypass references to avoid function creation in every render.
+			const { onConnectNodes } = refBus.current;
+
+			// Add an event listener for the connect nodes event.
+			const connectNodesListener = (e: Event) => {
+				onConnectNodes?.((e as CustomEvent<ConnectNodesEvent>).detail);
+			};
+			window.addEventListener(CONNECT_NODES_EVENT_NAME, connectNodesListener);
+
+			// Cleanup the event listener on component unmount.
+			return () => {
+				window.removeEventListener(
+					CONNECT_NODES_EVENT_NAME,
+					connectNodesListener,
+				);
 			};
 		}, []);
 
