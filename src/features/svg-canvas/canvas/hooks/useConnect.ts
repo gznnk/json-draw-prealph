@@ -1,5 +1,5 @@
 // Import React.
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 
 // Import types related to SvgCanvas.
 import type { ConnectLineData } from "../../components/shapes/ConnectLine";
@@ -10,33 +10,18 @@ import type { CanvasHooksProps } from "../SvgCanvasTypes";
 // Import functions related to SvgCanvas.
 import { newId } from "../../utils/Diagram";
 import { calcPointsOuterShape } from "../../utils/Math";
-
-// Import hooks related to SvgCanvas.
-import { useNewItem } from "./useNewItem";
+import { dispatchNewItemEvent } from "../observers/addNewItem";
 
 /**
  * Custom hook to handle connect events on the canvas.
  */
-export const useConnect = (props: CanvasHooksProps) => {
-	// Get the function to add items to the canvas.
-	const onNewItem = useNewItem(props);
-
-	// Create references bypass to avoid function creation in every render.
-	const refBusVal = {
-		onNewItem,
-	};
-	const refBus = useRef(refBusVal);
-	refBus.current = refBusVal;
-
+export const useConnect = (_props: CanvasHooksProps) => {
 	return useCallback((e: DiagramConnectEvent) => {
-		// Bypass references to avoid function creation in every render.
-		const { onNewItem } = refBus.current;
-
 		const shape = calcPointsOuterShape(
 			e.points.map((p) => ({ x: p.x, y: p.y })),
 		);
 
-		onNewItem({
+		dispatchNewItemEvent({
 			eventId: e.eventId,
 			item: {
 				id: newId(),

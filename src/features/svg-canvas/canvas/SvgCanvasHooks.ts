@@ -21,7 +21,7 @@ import { useDiagramChange } from "./hooks/useDiagramChange";
 import { useDrag } from "./hooks/useDrag";
 import { useGroup } from "./hooks/useGroup";
 import { useNewDiagram } from "./hooks/useNewDiagram";
-import { useNewItem } from "./hooks/useNewItem";
+import { useNewItem } from "./observers/addNewItem";
 import { usePaste } from "./hooks/usePaste";
 import { useRedo } from "./hooks/useRedo";
 import { useSelect } from "./hooks/useSelect";
@@ -139,9 +139,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the stack order change event.
 	const onStackOrderChange = useStackOrderChange(canvasHooksProps);
 
-	// Handler for the new item event.
-	const onNewItem = useNewItem(canvasHooksProps);
-
 	// Handler for the new diagram event.
 	const onNewDiagram = useNewDiagram(canvasHooksProps);
 
@@ -159,6 +156,9 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// Handler for the paste event.
 	const onPaste = usePaste(canvasHooksProps);
+
+	// Observer for the new item event.
+	useNewItem(canvasHooksProps);
 
 	// Observer for the connect nodes event.
 	useConnectNodes(canvasHooksProps);
@@ -180,7 +180,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onUndo,
 		onRedo,
 		onNewDiagram,
-		onNewItem,
 		onStackOrderChange,
 		onExecute,
 		onExport,

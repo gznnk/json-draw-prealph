@@ -21,6 +21,7 @@ import { useExecutionChain } from "../../../hooks/useExecutionChain";
 // Import functions related to SvgCanvas.
 import { createSvgDataFromText } from "../../shapes/Svg/SvgFunctions";
 import { newEventId } from "../../../utils/Util";
+import { dispatchNewItemEvent } from "../../../canvas/observers/addNewItem";
 
 /**
  * Props for the SvgToDiagramNode component.
@@ -29,7 +30,6 @@ type SvgToDiagramNodeProps = CreateDiagramProps<
 	RectangleProps,
 	{
 		executable: true;
-		itemCreatable: true;
 	}
 >;
 
@@ -53,7 +53,7 @@ const SvgToDiagramNodeComponent: React.FC<SvgToDiagramNodeProps> = (props) => {
 			svgData.x = props.x + (Math.random() - 0.5) * 300;
 			svgData.y = props.y + (Math.random() - 0.5) * 300;
 
-			props.onNewItem?.({
+			dispatchNewItemEvent({
 				eventId: newEventId(),
 				item: svgData as Diagram,
 			});

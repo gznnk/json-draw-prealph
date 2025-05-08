@@ -1,5 +1,5 @@
 // Import functions related to SvgCanvas.
-import { triggerNewItemEvent } from "../../canvas/hooks/useNewItem";
+import { dispatchNewItemEvent } from "../../canvas/observers/addNewItem";
 import { createImageGenNodeData } from "../../components/nodes/ImageGenNode";
 import { newEventId } from "../../utils/Util";
 
@@ -19,7 +19,7 @@ export const handler = (args: any) => {
 		});
 
 		// Trigger a new item event with the created node data.
-		triggerNewItemEvent({
+		dispatchNewItemEvent({
 			eventId: newEventId(),
 			item: data,
 		});

@@ -11,7 +11,7 @@ import React, {
 
 // SvgCanvas関連型定義をインポート
 import { type Diagram, DiagramComponentCatalog } from "../types/DiagramCatalog";
-import type { DiagramSelectEvent, NewItemEvent } from "../types/EventTypes";
+import type { DiagramSelectEvent } from "../types/EventTypes";
 
 // SvgCanvas関連コンポーネントをインポート
 import { TextEditor } from "../components/core/Textable";
@@ -42,7 +42,6 @@ import type {
 	SvgCanvasRef,
 	SvgCanvasState,
 } from "./SvgCanvasTypes";
-import { ADD_NEW_ITEM_EVENT_NAME } from "./hooks/useNewItem";
 
 // SvgCanvasの状態を階層を跨いで提供するためにSvgCanvasStateProviderを保持するコンテキストを作成
 export const SvgCanvasContext = createContext<SvgCanvasStateProvider | null>(
@@ -82,7 +81,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onTextEdit,
 			onTextChange,
 			onNewDiagram,
-			onNewItem,
 			onExecute,
 			onScroll,
 			onCopy,
@@ -144,7 +142,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onScroll,
 			onCopy,
 			onPaste,
-			onNewItem,
 			contextMenuFunctions,
 		};
 		const refBus = useRef(refBusVal);
@@ -287,23 +284,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			};
 		}, []);
 
-		// Use the useEffect hook to add an event listener for the new item event.
-		useEffect(() => {
-			// Bypass references to avoid function creation in every render.
-			const { onNewItem } = refBus.current;
-
-			// Add an event listener for the new item event.
-			const addNewItemListener = (e: Event) => {
-				onNewItem?.((e as CustomEvent<NewItemEvent>).detail);
-			};
-			window.addEventListener(ADD_NEW_ITEM_EVENT_NAME, addNewItemListener);
-
-			// Cleanup the event listener on component unmount.
-			return () => {
-				window.removeEventListener(ADD_NEW_ITEM_EVENT_NAME, addNewItemListener);
-			};
-		}, []);
-
 		useEffect(() => {
 			if (containerRef.current) {
 				const { scrollLeft, scrollTop } = refBus.current;
@@ -341,7 +321,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				onSelect: handleSelect,
 				onConnect,
 				onTextEdit,
-				onNewItem,
 				onExecute,
 			};
 

@@ -12,7 +12,6 @@ import type {
 	DiagramSelectEvent,
 	DiagramTextEditEvent,
 	DiagramTransformEvent,
-	NewItemEvent,
 } from "../../../types/EventTypes";
 
 // Import components related to SvgCanvas.
@@ -40,9 +39,7 @@ export type GroupProps = CreateDiagramProps<
 		textable: true;
 		executable: true;
 	}
-> & {
-	onNewItem?: (e: NewItemEvent) => void;
-};
+>;
 
 /**
  * Group component.
@@ -69,7 +66,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 	onDiagramChange,
 	onConnect,
 	onTextEdit,
-	onNewItem,
 	onExecute,
 }) => {
 	// Flag indicating whether the entire group is being dragged.
@@ -491,7 +487,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 			onDiagramChange: handleChildDiagramChange,
 			onConnect: handleChildDiagramConnect,
 			onTextEdit: handleChildDiagramTextEdit,
-			onNewItem,
 			onExecute,
 		};
 

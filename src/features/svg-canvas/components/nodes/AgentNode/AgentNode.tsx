@@ -15,12 +15,13 @@ import { DEFAULT_RECTANGLE_DATA, Rectangle } from "../../shapes/Rectangle";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import functions related to SvgCanvas.
+import { dispatchNewItemEvent } from "../../../canvas/observers/addNewItem";
+import { dispatchConnectNodesEvent } from "../../../canvas/observers/connectNodes";
 import { newEventId } from "../../../utils/Util";
 import { createImageGenNodeData } from "../ImageGenNode";
 import { createLLMNodeData } from "../LLMNode";
 import { createSvgToDiagramNodeData } from "../SvgToDiagramNode";
 import { createTextAreaNodeData } from "../TextAreaNode";
-import { dispatchConnectNodesEvent } from "../../../canvas/observers/connectNodes";
 
 // Import utilities.
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
@@ -161,7 +162,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 									y: functionCallArguments.y,
 									text: functionCallArguments.instructions,
 								});
-								props.onNewItem?.({
+								dispatchNewItemEvent({
 									eventId,
 									item: llmNode,
 								});
@@ -183,7 +184,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 									x: functionCallArguments.x,
 									y: functionCallArguments.y,
 								});
-								props.onNewItem?.({
+								dispatchNewItemEvent({
 									eventId,
 									item: textNode,
 								});
@@ -204,7 +205,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 									x: functionCallArguments.x,
 									y: functionCallArguments.y,
 								});
-								props.onNewItem?.({
+								dispatchNewItemEvent({
 									eventId,
 									item: svgNode,
 								});
@@ -225,7 +226,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 									x: functionCallArguments.x,
 									y: functionCallArguments.y,
 								});
-								props.onNewItem?.({
+								dispatchNewItemEvent({
 									eventId,
 									item: node,
 								});

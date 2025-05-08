@@ -14,6 +14,7 @@ import { DEFAULT_RECTANGLE_DATA, Rectangle } from "../../shapes/Rectangle";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import functions related to SvgCanvas.
+import { dispatchNewItemEvent } from "../../../canvas/observers/addNewItem";
 import { newEventId } from "../../../utils/Util";
 
 // Import utilities.
@@ -71,7 +72,7 @@ const ImageGenNodeComponent: React.FC<ImageGenNodeProps> = (props) => {
 						eventType: e.eventType,
 						data: { text: base64Image },
 					});
-					props.onNewItem?.({
+					dispatchNewItemEvent({
 						eventId,
 						item: createImageData({
 							x: props.x,

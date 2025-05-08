@@ -1,5 +1,5 @@
 // Import React.
-import { useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 // Import types related to SvgCanvas.
 import type { ConnectLineData } from "../../../components/shapes/ConnectLine";
@@ -13,8 +13,8 @@ import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 import { createBestConnectPath } from "../../../components/shapes/ConnectPoint";
 import { newId } from "../../../utils/Diagram";
 import { calcPointsOuterShape } from "../../../utils/Math";
-import { useNewItem } from "../../hooks/useNewItem";
 import { getDiagramById } from "../../SvgCanvasFunctions";
+import { dispatchNewItemEvent } from "../addNewItem";
 
 // Import related to this component.
 import { CONNECT_NODES_EVENT_NAME } from "./connectNodesConstants";
@@ -23,15 +23,14 @@ import { CONNECT_NODES_EVENT_NAME } from "./connectNodesConstants";
  * ConnectNodes イベントを監視してノード接続を行う Hook。
  */
 export const useConnectNodes = (props: CanvasHooksProps) => {
-	const onNewItem = useNewItem(props);
-
-	const refBus = useRef({ props, onNewItem });
-	refBus.current = { props, onNewItem };
+	// Create references bypass to avoid function creation in every render.
+	const refBus = useRef({ props });
+	refBus.current = { props };
 
 	useEffect(() => {
 		const connectNodesListener = (e: Event) => {
 			const event = (e as CustomEvent<ConnectNodesEvent>).detail;
-			const { onNewItem, props } = refBus.current;
+			const { props } = refBus.current;
 			const { canvasState } = props;
 
 			const sourceNode = getDiagramById(
@@ -86,7 +85,7 @@ export const useConnectNodes = (props: CanvasHooksProps) => {
 				type: "PathPoint",
 			})) as PathPointData[];
 
-			onNewItem({
+			dispatchNewItemEvent({
 				eventId: event.eventId,
 				item: {
 					id: newId(),
