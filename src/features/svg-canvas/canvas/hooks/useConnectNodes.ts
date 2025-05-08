@@ -1,5 +1,5 @@
 // Import React.
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 // Import types related to SvgCanvas.
 import type { ConnectLineData } from "../../components/shapes/ConnectLine";
@@ -20,6 +20,22 @@ import { useNewItem } from "./useNewItem";
 // Imports related to this component.
 import { getDiagramById } from "../SvgCanvasFunctions";
 
+// Event name for connecting nodes on the canvas.
+const CONNECT_NODES_EVENT_NAME = "connectNodes";
+
+/**
+ * Function to trigger a connect nodes event on the canvas.
+ * @param e - The connect nodes event to be triggered.
+ */
+export const triggerConnectNodesEvent = (e: ConnectNodesEvent) => {
+	// Create a new event with the specified name and detail.
+	const event = new CustomEvent(CONNECT_NODES_EVENT_NAME, {
+		detail: e,
+	});
+	// Dispatch the event on the window object.
+	window.dispatchEvent(event);
+};
+
 /**
  * Custom hook to handle connect nodes events on the canvas.
  */
@@ -35,7 +51,7 @@ export const useConnectNodes = (props: CanvasHooksProps) => {
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	return useCallback((e: ConnectNodesEvent) => {
+	const connectNodes = useCallback((e: ConnectNodesEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const { onNewItem, props } = refBus.current;
 
@@ -115,4 +131,23 @@ export const useConnectNodes = (props: CanvasHooksProps) => {
 			} as ConnectLineData,
 		});
 	}, []);
+
+	// Use the useEffect hook to add an event listener for the connect nodes event.
+	useEffect(() => {
+		// Add an event listener for the connect nodes event.
+		const connectNodesListener = (e: Event) => {
+			connectNodes((e as CustomEvent<ConnectNodesEvent>).detail);
+		};
+		window.addEventListener(CONNECT_NODES_EVENT_NAME, connectNodesListener);
+
+		// Cleanup the event listener on component unmount.
+		return () => {
+			window.removeEventListener(
+				CONNECT_NODES_EVENT_NAME,
+				connectNodesListener,
+			);
+		};
+	}, [connectNodes]);
+
+	return connectNodes;
 };
