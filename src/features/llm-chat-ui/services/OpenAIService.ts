@@ -1,7 +1,6 @@
 import OpenAI from "openai";
 import type { Message } from "../types";
-import { AI_AGENT_INSTRUCTIONS } from "../../svg-canvas/components/nodes/AgentNode/AgentConstants";
-import { AI_TOOLS, handleChunk } from "../../../ai-tools";
+import { workflowAgent } from "../../svg-canvas/tools/workflow_agent";
 
 /**
  * Service for handling communication with OpenAI's API.
@@ -46,12 +45,11 @@ export class OpenAIService {
 				let foundFunctionCall = false;
 				const stream = await this.client.responses.create({
 					model: "gpt-4o",
-					// temperature: this.config.temperature,
-					instructions: AI_AGENT_INSTRUCTIONS,
-					// "You are a general-purpose assistant that outputs responses in Markdown format. When including LaTeX expressions, do not use code blocks (e.g., triple backticks or indentation). Instead, use inline LaTeX syntax like $...$ for inline math and $$...$$ for block math.",
+					instructions:
+						"You are a general-purpose assistant that outputs responses in Markdown format. When including LaTeX expressions, do not use code blocks (e.g., triple backticks or indentation). Instead, use inline LaTeX syntax like $...$ for inline math and $$...$$ for block math.",
 					input: input,
 					stream: true,
-					tools: AI_TOOLS,
+					tools: [workflowAgent.definition],
 				});
 
 				for await (const chunk of stream) {
@@ -69,15 +67,18 @@ export class OpenAIService {
 						chunk.type === "response.output_item.done" &&
 						chunk.item?.type === "function_call"
 					) {
-						const reuslt = handleChunk(chunk);
-						if (reuslt) {
-							foundFunctionCall = true;
-							input.push(chunk.item);
-							input.push({
-								type: "function_call_output",
-								call_id: chunk.item.call_id,
-								output: JSON.stringify(reuslt),
-							});
+						if (chunk.item.name === "workflow_agent") {
+							const functionCallArguments = JSON.parse(chunk.item.arguments);
+							const result = await workflowAgent.handler(functionCallArguments);
+							if (result) {
+								foundFunctionCall = true;
+								input.push(chunk.item);
+								input.push({
+									type: "function_call_output",
+									call_id: chunk.item.call_id,
+									output: JSON.stringify(result),
+								});
+							}
 						}
 					}
 				}
