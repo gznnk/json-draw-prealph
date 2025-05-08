@@ -1,5 +1,5 @@
 // Import React.
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 // Import types related to SvgCanvas.
 import type { NewItemEvent } from "../../types/EventTypes";
@@ -8,6 +8,22 @@ import type { CanvasHooksProps, SvgCanvasState } from "../SvgCanvasTypes";
 // Import functions related to SvgCanvas.
 import { isSelectableData } from "../../utils/TypeUtils";
 import { addHistory } from "../SvgCanvasFunctions";
+
+// Event name for adding a new item to the canvas.
+const ADD_NEW_ITEM_EVENT_NAME = "addNewItem";
+
+/**
+ * Function to trigger a new item event on the canvas.
+ * @param e - The new item event to be triggered.
+ */
+export const triggerNewItemEvent = (e: NewItemEvent) => {
+	// Create a new event with the specified name and detail.
+	const event = new CustomEvent(ADD_NEW_ITEM_EVENT_NAME, {
+		detail: e,
+	});
+	// Dispatch the event on the window object.
+	window.dispatchEvent(event);
+};
 
 /**
  * Custom hook to handle new item events on the canvas.
@@ -20,7 +36,7 @@ export const useNewItem = (props: CanvasHooksProps) => {
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	return useCallback((e: NewItemEvent) => {
+	const addNewItem = useCallback((e: NewItemEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const { setCanvasState } = refBus.current.props;
 
@@ -51,4 +67,20 @@ export const useNewItem = (props: CanvasHooksProps) => {
 			return newState;
 		});
 	}, []);
+
+	// Use the useEffect hook to add an event listener for the new item event.
+	useEffect(() => {
+		// Add an event listener for the new item event.
+		const addNewItemListener = (e: Event) => {
+			addNewItem((e as CustomEvent<NewItemEvent>).detail);
+		};
+		window.addEventListener(ADD_NEW_ITEM_EVENT_NAME, addNewItemListener);
+
+		// Cleanup the event listener on component unmount.
+		return () => {
+			window.removeEventListener(ADD_NEW_ITEM_EVENT_NAME, addNewItemListener);
+		};
+	}, [addNewItem]);
+
+	return addNewItem;
 };
