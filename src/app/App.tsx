@@ -13,7 +13,7 @@ import { OpenAiKeyManager } from "../utils/KeyManager";
 
 import { loadCanvasDataFromLocalStorage } from "../features/svg-canvas/canvas/SvgCanvasFunctions";
 import { useRef, useState, useEffect } from "react";
-import { TabContainer, type TabItem } from "./components/TabContainer";
+import { Sheets, type SheetItem } from "./components/Sheets";
 
 declare global {
 	interface Window {
@@ -503,7 +503,7 @@ function App() {
 
 	const { canvasProps } = useSvgCanvas(canvasInitialState);
 
-	const [tabs, setTabs] = useState<TabItem[]>([
+	const [tabs, setTabs] = useState<SheetItem[]>([
 		{
 			id: "dashboard",
 			title: "Dashboard",
@@ -546,7 +546,7 @@ function App() {
 	const handleAddTab = () => {
 		const tabCount = tabs.length + 1;
 		const newTabId = `tab-${Date.now()}`;
-		const newTab: TabItem = {
+		const newTab: SheetItem = {
 			id: newTabId,
 			title: `Sheet ${tabCount}`,
 			content: (
@@ -574,7 +574,7 @@ function App() {
 			>
 				{/* SVGキャンバスエリア (2/3) */}
 				<div style={{ width: "100%", height: "100%" }}>
-					<TabContainer
+					<Sheets
 						tabs={tabs}
 						activeTabId={activeTabId}
 						onTabSelect={setActiveTabId}
