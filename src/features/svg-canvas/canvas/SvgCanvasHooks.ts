@@ -41,6 +41,7 @@ import { useConnectNodes } from "./observers/connectNodes";
  * Props for the useSvgCanvas hook.
  */
 type SvgCanvasHooksProps = {
+	id: string;
 	minX: number;
 	minY: number;
 	width: number;
@@ -72,6 +73,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// The state of the canvas.
 	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
 		...initialBounds,
+		id: props.id,
 		items: props.items,
 		isDiagramChanging: false,
 		scrollLeft: props.scrollLeft,
@@ -79,6 +81,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		history: [
 			{
 				...initialBounds,
+				id: props.id,
 				items: deepCopy(props.items),
 			},
 		],

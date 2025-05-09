@@ -244,6 +244,7 @@ export const ungroupSelectedGroupsRecursive = (items: Diagram[]) => {
  *
  * @param prevState - The previous state of the SvgCanvas.
  * @param newState - The new state to be added to the history.
+ * @param sheetId - Optional sheet ID to use for storage. Defaults to "default"
  * @returns {SvgCanvasState} - The updated state of the SvgCanvas with the new history.
  */
 export const addHistory = (
@@ -285,7 +286,7 @@ export const addHistory = (
 	// console.log("history", JSON.stringify(ret, null, 2));
 	// console.log("history", ret);
 
-	saveCanvasDataToLocalStorage(ret);
+	saveCanvasDataToLocalStorage(ret); // Save the canvas data to local storage.
 
 	return ret;
 };
@@ -304,6 +305,7 @@ const canvasStateToHistory = (
 
 	// Convert the canvas state to history format
 	return {
+		id: copiedState.id,
 		minX: copiedState.minX,
 		minY: copiedState.minY,
 		width: copiedState.width,
@@ -324,14 +326,17 @@ export const saveCanvasDataToLocalStorage = (
 		historyIndex: undefined, // Exclude history index from local storage
 		lastHistoryEventId: undefined, // Exclude last history event ID from local storage
 	};
-	localStorage.setItem("canvasData", JSON.stringify(canvasData));
+	localStorage.setItem(
+		`canvasData_${canvasData.id}`,
+		JSON.stringify(canvasData),
+	);
 };
 
-export const loadCanvasDataFromLocalStorage = ():
-	| SvgCanvasState
-	| undefined => {
+export const loadCanvasDataFromLocalStorage = (
+	id = "default",
+): SvgCanvasState | undefined => {
 	// Load the canvas state from local storage
-	const canvasData = localStorage.getItem("canvasData");
+	const canvasData = localStorage.getItem(`canvasData_${id}`);
 	if (canvasData) {
 		const canvasState = JSON.parse(canvasData) as SvgCanvasState;
 		// Create a new history entry for the loaded state
