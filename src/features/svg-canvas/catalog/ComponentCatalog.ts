@@ -30,25 +30,25 @@ const DummyComponent: React.FC = () => null;
  */
 export const DiagramComponentCatalog: {
 	// biome-ignore lint/suspicious/noExplicitAny: さまざまな図形の共通の型を作成するのは困難なため
-	[key in DiagramType]: React.FC<any>;
+	[key in DiagramType]: () => React.FC<any>;
 } = {
 	// Shapes
-	ConnectLine,
-	ConnectPoint: DummyComponent,
-	Ellipse,
-	Group,
-	Image,
-	Path,
-	PathPoint,
-	Rectangle,
-	Svg,
+	ConnectLine: () => ConnectLine,
+	ConnectPoint: () => DummyComponent,
+	Ellipse: () => Ellipse,
+	Group: () => Group,
+	Image: () => Image,
+	Path: () => Path,
+	PathPoint: () => PathPoint,
+	Rectangle: () => Rectangle,
+	Svg: () => Svg,
 	// Nodes
-	AgentNode,
-	HubNode,
-	ImageGenNode,
-	SvgToDiagramNode,
-	LLMNode,
-	TextAreaNode,
-	VectorStoreNode,
-	WebSearchNode,
+	AgentNode: () => AgentNode,
+	HubNode: () => HubNode,
+	ImageGenNode: () => ImageGenNode,
+	SvgToDiagramNode: () => SvgToDiagramNode,
+	LLMNode: () => LLMNode,
+	TextAreaNode: () => TextAreaNode,
+	VectorStoreNode: () => VectorStoreNode,
+	WebSearchNode: () => WebSearchNode,
 };

@@ -324,7 +324,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				onExecute,
 			};
 
-			return React.createElement(component, props);
+			return React.createElement(component(), props);
 		});
 
 		return (
