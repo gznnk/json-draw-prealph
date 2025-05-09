@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
 	SvgCanvas,
 	useSvgCanvas,
@@ -12,8 +13,11 @@ import { Profiler } from "../utils/Profiler";
 import { OpenAiKeyManager } from "../utils/KeyManager";
 
 import { loadCanvasDataFromLocalStorage } from "../features/svg-canvas/canvas/SvgCanvasFunctions";
-import { useRef, useState, useEffect } from "react";
-import { Sheets, type SheetItem } from "./components/Sheets";
+import {
+	Sheets,
+	type SheetItem,
+	type SheetContentItem,
+} from "./components/Sheets";
 
 declare global {
 	interface Window {
@@ -503,41 +507,65 @@ function App() {
 
 	const { canvasProps } = useSvgCanvas(canvasInitialState);
 
+	// タブ情報の管理
 	const [tabs, setTabs] = useState<SheetItem[]>([
 		{
 			id: "dashboard",
 			title: "Dashboard",
-			content: <SvgCanvas {...canvasProps} ref={canvasRef} />,
 		},
 		{
 			id: "analytics",
 			title: "Analytics",
-			content: (
-				<div style={{ position: "absolute", top: 0, left: 0 }}>
-					Analytics Content
-				</div>
-			),
 		},
 		{
 			id: "settings",
 			title: "Settings",
-			content: (
-				<div style={{ position: "absolute", top: 0, left: 0 }}>
-					Settings Content
-				</div>
-			),
 		},
 	]);
 
-	// チャットUIの設定
-	const chatConfig = {
-		height: "100%",
-		width: "100%",
-		apiKey: apiKey,
-		openAIConfig: {
-			model: "gpt-4",
-		},
-	};
+	/**
+	 * Generate content items for the sheets component.
+	 * This memoizes the content items array, but each content element
+	 * will be freshly rendered when accessed.
+	 */
+	const contentItems: SheetContentItem[] = useMemo(
+		() => [
+			{
+				id: "dashboard",
+				content: <SvgCanvas {...canvasProps} ref={canvasRef} />,
+			},
+			{
+				id: "analytics",
+				content: (
+					<div style={{ position: "absolute", top: 0, left: 0 }}>
+						Analytics Content
+					</div>
+				),
+			},
+			{
+				id: "settings",
+				content: (
+					<div style={{ position: "absolute", top: 0, left: 0 }}>
+						Settings Content
+					</div>
+				),
+			},
+			// 動的に追加されたタブのためのコンテンツ
+			...tabs
+				.filter(
+					(tab) => !["dashboard", "analytics", "settings"].includes(tab.id),
+				)
+				.map((tab) => ({
+					id: tab.id,
+					content: (
+						<div style={{ position: "absolute", top: 0, left: 0 }}>
+							Content for sheet {tab.title}
+						</div>
+					),
+				})),
+		],
+		[tabs, canvasProps],
+	);
 
 	/**
 	 * Handles adding a new tab to the tab container.
@@ -549,15 +577,20 @@ function App() {
 		const newTab: SheetItem = {
 			id: newTabId,
 			title: `Sheet ${tabCount}`,
-			content: (
-				<div style={{ position: "absolute", top: 0, left: 0 }}>
-					Content for new sheet {tabCount}
-				</div>
-			),
 		};
 
 		setTabs([...tabs, newTab]);
 		setActiveTabId(newTabId); // 新しいタブを自動的に選択
+	};
+
+	// チャットUIの設定
+	const chatConfig = {
+		height: "100%",
+		width: "100%",
+		apiKey: apiKey,
+		openAIConfig: {
+			model: "gpt-4",
+		},
 	};
 
 	return (
@@ -576,6 +609,7 @@ function App() {
 				<div style={{ width: "100%", height: "100%" }}>
 					<Sheets
 						tabs={tabs}
+						contentItems={contentItems}
 						activeTabId={activeTabId}
 						onTabSelect={setActiveTabId}
 						onAddTab={handleAddTab}

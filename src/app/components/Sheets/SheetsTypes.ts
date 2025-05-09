@@ -1,11 +1,19 @@
 /**
- * Sheet information structure with content
+ * Sheet information structure
  */
 export interface SheetItem {
 	/** Unique identifier for the sheet */
 	id: string;
 	/** Display title for the sheet */
 	title: string;
+}
+
+/**
+ * Content item structure for sheets
+ */
+export interface SheetContentItem {
+	/** ID matching to a sheet */
+	id: string;
 	/** Content to be displayed inside the sheet */
 	content: React.ReactNode;
 }
@@ -14,8 +22,10 @@ export interface SheetItem {
  * Props for Sheets component
  */
 export interface SheetsProps {
-	/** Array of sheet items containing sheet info and content */
+	/** Array of sheet items containing sheet info */
 	tabs: SheetItem[];
+	/** Array of content items corresponding to tabs */
+	contentItems: SheetContentItem[];
 	/** ID of the currently active sheet */
 	activeTabId: string;
 	/** Callback when a sheet is selected */

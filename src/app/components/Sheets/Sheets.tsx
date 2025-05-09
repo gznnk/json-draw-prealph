@@ -23,27 +23,31 @@ import {
  * @example
  * ```tsx
  * import { useState } from "react";
- * import { Sheets, SheetItem } from "../app/components/Sheets";
+ * import { Sheets, SheetItem, SheetContentItem } from "../app/components/Sheets";
  *
  * const ExamplePage = () => {
  *   const [activeTabId, setActiveTabId] = useState<string>("dashboard");
  *
- *   // Define sheets with their content
+ *   // Define sheets
  *   const tabs: SheetItem[] = [
+ *     { id: "dashboard", title: "Dashboard" },
+ *     { id: "analytics", title: "Analytics" },
+ *     { id: "settings", title: "Settings" },
+ *   ];
+ *
+ *   // Define content items
+ *   const contentItems: SheetContentItem[] = [
  *     {
  *       id: "dashboard",
- *       title: "Dashboard",
- *       content: <div style={{ position: "absolute", top: 0, left: 0 }}>Dashboard Content</div>
+ *       content: <div style={{ position: "absolute", top: 0, left: 0 }}>Dashboard Content</div>,
  *     },
  *     {
  *       id: "analytics",
- *       title: "Analytics",
- *       content: <div style={{ position: "absolute", top: 0, left: 0 }}>Analytics Content</div>
+ *       content: <div style={{ position: "absolute", top: 0, left: 0 }}>Analytics Content</div>,
  *     },
  *     {
  *       id: "settings",
- *       title: "Settings",
- *       content: <div style={{ position: "absolute", top: 0, left: 0 }}>Settings Content</div>
+ *       content: <div style={{ position: "absolute", top: 0, left: 0 }}>Settings Content</div>,
  *     },
  *   ];
  *
@@ -56,6 +60,7 @@ import {
  *     <div style={{ width: "100%", height: "500px" }}>
  *       <Sheets
  *         tabs={tabs}
+ *         contentItems={contentItems}
  *         activeTabId={activeTabId}
  *         onTabSelect={setActiveTabId}
  *         onAddTab={handleAddTab}
@@ -65,11 +70,11 @@ import {
  * };
  * ```
  *
- * @param props - Component props including tabs with content, active tab ID, and tab selection handler
+ * @param props - Component props including tabs info, content items, active tab ID, and event handlers
  * @returns Sheets component with Excel-like bottom tabs
  */
 export const Sheets: FC<SheetsProps> = memo(
-	({ tabs, activeTabId, onTabSelect, onAddTab }) => {
+	({ tabs, contentItems, activeTabId, onTabSelect, onAddTab }) => {
 		// Handle tab selection
 		const handleTabClick = (tabId: string) => {
 			if (onTabSelect) {
@@ -77,15 +82,17 @@ export const Sheets: FC<SheetsProps> = memo(
 			}
 		};
 
-		// Find the active tab
-		const activeTab = tabs.find((tab) => tab.id === activeTabId);
+		// Find the content for active tab
+		const activeContent = contentItems.find(
+			(item) => item.id === activeTabId,
+		)?.content;
 
 		return (
 			<SheetsWrapper>
 				{/* Content area - content is absolutely positioned inside this container */}
 				<SheetContentContainer>
-					{/* Only render the active tab content */}
-					{activeTab?.content}
+					{/* Render the content for active tab */}
+					{activeContent}
 				</SheetContentContainer>
 
 				{/* Sheet bar at the bottom */}
