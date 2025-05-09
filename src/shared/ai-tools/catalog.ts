@@ -5,12 +5,12 @@ import type { OpenAI } from "openai";
 import type { aiToolHander } from "./types";
 
 // Import ai tools.
-import { workflowAgent } from "../features/svg-canvas/tools/workflow_agent";
-import { addImageGenNode } from "../features/svg-canvas/tools/add_image_gen_node";
-import { addLLMNode } from "../features/svg-canvas/tools/add_llm_node";
-import { addTextNode } from "../features/svg-canvas/tools/add_text_node";
-import { addSvgToCanvasNode } from "../features/svg-canvas/tools/add_svg_to_canvas_node";
-import { connectNodes } from "../features/svg-canvas/tools/connect_nodes";
+import { workflowAgent } from "../../features/svg-canvas/tools/workflow_agent";
+import { addImageGenNode } from "../../features/svg-canvas/tools/add_image_gen_node";
+import { addLLMNode } from "../../features/svg-canvas/tools/add_llm_node";
+import { addTextNode } from "../../features/svg-canvas/tools/add_text_node";
+import { addSvgToCanvasNode } from "../../features/svg-canvas/tools/add_svg_to_canvas_node";
+import { connectNodes } from "../../features/svg-canvas/tools/connect_nodes";
 
 export const AI_TOOLS = [
 	addImageGenNode.definition,
