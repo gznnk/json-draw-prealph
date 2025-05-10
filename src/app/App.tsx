@@ -29,6 +29,23 @@ if (!window.profiler) {
 const sheetItemsStr = localStorage.getItem("sheets") || "[]";
 const sheetItems: SheetItem[] = JSON.parse(sheetItemsStr) || [];
 
+const ADD_NEW_SHEET_EVENT_NAME = "add_new_sheet";
+export const dispatchAddNewSheetEvent = ({
+	id,
+	sheetName,
+}: {
+	id: string;
+	sheetName: string;
+}) => {
+	const event = new CustomEvent(ADD_NEW_SHEET_EVENT_NAME, {
+		detail: {
+			id,
+			sheetName,
+		},
+	});
+	window.dispatchEvent(event);
+};
+
 function App() {
 	const [apiKey, setApiKey] = useState<string | null>(null);
 
@@ -84,6 +101,26 @@ function App() {
 			model: "gpt-4",
 		},
 	};
+
+	useEffect(() => {
+		const handleAddNewSheetEvent = (e: Event) => {
+			const { id, sheetName } = (e as CustomEvent).detail;
+			const newTab: SheetItem = {
+				id,
+				title: sheetName,
+			};
+			setTabs((prevTabs) => [...prevTabs, newTab]);
+			setActiveTabId(id); // 新しいタブを自動的に選択
+		};
+		window.addEventListener(ADD_NEW_SHEET_EVENT_NAME, handleAddNewSheetEvent);
+
+		return () => {
+			window.removeEventListener(
+				ADD_NEW_SHEET_EVENT_NAME,
+				handleAddNewSheetEvent,
+			);
+		};
+	}, []);
 
 	return (
 		<div className="App">

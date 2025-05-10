@@ -55,6 +55,10 @@ export const handler = async (args: any) => {
 			role: "user",
 			content: args.user_goal,
 		});
+		input.push({
+			role: "user",
+			content: `Start placing the first node near (X: ${300}, Y: ${200}) on the canvas.`,
+		});
 
 		try {
 			let count = 0;
