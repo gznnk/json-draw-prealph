@@ -73,8 +73,8 @@ const TextableComponent: React.FC<TextableProps> = ({
 						fontSize={fontSize}
 						fontFamily={fontFamily}
 						fontWeight={fontWeight}
-						wordBreak="break-word"
-						whiteSpace="pre-wrap"
+						wordBreak="normal"
+						whiteSpace="normal"
 						ref={textRef}
 					/>
 				) : (

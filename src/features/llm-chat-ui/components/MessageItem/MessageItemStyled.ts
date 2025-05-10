@@ -30,6 +30,15 @@ export const AssistantMessageContainer = styled.div`
  * Styled content area for markdown-rendered text
  */
 export const MessageContent = styled.div`
+  & a {
+    color: #3A79B8;
+    pointer-events: auto;
+    transition: color 0.2s ease;
+  }
+  & a:hover {
+    color: #4EA1FF;
+  }
+
   pre {
     background-color: #1a1f33;
     padding: 0;
@@ -38,7 +47,6 @@ export const MessageContent = styled.div`
 
     & > code {
       background-color: #1a1f33;
-      border-radius: 6px;
       border: 1px solid rgba(0, 0, 0, 0.15);
       margin: 0;
     }

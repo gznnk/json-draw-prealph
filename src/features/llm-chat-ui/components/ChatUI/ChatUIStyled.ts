@@ -40,7 +40,7 @@ export const InputContainer = styled.div`
 export const MessageInput = styled.textarea`
   flex-grow: 1;
   background-color: #0C0F1C;
-  border: 3px solid #2A2F4C;
+  border: 2px solid #2A2F4C;
   border-radius: 6px;
   padding: 10px 14px;
   resize: none;
