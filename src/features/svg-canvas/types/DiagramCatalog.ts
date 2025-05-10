@@ -87,7 +87,7 @@ export type DiagramType =
 	| "WebSearchNode";
 
 /**
- * 全図形のデータを統合した型
+ * Union type representing all diagram data types.
  */
 export type Diagram =
 	// Shapes
@@ -104,40 +104,40 @@ export type Diagram =
 	| HubNodeData;
 
 /**
- * Dummy component. This is used by components that are always wrapped by another component.
+ * Dummy component for components that are always wrapped by another component.
  */
 const DummyComponent: React.FC = () => null;
 
 /**
- * The mapping of diagram types to their corresponding React components.
+ * Maps diagram types to their corresponding React components.
  */
 export const DiagramComponentCatalog: {
-	// biome-ignore lint/suspicious/noExplicitAny: 種々の図形の共通の型を作るのは困難なため
-	[key in DiagramType]: React.FC<any>;
+	// biome-ignore lint/suspicious/noExplicitAny: さまざまな図形の共通の型を作成するのは困難なため
+	[key in DiagramType]: () => React.FC<any>;
 } = {
 	// Shapes
-	ConnectLine: ConnectLine,
-	ConnectPoint: DummyComponent,
-	Ellipse: Ellipse,
-	Group: Group,
-	Image: Image,
-	Path: Path,
-	PathPoint: PathPoint,
-	Rectangle: Rectangle,
-	Svg: Svg,
+	ConnectLine: () => ConnectLine,
+	ConnectPoint: () => DummyComponent,
+	Ellipse: () => Ellipse,
+	Group: () => Group,
+	Image: () => Image,
+	Path: () => Path,
+	PathPoint: () => PathPoint,
+	Rectangle: () => Rectangle,
+	Svg: () => Svg,
 	// Nodes
-	AgentNode: AgentNode,
-	HubNode: HubNode,
-	ImageGenNode: ImageGenNode,
-	SvgToDiagramNode: SvgToDiagramNode,
-	LLMNode: LLMNode,
-	TextAreaNode: TextAreaNode,
-	VectorStoreNode: VectorStoreNode,
-	WebSearchNode: WebSearchNode,
+	AgentNode: () => AgentNode,
+	HubNode: () => HubNode,
+	ImageGenNode: () => ImageGenNode,
+	SvgToDiagramNode: () => SvgToDiagramNode,
+	LLMNode: () => LLMNode,
+	TextAreaNode: () => TextAreaNode,
+	VectorStoreNode: () => VectorStoreNode,
+	WebSearchNode: () => WebSearchNode,
 };
 
 /**
- * ConnectPoint position calculator for each diagram type.
+ * Maps diagram types to their corresponding connect point calculation functions.
  */
 export const DiagramConnectPointCalculators: {
 	[key in DiagramType]: (diagram: Diagram) => ConnectPointMoveData[];
@@ -145,26 +145,26 @@ export const DiagramConnectPointCalculators: {
 	// Shapes
 	ConnectLine: () => [],
 	ConnectPoint: () => [],
-	Ellipse: calcEllipseConnectPointPosition,
+	Ellipse: (diagram) => calcEllipseConnectPointPosition(diagram),
 	Group: () => [],
 	Image: () => [],
 	Path: () => [],
 	PathPoint: () => [],
-	Rectangle: calcRectangleConnectPointPosition,
+	Rectangle: (diagram) => calcRectangleConnectPointPosition(diagram),
 	Svg: () => [],
 	// Nodes
-	AgentNode: calcRectangleConnectPointPosition,
-	HubNode: calcEllipseConnectPointPosition,
-	ImageGenNode: calcRectangleConnectPointPosition,
-	SvgToDiagramNode: calcRectangleConnectPointPosition,
-	LLMNode: calcRectangleConnectPointPosition,
-	TextAreaNode: calcRectangleConnectPointPosition,
-	VectorStoreNode: calcRectangleConnectPointPosition,
-	WebSearchNode: calcRectangleConnectPointPosition,
+	AgentNode: (diagram) => calcRectangleConnectPointPosition(diagram),
+	HubNode: (diagram) => calcEllipseConnectPointPosition(diagram),
+	ImageGenNode: (diagram) => calcRectangleConnectPointPosition(diagram),
+	SvgToDiagramNode: (diagram) => calcRectangleConnectPointPosition(diagram),
+	LLMNode: (diagram) => calcRectangleConnectPointPosition(diagram),
+	TextAreaNode: (diagram) => calcRectangleConnectPointPosition(diagram),
+	VectorStoreNode: (diagram) => calcRectangleConnectPointPosition(diagram),
+	WebSearchNode: (diagram) => calcRectangleConnectPointPosition(diagram),
 };
 
 /**
- * Mapping of diagram types to their corresponding data creation functions.
+ * Maps diagram types to their corresponding data creation functions.
  */
 export const DiagramCreateFunctions: {
 	[key in DiagramType]: (props: {
@@ -175,24 +175,27 @@ export const DiagramCreateFunctions: {
 	// Shapes
 	ConnectLine: () => undefined,
 	ConnectPoint: () => undefined,
-	Ellipse: createEllipseData,
+	Ellipse: (props) => createEllipseData(props),
 	Group: () => undefined,
-	Image: createImageData,
-	Path: createPathData,
+	Image: (props) => createImageData(props),
+	Path: (props) => createPathData(props),
 	PathPoint: () => undefined,
-	Rectangle: createRectangleData,
+	Rectangle: (props) => createRectangleData(props),
 	Svg: () => undefined,
 	// Nodes
-	AgentNode: createAgentNodeData,
-	HubNode: createHubNodeData,
-	ImageGenNode: createImageGenNodeData,
-	SvgToDiagramNode: createSvgToDiagramNodeData,
-	LLMNode: createLLMNodeData,
-	TextAreaNode: createTextAreaNodeData,
-	VectorStoreNode: createVectorStoreNodeData,
-	WebSearchNode: createWebSearchNodeData,
+	AgentNode: (props) => createAgentNodeData(props),
+	HubNode: (props) => createHubNodeData(props),
+	ImageGenNode: (props) => createImageGenNodeData(props),
+	SvgToDiagramNode: (props) => createSvgToDiagramNodeData(props),
+	LLMNode: (props) => createLLMNodeData(props),
+	TextAreaNode: (props) => createTextAreaNodeData(props),
+	VectorStoreNode: (props) => createVectorStoreNodeData(props),
+	WebSearchNode: (props) => createWebSearchNodeData(props),
 };
 
+/**
+ * Maps diagram types to their corresponding export functions.
+ */
 export const DiagramExportFunctions: {
 	[key in DiagramType]: ((diagram: Diagram) => Blob | undefined) | undefined;
 } = {

@@ -6,7 +6,7 @@ import type { Diagram } from "../types/DiagramCatalog";
 import type { TextEditorState } from "../components/core/Textable";
 
 // Import functions related to SvgCanvas.
-import { deepCopy } from "../utils/Util";
+import { deepCopy } from "../utils";
 import { calcOptimalCanvasSize } from "./SvgCanvasFunctions";
 
 // Imports related to this component.
@@ -21,7 +21,7 @@ import { useDiagramChange } from "./hooks/useDiagramChange";
 import { useDrag } from "./hooks/useDrag";
 import { useGroup } from "./hooks/useGroup";
 import { useNewDiagram } from "./hooks/useNewDiagram";
-import { useNewItem } from "./hooks/useNewItem";
+import { useNewItem } from "./observers/addNewItem";
 import { usePaste } from "./hooks/usePaste";
 import { useRedo } from "./hooks/useRedo";
 import { useSelect } from "./hooks/useSelect";
@@ -35,12 +35,13 @@ import { useUngroup } from "./hooks/useUngroup";
 import { useExecute } from "./hooks/useExecute";
 import { useExport } from "./hooks/useExport";
 import { useScroll } from "./hooks/useScroll";
-import { useConnectNodes } from "./hooks/useConnectNodes";
+import { useConnectNodes } from "./observers/connectNodes";
 
 /**
  * Props for the useSvgCanvas hook.
  */
 type SvgCanvasHooksProps = {
+	id: string;
 	minX: number;
 	minY: number;
 	width: number;
@@ -72,6 +73,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// The state of the canvas.
 	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
 		...initialBounds,
+		id: props.id,
 		items: props.items,
 		isDiagramChanging: false,
 		scrollLeft: props.scrollLeft,
@@ -79,6 +81,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		history: [
 			{
 				...initialBounds,
+				id: props.id,
 				items: deepCopy(props.items),
 			},
 		],
@@ -139,9 +142,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the stack order change event.
 	const onStackOrderChange = useStackOrderChange(canvasHooksProps);
 
-	// Handler for the new item event.
-	const onNewItem = useNewItem(canvasHooksProps);
-
 	// Handler for the new diagram event.
 	const onNewDiagram = useNewDiagram(canvasHooksProps);
 
@@ -154,14 +154,17 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the scroll event.
 	const onScroll = useScroll(canvasHooksProps);
 
-	// Handler for the connect nodes event.
-	const onConnectNodes = useConnectNodes(canvasHooksProps);
-
 	// Handler for the copy event.
 	const onCopy = useCopy(canvasHooksProps);
 
 	// Handler for the paste event.
 	const onPaste = usePaste(canvasHooksProps);
+
+	// Observer for the new item event.
+	useNewItem(canvasHooksProps);
+
+	// Observer for the connect nodes event.
+	useConnectNodes(canvasHooksProps);
 
 	const canvasProps = {
 		...canvasState,
@@ -180,12 +183,10 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onUndo,
 		onRedo,
 		onNewDiagram,
-		onNewItem,
 		onStackOrderChange,
 		onExecute,
 		onExport,
 		onScroll,
-		onConnectNodes,
 		onCopy,
 		onPaste,
 	};

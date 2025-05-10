@@ -6,14 +6,12 @@ import type { Diagram } from "../../../types/DiagramCatalog";
 import { DiagramComponentCatalog } from "../../../types/DiagramCatalog";
 import type { CreateDiagramProps } from "../../../types/DiagramTypes";
 import type {
-	ConnectNodesEvent,
 	DiagramChangeEvent,
 	DiagramConnectEvent,
 	DiagramDragEvent,
 	DiagramSelectEvent,
 	DiagramTextEditEvent,
 	DiagramTransformEvent,
-	NewItemEvent,
 } from "../../../types/EventTypes";
 
 // Import components related to SvgCanvas.
@@ -21,8 +19,8 @@ import { PositionLabel } from "../../core/PositionLabel";
 import { Transformative } from "../../core/Transformative";
 
 // Import functions related to SvgCanvas.
-import { degreesToRadians, rotatePoint } from "../../../utils/Math";
-import { isItemableData, isTransformativeData } from "../../../utils/TypeUtils";
+import { degreesToRadians, rotatePoint } from "../../../utils";
+import { isItemableData, isTransformativeData } from "../../../utils";
 
 // Imports related to this component.
 import { getSelectedChildDiagram } from "./GroupFunctions";
@@ -41,10 +39,7 @@ export type GroupProps = CreateDiagramProps<
 		textable: true;
 		executable: true;
 	}
-> & {
-	onNewItem?: (e: NewItemEvent) => void;
-	onConnectNodes?: (e: ConnectNodesEvent) => void;
-};
+>;
 
 /**
  * Group component.
@@ -71,9 +66,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	onDiagramChange,
 	onConnect,
 	onTextEdit,
-	onNewItem,
 	onExecute,
-	onConnectNodes,
 }) => {
 	// Flag indicating whether the entire group is being dragged.
 	// Set to true only when this group is selected and currently being dragged.
@@ -494,12 +487,10 @@ const GroupComponent: React.FC<GroupProps> = ({
 			onDiagramChange: handleChildDiagramChange,
 			onConnect: handleChildDiagramConnect,
 			onTextEdit: handleChildDiagramTextEdit,
-			onNewItem,
 			onExecute,
-			onConnectNodes,
 		};
 
-		return React.createElement(component, props);
+		return React.createElement(component(), props);
 	});
 
 	return (

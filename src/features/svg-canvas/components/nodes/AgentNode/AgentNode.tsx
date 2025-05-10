@@ -15,7 +15,9 @@ import { DEFAULT_RECTANGLE_DATA, Rectangle } from "../../shapes/Rectangle";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import functions related to SvgCanvas.
-import { newEventId } from "../../../utils/Util";
+import { dispatchNewItemEvent } from "../../../canvas/observers/addNewItem";
+import { dispatchConnectNodesEvent } from "../../../canvas/observers/connectNodes";
+import { newEventId } from "../../../utils";
 import { createImageGenNodeData } from "../ImageGenNode";
 import { createLLMNodeData } from "../LLMNode";
 import { createSvgToDiagramNodeData } from "../SvgToDiagramNode";
@@ -160,7 +162,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 									y: functionCallArguments.y,
 									text: functionCallArguments.instructions,
 								});
-								props.onNewItem?.({
+								dispatchNewItemEvent({
 									eventId,
 									item: llmNode,
 								});
@@ -182,7 +184,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 									x: functionCallArguments.x,
 									y: functionCallArguments.y,
 								});
-								props.onNewItem?.({
+								dispatchNewItemEvent({
 									eventId,
 									item: textNode,
 								});
@@ -203,7 +205,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 									x: functionCallArguments.x,
 									y: functionCallArguments.y,
 								});
-								props.onNewItem?.({
+								dispatchNewItemEvent({
 									eventId,
 									item: svgNode,
 								});
@@ -224,7 +226,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 									x: functionCallArguments.x,
 									y: functionCallArguments.y,
 								});
-								props.onNewItem?.({
+								dispatchNewItemEvent({
 									eventId,
 									item: node,
 								});
@@ -243,11 +245,12 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 							if (functionName === "connect_nodes") {
 								const sourceNodeId = functionCallArguments.sourceNodeId;
 								const targetNodeId = functionCallArguments.targetNodeId;
-								props.onConnectNodes({
+								dispatchConnectNodesEvent({
 									eventId,
 									sourceNodeId,
 									targetNodeId,
 								});
+
 								input.push(event.item);
 								input.push({
 									type: "function_call_output",

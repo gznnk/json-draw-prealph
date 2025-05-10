@@ -6,7 +6,6 @@ import type { TextEditorState } from "../components/core/Textable";
 import type { GroupData } from "../components/shapes/Group/GroupTypes";
 import type { Diagram } from "../types/DiagramCatalog";
 import type {
-	ConnectNodesEvent,
 	DiagramChangeEvent,
 	DiagramConnectEvent,
 	DiagramDragDropEvent,
@@ -17,7 +16,6 @@ import type {
 	DiagramTransformEvent,
 	ExecuteEvent,
 	NewDiagramEvent,
-	NewItemEvent,
 	StackOrderChangeEvent,
 	SvgCanvasResizeEvent,
 } from "../types/EventTypes";
@@ -26,6 +24,7 @@ import type {
  * Type for the data of the SvgCanvas.
  */
 export type SvgCanvasData = {
+	id: string;
 	minX: number;
 	minY: number;
 	width: number;
@@ -95,12 +94,10 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onRedo?: () => void;
 	onCanvasResize?: (e: SvgCanvasResizeEvent) => void;
 	onNewDiagram?: (e: NewDiagramEvent) => void;
-	onNewItem?: (e: NewItemEvent) => void;
 	onStackOrderChange?: (e: StackOrderChangeEvent) => void;
 	onExecute?: (e: ExecuteEvent) => void;
 	onExport?: () => void;
 	onScroll?: (e: React.UIEvent<HTMLDivElement, UIEvent>) => void;
-	onConnectNodes?: (e: ConnectNodesEvent) => void;
 	onCopy?: () => void;
 	onPaste?: () => void;
 };

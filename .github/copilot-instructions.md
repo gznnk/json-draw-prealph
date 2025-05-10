@@ -38,11 +38,26 @@ function generateUniqueId(): string {
 - Define components as arrow functions assigned to constants, then export them
 - Use React.memo for performance optimization where appropriate
 
+## React Component Folder Structure
+
+- Folder name should match the component name exactly
+- Use [ComponentName].tsx for the main component implementation file
+- Use [ComponentName]Styled.ts for emotion style definitions related to the component
+- Use [ComponentName]Constants.ts for constant definitions related to the component
+- Use [ComponentName]Types.ts for type definitions related to the component
+- Use [ComponentName]Functions.ts for utility functions related to the component
+- Re-export all items meant to be referenced from outside through index.tsx
+- When a component consists of multiple components, divide them into separate folders following the same naming rules for folder names and internal files
+
 ## TypeScript Guidelines
 
 - Use explicit typing instead of relying on inference when intent needs to be clear
 - Prefer interfaces for public APIs and type aliases for complex types
 - Use descriptive type names that explain the purpose
+- Avoid using default exports, prefer named exports for all modules
+  - This improves maintainability, refactoring, and static analysis
+  - Named exports make import statements consistent and self-documenting
+  - Named exports support better tree-shaking in the final bundle
 
 ## File Organization
 
@@ -63,6 +78,15 @@ function generateUniqueId(): string {
 - Prefer template literals over string concatenation when variables are involved
 - Sort import statements alphabetically
 - Avoid console statements in production code (except for proper logging utilities)
+
+## YAGNI (You Aren't Gonna Need It) Principle
+
+- Do not implement functionality solely on the speculation that it might be needed in the future
+- Write the minimum amount of code necessary to meet the current requirements
+- Avoid over-engineering with excessive generalization or abstraction
+- Do not create extension points or interfaces without concrete use cases
+- Embrace refactoring to accommodate changing requirements when they actually arise
+- Prioritize simple, readable, and maintainable code over speculative features
 
 ## Git Operations and Workflow
 

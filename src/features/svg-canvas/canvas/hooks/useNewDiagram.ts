@@ -2,33 +2,23 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import {
-	DiagramCreateFunctions,
-	type Diagram,
-	type DiagramType,
-} from "../../types/DiagramCatalog";
+import type { Diagram } from "../../types/DiagramCatalog";
+import type { DiagramType } from "../../types/DiagramCatalog";
 import type { NewDiagramEvent } from "../../types/EventTypes";
-
-// Import components related to SvgCanvas.
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { isSelectableData } from "../../utils/TypeUtils";
-
-// Import hooks related to SvgCanvas.
-import { useNewItem } from "./useNewItem";
+import { DiagramCreateFunctions } from "../../types/DiagramCatalog";
+import { isSelectableData } from "../../utils";
+import { dispatchNewItemEvent } from "../observers/addNewItem";
 
 /**
  * Custom hook to handle new diagram events on the canvas.
  */
 export const useNewDiagram = (props: CanvasHooksProps) => {
-	// Get the function to add items to the canvas.
-	const onNewItem = useNewItem(props);
-
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onNewItem,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -36,7 +26,6 @@ export const useNewDiagram = (props: CanvasHooksProps) => {
 	return useCallback((e: NewDiagramEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const {
-			onNewItem,
 			props: { canvasState },
 		} = refBus.current;
 
@@ -63,7 +52,7 @@ export const useNewDiagram = (props: CanvasHooksProps) => {
 		}
 
 		if (data) {
-			onNewItem({
+			dispatchNewItemEvent({
 				eventId: e.eventId,
 				item: data,
 			});
