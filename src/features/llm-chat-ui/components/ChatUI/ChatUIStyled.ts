@@ -1,15 +1,16 @@
 import styled from "@emotion/styled";
+import { ViewBackground } from "../../../../app/styled/common";
 
 /**
  * Container for the entire chat interface
  */
 export const ChatContainer = styled.div<{ width?: string; height?: string }>`
+  ${ViewBackground};
   display: flex;
   flex-direction: column;
   overflow: hidden;
   width: ${({ width }) => width || "600px"};
   height: ${({ height }) => height || "500px"};
-  background-color: #ffffff;
 `;
 
 /**
