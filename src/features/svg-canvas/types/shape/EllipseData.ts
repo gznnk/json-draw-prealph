@@ -1,4 +1,4 @@
-import type { CreateDiagramType } from "../DiagramTypes";
+import type { CreateDiagramType } from "./CreateDiagramType";
 
 /**
  * 楕円のデータ
