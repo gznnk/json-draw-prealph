@@ -1,4 +1,14 @@
 /**
+ * Defines the possible types of sheets that can be created in the application.
+ */
+export enum SheetType {
+	/** Standard canvas sheet for diagrams */
+	Canvas = "canvas",
+	/** Interactive sandbox sheet for HTML content */
+	Sandbox = "sandbox",
+}
+
+/**
  * Sheet information structure
  */
 export type SheetItem = {
@@ -6,6 +16,8 @@ export type SheetItem = {
 	id: string;
 	/** Display title for the sheet */
 	title: string;
+	/** Type of sheet (canvas or sandbox) */
+	type?: SheetType;
 };
 
 /**
