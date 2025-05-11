@@ -2,7 +2,7 @@
 import styled from "@emotion/styled";
 
 // Import types related to SvgCanvas.
-import type { TextAlign, VerticalAlign } from "../../../../types/DiagramTypes";
+import type { TextAlign, VerticalAlign } from "../../../../types/base";
 
 // Imports related to this component.
 import { TextAlignMap, VerticalAlignMap } from "./TextableConstants";

@@ -8,7 +8,8 @@ import type {
 	SelectableData,
 	TransformativeData,
 } from "../types/core";
-import type { TextableData, ConnectableData } from "../types/DiagramTypes";
+import type { ConnectableData } from "../types/DiagramTypes";
+import type { TextableData } from "../types/core";
 
 /**
  * Default diagram base data.

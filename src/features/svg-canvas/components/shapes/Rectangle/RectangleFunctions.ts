@@ -1,11 +1,11 @@
 // Import types related to SvgCanvas.
-import type { RectangleVertices } from "../../../types/base";
-import type { Diagram } from "../../../types/DiagramCatalog";
 import type {
+	RectangleVertices,
 	TextAlign,
 	TextableType,
 	VerticalAlign,
-} from "../../../types/DiagramTypes";
+} from "../../../types/base";
+import type { Diagram } from "../../../types/DiagramCatalog";
 import type { Shape } from "../../../types";
 import type { ConnectPointMoveData } from "../../../types/EventTypes";
 

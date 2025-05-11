@@ -14,44 +14,20 @@ import type {
 	FileDropEvent,
 } from "./EventTypes";
 import type { DiagramBaseData } from "./base";
-import type { FillableData, StrokableData } from "./core";
-import type { ItemableData, SelectableData, TransformativeData } from "./core";
+import type {
+	FillableData,
+	ItemableData,
+	SelectableData,
+	StrokableData,
+	TextableData,
+	TransformativeData,
+} from "./core";
 
 /**
  * 接続可能な図形のデータ
  */
 export type ConnectableData = {
 	connectPoints: ConnectPointData[];
-};
-
-/**
- * Type of textable component.
- */
-export type TextableType = "text" | "textarea" | "markdown";
-
-/**
- * テキストの水平位置揃え
- */
-export type TextAlign = "left" | "center" | "right";
-
-/**
- * テキストの垂直位置揃え
- */
-export type VerticalAlign = "top" | "center" | "bottom";
-
-/**
- * テキストを持つ図形のデータ
- */
-export type TextableData = {
-	text: string;
-	textType: TextableType;
-	textAlign: TextAlign;
-	verticalAlign: VerticalAlign;
-	fontColor: string;
-	fontSize: number;
-	fontFamily: string;
-	fontWeight: string;
-	isTextEditing: boolean; // 永続化されないプロパティ TODO: 永続化されるプロパティと分ける
 };
 
 /**

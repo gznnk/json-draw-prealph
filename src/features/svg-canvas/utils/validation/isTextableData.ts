@@ -1,4 +1,4 @@
-import type { TextableData } from "../../types/DiagramTypes";
+import type { TextableData } from "../../types/core";
 
 /**
  * Check if an object is TextableData.

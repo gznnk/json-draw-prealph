@@ -7,3 +7,6 @@ export type { Frame } from "./Frame";
 export type { Box } from "./Box";
 export type { RectangleVertices } from "./RectangleVertices";
 export type { EllipseVertices } from "./EllipseVertices";
+export type { TextableType } from "./TextableType";
+export type { TextAlign } from "./TextAlign";
+export type { VerticalAlign } from "./VerticalAlign";

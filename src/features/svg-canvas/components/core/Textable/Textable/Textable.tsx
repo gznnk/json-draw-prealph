@@ -6,7 +6,7 @@ import { memo, useEffect, useRef } from "react";
 import { renderMarkdown } from "../../../../../markdown";
 
 // Import types related to SvgCanvas.
-import type { TextableData } from "../../../../types/DiagramTypes";
+import type { TextableData } from "../../../../types/core";
 
 // Imports related to this component.
 import { Text, TextWrapper } from "./TextableStyled";

@@ -8,7 +8,7 @@ import { getSelectedItems } from "../../../../canvas/SvgCanvasFunctions";
 import type { SvgCanvasProps } from "../../../../canvas/SvgCanvasTypes";
 import type { Diagram } from "../../../../types/DiagramCatalog";
 import type { FillableData, StrokableData } from "../../../../types/core";
-import type { TextableData } from "../../../../types/DiagramTypes";
+import type { TextableData } from "../../../../types/core";
 import type { RectangleData } from "../../../shapes/Rectangle";
 
 // Import functions related to SvgCanvas.

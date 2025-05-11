@@ -3,7 +3,7 @@ import type {
 	TextableType,
 	TextAlign,
 	VerticalAlign,
-} from "../../../../types/DiagramTypes";
+} from "../../../../types/base";
 import type { DiagramTextChangeEvent } from "../../../../types/EventTypes";
 
 /**
