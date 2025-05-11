@@ -4,7 +4,7 @@ import { newId } from "../../../utils/diagram";
 
 // Imports related to this component.
 import { DEFAULT_IMAGE_DATA } from "./ImageConstants";
-import type { ImageData } from "../../../types/shapes";
+import type { ImageData } from "../../../types/data";
 
 export const createImageData = ({
 	x,

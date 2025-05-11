@@ -1,6 +1,6 @@
 // Import types related to SvgCanvas.
 import type { CreateDiagramProps } from "../../../types/DiagramTypes";
-import type { RectangleData } from "../../../types/shapes";
+import type { RectangleData } from "../../../types/data";
 
 /**
  * 四角形コンポーネントのプロパティ

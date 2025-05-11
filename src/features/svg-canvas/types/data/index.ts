@@ -4,9 +4,9 @@ export type { ConnectableData } from "./ConnectableData";
 export type { ConnectLineData } from "./ConnectLineData";
 export type { ConnectPointData } from "./ConnectPointData";
 export type {
-	CreateDiagramType,
+	CreateDataType,
 	DiagramDataOptions,
-} from "./CreateDiagramType";
+} from "./CreateDataType";
 export type { EllipseData } from "./EllipseData";
 export type { GroupData } from "./GroupData";
 export type { ImageData } from "./ImageData";

@@ -1,11 +1,11 @@
 // Import types related to SvgCanvas.
 import type { CreateDiagramProps } from "../../../types/DiagramTypes";
-import type { CreateDiagramType } from "../../../types/shapes";
+import type { CreateDataType } from "../../../types/data";
 
 /**
  * Type of the SvgToDiagramNode data.
  */
-export type SvgToDiagramNodeData = CreateDiagramType<{
+export type SvgToDiagramNodeData = CreateDataType<{
 	selectable: true;
 	transformative: true;
 	connectable: true;

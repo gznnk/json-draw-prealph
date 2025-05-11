@@ -8,7 +8,7 @@ import type { ConnectPointMoveData, EventType } from "../types/events";
 
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../components/shapes/ConnectLine";
-import type { ConnectPointData } from "../types/shapes";
+import type { ConnectPointData } from "../types/data";
 import { calcBoundsOfGroup } from "../components/shapes/Group";
 
 // Import functions related to SvgCanvas.
@@ -21,7 +21,7 @@ import {
 import { deepCopy, newEventId } from "../utils";
 
 // Imports related to this component.
-import type { ConnectableData } from "../types/shapes";
+import type { ConnectableData } from "../types/data";
 import { degreesToRadians, rotatePoint } from "../utils";
 import { CANVAS_EXPANSION_SIZE, MAX_HISTORY_SIZE } from "./SvgCanvasConstants";
 import type { SvgCanvasHistory, SvgCanvasState } from "./SvgCanvasTypes";

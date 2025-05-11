@@ -1,4 +1,4 @@
-import type { ImageData } from "../../../types/shapes";
+import type { ImageData } from "../../../types/data";
 
 import {
 	DEFAULT_DIAGRAM_BASE_DATA,

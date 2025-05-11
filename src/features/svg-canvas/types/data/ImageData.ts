@@ -1,9 +1,9 @@
-import type { CreateDiagramType } from "./CreateDiagramType";
+import type { CreateDataType } from "./CreateDataType";
 
 /**
  * Type for the data of the Image component.
  */
-export type ImageData = CreateDiagramType<{
+export type ImageData = CreateDataType<{
 	selectable: true;
 	transformative: true;
 }> & {

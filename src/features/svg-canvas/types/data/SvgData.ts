@@ -1,9 +1,9 @@
-import type { CreateDiagramType } from "./CreateDiagramType";
+import type { CreateDataType } from "./CreateDataType";
 
 /**
  * Type for the data of the Svg component.
  */
-export type SvgData = CreateDiagramType<{
+export type SvgData = CreateDataType<{
 	selectable: true;
 	transformative: true;
 }> & {

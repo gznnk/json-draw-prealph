@@ -1,4 +1,4 @@
-import type { ConnectLineData } from "../../../../types/shapes";
+import type { ConnectLineData } from "../../../../types/data";
 
 export type FlashConnectLineEvent = {
 	eventId: string;

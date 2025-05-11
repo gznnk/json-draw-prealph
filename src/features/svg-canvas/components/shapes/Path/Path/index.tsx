@@ -6,4 +6,4 @@ export {
 	createPathData,
 	createStartPointArrowHead,
 } from "./PathFunctions";
-export type { PathData } from "../../../../types/shapes";
+export type { PathData } from "../../../../types/data";

@@ -31,7 +31,7 @@ import {
 	createEndPointArrowHead,
 	createStartPointArrowHead,
 } from "./PathFunctions";
-import type { PathData } from "../../../../types/shapes";
+import type { PathData } from "../../../../types/data";
 
 /**
  * 折れ線コンポーネントのプロパティ

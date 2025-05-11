@@ -1,10 +1,10 @@
 import type { ArrowHeadType } from "../base";
-import type { CreateDiagramType } from "./CreateDiagramType";
+import type { CreateDataType } from "./CreateDataType";
 
 /**
  * 接続線のデータ
  */
-export type ConnectLineData = CreateDiagramType<{
+export type ConnectLineData = CreateDataType<{
 	selectable: true;
 	transformative: true;
 	itemable: true;

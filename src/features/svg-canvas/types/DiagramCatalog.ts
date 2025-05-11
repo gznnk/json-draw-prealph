@@ -10,7 +10,7 @@ import type {
 	PathPointData,
 	RectangleData,
 	SvgData,
-} from "./shapes";
+} from "./data";
 
 // Import components related to SvgCanvas.
 import { AgentNode, createAgentNodeData } from "../components/nodes/AgentNode";

@@ -25,7 +25,7 @@ export type DiagramDataOptions = {
 /**
  * 図形のデータ型を作成する型
  */
-export type CreateDiagramType<T extends DiagramDataOptions> = DiagramBaseData &
+export type CreateDataType<T extends DiagramDataOptions> = DiagramBaseData &
 	(T["selectable"] extends true ? SelectableData : object) &
 	(T["transformative"] extends true ? TransformativeData : object) &
 	(T["itemable"] extends true ? ItemableData : object) &

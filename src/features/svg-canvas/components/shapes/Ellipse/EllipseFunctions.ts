@@ -10,7 +10,7 @@ import type { Shape } from "../../../types";
 import type { ConnectPointMoveData } from "../../../types/events";
 
 // Import components related to SvgCanvas.
-import type { ConnectPointData } from "../../../types/shapes";
+import type { ConnectPointData } from "../../../types/data";
 
 // Import functions related to SvgCanvas.
 import { newId } from "../../../utils/diagram";
@@ -19,7 +19,7 @@ import { isConnectableData } from "../../../utils";
 
 // Imports related to this component.
 import { DEFAULT_ELLIPSE_DATA } from "./EllipseConstants";
-import type { EllipseData } from "../../../types/shapes";
+import type { EllipseData } from "../../../types/data";
 
 /**
  * Calculate the position of the connection points of the ellipse.
