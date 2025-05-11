@@ -52,11 +52,7 @@ import {
 	Image,
 	imageToBlob,
 } from "../components/shapes/Image";
-import {
-	createPathData,
-	Path,
-	PathPoint,
-} from "../components/shapes/Path";
+import { createPathData, Path, PathPoint } from "../components/shapes/Path";
 import {
 	calcRectangleConnectPointPosition,
 	createRectangleData,

@@ -1,7 +1,5 @@
 // Import types related to SvgCanvas.
-import type {
-	CreateDiagramProps,
-} from "../../../types/DiagramTypes";
+import type { CreateDiagramProps } from "../../../types/DiagramTypes";
 import type { ImageData } from "../../../types/shape";
 
 // Re-export from central type definitions
