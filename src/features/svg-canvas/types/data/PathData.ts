@@ -1,5 +1,5 @@
 import type { CreateDataType } from "./CreateDataType";
-import type { ArrowHeadType, DiagramBaseData } from "../base";
+import type { ArrowHeadType } from "../base";
 
 /**
  * 折れ線のデータ
@@ -12,11 +12,4 @@ export type PathData = CreateDataType<{
 }> & {
 	startArrowHead?: ArrowHeadType;
 	endArrowHead?: ArrowHeadType;
-};
-
-/**
- * 折れ線の頂点のデータ
- */
-export type PathPointData = DiagramBaseData & {
-	hidden: boolean;
 };
