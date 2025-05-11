@@ -4,6 +4,7 @@ import type { Message } from "../types";
 // TODO: 直接インポートするのではなく、Propsで渡すようにする
 import { workflowAgent } from "../../svg-canvas/tools/workflow_agent";
 import { newSheet } from "../../../app/tools/new_sheet";
+import { createSandbox } from "../../../app/tools/sandbox";
 
 /**
  * Service for handling communication with OpenAI's API.
@@ -49,10 +50,14 @@ export class OpenAIService {
 				const stream = await this.client.responses.create({
 					model: "gpt-4o",
 					instructions:
-						"You are a general-purpose assistant that outputs responses in Markdown format. When including LaTeX expressions, do not use code blocks (e.g., triple backticks or indentation). Instead, use inline LaTeX syntax like $...$ for inline math and $$...$$ for block math. When creating workflows, always create a new sheet first before creating the workflow itself.",
+						"You are a general-purpose assistant that outputs responses in Markdown format. When including LaTeX expressions, do not use code blocks (e.g., triple backticks or indentation). Instead, use inline LaTeX syntax like $...$ for inline math and $$...$$ for block math. When creating workflows, always create a new sheet first before creating the workflow itself. For HTML content or interactive applications (like calculators, games, demos), use the create_sandbox tool instead of workflow_agent. The create_sandbox tool lets you generate a complete HTML document with proper DOCTYPE, html, head, and body tags, including CSS and JavaScript all in one file. When user mentions 'アプリ', 'ゲーム', 'デモ', 'HTML', 'インタラクティブ', or any interactive content that would benefit from HTML rendering, prioritize using create_sandbox over workflow_agent.",
 					input: input,
 					stream: true,
-					tools: [workflowAgent.definition, newSheet.definition],
+					tools: [
+						workflowAgent.definition,
+						newSheet.definition,
+						createSandbox.definition,
+					],
 				});
 
 				for await (const chunk of stream) {
@@ -86,6 +91,19 @@ export class OpenAIService {
 						if (chunk.item.name === "new_sheet") {
 							const functionCallArguments = JSON.parse(chunk.item.arguments);
 							const result = newSheet.handler(functionCallArguments);
+							if (result) {
+								foundFunctionCall = true;
+								input.push(chunk.item);
+								input.push({
+									type: "function_call_output",
+									call_id: chunk.item.call_id,
+									output: JSON.stringify(result),
+								});
+							}
+						}
+						if (chunk.item.name === "create_sandbox") {
+							const functionCallArguments = JSON.parse(chunk.item.arguments);
+							const result = createSandbox.handler(functionCallArguments);
 							if (result) {
 								foundFunctionCall = true;
 								input.push(chunk.item);

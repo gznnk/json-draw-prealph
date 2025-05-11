@@ -11,6 +11,7 @@ import {
 	type SheetContentItem,
 } from "./components/Sheets";
 import { CanvasSheet } from "./components/CanvasSheet";
+import { SandboxSheet } from "./components/SandboxSheet";
 
 // Import utils.
 import { Profiler } from "../utils/Profiler";
@@ -33,14 +34,17 @@ const ADD_NEW_SHEET_EVENT_NAME = "add_new_sheet";
 export const dispatchAddNewSheetEvent = ({
 	id,
 	sheetName,
+	sheetType = "canvas", // Default to canvas if not specified
 }: {
 	id: string;
 	sheetName: string;
+	sheetType?: string;
 }) => {
 	const event = new CustomEvent(ADD_NEW_SHEET_EVENT_NAME, {
 		detail: {
 			id,
 			sheetName,
+			sheetType,
 		},
 	});
 	window.dispatchEvent(event);
@@ -59,7 +63,6 @@ function App() {
 
 	// タブ情報の管理
 	const [tabs, setTabs] = useState<SheetItem[]>(sheetItems);
-
 	/**
 	 * Generate content items for the sheets component.
 	 * This creates a new component instance for each tab to ensure proper state isolation.
@@ -67,10 +70,21 @@ function App() {
 	 */
 	const contentItems: SheetContentItem[] = useMemo(
 		() =>
-			tabs.map((tab) => ({
-				id: tab.id,
-				content: <CanvasSheet key={tab.id} id={tab.id} />,
-			})),
+			tabs.map((tab) => {
+				// Determine which component to render based on sheet type
+				if (tab.type === "sandbox") {
+					return {
+						id: tab.id,
+						content: <SandboxSheet key={tab.id} id={tab.id} />,
+					};
+				}
+
+				// Default to CanvasSheet if type is not specified or is "canvas"
+				return {
+					id: tab.id,
+					content: <CanvasSheet key={tab.id} id={tab.id} />,
+				};
+			}),
 		[tabs],
 	);
 
@@ -101,13 +115,13 @@ function App() {
 			model: "gpt-4",
 		},
 	};
-
 	useEffect(() => {
 		const handleAddNewSheetEvent = (e: Event) => {
-			const { id, sheetName } = (e as CustomEvent).detail;
+			const { id, sheetName, sheetType } = (e as CustomEvent).detail;
 			const newTab: SheetItem = {
 				id,
 				title: sheetName,
+				type: sheetType,
 			};
 			setTabs((prevTabs) => [...prevTabs, newTab]);
 			setActiveTabId(id); // 新しいタブを自動的に選択
