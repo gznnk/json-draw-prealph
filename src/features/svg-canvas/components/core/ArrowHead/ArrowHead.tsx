@@ -7,7 +7,7 @@ import { createSvgTransform } from "../../../utils/diagram";
 
 // Imports related to this component.
 import { ARROW_HEAD_SIZE } from "./ArrowHeadConstants";
-import type { ArrowHeadType } from "./ArrowHeadTypes";
+import type { ArrowHeadType } from "../../../types/base";
 
 /**
  * Props for ArrowHead component.

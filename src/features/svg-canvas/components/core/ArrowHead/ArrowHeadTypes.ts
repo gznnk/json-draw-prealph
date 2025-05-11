@@ -1,4 +1,4 @@
 /**
- * Shape of ArrowHead.
+ * Re-export ArrowHeadType from base types
  */
-export type ArrowHeadType = "Triangle" | "ConcaveTriangle" | "Circle" | "None";
+export type { ArrowHeadType } from "../../../types/base";

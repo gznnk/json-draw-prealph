@@ -1,4 +1,4 @@
-import type { ArrowHeadType } from "../../components/core/ArrowHead";
+import type { ArrowHeadType } from "../base";
 import type { CreateDiagramType } from "../DiagramTypes";
 
 /**

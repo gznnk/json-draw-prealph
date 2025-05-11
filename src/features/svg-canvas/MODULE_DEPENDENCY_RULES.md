@@ -11,14 +11,14 @@ but such imports must follow the dependency graph defined below.
 ```mermaid
 graph TD
     core --> base
-    diagram --> base
-    diagram --> core
+    shape --> base
+    shape --> core
     events --> base
     events --> core
-    events --> diagram
+    events --> shape
 ```
 
 - `base`: Fundamental types with no dependencies on other types.
 - `core`: Core types that optionally depend only on `base` types.
-- `diagram`: Diagram-specific types that may depend on base and core types.
+- `shape`: Types representing diagram shapes, which may depend on `base` and `core` types.
 - `events`: Event-related types that may depend on all of the above.

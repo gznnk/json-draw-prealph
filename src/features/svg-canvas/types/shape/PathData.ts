@@ -1,6 +1,5 @@
 import type { CreateDiagramType } from "../DiagramTypes";
-import type { DiagramBaseData } from "../base";
-import type { ArrowHeadType } from "../../components/core/ArrowHead";
+import type { ArrowHeadType, DiagramBaseData } from "../base";
 
 /**
  * 折れ線のデータ

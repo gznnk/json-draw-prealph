@@ -10,3 +10,4 @@ export type { EllipseVertices } from "./EllipseVertices";
 export type { TextableType } from "./TextableType";
 export type { TextAlign } from "./TextAlign";
 export type { VerticalAlign } from "./VerticalAlign";
+export type { ArrowHeadType } from "./ArrowHeadType";
