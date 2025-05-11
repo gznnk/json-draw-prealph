@@ -1,3 +1,4 @@
+// filepath: c:\Users\maver\Project\react-vite-project-2\src\app\tools\sandbox\definition.ts
 // Import libraries.
 import type { OpenAI } from "openai";
 
@@ -16,14 +17,45 @@ USE CASES (Always use this tool for):
 - Form-based applications
 - Any app that requires client-side logic
 
-IMPORTANT USAGE NOTES:
-- The HTML must be provided as a complete, valid document with proper DOCTYPE, html, head, and body tags
-- All CSS should be included within <style> tags in the head section
-- All JavaScript should be included within <script> tags
-- External resources are not allowed due to sandbox restrictions
-- The content will be displayed exactly as provided, so ensure it's properly formatted
+MANDATORY IMPLEMENTATION REQUIREMENTS:
+- NEVER reference external resources - DO NOT include URLs to external scripts, stylesheets, or images
+- NEVER suggest users to "click links" or "download resources" - everything must work in the sandbox itself
+- NEVER rely on CDNs or externally hosted libraries - all code must be inline
+- NEVER use import statements that reference external modules
+- ALWAYS implement complete working solutions directly within the sandbox HTML document
 
-EXAMPLE: When asked to "create a calculator", use this tool instead of workflow_agent
+TECHNICAL SPECIFICATIONS:
+- The HTML must be provided as a complete, valid document with proper DOCTYPE, html, head, and body tags
+- All CSS must be included within <style> tags in the head section
+- All JavaScript must be included within <script> tags in the document
+- All images must be created inline using data URLs, SVG, or canvas drawing operations
+- All game assets, sprites, and resources must be generated programmatically or stored as data URLs
+- Games like Tetris must use canvas or DOM elements for rendering with standard event listeners for controls
+- For graphics-intensive applications, use the HTML5 Canvas API within the sandbox
+- Audio can be generated using the Web Audio API, but NOT with external audio files
+
+SANDBOX LIMITATIONS:
+- The sandbox has strict security limitations; it blocks:
+  * fetch API and XMLHttpRequest for external resources
+  * loading external scripts, stylesheets, or images
+  * access to certain browser APIs that require permissions
+- For complex applications, focus on creating fully self-contained implementations that work within these constraints
+
+IMPLEMENTATION VERIFICATION:
+- The HTML content you generate WILL BE USED AS IS - no further modifications will happen after generation
+- Verify your code to ensure:
+  * No external resource URLs are included anywhere in the document
+  * All functionality works entirely within the sandbox
+  * All assets are generated inline or included as data URLs
+  * The implementation is complete and self-contained
+
+EXAMPLE APPROACH:
+When asked to "create a Tetris game", implement a complete, self-contained solution where:
+1. The game board is rendered using canvas or DOM elements
+2. Game pieces are drawn using CSS or canvas drawing operations
+3. All game logic is implemented in vanilla JavaScript
+4. Game state is managed within the document
+5. NO external resources are referenced
 `;
 
 /**
@@ -43,7 +75,7 @@ export const definition = {
 			html_content: {
 				type: "string",
 				description:
-					"Complete HTML document to display in the sandbox (including DOCTYPE, html, head, body tags).",
+					"Complete, fully self-contained HTML document to display in the sandbox (including DOCTYPE, html, head, body tags). All resources, scripts, styles, and assets must be included inline. External resources will not work. The implementation must work entirely within the sandbox with no external dependencies.",
 			},
 		},
 		additionalProperties: false,
