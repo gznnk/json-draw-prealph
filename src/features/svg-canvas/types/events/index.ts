@@ -1,42 +1,34 @@
 export type { EventType } from "./EventBaseTypes";
 
-export type {
-	DiagramPointerEvent,
-	DiagramDragEvent,
-	DiagramDragDropEvent,
-	FileDropEvent,
-	DiagramClickEvent,
-	DiagramHoverEvent,
-	DiagramSelectEvent,
-	DiagramTransformEvent,
-	DiagramChangeData,
-	DiagramChangeEventType,
-	DiagramChangeEvent,
-	DiagramTextEditEvent,
-	DiagramTextChangeEvent,
-	StackOrderChangeType,
-	StackOrderChangeEvent,
-	NewDiagramEvent,
-	NewItemEvent,
-} from "./DiagramInteractionEvents";
+export type { DiagramPointerEvent } from "./DiagramPointerEvent";
+export type { DiagramDragEvent } from "./DiagramDragEvent";
+export type { DiagramDragDropEvent } from "./DiagramDragDropEvent";
+export type { FileDropEvent } from "./FileDropEvent";
+export type { DiagramClickEvent } from "./DiagramClickEvent";
+export type { DiagramHoverEvent } from "./DiagramHoverEvent";
+export type { DiagramSelectEvent } from "./DiagramSelectEvent";
+export type { DiagramTransformEvent } from "./DiagramTransformEvent";
+export type { DiagramChangeData } from "./DiagramChangeData";
+export type { DiagramChangeEventType } from "./DiagramChangeEventType";
+export type { DiagramChangeEvent } from "./DiagramChangeEvent";
+export type { DiagramTextEditEvent } from "./DiagramTextEditEvent";
+export type { DiagramTextChangeEvent } from "./DiagramTextChangeEvent";
+export type { StackOrderChangeType } from "./StackOrderChangeType";
+export type { StackOrderChangeEvent } from "./StackOrderChangeEvent";
+export type { NewDiagramEvent } from "./NewDiagramEvent";
+export type { NewItemEvent } from "./NewItemEvent";
 
-export type {
-	DiagramConnectEvent,
-	ConnectPointMoveData,
-	ConnectPointsMoveEvent,
-	ConnectNodesEvent,
-} from "./ConnectionEvents";
+export type { DiagramConnectEvent } from "./DiagramConnectEvent";
+export type { ConnectPointMoveData } from "./ConnectPointMoveData";
+export type { ConnectPointsMoveEvent } from "./ConnectPointsMoveEvent";
+export type { ConnectNodesEvent } from "./ConnectNodesEvent";
 
-export type {
-	SvgCanvasScrollEvent,
-	SvgCanvasResizeEvent,
-} from "./CanvasEvents";
+export type { SvgCanvasScrollEvent } from "./SvgCanvasScrollEvent";
+export type { SvgCanvasResizeEvent } from "./SvgCanvasResizeEvent";
 
-export type {
-	ExecuteResult,
-	ExecuteEvent,
-	ExecutionPropagationEvent,
-} from "./ExecutionEvents";
+export type { ExecuteResult } from "./ExecuteResult";
+export type { ExecuteEvent } from "./ExecuteEvent";
+export type { ExecutionPropagationEvent } from "./ExecutionPropagationEvent";
 
 export {
 	SVG_CANVAS_SCROLL_EVENT_NAME,
