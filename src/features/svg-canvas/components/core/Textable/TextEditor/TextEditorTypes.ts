@@ -4,7 +4,7 @@ import type {
 	TextAlign,
 	VerticalAlign,
 } from "../../../../types/base";
-import type { DiagramTextChangeEvent } from "../../../../types/EventTypes";
+import type { DiagramTextChangeEvent } from "../../../../types/events";
 
 /**
  * Type for the state of the TextEditor.

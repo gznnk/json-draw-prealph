@@ -7,7 +7,7 @@ import {
 	EXECUTION_PROPAGATION_EVENT_NAME,
 	type ExecuteEvent,
 	type ExecutionPropagationEvent,
-} from "../../types/EventTypes";
+} from "../../types/events";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.

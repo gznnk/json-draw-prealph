@@ -14,7 +14,7 @@ import { DEFAULT_RECTANGLE_DATA, Rectangle } from "../../shapes/Rectangle";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import types related to SvgCanvas.
-import type { FileDropEvent } from "../../../types/EventTypes";
+import type { FileDropEvent } from "../../../types/events";
 
 // Import functions related to SvgCanvas.
 import { newEventId } from "../../../utils";

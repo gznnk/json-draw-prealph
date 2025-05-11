@@ -11,7 +11,7 @@ import type {
 	DiagramClickEvent,
 	DiagramDragEvent,
 	DiagramPointerEvent,
-} from "../../../../types/EventTypes";
+} from "../../../../types/events";
 
 // Import functions related to SvgCanvas.
 import { getCursorFromAngle } from "../../../../utils/diagram";

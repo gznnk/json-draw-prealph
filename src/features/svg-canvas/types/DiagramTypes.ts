@@ -11,7 +11,7 @@ import type {
 	DiagramTransformEvent,
 	ExecuteEvent,
 	FileDropEvent,
-} from "./EventTypes";
+} from "./events";
 
 /**
  * 図形の基本プロパティ

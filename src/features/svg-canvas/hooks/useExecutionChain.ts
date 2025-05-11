@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import {
 	EXECUTION_PROPAGATION_EVENT_NAME,
 	type ExecutionPropagationEvent,
-} from "../types/EventTypes";
+} from "../types/events";
 
 type ExecutionChainProps = {
 	id: string;

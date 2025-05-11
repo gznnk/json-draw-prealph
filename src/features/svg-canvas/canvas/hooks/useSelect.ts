@@ -3,7 +3,7 @@ import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
 import type { GroupData } from "../../components/shapes/Group";
-import type { DiagramSelectEvent } from "../../types/EventTypes";
+import type { DiagramSelectEvent } from "../../types/events";
 
 // Import components related to SvgCanvas.
 import { calcGroupBoxOfNoRotation } from "../../components/shapes/Group";

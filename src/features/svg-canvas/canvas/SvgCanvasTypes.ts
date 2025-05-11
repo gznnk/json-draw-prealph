@@ -18,7 +18,7 @@ import type {
 	NewDiagramEvent,
 	StackOrderChangeEvent,
 	SvgCanvasResizeEvent,
-} from "../types/EventTypes";
+} from "../types/events";
 
 /**
  * Type for the data of the SvgCanvas.

@@ -1,5 +1,5 @@
 // Import types related to SvgCanvas.
-import type { ConnectPointMoveData } from "./EventTypes";
+import type { ConnectPointMoveData } from "./events";
 import type {
 	ConnectLineData,
 	ConnectPointData,

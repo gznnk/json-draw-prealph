@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type { NewItemEvent } from "../../../types/EventTypes";
+import type { NewItemEvent } from "../../../types/events";
 import type { CanvasHooksProps, SvgCanvasState } from "../../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.

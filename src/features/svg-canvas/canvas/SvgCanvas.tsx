@@ -11,7 +11,7 @@ import React, {
 
 // SvgCanvas関連型定義をインポート
 import { type Diagram, DiagramComponentCatalog } from "../types/DiagramCatalog";
-import type { DiagramSelectEvent } from "../types/EventTypes";
+import type { DiagramSelectEvent } from "../types/events";
 
 // SvgCanvas関連コンポーネントをインポート
 import { TextEditor } from "../components/core/Textable";

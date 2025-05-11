@@ -5,7 +5,7 @@ import { memo, useCallback, useRef, useState } from "react";
 // Import hooks related to SvgCanvas.
 import type { DragProps } from "../../../hooks/useDrag";
 import { useDrag } from "../../../hooks/useDrag";
-import type { DiagramDragEvent } from "../../../types/EventTypes";
+import type { DiagramDragEvent } from "../../../types/events";
 
 // Import components related to SvgCanvas.
 import { RotateRight } from "../../icons/RotateRight";

@@ -8,7 +8,7 @@ import type {
 	DiagramHoverEvent,
 	DiagramPointerEvent,
 	DiagramTransformEvent,
-} from "../../../types/EventTypes";
+} from "../../../types/events";
 
 // Import components related to SvgCanvas.
 import { PositionLabel } from "../../core/PositionLabel";

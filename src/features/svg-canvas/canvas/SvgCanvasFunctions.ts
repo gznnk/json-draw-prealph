@@ -4,7 +4,7 @@ import {
 	DiagramConnectPointCalculators,
 	type Diagram,
 } from "../types/DiagramCatalog";
-import type { ConnectPointMoveData, EventType } from "../types/EventTypes";
+import type { ConnectPointMoveData, EventType } from "../types/events";
 
 // Import components related to SvgCanvas.
 import { notifyConnectPointsMove } from "../components/shapes/ConnectLine";

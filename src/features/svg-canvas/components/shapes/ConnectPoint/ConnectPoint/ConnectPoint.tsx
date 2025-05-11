@@ -11,7 +11,7 @@ import type {
 	DiagramDragDropEvent,
 	DiagramDragEvent,
 	DiagramHoverEvent,
-} from "../../../../types/EventTypes";
+} from "../../../../types/events";
 
 // SvgCanvas関連コンポーネントをインポート
 import { DragPoint } from "../../../core/DragPoint";

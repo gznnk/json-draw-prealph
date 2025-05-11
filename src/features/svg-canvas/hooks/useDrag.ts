@@ -13,7 +13,7 @@ import {
 	type DiagramHoverEvent,
 	type DiagramPointerEvent,
 	type EventType,
-} from "../types/EventTypes";
+} from "../types/events";
 
 // SvgCanvas関連関数をインポート
 import { newEventId } from "../utils";

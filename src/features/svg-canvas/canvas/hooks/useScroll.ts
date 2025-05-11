@@ -5,7 +5,7 @@ import { useCallback, useRef } from "react";
 import {
 	SVG_CANVAS_SCROLL_EVENT_NAME,
 	type SvgCanvasScrollEvent,
-} from "../../types/EventTypes";
+} from "../../types/events";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 /**

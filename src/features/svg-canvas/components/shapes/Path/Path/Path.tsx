@@ -14,7 +14,7 @@ import type {
 	DiagramClickEvent,
 	DiagramDragEvent,
 	DiagramPointerEvent,
-} from "../../../../types/EventTypes";
+} from "../../../../types/events";
 
 // Import SvgCanvas related hooks.
 import { useDrag } from "../../../../hooks/useDrag";

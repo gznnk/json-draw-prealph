@@ -6,7 +6,7 @@ import { memo, useCallback, useRef, useState } from "react";
 import type {
 	DiagramDragEvent,
 	DiagramPointerEvent,
-} from "../../../types/EventTypes";
+} from "../../../types/events";
 
 // Import components related to ImageCanvas.
 import { PositionLabel } from "../../core/PositionLabel";

@@ -7,7 +7,7 @@ import type { Diagram } from "../../../../types/DiagramCatalog";
 import type {
 	DiagramChangeEvent,
 	DiagramDragEvent,
-} from "../../../../types/EventTypes";
+} from "../../../../types/events";
 
 // Import functions related to SvgCanvas.
 import { newId } from "../../../../utils/diagram";

@@ -1,5 +1,5 @@
 // Import types related to SvgCanvas.
-import type { NewItemEvent } from "../../../types/EventTypes";
+import type { NewItemEvent } from "../../../types/events";
 
 // Import related to this component.
 import { ADD_NEW_ITEM_EVENT_NAME } from "./addNewItemConstants";

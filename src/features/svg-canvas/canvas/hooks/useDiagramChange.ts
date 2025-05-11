@@ -6,7 +6,7 @@ import type { GroupData } from "../../components/shapes/Group";
 import type {
 	ConnectPointMoveData,
 	DiagramChangeEvent,
-} from "../../types/EventTypes";
+} from "../../types/events";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import components related to SvgCanvas.

@@ -6,7 +6,7 @@ import type { ConnectLineData } from "../../../components/shapes/ConnectLine";
 import type { PathPointData } from "../../../components/shapes/Path";
 import type { Diagram } from "../../../types/DiagramCatalog";
 import type { ConnectableData } from "../../../types/shape";
-import type { ConnectNodesEvent } from "../../../types/EventTypes";
+import type { ConnectNodesEvent } from "../../../types/events";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 import type { Shape } from "../../../types";
 
