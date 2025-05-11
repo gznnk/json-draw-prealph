@@ -1,4 +1,4 @@
-import type { ConnectPointData } from "../types/shape";
+import type { ConnectPointData, ConnectableData } from "../types/shape";
 import type { Diagram } from "../types/DiagramCatalog";
 import type { DiagramBaseData } from "../types/base";
 import type {
@@ -7,9 +7,8 @@ import type {
 	ItemableData,
 	SelectableData,
 	TransformativeData,
+	TextableData,
 } from "../types/core";
-import type { ConnectableData } from "../types/DiagramTypes";
-import type { TextableData } from "../types/core";
 
 /**
  * Default diagram base data.

@@ -1,5 +1,5 @@
 import type { ArrowHeadType } from "../base";
-import type { CreateDiagramType } from "../DiagramTypes";
+import type { CreateDiagramType } from "./CreateDiagramType";
 
 /**
  * 接続線のデータ
