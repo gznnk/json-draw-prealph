@@ -1,4 +1,4 @@
-import type { EventType } from "./EventBaseTypes";
+import type { EventType } from "./EventType";
 
 /**
  * Event fired during diagram dragging operations

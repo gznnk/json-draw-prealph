@@ -1,4 +1,4 @@
-import type { EventType } from "./EventBaseTypes";
+import type { EventType } from "./EventType";
 import type { ExecuteResult } from "./ExecuteResult";
 
 /**

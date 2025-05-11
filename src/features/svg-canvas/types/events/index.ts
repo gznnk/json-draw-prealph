@@ -1,4 +1,4 @@
-export type { EventType } from "./EventBaseTypes";
+export type { EventType } from "./EventType";
 
 export type { DiagramPointerEvent } from "./DiagramPointerEvent";
 export type { DiagramDragEvent } from "./DiagramDragEvent";

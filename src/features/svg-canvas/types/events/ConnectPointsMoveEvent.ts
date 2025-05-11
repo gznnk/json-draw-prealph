@@ -1,4 +1,4 @@
-import type { EventType } from "./EventBaseTypes.js";
+import type { EventType } from "./EventType.js";
 import type { ConnectPointMoveData } from "./ConnectPointMoveData.js";
 
 /**
