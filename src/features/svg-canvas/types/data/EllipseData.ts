@@ -1,7 +1,8 @@
 import type { CreateDataType } from "./CreateDataType";
 
 /**
- * 楕円のデータ
+ * Data type for ellipse shapes.
+ * Includes properties for styling, text, connections and transformations of elliptical elements.
  */
 export type EllipseData = CreateDataType<{
 	selectable: true;

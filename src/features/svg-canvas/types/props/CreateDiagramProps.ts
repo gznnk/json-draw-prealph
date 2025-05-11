@@ -11,6 +11,7 @@ import type {
 
 /**
  * Options for diagram properties creation.
+ * Controls which feature interfaces should be included in the resulting component props.
  */
 export type DiagramPropsOptions = {
 	selectable?: boolean;
@@ -25,7 +26,8 @@ export type DiagramPropsOptions = {
 
 /**
  * Create diagram props type.
- * This type is used to create props for diagram components.
+ * This type conditionally merges different props interfaces based on specified options,
+ * allowing components to selectively inherit specific behaviors and event handlers.
  */
 export type CreateDiagramProps<T, U extends DiagramPropsOptions> = Omit<
 	T,

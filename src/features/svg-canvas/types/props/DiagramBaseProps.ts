@@ -6,7 +6,8 @@ import type {
 } from "../events";
 
 /**
- * 図形の基本プロパティ
+ * Base properties for diagram components.
+ * Defines common event handlers and appearance settings shared by all diagram elements.
  */
 export type DiagramBaseProps = {
 	isTransparent?: boolean;

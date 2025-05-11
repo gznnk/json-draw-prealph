@@ -2,7 +2,8 @@ import type { ArrowHeadType } from "../base";
 import type { CreateDataType } from "./CreateDataType";
 
 /**
- * 接続線のデータ
+ * Data type for connection lines between diagram elements.
+ * Contains properties for defining connection endpoints and visual styling.
  */
 export type ConnectLineData = CreateDataType<{
 	selectable: true;

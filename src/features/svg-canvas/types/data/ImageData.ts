@@ -1,7 +1,8 @@
 import type { CreateDataType } from "./CreateDataType";
 
 /**
- * Type for the data of the Image component.
+ * Data type for Image component.
+ * Contains properties specific to image elements including base64 encoded image data.
  */
 export type ImageData = CreateDataType<{
 	selectable: true;

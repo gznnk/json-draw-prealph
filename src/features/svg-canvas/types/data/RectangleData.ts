@@ -1,7 +1,8 @@
 import type { CreateDataType } from "./CreateDataType";
 
 /**
- * 矩形のデータ
+ * Data type for rectangle shapes.
+ * Contains properties specific to rectangular diagram elements.
  */
 export type RectangleData = CreateDataType<{
 	selectable: true;

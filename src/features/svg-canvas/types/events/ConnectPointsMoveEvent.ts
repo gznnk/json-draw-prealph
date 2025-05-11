@@ -1,5 +1,5 @@
-import type { EventType } from "./EventType.js";
-import type { ConnectPointMoveData } from "./ConnectPointMoveData.js";
+import type { EventType } from "./EventType";
+import type { ConnectPointMoveData } from "./ConnectPointMoveData";
 
 /**
  * Event fired when connection points are moved

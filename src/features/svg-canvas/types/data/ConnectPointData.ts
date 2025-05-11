@@ -1,7 +1,8 @@
 import type { DiagramBaseData } from "../base";
 
 /**
- * 接続ポイントのデータ
+ * Data type for connection points.
+ * Defines properties for points where connections between diagram elements can be made.
  */
 export type ConnectPointData = DiagramBaseData & {
 	name: string;

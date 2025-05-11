@@ -1,7 +1,9 @@
 import type { DiagramType } from "../base";
 
 /**
- * Event fired when a diagram is dragged and dropped onto another element
+ * Event fired when a diagram is dragged and dropped onto another element.
+ * Contains data about both the dragged element and the target element.
+ * Used for implementing interactions between diagram components.
  */
 export type DiagramDragDropEvent = {
 	eventId: string;

@@ -10,7 +10,8 @@ import type {
 import type { ConnectableData } from "./ConnectableData";
 
 /**
- * 図形の型作成オプション
+ * Options for creating diagram data types.
+ * Controls which feature interfaces should be included in the resulting type.
  */
 export type DiagramDataOptions = {
 	selectable?: boolean;
@@ -23,7 +24,8 @@ export type DiagramDataOptions = {
 };
 
 /**
- * 図形のデータ型を作成する型
+ * Generic type creator for diagram data types.
+ * Conditionally includes feature interfaces based on provided options.
  */
 export type CreateDataType<T extends DiagramDataOptions> = DiagramBaseData &
 	(T["selectable"] extends true ? SelectableData : object) &

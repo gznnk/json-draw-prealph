@@ -1,7 +1,8 @@
 import type { ConnectPointData } from "./ConnectPointData";
 
 /**
- * 接続可能な図形のデータ
+ * Data type for connectable diagram elements.
+ * Defines the connection points that allow a diagram element to connect with other elements.
  */
 export type ConnectableData = {
 	connectPoints: ConnectPointData[];

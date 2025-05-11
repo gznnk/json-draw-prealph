@@ -1,7 +1,8 @@
 import type { DiagramTransformEvent } from "../events";
 
 /**
- * 変形可能な図形のプロパティ
+ * Properties for transformable diagram elements.
+ * Provides event handlers for transformation operations like resizing and rotation.
  */
 export type TransformativeProps = {
 	onTransform?: (e: DiagramTransformEvent) => void;

@@ -1,4 +1,4 @@
-import type { Diagram } from "../../catalog/DiagramTypes";
+import type { Diagram } from "../../catalog/DiagramTypes"; // TODO: type以外のモジュールを参照している
 
 /**
  * Event for creating a new diagram item with complete details

@@ -2,7 +2,8 @@ import type { CreateDataType } from "./CreateDataType";
 import type { ArrowHeadType } from "../base";
 
 /**
- * 折れ線のデータ
+ * Data type for polyline/path elements.
+ * Contains properties for styling path elements and optional arrow heads at endpoints.
  */
 export type PathData = CreateDataType<{
 	selectable: true;
