@@ -45,11 +45,6 @@ export const definition = {
 				description:
 					"Complete HTML document to display in the sandbox (including DOCTYPE, html, head, body tags).",
 			},
-			description: {
-				type: "string",
-				description:
-					"Optional description of what this sandbox demonstrates or is used for.",
-			},
 		},
 		additionalProperties: false,
 		required: ["sandbox_name", "html_content"],

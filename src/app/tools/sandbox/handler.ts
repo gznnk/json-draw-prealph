@@ -34,12 +34,10 @@ export const handler = (args: any) => {
 				htmlContent: args.html_content,
 			});
 		}, 100);
-
 		// Return information about the created sandbox
 		return {
 			id,
 			sandbox_name: args.sandbox_name,
-			description: args.description || "Interactive sandbox environment",
 			status: "Sandbox created successfully",
 		};
 	}
