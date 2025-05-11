@@ -32,8 +32,8 @@ import {
 import type {
 	ConnectingPoint,
 	ConnectionEvent,
-	ConnectPointData,
 } from "./ConnectPointTypes";
+import type { ConnectPointData } from "../../../../types/shape";
 
 /**
  * 接続ポイントプロパティ

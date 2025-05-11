@@ -2,9 +2,6 @@
 import type { CreateDiagramProps } from "../../../types/DiagramTypes";
 import type { SvgData } from "../../../types/shape";
 
-// Re-export from central type definitions
-export type { SvgData } from "../../../types/shape";
-
 /**
  * Props for the Svg component.
  */

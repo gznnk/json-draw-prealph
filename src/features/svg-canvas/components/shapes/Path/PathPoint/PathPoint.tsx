@@ -9,7 +9,7 @@ import { DragPoint } from "../../../core/DragPoint";
 import type { CreateDiagramProps } from "../../../../types/DiagramTypes";
 
 // Import related to this component.
-import type { PathPointData } from "./PathPointTypes";
+import type { PathPointData } from "../../../../types/shape";
 
 /**
  * 折れ線の頂点プロパティ

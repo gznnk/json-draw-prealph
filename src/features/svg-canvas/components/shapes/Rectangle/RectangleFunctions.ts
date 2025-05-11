@@ -21,7 +21,7 @@ import {
 
 // Imports related to this component.
 import { DEFAULT_RECTANGLE_DATA } from "./RectangleConstants";
-import type { RectangleData } from "./RectangleTypes";
+import type { RectangleData } from "../../../types/shape";
 
 /**
  * Calculate the position of the connection points of the ellipse.

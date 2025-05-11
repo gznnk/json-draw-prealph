@@ -1,2 +1,2 @@
 export { PathPoint } from "./PathPoint";
-export type { PathPointData } from "./PathPointTypes";
+export type { PathPointData } from "../../../../types/shape";

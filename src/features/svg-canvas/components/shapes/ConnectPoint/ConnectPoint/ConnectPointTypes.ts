@@ -2,9 +2,6 @@
 import type { Point } from "../../../../types/base";
 import type { Shape } from "../../../../types";
 
-// Re-export from central type definitions
-export type { ConnectPointData } from "../../../../types/shape";
-
 /**
  * 接続ポイントの方向
  */

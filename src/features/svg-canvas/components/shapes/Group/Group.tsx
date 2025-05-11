@@ -24,7 +24,7 @@ import { isItemableData, isTransformativeData } from "../../../utils";
 
 // Imports related to this component.
 import { getSelectedChildDiagram } from "./GroupFunctions";
-import type { GroupData } from "./GroupTypes";
+import type { GroupData } from "../../../types/shape";
 
 /**
  * Props for Group component.

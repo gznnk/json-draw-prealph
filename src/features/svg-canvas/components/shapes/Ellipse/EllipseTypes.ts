@@ -2,9 +2,6 @@
 import type { CreateDiagramProps } from "../../../types/DiagramTypes";
 import type { EllipseData } from "../../../types/shape";
 
-// Re-export from central type definitions
-export type { EllipseData } from "../../../types/shape";
-
 /**
  * 楕円コンポーネントのプロパティ
  */

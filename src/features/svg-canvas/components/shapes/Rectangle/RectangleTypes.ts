@@ -2,9 +2,6 @@
 import type { CreateDiagramProps } from "../../../types/DiagramTypes";
 import type { RectangleData } from "../../../types/shape";
 
-// Re-export from central type definitions
-export type { RectangleData } from "../../../types/shape";
-
 /**
  * 四角形コンポーネントのプロパティ
  */

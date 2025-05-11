@@ -1,4 +1,4 @@
-import type { EllipseData } from "./EllipseTypes";
+import type { EllipseData } from "../../../types/shape";
 
 import {
 	DEFAULT_CONNECTABLE_DATA,

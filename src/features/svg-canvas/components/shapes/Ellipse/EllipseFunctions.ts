@@ -19,7 +19,7 @@ import { isConnectableData } from "../../../utils";
 
 // Imports related to this component.
 import { DEFAULT_ELLIPSE_DATA } from "./EllipseConstants";
-import type { EllipseData } from "./EllipseTypes";
+import type { EllipseData } from "../../../types/shape";
 
 /**
  * Calculate the position of the connection points of the ellipse.
