@@ -4,7 +4,7 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // SvgCanvas関連型定義をインポート
 import type { Point } from "../../../../types/base";
-import type { CreateDiagramProps } from "../../../../types/props/CreateDiagramProps";
+import type { CreateDiagramProps } from "../../../../types/props/core/CreateDiagramProps";
 import type { Shape } from "../../../../types";
 import type {
 	DiagramConnectEvent,

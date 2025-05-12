@@ -1,4 +1,4 @@
-import type { DiagramConnectEvent } from "../events";
+import type { DiagramConnectEvent } from "../../events";
 
 /**
  * Props for connectable component.

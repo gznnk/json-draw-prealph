@@ -1,4 +1,4 @@
-import type { DiagramBaseData } from "../base";
+import type { DiagramBaseData } from "../../base";
 import type {
 	FillableData,
 	ItemableData,
@@ -7,7 +7,7 @@ import type {
 	TextableData,
 	TransformativeData,
 } from "../core";
-import type { ConnectableData } from "./ConnectableData";
+import type { ConnectableData } from "../shapes";
 
 /**
  * Options for creating diagram data types.

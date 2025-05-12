@@ -1,4 +1,4 @@
-import type { DiagramSelectEvent } from "../events";
+import type { DiagramSelectEvent } from "../../events";
 
 /**
  * Properties for selectable diagram components.

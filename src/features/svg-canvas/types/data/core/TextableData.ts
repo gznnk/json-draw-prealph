@@ -1,5 +1,5 @@
 // Import base types.
-import type { TextableType, TextAlign, VerticalAlign } from "../base";
+import type { TextableType, TextAlign, VerticalAlign } from "../../base";
 
 /**
  * Interface for diagram elements that can display and edit text.

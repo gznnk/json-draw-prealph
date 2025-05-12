@@ -6,7 +6,7 @@ import { memo, useEffect, useState, useRef } from "react";
 import { OpenAI } from "openai";
 
 // Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../../../types/props/CreateDiagramProps";
+import type { CreateDiagramProps } from "../../../types/props/core/CreateDiagramProps";
 
 // Import components related to SvgCanvas.
 import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";

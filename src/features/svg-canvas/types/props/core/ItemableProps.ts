@@ -1,4 +1,4 @@
-import type { DiagramChangeEvent } from "../events";
+import type { DiagramChangeEvent } from "../../events";
 
 /**
  * Props for having child diagrams component.

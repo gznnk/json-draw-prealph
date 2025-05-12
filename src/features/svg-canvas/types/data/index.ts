@@ -1,16 +1,2 @@
-// Export all shape-related type definitions
-
-export type { ConnectableData } from "./ConnectableData";
-export type { ConnectLineData } from "./ConnectLineData";
-export type { ConnectPointData } from "./ConnectPointData";
-export type {
-	CreateDataType,
-	DiagramDataOptions,
-} from "./CreateDataType";
-export type { EllipseData } from "./EllipseData";
-export type { GroupData } from "./GroupData";
-export type { ImageData } from "./ImageData";
-export type { PathData } from "./PathData";
-export type { PathPointData } from "./PathPointData";
-export type { RectangleData } from "./RectangleData";
-export type { SvgData } from "./SvgData";
+export * from "./shapes";
+export * from "./core";

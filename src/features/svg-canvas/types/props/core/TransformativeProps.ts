@@ -1,4 +1,4 @@
-import type { DiagramTransformEvent } from "../events";
+import type { DiagramTransformEvent } from "../../events";
 
 /**
  * Properties for transformable diagram elements.

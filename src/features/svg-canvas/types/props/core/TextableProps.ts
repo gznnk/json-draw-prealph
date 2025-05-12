@@ -1,4 +1,4 @@
-import type { DiagramTextEditEvent, DiagramChangeEvent } from "../events";
+import type { DiagramTextEditEvent, DiagramChangeEvent } from "../../events";
 
 /**
  * Props for components that can display and edit text.

@@ -8,7 +8,7 @@ import type {
 	SelectableData,
 	TransformativeData,
 	TextableData,
-} from "../types/core";
+} from "../types/data/core";
 
 /**
  * Default diagram base data.

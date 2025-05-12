@@ -3,7 +3,7 @@ import type {
 	DiagramDragDropEvent,
 	DiagramClickEvent,
 	DiagramHoverEvent,
-} from "../events";
+} from "../../events";
 
 /**
  * Base properties for diagram components.

@@ -8,7 +8,7 @@ import { Group } from "../../Group";
 
 // Import types related to SvgCanvas.
 import type { Diagram } from "../../../../catalog";
-import type { CreateDiagramProps } from "../../../../types/props/CreateDiagramProps";
+import type { CreateDiagramProps } from "../../../../types/props/core/CreateDiagramProps";
 import type {
 	DiagramChangeEvent,
 	DiagramClickEvent,

@@ -7,7 +7,7 @@ import type {
 	TextableProps,
 	ExecutableProps,
 	FileDroppableProps,
-} from "./";
+} from "..";
 
 /**
  * Options for diagram properties creation.

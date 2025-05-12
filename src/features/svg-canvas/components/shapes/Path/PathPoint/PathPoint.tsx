@@ -6,7 +6,7 @@ import { memo } from "react";
 import { DragPoint } from "../../../core/DragPoint";
 
 // Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../../../../types/props/CreateDiagramProps";
+import type { CreateDiagramProps } from "../../../../types/props/core/CreateDiagramProps";
 
 // Import related to this component.
 import type { PathPointData } from "../../../../types/data";
