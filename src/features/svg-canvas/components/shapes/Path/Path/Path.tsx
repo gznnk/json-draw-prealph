@@ -10,7 +10,7 @@ import type {
 	DiagramDragEvent,
 	DiagramPointerEvent,
 	PathData,
-	PathProps
+	PathProps,
 } from "../../../../types";
 
 // Import components.
@@ -23,10 +23,7 @@ import { SegmentList } from "../SegmentList";
 import { useDrag } from "../../../../hooks/useDrag";
 
 // Import utils.
-import { 
-	calcPointsOuterShape, 
-	isItemableData 
-} from "../../../../utils";
+import { calcPointsOuterShape, isItemableData } from "../../../../utils";
 import {
 	createDValue,
 	createEndPointArrowHead,
