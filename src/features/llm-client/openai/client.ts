@@ -1,6 +1,6 @@
 import OpenAI from "openai";
-import type { LLMClient, ChatParams, MessageParam } from "../interface";
-import type { ToolDefinition } from "../types";
+import type { LLMClient, ChatParams } from "../interface";
+import type { MessageParam, ToolDefinition } from "../types";
 
 /**
  * OpenAIを使用したLLMクライアントの実装.
