@@ -26,7 +26,7 @@ type HeaderProps = {
 const HeaderComponent: React.FC<HeaderProps> = ({ height = 30 }) => {
 	return (
 		<HeaderContainer height={height}>
-			<HeaderTitle>Header</HeaderTitle>
+			<HeaderTitle />
 			<HeaderControls>
 				{/* ヘッダーの右側にはコントロールを配置できます */}
 			</HeaderControls>
