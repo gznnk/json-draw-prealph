@@ -1,4 +1,4 @@
-Processed 466 files (3.2s) (2 warnings)
+Processed 465 files (2.9s) (2 warnings)
 
 app/App.tsx
   app/components/CanvasSheet/index.tsx
@@ -59,26 +59,33 @@ app/components/SplitView/SplitView.tsx
 app/components/SplitView/SplitViewStyled.ts
 app/index.css
 app/tools/new_sheet/definition.ts
+  features/llm-client/types.ts
 app/tools/new_sheet/handler.ts
   app/App.tsx
+  features/llm-client/types.ts
   features/svg-canvas/utils/index.ts
 app/tools/new_sheet/index.ts
   app/tools/new_sheet/definition.ts
   app/tools/new_sheet/handler.ts
 app/tools/sandbox/definition.ts
+  features/llm-client/types.ts
 app/tools/sandbox/handler.ts
   app/App.tsx
   app/components/SandboxSheet/index.tsx
+  features/llm-client/types.ts
   features/svg-canvas/utils/index.ts
 app/tools/sandbox/index.ts
   app/tools/sandbox/definition.ts
   app/tools/sandbox/handler.ts
 features/llm-chat-ui/components/ChatUI/ChatUI.tsx
+  app/tools/new_sheet/index.ts
+  app/tools/sandbox/index.ts
   features/llm-chat-ui/components/ChatUI/ChatUIStyled.ts
   features/llm-chat-ui/components/ChatUI/ChatUITypes.ts
   features/llm-chat-ui/components/MessageItem/MessageItem.tsx
-  features/llm-chat-ui/services/OpenAIService.ts
   features/llm-chat-ui/types.ts
+  features/llm-client/index.ts
+  features/svg-canvas/tools/workflow_agent/index.ts
 features/llm-chat-ui/components/ChatUI/ChatUIStyled.ts
 features/llm-chat-ui/components/ChatUI/ChatUITypes.ts
   features/llm-chat-ui/types.ts
@@ -91,12 +98,16 @@ features/llm-chat-ui/components/MessageItem/MessageItemStyled.ts
 features/llm-chat-ui/index.tsx
   features/llm-chat-ui/components/ChatUI/ChatUI.tsx
   features/llm-chat-ui/types.ts
-features/llm-chat-ui/services/OpenAIService.ts
-  app/tools/new_sheet/index.ts
-  app/tools/sandbox/index.ts
-  features/llm-chat-ui/types.ts
-  features/svg-canvas/tools/workflow_agent/index.ts
 features/llm-chat-ui/types.ts
+features/llm-client/factory.ts
+  features/llm-client/interface.ts
+  features/llm-client/openai/client.ts
+  features/llm-client/types.ts
+features/llm-client/index.ts
+  features/llm-client/factory.ts
+  features/llm-client/interface.ts
+  features/llm-client/openai/client.ts
+  features/llm-client/types.ts
 features/llm-client/interface.ts
 features/llm-client/openai/client.ts
   features/llm-client/interface.ts
@@ -228,7 +239,7 @@ features/svg-canvas/canvas/hooks/useNewDiagram.ts
   features/svg-canvas/canvas/SvgCanvasTypes.ts
   features/svg-canvas/canvas/observers/addNewItem/index.ts
   features/svg-canvas/catalog/index.ts
-  features/svg-canvas/types/events/index.ts
+  features/svg-canvas/types/index.ts
   features/svg-canvas/utils/index.ts
 features/svg-canvas/canvas/hooks/usePaste.ts
   features/svg-canvas/canvas/SvgCanvasConstants.ts
@@ -327,7 +338,6 @@ features/svg-canvas/canvas/observers/connectNodes/useConnectNodes.ts
   features/svg-canvas/utils/index.ts
   features/svg-canvas/utils/shapes/index.ts
 features/svg-canvas/catalog/DiagramComponentCatalog.ts
-  features/svg-canvas/catalog/DiagramTypes.ts
   features/svg-canvas/components/nodes/AgentNode/index.tsx
   features/svg-canvas/components/nodes/HubNode/index.tsx
   features/svg-canvas/components/nodes/ImageGenNode/index.tsx
@@ -343,6 +353,7 @@ features/svg-canvas/catalog/DiagramComponentCatalog.ts
   features/svg-canvas/components/shapes/Path/index.tsx
   features/svg-canvas/components/shapes/Rectangle/index.tsx
   features/svg-canvas/components/shapes/Svg/index.tsx
+  features/svg-canvas/types/index.ts
 features/svg-canvas/catalog/DiagramConnectPointCalculators.ts
   features/svg-canvas/catalog/DiagramTypes.ts
   features/svg-canvas/types/index.ts
@@ -358,6 +369,7 @@ features/svg-canvas/catalog/DiagramCreateFunctions.ts
   features/svg-canvas/components/nodes/TextAreaNode/index.tsx
   features/svg-canvas/components/nodes/VectorStoreNode/index.ts
   features/svg-canvas/components/nodes/WebSearchNode/index.tsx
+  features/svg-canvas/types/index.ts
   features/svg-canvas/utils/shapes/ellipse/index.ts
   features/svg-canvas/utils/shapes/image/index.ts
   features/svg-canvas/utils/shapes/path/index.ts
@@ -365,10 +377,10 @@ features/svg-canvas/catalog/DiagramCreateFunctions.ts
 features/svg-canvas/catalog/DiagramExportFunctions.ts
   features/svg-canvas/catalog/DiagramTypes.ts
   features/svg-canvas/components/shapes/Svg/index.tsx
+  features/svg-canvas/types/index.ts
   features/svg-canvas/utils/shapes/image/index.ts
 features/svg-canvas/catalog/DiagramTypes.ts
   features/svg-canvas/components/nodes/HubNode/index.tsx
-  features/svg-canvas/types/base/DiagramType.ts
   features/svg-canvas/types/data/index.ts
 features/svg-canvas/catalog/index.ts
   features/svg-canvas/catalog/DiagramComponentCatalog.ts
@@ -987,8 +999,10 @@ features/svg-canvas/index.tsx
   features/svg-canvas/canvas/index.tsx
   features/svg-canvas/catalog/index.ts
 features/svg-canvas/tools/add_image_gen_node/definition.ts
+  features/llm-client/types.ts
   features/svg-canvas/tools/shared/descriptions.ts
 features/svg-canvas/tools/add_image_gen_node/handler.ts
+  features/llm-client/types.ts
   features/svg-canvas/canvas/observers/addNewItem/index.ts
   features/svg-canvas/components/nodes/ImageGenNode/index.tsx
   features/svg-canvas/utils/index.ts
@@ -996,8 +1010,10 @@ features/svg-canvas/tools/add_image_gen_node/index.ts
   features/svg-canvas/tools/add_image_gen_node/definition.ts
   features/svg-canvas/tools/add_image_gen_node/handler.ts
 features/svg-canvas/tools/add_llm_node/definition.ts
+  features/llm-client/types.ts
   features/svg-canvas/tools/shared/descriptions.ts
 features/svg-canvas/tools/add_llm_node/handler.ts
+  features/llm-client/types.ts
   features/svg-canvas/canvas/observers/addNewItem/index.ts
   features/svg-canvas/components/nodes/LLMNode/index.tsx
   features/svg-canvas/utils/index.ts
@@ -1005,8 +1021,10 @@ features/svg-canvas/tools/add_llm_node/index.ts
   features/svg-canvas/tools/add_llm_node/definition.ts
   features/svg-canvas/tools/add_llm_node/handler.ts
 features/svg-canvas/tools/add_svg_to_canvas_node/definition.ts
+  features/llm-client/types.ts
   features/svg-canvas/tools/shared/descriptions.ts
 features/svg-canvas/tools/add_svg_to_canvas_node/handler.ts
+  features/llm-client/types.ts
   features/svg-canvas/canvas/observers/addNewItem/index.ts
   features/svg-canvas/components/nodes/SvgToDiagramNode/index.tsx
   features/svg-canvas/utils/index.ts
@@ -1014,8 +1032,10 @@ features/svg-canvas/tools/add_svg_to_canvas_node/index.ts
   features/svg-canvas/tools/add_svg_to_canvas_node/definition.ts
   features/svg-canvas/tools/add_svg_to_canvas_node/handler.ts
 features/svg-canvas/tools/add_text_node/definition.ts
+  features/llm-client/types.ts
   features/svg-canvas/tools/shared/descriptions.ts
 features/svg-canvas/tools/add_text_node/handler.ts
+  features/llm-client/types.ts
   features/svg-canvas/canvas/observers/addNewItem/index.ts
   features/svg-canvas/components/nodes/TextAreaNode/index.tsx
   features/svg-canvas/utils/index.ts
@@ -1023,7 +1043,9 @@ features/svg-canvas/tools/add_text_node/index.ts
   features/svg-canvas/tools/add_text_node/definition.ts
   features/svg-canvas/tools/add_text_node/handler.ts
 features/svg-canvas/tools/connect_nodes/definition.ts
+  features/llm-client/types.ts
 features/svg-canvas/tools/connect_nodes/handler.ts
+  features/llm-client/types.ts
   features/svg-canvas/canvas/observers/connectNodes/index.ts
   features/svg-canvas/utils/index.ts
 features/svg-canvas/tools/connect_nodes/index.ts
@@ -1031,13 +1053,15 @@ features/svg-canvas/tools/connect_nodes/index.ts
   features/svg-canvas/tools/connect_nodes/handler.ts
 features/svg-canvas/tools/shared/descriptions.ts
 features/svg-canvas/tools/workflow_agent/definition.ts
+  features/llm-client/types.ts
 features/svg-canvas/tools/workflow_agent/handler.ts
+  features/llm-client/index.ts
+  features/llm-client/types.ts
   features/svg-canvas/tools/add_image_gen_node/index.ts
   features/svg-canvas/tools/add_llm_node/index.ts
   features/svg-canvas/tools/add_svg_to_canvas_node/index.ts
   features/svg-canvas/tools/add_text_node/index.ts
   features/svg-canvas/tools/connect_nodes/index.ts
-  shared/ai-tools/index.ts
   utils/KeyManager.ts
 features/svg-canvas/tools/workflow_agent/index.ts
   features/svg-canvas/tools/workflow_agent/definition.ts
@@ -1504,9 +1528,6 @@ logger.json
 main.tsx
   app/App.tsx
   app/index.css
-shared/ai-tools/index.ts
-  shared/ai-tools/types.ts
-shared/ai-tools/types.ts
 shared/event-bus/EventBus.ts
 utils/KeyManager.ts
 utils/Logger.ts

@@ -1,5 +1,6 @@
 // Import types.
-import type { Diagram, DiagramType } from "./DiagramTypes";
+import type { DiagramType } from "../types";
+import type { Diagram } from "./DiagramTypes";
 
 // Import node creation functions.
 import { createAgentNodeData } from "../components/nodes/AgentNode";

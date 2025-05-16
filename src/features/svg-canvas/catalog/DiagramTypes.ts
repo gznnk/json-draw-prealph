@@ -11,7 +11,6 @@ import type {
 	SvgData,
 } from "../types/data";
 import type { HubNodeData } from "../components/nodes/HubNode";
-import type { DiagramType } from "../types/base/DiagramType";
 
 /**
  * Union type representing all diagram data types.
@@ -30,14 +29,3 @@ export type Diagram =
 	| SvgData
 	// Nodes
 	| HubNodeData;
-
-/**
- * Ensures that the diagram has a type property that is a DiagramType.
- * This is needed for type safety when accessing DiagramComponentCatalog[item.type].
- */
-export type TypedDiagram = Diagram & {
-	type: DiagramType;
-};
-
-// Re-export DiagramType for convenience
-export type { DiagramType };
