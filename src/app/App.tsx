@@ -12,6 +12,7 @@ import {
 } from "./components/Sheets";
 import { CanvasSheet } from "./components/CanvasSheet";
 import { SandboxSheet } from "./components/SandboxSheet";
+import { Header } from "./components/Header";
 
 // Import utils.
 import { Profiler } from "../utils/Profiler";
@@ -138,10 +139,11 @@ function App() {
 
 	return (
 		<div className="App">
+			<Header />
 			<div
 				style={{
 					position: "fixed",
-					top: 0,
+					top: "30px",
 					left: 0,
 					right: "33.33%",
 					bottom: 0,
@@ -163,7 +165,7 @@ function App() {
 			<div
 				style={{
 					position: "fixed",
-					top: 0,
+					top: "30px",
 					left: "66.67%",
 					right: 0,
 					bottom: 0,
