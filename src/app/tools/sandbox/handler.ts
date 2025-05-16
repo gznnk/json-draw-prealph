@@ -47,7 +47,7 @@ export const handler: FunctionCallHandler = (
 				id,
 				htmlContent: args.html_content,
 			});
-		}, 100);
+		}, 1000);
 		// Return information about the created sandbox
 		return {
 			id,
