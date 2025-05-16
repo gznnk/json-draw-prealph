@@ -183,13 +183,16 @@ export const ChatUI = React.memo(
 						<MessageItem
 							key={`${message.role}-${message.timestamp?.getTime() || index}`}
 							message={message}
+							showCaret={
+								message.role === "assistant" &&
+								index === messages.length - 1 &&
+								isLoading
+							}
 						/>
 					))}
-
 					{/* Empty div for scrolling to bottom */}
 					<div ref={messagesEndRef} />
 				</MessagesContainer>
-
 				<InputContainer>
 					<MessageInput
 						ref={inputRef}

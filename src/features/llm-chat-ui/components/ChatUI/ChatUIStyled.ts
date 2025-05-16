@@ -60,3 +60,27 @@ export const MessageInput = styled.textarea`
     color: #666B82;
   }
 `;
+
+/**
+ * Blinking caret indicator for streaming AI output
+ */
+export const CaretIndicator = styled.span`
+  display: inline-block;
+  width: 1ch;
+  height: 1em;
+  background: none;
+  color: #B0B0B0;
+  font-weight: bold;
+  animation: blink-caret 1s steps(1) infinite;
+  vertical-align: baseline;
+  margin-left: 2px;
+
+  @keyframes blink-caret {
+    0%, 49% {
+      opacity: 1;
+    }
+    50%, 100% {
+      opacity: 0;
+    }
+  }
+`;
