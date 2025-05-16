@@ -13,6 +13,7 @@ import {
 import { CanvasSheet } from "./components/CanvasSheet";
 import { SandboxSheet } from "./components/SandboxSheet";
 import { Page } from "./components/Page";
+import { SplitView } from "./components/SplitView/SplitView";
 
 // Import utils.
 import { Profiler } from "../utils/Profiler";
@@ -139,43 +140,19 @@ function App() {
 	return (
 		<div className="App">
 			<Page>
-				<div
-					style={{
-						display: "flex",
-						width: "100%",
-						height: "100%",
-					}}
-				>
-					<div
-						style={{
-							width: "66.67%",
-							height: "100%",
-							backgroundColor: "#0C0F1C",
-						}}
-					>
-						{/* SVGキャンバスエリア (2/3) */}
-						<div style={{ width: "100%", height: "100%" }}>
-							<Sheets
-								tabs={tabs}
-								contentItems={contentItems}
-								activeTabId={activeTabId}
-								onTabSelect={setActiveTabId}
-								onAddTab={handleAddTab}
-							/>
-						</div>
-					</div>
-					{/* チャットエリア (1/3) */}
-					<div
-						style={{
-							width: "33.33%",
-							height: "100%",
-							borderLeft: "1px solid #3A415C",
-							boxSizing: "border-box",
-						}}
-					>
-						<ChatUI {...chatConfig} apiKey={apiKey || undefined} />
-					</div>
-				</div>
+				<SplitView
+					initialRatio={0.67}
+					left={
+						<Sheets
+							tabs={tabs}
+							contentItems={contentItems}
+							activeTabId={activeTabId}
+							onTabSelect={setActiveTabId}
+							onAddTab={handleAddTab}
+						/>
+					}
+					right={<ChatUI {...chatConfig} apiKey={apiKey || undefined} />}
+				/>
 			</Page>
 		</div>
 	);
