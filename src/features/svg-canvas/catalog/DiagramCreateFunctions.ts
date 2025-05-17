@@ -5,12 +5,14 @@ import type { Diagram } from "./DiagramTypes";
 // Import node creation functions.
 import { createAgentNodeData } from "../components/nodes/AgentNode";
 import { createHubNodeData } from "../components/nodes/HubNode";
-import { createImageGenNodeData } from "../components/nodes/ImageGenNode";
-import { createLLMNodeData } from "../components/nodes/LLMNode";
-import { createSvgToDiagramNodeData } from "../components/nodes/SvgToDiagramNode";
-import { createTextAreaNodeData } from "../components/nodes/TextAreaNode";
-import { createVectorStoreNodeData } from "../components/nodes/VectorStoreNode";
-import { createWebSearchNodeData } from "../components/nodes/WebSearchNode";
+import {
+	createImageGenNodeData,
+	createLLMNodeData,
+	createSvgToDiagramNodeData,
+	createTextAreaNodeData,
+	createVectorStoreNodeData,
+	createWebSearchNodeData,
+} from "../utils/nodes";
 
 // Import shape creation functions.
 import { createEllipseData } from "../utils/shapes/ellipse";

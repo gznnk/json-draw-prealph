@@ -1,6 +1,6 @@
 // Import functions related to SvgCanvas.
 import { dispatchNewItemEvent } from "../../canvas/observers/addNewItem";
-import { createTextAreaNodeData } from "../../components/nodes/TextAreaNode";
+import { createTextAreaNodeData } from "../../utils/nodes";
 import { newEventId } from "../../utils";
 import type {
 	FunctionCallHandler,
@@ -18,7 +18,6 @@ export const handler: FunctionCallHandler = (
 	functionCall: FunctionCallInfo,
 ) => {
 	const args = functionCall.arguments as { x: number; y: number };
-
 	if (typeof args.x === "number" && typeof args.y === "number") {
 		// Create a new Text node with the specified x and y coordinates
 		const data = createTextAreaNodeData({

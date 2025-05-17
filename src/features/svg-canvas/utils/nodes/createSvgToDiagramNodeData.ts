@@ -1,10 +1,17 @@
 // Import types.
-import type { SvgToDiagramNodeData } from "../../../types/data/nodes";
+import type { SvgToDiagramNodeData } from "../../types/data/nodes/SvgToDiagramNodeData";
 
 // Import utils.
-import { newId } from "../../../utils/shapes";
-import { createRectangleConnectPoint } from "../../../utils/shapes/rectangle";
+import { newId } from "../shapes";
+import { createRectangleConnectPoint } from "../shapes/rectangle";
 
+/**
+ * Creates data for a SvgToDiagram node with specified properties.
+ *
+ * @param x - The x coordinate of the node
+ * @param y - The y coordinate of the node
+ * @returns SvgToDiagram node data object
+ */
 export const createSvgToDiagramNodeData = ({
 	x,
 	y,

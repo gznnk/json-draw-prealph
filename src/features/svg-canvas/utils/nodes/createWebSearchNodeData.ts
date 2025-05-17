@@ -1,10 +1,17 @@
 // Import types.
-import type { WebSearchNodeData } from "../../../types/data/nodes";
+import type { WebSearchNodeData } from "../../types/data/nodes/WebSearchNodeData";
 
 // Import utils.
-import { newId } from "../../../utils/shapes";
-import { createRectangleConnectPoint } from "../../../utils/shapes/rectangle";
+import { newId } from "../shapes";
+import { createRectangleConnectPoint } from "../shapes/rectangle";
 
+/**
+ * Creates data for a WebSearch node with specified properties.
+ *
+ * @param x - The x coordinate of the node
+ * @param y - The y coordinate of the node
+ * @returns WebSearch node data object
+ */
 export const createWebSearchNodeData = ({
 	x,
 	y,

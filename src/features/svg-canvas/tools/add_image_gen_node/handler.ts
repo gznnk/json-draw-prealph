@@ -1,6 +1,6 @@
 // Import functions related to SvgCanvas.
 import { dispatchNewItemEvent } from "../../canvas/observers/addNewItem";
-import { createImageGenNodeData } from "../../components/nodes/ImageGenNode";
+import { createImageGenNodeData } from "../../utils/nodes";
 import { newEventId } from "../../utils";
 import type {
 	FunctionCallHandler,
@@ -18,7 +18,6 @@ export const handler: FunctionCallHandler = (
 	functionCall: FunctionCallInfo,
 ) => {
 	const args = functionCall.arguments as { x: number; y: number };
-
 	if (typeof args.x === "number" && typeof args.y === "number") {
 		// Create a new Image Generation node with the specified x and y coordinates
 		const data = createImageGenNodeData({

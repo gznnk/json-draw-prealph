@@ -1,6 +1,13 @@
 // Import utils.
-import { createRectangleData } from "../../../utils/shapes/rectangle";
+import { createRectangleData } from "../shapes/rectangle";
 
+/**
+ * Creates data for a TextArea node with specified properties.
+ *
+ * @param x - The x coordinate of the node
+ * @param y - The y coordinate of the node
+ * @returns TextArea node data object
+ */
 export const createTextAreaNodeData = ({
 	x,
 	y,

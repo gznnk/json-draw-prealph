@@ -18,10 +18,12 @@ import { useExecutionChain } from "../../../hooks/useExecutionChain";
 import { dispatchNewItemEvent } from "../../../canvas/observers/addNewItem";
 import { dispatchConnectNodesEvent } from "../../../canvas/observers/connectNodes";
 import { newEventId } from "../../../utils";
-import { createImageGenNodeData } from "../ImageGenNode";
-import { createLLMNodeData } from "../LLMNode";
-import { createSvgToDiagramNodeData } from "../SvgToDiagramNode";
-import { createTextAreaNodeData } from "../TextAreaNode";
+import {
+	createImageGenNodeData,
+	createLLMNodeData,
+	createSvgToDiagramNodeData,
+	createTextAreaNodeData,
+} from "../../../utils";
 
 // Import utilities.
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";

@@ -1,6 +1,14 @@
 // Import utils.
-import { createRectangleData } from "../../../utils/shapes/rectangle";
+import { createRectangleData } from "../shapes/rectangle";
 
+/**
+ * Creates data for an LLM node with specified properties.
+ *
+ * @param x - The x coordinate of the node
+ * @param y - The y coordinate of the node
+ * @param text - Optional text content of the node
+ * @returns LLM node data object
+ */
 export const createLLMNodeData = ({
 	x,
 	y,

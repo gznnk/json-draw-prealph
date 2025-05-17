@@ -1,10 +1,17 @@
 // Import types.
-import type { ImageGenNodeData } from "../../../types/data/nodes";
+import type { ImageGenNodeData } from "../../types/data/nodes/ImageGenNodeData";
 
 // Import utils.
-import { newId } from "../../../utils/shapes";
-import { createRectangleConnectPoint } from "../../../utils/shapes/rectangle";
+import { newId } from "../shapes";
+import { createRectangleConnectPoint } from "../shapes/rectangle";
 
+/**
+ * Creates data for an ImageGen node with specified properties.
+ *
+ * @param x - The x coordinate of the node
+ * @param y - The y coordinate of the node
+ * @returns ImageGen node data object
+ */
 export const createImageGenNodeData = ({
 	x,
 	y,
