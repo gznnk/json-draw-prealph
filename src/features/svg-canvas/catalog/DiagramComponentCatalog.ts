@@ -1,4 +1,4 @@
-import type { DiagramType } from "./DiagramTypes";
+import type { DiagramType } from "../types";
 
 // Import components related to SvgCanvas.
 import { AgentNode } from "../components/nodes/AgentNode";

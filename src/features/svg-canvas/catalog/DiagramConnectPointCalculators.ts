@@ -1,6 +1,6 @@
 // Import types.
-import type { ConnectPointMoveData } from "../types";
-import type { Diagram, DiagramType } from "./DiagramTypes";
+import type { ConnectPointMoveData, DiagramType } from "../types";
+import type { Diagram } from "./DiagramTypes";
 
 // Import utils.
 import { calcEllipseConnectPointPosition } from "../utils/shapes/ellipse";

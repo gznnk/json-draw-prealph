@@ -1,5 +1,6 @@
 // Import types.
-import type { Diagram, DiagramType } from "./DiagramTypes";
+import type { DiagramType } from "../types";
+import type { Diagram } from "./DiagramTypes";
 
 // Import utils.
 import { imageToBlob } from "../utils/shapes/image";
