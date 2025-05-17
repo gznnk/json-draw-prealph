@@ -1,4 +1,4 @@
-Processed 477 files (3.2s) (2 warnings)
+Processed 477 files (3.3s) (2 warnings)
 
 app/App.tsx
   app/components/CanvasSheet/index.tsx
@@ -381,7 +381,6 @@ features/svg-canvas/catalog/DiagramExportFunctions.ts
   features/svg-canvas/types/index.ts
   features/svg-canvas/utils/shapes/image/index.ts
 features/svg-canvas/catalog/DiagramTypes.ts
-  features/svg-canvas/components/nodes/HubNode/index.tsx
   features/svg-canvas/types/data/index.ts
 features/svg-canvas/catalog/index.ts
   features/svg-canvas/catalog/DiagramComponentCatalog.ts
@@ -645,13 +644,12 @@ features/svg-canvas/components/nodes/HubNode/HubNode.tsx
   features/svg-canvas/hooks/useExecutionChain.ts
   features/svg-canvas/types/props/nodes/index.ts
 features/svg-canvas/components/nodes/HubNode/HubNodeFunctions.ts
-  features/svg-canvas/types/data/nodes/index.ts
+  features/svg-canvas/types/data/nodes/HubNodeData.ts
   features/svg-canvas/utils/shapes/ellipse/index.ts
   features/svg-canvas/utils/shapes/index.ts
 features/svg-canvas/components/nodes/HubNode/index.tsx
   features/svg-canvas/components/nodes/HubNode/HubNode.tsx
   features/svg-canvas/components/nodes/HubNode/HubNodeFunctions.ts
-  features/svg-canvas/types/data/nodes/index.ts
 features/svg-canvas/components/nodes/ImageGenNode/ImageGenNode.tsx
   features/svg-canvas/canvas/observers/addNewItem/index.ts
   features/svg-canvas/components/core/IconContainer/index.tsx
@@ -888,6 +886,7 @@ features/svg-canvas/components/shapes/Path/Path/Path.tsx
   features/svg-canvas/components/shapes/Path/NewVertexList/index.tsx
   features/svg-canvas/components/shapes/Path/SegmentList/index.tsx
   features/svg-canvas/hooks/useDrag.ts
+  features/svg-canvas/types/base/index.ts
   features/svg-canvas/types/index.ts
   features/svg-canvas/utils/index.ts
   features/svg-canvas/utils/shapes/path/index.ts
