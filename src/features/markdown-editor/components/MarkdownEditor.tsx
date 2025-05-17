@@ -16,10 +16,10 @@ import {
 	EditorContainer,
 	EditorSection,
 	MarkdownTextarea,
-	PreviewArea,
 	Toolbar,
 	ToolbarButton,
 } from "./MarkdownEditorStyled";
+import { SafeHtmlPreview } from "./SafeHtmlPreview";
 
 const MarkdownEditorComponent = ({
 	initialMarkdown = "",
@@ -91,11 +91,10 @@ const MarkdownEditorComponent = ({
 						onChange={handleChange}
 						placeholder={placeholder}
 					/>
-				</EditorSection>
-
+				</EditorSection>{" "}
 				{/* プレビュー表示エリア */}
 				<EditorSection viewMode={viewMode} isEditor={false}>
-					<PreviewArea dangerouslySetInnerHTML={{ __html: renderedHtml }} />
+					<SafeHtmlPreview html={renderedHtml} />
 				</EditorSection>
 			</EditorContainer>
 		</div>
