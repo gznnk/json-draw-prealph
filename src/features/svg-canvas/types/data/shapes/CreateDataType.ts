@@ -7,7 +7,7 @@ import type {
 	TextableData,
 	TransformativeData,
 } from "../core";
-import type { ConnectableData } from "../shapes";
+import type { ConnectableData } from "./ConnectableData";
 
 /**
  * Options for creating diagram data types.
