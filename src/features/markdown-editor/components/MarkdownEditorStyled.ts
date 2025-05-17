@@ -9,6 +9,7 @@ export const EditorContainer = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
+  flex: 1; /* 親要素の高さを継承するために追加 */
   min-height: 300px;
   border: 1px solid #2A2F4C;
   border-radius: 4px;
@@ -32,7 +33,7 @@ export const EditorSection = styled.div<{
 		return "none";
 	}};
   height: 100%;
-  overflow: auto;
+  overflow: auto; /* hiddenからautoに変更してスクロールを有効化 */
   padding: 16px;
   background-color: #0C0F1C;
   ${({ isEditor }) =>
@@ -61,6 +62,7 @@ export const MarkdownTextarea = styled.textarea`
   background-color: #0C0F1C;
   color: #B0B0B0;
   caret-color: #B0B0B0;
+  overflow: auto;
 
   &::placeholder {
     color: #666B82;
@@ -77,9 +79,9 @@ export const PreviewArea = styled.div`
   font-size: 14px;
   line-height: 1.6;
   overflow-wrap: break-word;
+  overflow: auto;
   background-color: #0C0F1C;
   color: #B0B0B0;
-  
   /* マークダウンレンダリング向けの基本スタイル */
   h1, h2, h3, h4, h5, h6 {
     margin-top: 24px;
@@ -104,7 +106,7 @@ export const PreviewArea = styled.div`
     font-family: "Consolas", monospace;
     padding: 0.2em 0.4em;
     margin: 0;
-    font-size: 85%;
+    font-size: 0.9em;
     background-color: #1A1E2E;
     color: #B0B0B0;
     border-radius: 3px;
@@ -113,7 +115,6 @@ export const PreviewArea = styled.div`
   pre {
     padding: 16px;
     overflow: auto;
-    font-size: 85%;
     line-height: 1.45;
     background-color: #1A1E2E;
     border-radius: 3px;

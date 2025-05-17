@@ -42,20 +42,10 @@ $$
 [Markdown 公式サイト](https://daringfireball.net/projects/markdown/)`;
 
 const Container = styled.div`
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 20px;
-`;
-
-const Title = styled.h1`
-  margin-bottom: 20px;
-`;
-
-const StatusBar = styled.div`
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 `;
 
 const MarkdownEditorSampleComponent = (): ReactElement => {
@@ -67,17 +57,22 @@ const MarkdownEditorSampleComponent = (): ReactElement => {
 
 	return (
 		<Container>
-			<Title>マークダウンエディタサンプル</Title>
-			<div style={{ height: "600px" }}>
+			<div
+				style={{
+					position: "absolute",
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					margin: "20px",
+				}}
+			>
 				<MarkdownEditor
 					initialMarkdown={markdown}
 					onChange={handleChange}
 					minHeight={500}
 				/>
 			</div>
-			<StatusBar>
-				<p>文字数: {markdown.length}</p>
-			</StatusBar>
 		</Container>
 	);
 };

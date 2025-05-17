@@ -59,7 +59,14 @@ const MarkdownEditorComponent = ({
 	}, []);
 
 	return (
-		<div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				height: "100%",
+				minHeight: minHeight,
+			}}
+		>
 			{/* ツールバー */}
 			<Toolbar>
 				<ToolbarButton
@@ -83,7 +90,7 @@ const MarkdownEditorComponent = ({
 			</Toolbar>
 
 			{/* エディタとプレビューのコンテナ */}
-			<EditorContainer style={{ minHeight }}>
+			<EditorContainer>
 				{/* マークダウン入力エリア */}
 				<EditorSection viewMode={viewMode} isEditor={true}>
 					<MarkdownTextarea
@@ -91,7 +98,7 @@ const MarkdownEditorComponent = ({
 						onChange={handleChange}
 						placeholder={placeholder}
 					/>
-				</EditorSection>{" "}
+				</EditorSection>
 				{/* プレビュー表示エリア */}
 				<EditorSection viewMode={viewMode} isEditor={false}>
 					<SafeHtmlPreview html={renderedHtml} />
