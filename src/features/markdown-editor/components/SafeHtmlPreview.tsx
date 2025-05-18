@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, type ReactElement } from "react";
+import { forwardRef, memo, useEffect, useRef } from "react";
 import { PreviewArea } from "./MarkdownEditorStyled";
 
 /**
@@ -16,21 +16,27 @@ type SafeHtmlPreviewProps = {
  * @param props - コンポーネントのプロパティ
  * @returns SafeHtmlPreviewコンポーネント
  */
-const SafeHtmlPreviewComponent = ({
-	html,
-}: SafeHtmlPreviewProps): ReactElement => {
-	const containerRef = useRef<HTMLDivElement>(null);
+const SafeHtmlPreviewComponent = forwardRef<
+	HTMLDivElement,
+	SafeHtmlPreviewProps
+>(({ html }, forwardedRef) => {
+	const localRef = useRef<HTMLDivElement>(null);
+	const resolvedRef = (forwardedRef ||
+		localRef) as React.RefObject<HTMLDivElement>;
 
 	// HTMLコンテンツをrefを通じて設定
 	useEffect(() => {
-		if (containerRef.current) {
+		if (resolvedRef.current) {
 			// innerHTMLを使用して手動でHTMLをセット
-			containerRef.current.innerHTML = html;
+			resolvedRef.current.innerHTML = html;
 		}
-	}, [html]);
+	}, [html, resolvedRef]);
 
 	// 空のdiv要素を返す（内容はuseEffectで設定）
-	return <PreviewArea ref={containerRef} />;
-};
+	return <PreviewArea ref={resolvedRef} />;
+});
+
+// コンポーネント名の設定（デバッグ用）
+SafeHtmlPreviewComponent.displayName = "SafeHtmlPreview";
 
 export const SafeHtmlPreview = memo(SafeHtmlPreviewComponent);

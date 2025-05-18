@@ -34,13 +34,93 @@ const MarkdownEditorComponent = ({
 	// 表示状態の管理
 	const [showEditor, setShowEditor] = useState(true);
 	const [showPreview, setShowPreview] = useState(true);
-	// テキストエリアの参照
+	// テキストエリアとプレビューの参照
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+	const previewRef = useRef<HTMLDivElement | null>(null);
+
+	// スクロール同期のフラグ
+	const isScrollingEditor = useRef(false);
+	const isScrollingPreview = useRef(false);
 
 	// マークダウンが変更されたときにHTMLをレンダリングし直す
 	useEffect(() => {
 		setRenderedHtml(renderMarkdown(markdown));
 	}, [markdown]);
+
+	// スクロール位置の割合を取得する関数
+	const getScrollPercentage = useCallback((element: HTMLElement) => {
+		return (
+			element.scrollTop / (element.scrollHeight - element.clientHeight) || 0
+		);
+	}, []);
+
+	// スクロール位置をパーセンテージに基づいて設定する関数
+	const setScrollPercentage = useCallback(
+		(element: HTMLElement, percentage: number) => {
+			const maxScroll = element.scrollHeight - element.clientHeight;
+			element.scrollTop = Math.max(
+				0,
+				Math.min(maxScroll, percentage * maxScroll),
+			);
+		},
+		[],
+	);
+
+	// エディタのスクロールイベントハンドラ
+	const handleEditorScroll = useCallback(() => {
+		if (
+			isScrollingPreview.current ||
+			!showPreview ||
+			!textareaRef.current ||
+			!previewRef.current
+		)
+			return;
+
+		isScrollingEditor.current = true;
+		const percentage = getScrollPercentage(textareaRef.current);
+		setScrollPercentage(previewRef.current, percentage);
+
+		// スクロールイベントのロックを解除するタイマー
+		setTimeout(() => {
+			isScrollingEditor.current = false;
+		}, 50);
+	}, [showPreview, getScrollPercentage, setScrollPercentage]);
+
+	// プレビューのスクロールイベントハンドラ
+	const handlePreviewScroll = useCallback(() => {
+		if (
+			isScrollingEditor.current ||
+			!showEditor ||
+			!textareaRef.current ||
+			!previewRef.current
+		)
+			return;
+
+		isScrollingPreview.current = true;
+		const percentage = getScrollPercentage(previewRef.current);
+		setScrollPercentage(textareaRef.current, percentage);
+
+		// スクロールイベントのロックを解除するタイマー
+		setTimeout(() => {
+			isScrollingPreview.current = false;
+		}, 50);
+	}, [showEditor, getScrollPercentage, setScrollPercentage]);
+
+	// スクロールイベントのリスナーを設定
+	useEffect(() => {
+		const textarea = textareaRef.current;
+		const preview = previewRef.current;
+
+		if (textarea && preview && showEditor && showPreview) {
+			textarea.addEventListener("scroll", handleEditorScroll);
+			preview.addEventListener("scroll", handlePreviewScroll);
+
+			return () => {
+				textarea.removeEventListener("scroll", handleEditorScroll);
+				preview.removeEventListener("scroll", handlePreviewScroll);
+			};
+		}
+	}, [handleEditorScroll, handlePreviewScroll, showEditor, showPreview]);
 
 	// テキストエリアの変更イベントハンドラ
 	const handleChange = useCallback(
@@ -53,7 +133,9 @@ const MarkdownEditorComponent = ({
 			}
 		},
 		[onChange],
-	); // キャレット位置に基づいてスクロールを調整
+	);
+
+	// キャレット位置に基づいてスクロールを調整
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 			// 矢印キーまたはエンターキーの場合のみ処理
@@ -103,7 +185,9 @@ const MarkdownEditorComponent = ({
 					// 上方向のスクロール調整（最初の行の場合、paddingTopを考慮）
 					if (currentLineIndex === 0 || caretY < scrollTop + paddingTop) {
 						textarea.scrollTop = Math.max(0, caretY - paddingTop);
-					} // 下方向のスクロール調整（最後の行の場合、paddingBottomを考慮）
+					}
+
+					// 下方向のスクロール調整（最後の行の場合、paddingBottomを考慮）
 					const allLines = text.split("\n");
 					const isLastLine = currentLineIndex === allLines.length - 1;
 					const isEnterKey = e.key === "Enter";
@@ -124,10 +208,25 @@ const MarkdownEditorComponent = ({
 						textarea.scrollTop =
 							caretY + lineHeight - clientHeight + paddingBottom;
 					}
+
+					// エディタがスクロールされたとき、プレビューも同期させる
+					if (
+						showPreview &&
+						previewRef.current &&
+						!isScrollingPreview.current
+					) {
+						isScrollingEditor.current = true;
+						const percentage = getScrollPercentage(textarea);
+						setScrollPercentage(previewRef.current, percentage);
+
+						setTimeout(() => {
+							isScrollingEditor.current = false;
+						}, 50);
+					}
 				}, 0);
 			}
 		},
-		[],
+		[showPreview, getScrollPercentage, setScrollPercentage],
 	);
 
 	return (
@@ -183,7 +282,9 @@ const MarkdownEditorComponent = ({
 					/>
 				)}
 				{/* プレビュー表示エリア */}
-				{showPreview && <SafeHtmlPreview html={renderedHtml} />}
+				{showPreview && (
+					<SafeHtmlPreview ref={previewRef} html={renderedHtml} />
+				)}
 			</EditorContainer>
 		</div>
 	);
