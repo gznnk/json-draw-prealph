@@ -16,25 +16,6 @@ export const EditorContainer = styled.div`
 `;
 
 /**
- * エディタとプレビューの各セクションのスタイル
- * ChatUIStyled.tsと合わせたダークテーマスタイル
- */
-export const EditorSection = styled.div<{ isEditor: boolean }>`
-  flex: 1;
-  height: 100%;
-  overflow: auto;
-  background-color: #0C0F1C;
-  padding: 0 1em;
-  box-sizing: border-box;
-  ${({ isEditor }) =>
-		isEditor
-			? `
-    border-right: 1px solid #2A2F4C;
-  `
-			: ""}
-`;
-
-/**
  * マークダウン入力用のテキストエリアのスタイル
  * ChatUIStyled.tsと合わせたダークテーマスタイル
  */
@@ -42,7 +23,7 @@ export const MarkdownTextarea = styled.textarea`
   flex: 1;
   width: 100%;
   height: 100%;
-  padding: 1em;
+  padding: 1em 1em;
   box-sizing: border-box;
   resize: none;
   border: none;
