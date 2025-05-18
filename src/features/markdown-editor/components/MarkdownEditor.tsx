@@ -14,7 +14,6 @@ import {
 } from "./MarkdownEditorConstants";
 import {
 	EditorContainer,
-	EditorSection,
 	MarkdownTextarea,
 	Toolbar,
 	ToolbarButton,
@@ -97,20 +96,14 @@ const MarkdownEditorComponent = ({
 			<EditorContainer>
 				{/* マークダウン入力エリア */}
 				{showEditor && (
-					<EditorSection isEditor={true}>
-						<MarkdownTextarea
-							value={markdown}
-							onChange={handleChange}
-							placeholder={placeholder}
-						/>
-					</EditorSection>
+					<MarkdownTextarea
+						value={markdown}
+						onChange={handleChange}
+						placeholder={placeholder}
+					/>
 				)}
 				{/* プレビュー表示エリア */}
-				{showPreview && (
-					<EditorSection isEditor={false}>
-						<SafeHtmlPreview html={renderedHtml} />
-					</EditorSection>
-				)}
+				{showPreview && <SafeHtmlPreview html={renderedHtml} />}
 			</EditorContainer>
 		</div>
 	);

@@ -8,7 +8,6 @@ export const EditorContainer = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
-  flex: 1; /* 親要素の高さを継承するために追加 */
   min-height: 300px;
   border: 1px solid #2A2F4C;
   border-radius: 4px;
@@ -25,6 +24,8 @@ export const EditorSection = styled.div<{ isEditor: boolean }>`
   height: 100%;
   overflow: auto;
   background-color: #0C0F1C;
+  padding: 0 1em;
+  box-sizing: border-box;
   ${({ isEditor }) =>
 		isEditor
 			? `
@@ -38,16 +39,17 @@ export const EditorSection = styled.div<{ isEditor: boolean }>`
  * ChatUIStyled.tsと合わせたダークテーマスタイル
  */
 export const MarkdownTextarea = styled.textarea`
+  flex: 1;
   width: 100%;
   height: 100%;
-  min-height: inherit;
+  padding: 1em;
+  box-sizing: border-box;
   resize: none;
   border: none;
   outline: none;
   font-family: "Consolas", monospace;
   font-size: 14px;
   line-height: 1.6;
-  padding: 0;
   background-color: #0C0F1C;
   color: #B0B0B0;
   caret-color: #B0B0B0;
@@ -62,11 +64,15 @@ export const MarkdownTextarea = styled.textarea`
  * ChatUIStyled.tsの配色に合わせたダークテーマスタイル
  */
 export const PreviewArea = styled.div`
+  flex: 1;
   width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 0 1em;
+  box-sizing: border-box;
   font-size: 14px;
   line-height: 1.6;
   overflow-wrap: break-word;
-  overflow: auto;
   background-color: #0C0F1C;
   color: #B0B0B0;
   /* マークダウンレンダリング向けの基本スタイル */
