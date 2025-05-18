@@ -8,7 +8,7 @@ import { ChatUI } from "../features/llm-chat-ui";
 // Import components.
 import { Page } from "./components/Page";
 import { SplitView } from "./components/SplitView/SplitView";
-import { MarkdownEditorSample } from "./components/MarkdownEditorSample";
+import { DirectoryExplorerDemo } from "../features/directory-explorer/DirectoryExplorerDemo";
 
 // Import utils.
 import { Profiler } from "../utils/Profiler";
@@ -71,15 +71,14 @@ const App = (): ReactElement => {
 			model: "gpt-4",
 		},
 	};
-
 	return (
 		<div className="App">
 			<Page>
 				<SplitView
 					initialRatio={0.67}
 					left={
-						// マークダウンエディターサンプルを表示
-						<MarkdownEditorSample />
+						// ディレクトリエクスプローラーデモを表示
+						<DirectoryExplorerDemo />
 					}
 					right={<ChatUI {...chatConfig} apiKey={apiKey || undefined} />}
 				/>
