@@ -1,16 +1,17 @@
-Processed 465 files (3.1s) (2 warnings)
+Processed 470 files (3.5s) (2 warnings)
 
 app/App.tsx
   app/components/MarkdownEditorSample/index.tsx
   app/components/Page/index.tsx
   app/components/SplitView/SplitView.tsx
+  app/hooks/useWorks.ts
   app/tools/new_sheet/index.ts
   app/tools/sandbox/index.ts
-  features/directory-explorer/DirectoryExplorerDemo.tsx
+  features/directory-explorer/index.ts
   features/llm-chat-ui/index.tsx
   features/llm-chat-ui/types.ts
-  features/llm-client/index.ts
   features/svg-canvas/tools/workflow_agent/index.ts
+  shared/llm-client/index.ts
   utils/KeyManager.ts
   utils/Profiler.ts
 app/components/Body/Body.tsx
@@ -65,23 +66,36 @@ app/components/Sheets/index.tsx
 app/components/SplitView/SplitView.tsx
   app/components/SplitView/SplitViewStyled.ts
 app/components/SplitView/SplitViewStyled.ts
+app/hooks/useWorks.ts
+  app/model/Work.ts
+  app/repository/work/factory.ts
+  app/repository/work/interface.ts
 app/index.css
+app/model/Work.ts
+app/repository/work/factory.ts
+  app/repository/work/interface.ts
+  app/repository/work/localStrageImpl.ts
+app/repository/work/interface.ts
+  app/model/Work.ts
+app/repository/work/localStrageImpl.ts
+  app/model/Work.ts
+  app/repository/work/interface.ts
 app/tools/new_sheet/definition.ts
-  features/llm-client/types.ts
+  shared/llm-client/types.ts
 app/tools/new_sheet/handler.ts
   app/App.tsx
-  features/llm-client/types.ts
   features/svg-canvas/utils/shapes/common/newId.ts
+  shared/llm-client/types.ts
 app/tools/new_sheet/index.ts
   app/tools/new_sheet/definition.ts
   app/tools/new_sheet/handler.ts
 app/tools/sandbox/definition.ts
-  features/llm-client/types.ts
+  shared/llm-client/types.ts
 app/tools/sandbox/handler.ts
   app/App.tsx
   app/components/SandboxSheet/index.tsx
-  features/llm-client/types.ts
   features/svg-canvas/utils/shapes/common/newId.ts
+  shared/llm-client/types.ts
 app/tools/sandbox/index.ts
   app/tools/sandbox/definition.ts
   app/tools/sandbox/handler.ts
@@ -118,33 +132,19 @@ features/llm-chat-ui/components/MessageItem/MessageItem.tsx
   features/llm-chat-ui/components/ChatUI/ChatUIStyled.ts
   features/llm-chat-ui/components/MessageItem/MessageItemStyled.ts
   features/llm-chat-ui/types.ts
-  features/markdown/index.ts
+  shared/markdown/index.ts
 features/llm-chat-ui/components/MessageItem/MessageItemStyled.ts
 features/llm-chat-ui/index.tsx
   features/llm-chat-ui/components/ChatUI/ChatUI.tsx
   features/llm-chat-ui/types.ts
 features/llm-chat-ui/types.ts
-features/llm-client/factory.ts
-  features/llm-client/interface.ts
-  features/llm-client/openai/client.ts
-  features/llm-client/types.ts
-features/llm-client/index.ts
-  features/llm-client/factory.ts
-  features/llm-client/interface.ts
-  features/llm-client/openai/client.ts
-  features/llm-client/types.ts
-features/llm-client/interface.ts
-features/llm-client/openai/client.ts
-  features/llm-client/interface.ts
-  features/llm-client/types.ts
-features/llm-client/types.ts
 features/markdown-editor/components/MarkdownEditor.tsx
   features/markdown-editor/components/MarkdownEditorConstants.ts
   features/markdown-editor/components/MarkdownEditorFunctions.ts
   features/markdown-editor/components/MarkdownEditorStyled.ts
   features/markdown-editor/components/SafeHtmlPreview.tsx
   features/markdown-editor/types.ts
-  features/markdown/index.ts
+  shared/markdown/index.ts
 features/markdown-editor/components/MarkdownEditorConstants.ts
 features/markdown-editor/components/MarkdownEditorFunctions.ts
 features/markdown-editor/components/MarkdownEditorStyled.ts
@@ -154,8 +154,6 @@ features/markdown-editor/index.tsx
   features/markdown-editor/components/MarkdownEditor.tsx
   features/markdown-editor/types.ts
 features/markdown-editor/types.ts
-features/markdown/index.ts
-features/markdown/markdown-it-katex.d.ts
 features/sandboxed-iframe/SandboxedIframe.tsx
   features/sandboxed-iframe/SandboxedIframeStyled.ts
 features/sandboxed-iframe/SandboxedIframeStyled.ts
@@ -533,9 +531,9 @@ features/svg-canvas/components/core/Textable/TextEditor/index.tsx
   features/svg-canvas/components/core/Textable/TextEditor/TextEditor.tsx
   features/svg-canvas/components/core/Textable/TextEditor/TextEditorTypes.ts
 features/svg-canvas/components/core/Textable/Textable/Textable.tsx
-  features/markdown/index.ts
   features/svg-canvas/components/core/Textable/Textable/TextableStyled.ts
   features/svg-canvas/types/data/core/TextableData.ts
+  shared/markdown/index.ts
 features/svg-canvas/components/core/Textable/Textable/TextableConstants.ts
   features/svg-canvas/types/base/TextAlign.ts
   features/svg-canvas/types/base/VerticalAlign.ts
@@ -1144,69 +1142,69 @@ features/svg-canvas/index.tsx
   features/svg-canvas/canvas/SvgCanvasTypes.ts
   features/svg-canvas/canvas/index.tsx
 features/svg-canvas/tools/add_image_gen_node/definition.ts
-  features/llm-client/types.ts
   features/svg-canvas/tools/shared/descriptions.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/add_image_gen_node/handler.ts
-  features/llm-client/types.ts
   features/svg-canvas/canvas/observers/addNewItem/index.ts
   features/svg-canvas/utils/common/newEventId.ts
   features/svg-canvas/utils/nodes/imageGenNode/createImageGenNodeData.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/add_image_gen_node/index.ts
   features/svg-canvas/tools/add_image_gen_node/definition.ts
   features/svg-canvas/tools/add_image_gen_node/handler.ts
 features/svg-canvas/tools/add_llm_node/definition.ts
-  features/llm-client/types.ts
   features/svg-canvas/tools/shared/descriptions.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/add_llm_node/handler.ts
-  features/llm-client/types.ts
   features/svg-canvas/canvas/observers/addNewItem/index.ts
   features/svg-canvas/utils/common/newEventId.ts
   features/svg-canvas/utils/nodes/llmNodeData/createLLMNodeData.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/add_llm_node/index.ts
   features/svg-canvas/tools/add_llm_node/definition.ts
   features/svg-canvas/tools/add_llm_node/handler.ts
 features/svg-canvas/tools/add_svg_to_canvas_node/definition.ts
-  features/llm-client/types.ts
   features/svg-canvas/tools/shared/descriptions.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/add_svg_to_canvas_node/handler.ts
-  features/llm-client/types.ts
   features/svg-canvas/canvas/observers/addNewItem/index.ts
   features/svg-canvas/utils/common/newEventId.ts
   features/svg-canvas/utils/nodes/svgToDiagramNode/createSvgToDiagramNodeData.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/add_svg_to_canvas_node/index.ts
   features/svg-canvas/tools/add_svg_to_canvas_node/definition.ts
   features/svg-canvas/tools/add_svg_to_canvas_node/handler.ts
 features/svg-canvas/tools/add_text_node/definition.ts
-  features/llm-client/types.ts
   features/svg-canvas/tools/shared/descriptions.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/add_text_node/handler.ts
-  features/llm-client/types.ts
   features/svg-canvas/canvas/observers/addNewItem/index.ts
   features/svg-canvas/utils/common/newEventId.ts
   features/svg-canvas/utils/nodes/textAreaNode/createTextAreaNodeData.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/add_text_node/index.ts
   features/svg-canvas/tools/add_text_node/definition.ts
   features/svg-canvas/tools/add_text_node/handler.ts
 features/svg-canvas/tools/connect_nodes/definition.ts
-  features/llm-client/types.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/connect_nodes/handler.ts
-  features/llm-client/types.ts
   features/svg-canvas/canvas/observers/connectNodes/index.ts
   features/svg-canvas/utils/common/newEventId.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/connect_nodes/index.ts
   features/svg-canvas/tools/connect_nodes/definition.ts
   features/svg-canvas/tools/connect_nodes/handler.ts
 features/svg-canvas/tools/shared/descriptions.ts
 features/svg-canvas/tools/workflow_agent/definition.ts
-  features/llm-client/types.ts
+  shared/llm-client/types.ts
 features/svg-canvas/tools/workflow_agent/handler.ts
-  features/llm-client/index.ts
-  features/llm-client/types.ts
   features/svg-canvas/tools/add_image_gen_node/index.ts
   features/svg-canvas/tools/add_llm_node/index.ts
   features/svg-canvas/tools/add_svg_to_canvas_node/index.ts
   features/svg-canvas/tools/add_text_node/index.ts
   features/svg-canvas/tools/connect_nodes/index.ts
+  shared/llm-client/index.ts
+  shared/llm-client/types.ts
   utils/KeyManager.ts
 features/svg-canvas/tools/workflow_agent/index.ts
   features/svg-canvas/tools/workflow_agent/definition.ts
@@ -1601,6 +1599,22 @@ main.tsx
   app/App.tsx
   app/index.css
 shared/event-bus/EventBus.ts
+shared/llm-client/factory.ts
+  shared/llm-client/interface.ts
+  shared/llm-client/openai/client.ts
+  shared/llm-client/types.ts
+shared/llm-client/index.ts
+  shared/llm-client/factory.ts
+  shared/llm-client/interface.ts
+  shared/llm-client/openai/client.ts
+  shared/llm-client/types.ts
+shared/llm-client/interface.ts
+shared/llm-client/openai/client.ts
+  shared/llm-client/interface.ts
+  shared/llm-client/types.ts
+shared/llm-client/types.ts
+shared/markdown/index.ts
+shared/markdown/markdown-it-katex.d.ts
 utils/KeyManager.ts
 utils/Logger.ts
   logger.json

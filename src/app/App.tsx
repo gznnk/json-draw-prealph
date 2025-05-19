@@ -23,13 +23,9 @@ import { workflowAgent } from "../features/svg-canvas/tools/workflow_agent";
 import { newSheet } from "./tools/new_sheet";
 import { createSandbox } from "./tools/sandbox";
 
-// Import repository.
-import { createWorkRepository } from "./repository/work/factory";
-import type { Work } from "./model/Work";
+// Import repository and hooks.
 import type { DirectoryItem } from "../features/directory-explorer";
-
-// Create repository instance
-const workRepository = createWorkRepository();
+import { useWorks } from "./hooks/useWorks";
 
 declare global {
 	interface Window {
@@ -75,19 +71,9 @@ const App = (): ReactElement => {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [apiKey, setApiKey] = useState<string | null>(null);
-	const [llmClient, setLLMClient] = useState<LLMClient | null>(null);
-
-	const [works, setWorks] = useState<Work[]>([]);
+	const [llmClient, setLLMClient] = useState<LLMClient | null>(null); // useWorksフックを使用してWorkの管理を行う
+	const { works, updateWorks } = useWorks();
 	const [directoryItems, setDirectoryItems] = useState<DirectoryItem[]>([]);
-
-	useEffect(() => {
-		// Load works from local storage
-		const loadWorks = async () => {
-			const loadedWorks = await workRepository.getWorks();
-			setWorks(loadedWorks);
-		};
-		loadWorks();
-	}, []);
 
 	useEffect(() => {
 		setDirectoryItems(
@@ -103,9 +89,21 @@ const App = (): ReactElement => {
 
 	const handleDirectoryItemsChange = useCallback(
 		(newItems: DirectoryItem[]) => {
+			// DirectoryItemの配列をWorkの配列にマッピング
+			const updatedWorks = newItems.map((item) => {
+				return {
+					id: item.id,
+					name: item.name,
+					path: item.path,
+					type: item.isDirectory ? "group" : item.type || "document",
+				};
+			});
+
+			// 状態とストレージを更新
 			setDirectoryItems(newItems);
+			updateWorks(updatedWorks);
 		},
-		[],
+		[updateWorks],
 	);
 
 	// Load OpenAI API key from KeyManager on component mount
