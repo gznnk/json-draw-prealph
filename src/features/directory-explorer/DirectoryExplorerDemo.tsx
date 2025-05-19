@@ -4,38 +4,53 @@ import { DirectoryExplorer, type DirectoryItem } from "../directory-explorer";
 // サンプルのディレクトリ構造データ
 const sampleData: DirectoryItem[] = [
 	// ルート階層（順序がランダム）
-	{ id: "1", name: "Cフォルダ", path: "C-folder", type: "folder" },
-	{ id: "2", name: "Bファイル", path: "B-file", type: "file" },
-	{ id: "3", name: "Aフォルダ", path: "A-folder", type: "folder" },
-	{ id: "4", name: "Dファイル", path: "D-file", type: "file" },
+	{ id: "1", name: "Cフォルダ", path: "C-folder", isDirectory: true },
+	{ id: "2", name: "Bファイル", path: "B-file", isDirectory: false },
+	{ id: "3", name: "Aフォルダ", path: "A-folder", isDirectory: true },
+	{ id: "4", name: "Dファイル", path: "D-file", isDirectory: false },
 
 	// Aフォルダの中身
-	{ id: "5", name: "Zファイル", path: "A-folder/Z-file", type: "file" },
+	{ id: "5", name: "Zファイル", path: "A-folder/Z-file", isDirectory: false },
 	{
 		id: "6",
 		name: "Xサブフォルダ",
 		path: "A-folder/X-subfolder",
-		type: "folder",
+		isDirectory: true,
 	},
-	{ id: "7", name: "Yファイル", path: "A-folder/Y-file", type: "file" },
+	{ id: "7", name: "Yファイル", path: "A-folder/Y-file", isDirectory: false },
 
 	// Xサブフォルダの中身
-	{ id: "8", name: "3番目", path: "A-folder/X-subfolder/3-file", type: "file" },
-	{ id: "9", name: "1番目", path: "A-folder/X-subfolder/1-file", type: "file" },
+	{
+		id: "8",
+		name: "3番目",
+		path: "A-folder/X-subfolder/3-file",
+		isDirectory: false,
+	},
+	{
+		id: "9",
+		name: "1番目",
+		path: "A-folder/X-subfolder/1-file",
+		isDirectory: false,
+	},
 	{
 		id: "10",
 		name: "2番目",
 		path: "A-folder/X-subfolder/2-file",
-		type: "file",
+		isDirectory: false,
 	},
 
 	// Cフォルダの中身
-	{ id: "11", name: "Cの中のファイル", path: "C-folder/C-file", type: "file" },
+	{
+		id: "11",
+		name: "Cの中のファイル",
+		path: "C-folder/C-file",
+		isDirectory: false,
+	},
 	{
 		id: "12",
 		name: "Cの中のフォルダ",
 		path: "C-folder/C-subfolder",
-		type: "folder",
+		isDirectory: true,
 	},
 ];
 

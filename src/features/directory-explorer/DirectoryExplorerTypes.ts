@@ -1,9 +1,4 @@
 /**
- * アイテムの種別を表す型
- */
-export type DirectoryItemType = "file" | "folder";
-
-/**
  * 階層構造を構成する要素の型定義
  */
 export type DirectoryItem = {
@@ -13,8 +8,10 @@ export type DirectoryItem = {
 	name: string;
 	/** アイテムのパス（/区切りで階層を表現） */
 	path: string;
-	/** アイテムの種別（"file" または "folder"） */
-	type: DirectoryItemType;
+	/** ディレクトリか？ */
+	isDirectory: boolean;
+	/** アイテムの種別 */
+	type?: string;
 };
 
 /**

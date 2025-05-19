@@ -56,13 +56,13 @@ const DirectoryNodeComponent = ({
 
 			// 同じフォルダ内へのドロップは許可しない
 			if (
-				item.type === "file" &&
+				!item.isDirectory &&
 				getParentPath(draggedItemObj.path) === getParentPath(item.path)
 			) {
 				return false;
 			}
 			if (
-				item.type === "folder" &&
+				item.isDirectory &&
 				getParentPath(draggedItemObj.path) === item.path
 			) {
 				return false;
@@ -81,13 +81,13 @@ const DirectoryNodeComponent = ({
 			let targetId = item.id;
 
 			// ファイルにドロップされた場合は、そのファイルの親フォルダにドロップする
-			if (item.type === "file") {
+			if (!item.isDirectory) {
 				// 親フォルダのパスを取得
 				const parentPath = item.path.substring(0, item.path.lastIndexOf("/"));
 
 				// 親フォルダのIDを探す
 				const parentFolder = allItems.find(
-					(folder) => folder.type === "folder" && folder.path === parentPath,
+					(folder) => folder.isDirectory && folder.path === parentPath,
 				);
 
 				// 親フォルダが見つかった場合は、そのIDを使用
@@ -97,7 +97,7 @@ const DirectoryNodeComponent = ({
 					// 親フォルダが見つからない場合は処理を中断
 					return;
 				}
-			} else if (item.type === "folder") {
+			} else if (item.isDirectory) {
 				// フォルダが展開されていない場合は直接展開する
 				if (!isExpanded) {
 					toggleExpand(item.id);
@@ -126,7 +126,7 @@ const DirectoryNodeComponent = ({
 	// アイテムのクリックハンドラー
 	const handleClick = () => {
 		// フォルダの場合は、子要素の有無にかかわらず展開/折りたたみを切り替える
-		if (item.type === "folder") {
+		if (item.isDirectory) {
 			toggleExpand(item.id);
 		}
 		if (onItemClick) {
@@ -135,7 +135,7 @@ const DirectoryNodeComponent = ({
 	};
 
 	useEffect(() => {
-		if (item.type === "file") {
+		if (!item.isDirectory) {
 			if (onDragOver && isOverShallow) {
 				onDragOver(item);
 			}
@@ -171,17 +171,16 @@ const DirectoryNodeComponent = ({
 			isDragging={isDragging}
 			isOver={
 				canDrop &&
-				((item.type === "folder" && isOverShallow) ||
-					dragOverNodeList.length > 0)
+				((item.isDirectory && isOverShallow) || dragOverNodeList.length > 0)
 			}
-			isFolder={item.type === "folder"}
+			isFolder={item.isDirectory}
 		>
 			{" "}
 			<NodeRow level={level} onClick={handleClick}>
 				{" "}
 				{/* 展開/非展開アイコン */}
 				<ExpandIconContainer>
-					{item.type === "folder" ? (
+					{item.isDirectory ? (
 						isExpanded ? (
 							"▾"
 						) : (
@@ -192,9 +191,7 @@ const DirectoryNodeComponent = ({
 					)}
 				</ExpandIconContainer>
 				{/* アイテムアイコン（フォルダかファイル） */}
-				<ItemIconContainer>
-					{item.type === "folder" ? "📁" : "📄"}
-				</ItemIconContainer>
+				<ItemIconContainer>{item.isDirectory ? "📁" : "📄"}</ItemIconContainer>
 				{/* アイテム名 */}
 				<span>{item.name}</span>
 			</NodeRow>

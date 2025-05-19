@@ -1,5 +1,5 @@
 // Import React.
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { ReactElement } from "react";
 
 // Import features.
@@ -11,7 +11,7 @@ import type { LLMClient } from "../features/llm-client";
 // Import components.
 import { Page } from "./components/Page";
 import { SplitView } from "./components/SplitView/SplitView";
-import { DirectoryExplorerDemo } from "../features/directory-explorer/DirectoryExplorerDemo";
+import { DirectoryExplorer } from "../features/directory-explorer";
 import { MarkdownEditorSample } from "./components/MarkdownEditorSample";
 
 // Import utils.
@@ -22,6 +22,14 @@ import { OpenAiKeyManager } from "../utils/KeyManager";
 import { workflowAgent } from "../features/svg-canvas/tools/workflow_agent";
 import { newSheet } from "./tools/new_sheet";
 import { createSandbox } from "./tools/sandbox";
+
+// Import repository.
+import { createWorkRepository } from "./repository/work/factory";
+import type { Work } from "./domain/Work";
+import type { DirectoryItem } from "../features/directory-explorer";
+
+// Create repository instance
+const workRepository = createWorkRepository();
 
 declare global {
 	interface Window {
@@ -68,6 +76,43 @@ const App = (): ReactElement => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [apiKey, setApiKey] = useState<string | null>(null);
 	const [llmClient, setLLMClient] = useState<LLMClient | null>(null);
+
+	const [works, setWorks] = useState<Work[]>([]);
+	const [directoryItems, setDirectoryItems] = useState<DirectoryItem[]>([]);
+
+	useEffect(() => {
+		// Load works from local storage
+		const loadWorks = async () => {
+			const loadedWorks = await workRepository.getWorks();
+			setWorks(loadedWorks);
+		};
+		loadWorks();
+	}, []);
+
+	useEffect(() => {
+		setDirectoryItems([
+			...works.map((work) => ({
+				id: work.id,
+				name: work.name,
+				path: work.path,
+				isDirectory: work.type === "group",
+				type: work.type,
+			})),
+			{
+				id: "draft",
+				name: "Draft",
+				path: "draft",
+				isDirectory: true,
+			}, // TODO: ちゃんと実装
+		]);
+	}, [works]);
+
+	const handleDirectoryItemsChange = useCallback(
+		(newItems: DirectoryItem[]) => {
+			setDirectoryItems(newItems);
+		},
+		[],
+	);
 
 	// Load OpenAI API key from KeyManager on component mount
 	useEffect(() => {
@@ -180,8 +225,13 @@ const App = (): ReactElement => {
 		<div className="App">
 			<Page>
 				<SplitView
-					initialRatio={[0.3, 0.4, 0.3]}
-					left={<DirectoryExplorerDemo />}
+					initialRatio={[0.2, 0.6, 0.2]}
+					left={
+						<DirectoryExplorer
+							items={directoryItems}
+							onItemsChange={handleDirectoryItemsChange}
+						/>
+					}
 					center={
 						// マークダウンエディターサンプルを表示（中央ペイン）
 						<MarkdownEditorSample />

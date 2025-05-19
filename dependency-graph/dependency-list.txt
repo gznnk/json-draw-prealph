@@ -1,4 +1,4 @@
-Processed 457 files (3.4s) (2 warnings)
+Processed 465 files (3.1s) (2 warnings)
 
 app/App.tsx
   app/components/MarkdownEditorSample/index.tsx
@@ -6,6 +6,7 @@ app/App.tsx
   app/components/SplitView/SplitView.tsx
   app/tools/new_sheet/index.ts
   app/tools/sandbox/index.ts
+  features/directory-explorer/DirectoryExplorerDemo.tsx
   features/llm-chat-ui/index.tsx
   features/llm-chat-ui/types.ts
   features/llm-client/index.ts
@@ -84,6 +85,28 @@ app/tools/sandbox/handler.ts
 app/tools/sandbox/index.ts
   app/tools/sandbox/definition.ts
   app/tools/sandbox/handler.ts
+features/directory-explorer/DirectoryExplorer.tsx
+  features/directory-explorer/DirectoryExplorerFunctions.ts
+  features/directory-explorer/DirectoryExplorerStyled.ts
+  features/directory-explorer/DirectoryExplorerTypes.ts
+  features/directory-explorer/DirectoryNode.tsx
+features/directory-explorer/DirectoryExplorerConstants.ts
+features/directory-explorer/DirectoryExplorerDemo.tsx
+  features/directory-explorer/index.ts
+features/directory-explorer/DirectoryExplorerFunctions.ts
+  features/directory-explorer/DirectoryExplorerTypes.ts
+features/directory-explorer/DirectoryExplorerStyled.ts
+  features/directory-explorer/DirectoryExplorerConstants.ts
+features/directory-explorer/DirectoryExplorerTypes.ts
+features/directory-explorer/DirectoryNode.tsx
+  features/directory-explorer/DirectoryExplorerConstants.ts
+  features/directory-explorer/DirectoryExplorerFunctions.ts
+  features/directory-explorer/DirectoryExplorerStyled.ts
+  features/directory-explorer/DirectoryExplorerTypes.ts
+features/directory-explorer/index.ts
+  features/directory-explorer/DirectoryExplorer.tsx
+  features/directory-explorer/DirectoryExplorerFunctions.ts
+  features/directory-explorer/DirectoryExplorerTypes.ts
 features/llm-chat-ui/components/ChatUI/ChatUI.tsx
   features/llm-chat-ui/components/ChatUI/ChatUIStyled.ts
   features/llm-chat-ui/components/ChatUI/ChatUITypes.ts

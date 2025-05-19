@@ -24,7 +24,7 @@ export const getDirectChildren = (
 	allItems: DirectoryItem[],
 ): DirectoryItem[] => {
 	// ファイルは子を持たない
-	if (item.type === "file") return [];
+	if (!item.isDirectory) return [];
 	const itemPath = item.path;
 	return allItems
 		.filter((otherItem) => getParentPath(otherItem.path) === itemPath)
@@ -59,8 +59,7 @@ export const updateItemsAfterDrop = (
 	const draggedItem = items.find((item) => item.id === draggedItemId);
 	const targetFolder = items.find((item) => item.id === targetFolderId);
 
-	if (!draggedItem || !targetFolder || targetFolder.type !== "folder")
-		return items;
+	if (!draggedItem || !targetFolder || !targetFolder.isDirectory) return items;
 
 	// ドラッグ元のアイテムとその子アイテムをすべて取得
 	const draggedItemWithDescendants = getItemWithDescendants(draggedItem, items);
@@ -180,8 +179,8 @@ export const sortDirectoryItems = (
 	b: DirectoryItem,
 ): number => {
 	// フォルダを先に表示
-	if (a.type !== b.type) {
-		return a.type === "folder" ? -1 : 1;
+	if (a.isDirectory !== b.isDirectory) {
+		return a.isDirectory ? -1 : 1;
 	}
 
 	// 同じ種類内では名前でソート
