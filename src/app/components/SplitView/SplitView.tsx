@@ -4,6 +4,12 @@ import { useRef, useState, memo } from "react";
 
 import { Container, Pane, Divider, DividerHitArea } from "./SplitViewStyled";
 
+// 最小ペインサイズの定数
+const MIN_PANE_SIZE = {
+	SIDE: 0.1, // 左右ペインの最小サイズ (10%)
+	CENTER: 0.2, // 中央ペインの最小サイズ (20%)
+};
+
 type SplitViewProps = {
 	initialRatio?: number[]; // 分割比率の配列（合計1になるように調整）
 	left: React.ReactNode;
@@ -22,7 +28,7 @@ type SplitViewProps = {
  * @param right - 右側に表示するコンテンツ
  */
 const SplitViewComponent = ({
-	initialRatio = [0.33, 0.34, 0.33], // 3つの場合のデフォルト比率
+	initialRatio = [0.2, 0.6, 0.2], // 3つの場合のデフォルト比率
 	left,
 	center,
 	right,
@@ -45,7 +51,7 @@ const SplitViewComponent = ({
 	} else {
 		// 3分割の場合
 		initialRatios =
-			initialRatio.length >= 3 ? [...initialRatio] : [0.33, 0.34, 0.33];
+			initialRatio.length >= 3 ? [...initialRatio] : [0.2, 0.6, 0.2];
 
 		// 合計が1になるように調整
 		const sum = initialRatios.reduce((a, b) => a + b, 0);
@@ -77,38 +83,43 @@ const SplitViewComponent = ({
 
 			// 新しい比率を計算
 			const newRatios = [...initialRatios];
-
 			if (is2PaneMode) {
 				// 2分割の場合のシンプルな計算
 				newRatios[0] = Math.max(
-					0.1,
-					Math.min(0.9, initialRatios[0] + ratioChange),
+					MIN_PANE_SIZE.SIDE,
+					Math.min(1 - MIN_PANE_SIZE.SIDE, initialRatios[0] + ratioChange),
 				);
 				newRatios[1] = 1 - newRatios[0];
 			} else {
 				// 3分割の場合の計算
 				if (index === 0) {
 					// 左のディバイダーを動かす場合
-					const maxMove = initialRatios[0] + initialRatios[1] - 0.2; // 中央ペインが最小10%確保
-					const adjustedChange = Math.max(
-						-initialRatios[0] + 0.1,
-						Math.min(maxMove, ratioChange),
+					// 左ペインが最小サイズを下回らず、中央ペインが最小サイズを下回らないように調整
+					const maxMoveLeft = initialRatios[1] - MIN_PANE_SIZE.CENTER; // 中央ペインが最小サイズを確保
+					const minMoveLeft = -(initialRatios[0] - MIN_PANE_SIZE.SIDE); // 左ペインが最小サイズを確保
+
+					const adjustedChangeLeft = Math.max(
+						minMoveLeft,
+						Math.min(maxMoveLeft, ratioChange),
 					);
 
-					newRatios[0] = initialRatios[0] + adjustedChange;
-					newRatios[1] = initialRatios[1] - adjustedChange;
+					newRatios[0] = initialRatios[0] + adjustedChangeLeft;
+					newRatios[1] = initialRatios[1] - adjustedChangeLeft;
 					// newRatios[2]はそのまま
 				} else {
 					// 右のディバイダーを動かす場合
-					const maxMove = initialRatios[1] + initialRatios[2] - 0.2; // 中央ペインが最小10%確保
-					const adjustedChange = Math.max(
-						-initialRatios[1] + 0.1,
-						Math.min(maxMove, ratioChange),
+					// 右ペインが最小サイズを下回らず、中央ペインが最小サイズを下回らないように調整
+					const maxMoveRight = initialRatios[2] - MIN_PANE_SIZE.SIDE; // 右ペインが最小サイズを確保
+					const minMoveRight = -(initialRatios[1] - MIN_PANE_SIZE.CENTER); // 中央ペインが最小サイズを確保
+
+					const adjustedChangeRight = Math.max(
+						minMoveRight,
+						Math.min(maxMoveRight, ratioChange),
 					);
 
 					// newRatios[0]はそのまま
-					newRatios[1] = initialRatios[1] + adjustedChange;
-					newRatios[2] = initialRatios[2] - adjustedChange;
+					newRatios[1] = initialRatios[1] + adjustedChangeRight;
+					newRatios[2] = initialRatios[2] - adjustedChangeRight;
 				}
 			}
 
