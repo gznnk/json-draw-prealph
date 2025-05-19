@@ -90,21 +90,15 @@ const App = (): ReactElement => {
 	}, []);
 
 	useEffect(() => {
-		setDirectoryItems([
-			...works.map((work) => ({
+		setDirectoryItems(
+			works.map((work) => ({
 				id: work.id,
 				name: work.name,
 				path: work.path,
 				isDirectory: work.type === "group",
 				type: work.type,
 			})),
-			{
-				id: "draft",
-				name: "Draft",
-				path: "draft",
-				isDirectory: true,
-			}, // TODO: ちゃんと実装
-		]);
+		);
 	}, [works]);
 
 	const handleDirectoryItemsChange = useCallback(
