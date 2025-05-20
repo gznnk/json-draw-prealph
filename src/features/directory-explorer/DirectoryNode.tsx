@@ -28,11 +28,13 @@ const DirectoryNodeComponent = ({
 	onItemClick,
 	onDragOver,
 	onDragLeave,
+	selectedNodeId,
 }: DirectoryNodeProps) => {
 	const [dragOverNodeList, setDragOverNodeList] = useState<string[]>([]);
 	const ref = useRef<HTMLDivElement>(null);
 	const isExpanded = expandedNodes.has(item.id);
 	const children = getDirectChildren(item, allItems);
+	const isSelected = selectedNodeId === item.id;
 
 	// アイテムのドラッグ設定
 	const [{ isDragging }, drag] = useDrag({
@@ -174,10 +176,9 @@ const DirectoryNodeComponent = ({
 				((item.isDirectory && isOverShallow) || dragOverNodeList.length > 0)
 			}
 			isFolder={item.isDirectory}
+			isSelected={isSelected}
 		>
-			{" "}
 			<NodeRow level={level} onClick={handleClick}>
-				{" "}
 				{/* 展開/非展開アイコン */}
 				<ExpandIconContainer>
 					{item.isDirectory ? (
@@ -209,6 +210,7 @@ const DirectoryNodeComponent = ({
 						onItemClick={onItemClick}
 						onDragOver={handleFileDragOver}
 						onDragLeave={handleFileDragLeave}
+						selectedNodeId={selectedNodeId}
 					/>
 				))}
 		</NodeContainer>

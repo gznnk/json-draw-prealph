@@ -59,4 +59,6 @@ export type DirectoryNodeProps = {
 	onDragOver?: (item: DirectoryItem) => void;
 	/** ドラッグリーブ時のコールバック */
 	onDragLeave?: (item: DirectoryItem) => void;
+	/** 選択されたノードのID */
+	selectedNodeId?: string | null;
 };

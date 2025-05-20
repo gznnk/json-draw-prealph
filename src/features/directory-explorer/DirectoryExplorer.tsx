@@ -4,6 +4,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import type {
 	DirectoryExplorerProps,
 	DropResult,
+	DirectoryItem,
 } from "./DirectoryExplorerTypes";
 import { DirectoryExplorerContainer } from "./DirectoryExplorerStyled";
 import { DirectoryNode } from "./DirectoryNode";
@@ -24,6 +25,8 @@ const DirectoryExplorerComponent = ({
 }: DirectoryExplorerProps) => {
 	// 展開されたノードのIDを管理
 	const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+	// 選択されたノードのIDを管理
+	const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
 	// ノードの展開/非展開を切り替える
 	const toggleExpand = useCallback((id: string) => {
@@ -37,6 +40,17 @@ const DirectoryExplorerComponent = ({
 			return next;
 		});
 	}, []);
+
+	// アイテムクリック時の処理
+	const handleItemClick = useCallback(
+		(item: DirectoryItem) => {
+			setSelectedNodeId(item.id);
+			if (onItemClick) {
+				onItemClick(item);
+			}
+		},
+		[onItemClick],
+	);
 
 	// ドロップ時の処理
 	const handleDrop = useCallback(
@@ -65,7 +79,8 @@ const DirectoryExplorerComponent = ({
 						toggleExpand={toggleExpand}
 						level={0}
 						onDrop={handleDrop}
-						onItemClick={onItemClick}
+						onItemClick={handleItemClick}
+						selectedNodeId={selectedNodeId}
 					/>
 				))}
 			</DirectoryExplorerContainer>
