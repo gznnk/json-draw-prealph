@@ -56,6 +56,10 @@ export const PreviewArea = styled.div`
   overflow-wrap: break-word;
   background-color: #0C0F1C;
   color: #B0B0B0;
+  &:not(:first-child) {
+    border-left: 1px solid #2A2F4C;
+  }
+
   /* マークダウンレンダリング向けの基本スタイル */
   h1, h2, h3, h4, h5, h6 {
     margin-top: 24px;
