@@ -12,7 +12,6 @@ import type { LLMClient } from "../shared/llm-client";
 import { Page } from "./components/Page";
 import { SplitView } from "./components/SplitView/SplitView";
 import { DirectoryExplorer } from "../features/directory-explorer";
-import { MarkdownEditorSample } from "./components/MarkdownEditorSample";
 
 // Import utils.
 import { Profiler } from "../utils/Profiler";
@@ -27,6 +26,8 @@ import { newWork } from "./tools/new_work";
 // Import repository and hooks.
 import type { DirectoryItem } from "../features/directory-explorer";
 import { useWorks } from "./hooks/useWorks";
+import type { WorkingItem } from "./model/WorkingItem";
+import { MarkdownEditor } from "../features/markdown-editor";
 
 declare global {
 	interface Window {
@@ -75,6 +76,10 @@ const App = (): ReactElement => {
 	const [llmClient, setLLMClient] = useState<LLMClient | null>(null);
 	const { works, updateWorks, addWork } = useWorks();
 	const [directoryItems, setDirectoryItems] = useState<DirectoryItem[]>([]);
+	const [workingItems, setWorkingItems] = useState<WorkingItem[]>([]);
+	const [selectedItem, setSelectedItem] = useState<DirectoryItem | undefined>(
+		undefined,
+	);
 
 	// new_workイベントのハンドリングとEventBusの取得
 	const workEventBus = newWork.useTool(async (work) => {
@@ -114,6 +119,23 @@ const App = (): ReactElement => {
 			updateWorks(updatedWorks);
 		},
 		[updateWorks],
+	);
+
+	const handleDirectoryItemSelect = useCallback(
+		(item: DirectoryItem) => {
+			const workingItem = workingItems.find((i) => i.id === item.id);
+			if (!workingItem) {
+				// 新しいワーキングアイテムを作成
+				const newItem: WorkingItem = {
+					id: item.id,
+					content: "",
+				};
+				setWorkingItems((prevItems) => [...prevItems, newItem]);
+			}
+
+			setSelectedItem(item);
+		},
+		[workingItems],
 	);
 
 	// Load OpenAI API key from KeyManager on component mount
@@ -227,6 +249,15 @@ const App = (): ReactElement => {
 		},
 	};
 
+	const content =
+		typeof workingItems.find((item) => item.id === selectedItem?.id)
+			?.content === "string"
+			? (workingItems.find((item) => item.id === selectedItem?.id)
+					?.content as string)
+			: undefined;
+
+	console.log(content);
+
 	return (
 		<div className="App">
 			<Page>
@@ -236,11 +267,24 @@ const App = (): ReactElement => {
 						<DirectoryExplorer
 							items={directoryItems}
 							onItemsChange={handleDirectoryItemsChange}
+							onItemClick={handleDirectoryItemSelect}
 						/>
 					}
 					center={
 						// マークダウンエディターサンプルを表示（中央ペイン）
-						<MarkdownEditorSample />
+						<MarkdownEditor
+							key={selectedItem?.id} // 異なるアイテムを選択したときに再マウントするためのキー
+							initialMarkdown={content}
+							onChange={(newMarkdown) => {
+								setWorkingItems((prevItems) =>
+									prevItems.map((item) =>
+										item.id === selectedItem?.id
+											? { ...item, content: newMarkdown }
+											: item,
+									),
+								);
+							}}
+						/>
 					}
 					right={
 						// チャットUIを表示（右ペイン）
