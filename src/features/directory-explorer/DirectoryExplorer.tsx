@@ -19,8 +19,8 @@ import {
  */
 const DirectoryExplorerComponent = ({
 	items,
-	onItemsChange,
 	selectedNodeId,
+	onItemsChange,
 	onSelect,
 }: DirectoryExplorerProps) => {
 	// 展開されたノードのIDを管理

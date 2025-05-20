@@ -24,17 +24,12 @@ export const DirectoryExplorerContainer = styled.div`
 export const NodeContainer = styled.div<{
 	isOver?: boolean;
 	isDragging?: boolean;
-	isSelected?: boolean;
 	isFolder?: boolean;
 }>`
   display: flex;
   flex-direction: column;
   opacity: ${(props) => (props.isDragging ? 0.5 : 1)};
   background-color: ${(props) => {
-		if (props.isSelected) {
-			return "#2b579a";
-		}
-
 		// フォルダ内の子要素は薄い色のハイライト
 		if (props.isOver) {
 			return "rgba(79, 156, 231, 0.2)";
@@ -42,10 +37,6 @@ export const NodeContainer = styled.div<{
 
 		return "transparent";
 	}};
-  color: ${(props) =>
-		props.isSelected
-			? "var(--list-active-selection-foreground, #ffffff)"
-			: "inherit"};
 `;
 
 /**
@@ -53,6 +44,7 @@ export const NodeContainer = styled.div<{
  */
 export const NodeRow = styled.div<{
 	level: number;
+	isSelected?: boolean;
 }>`
   display: flex;
   align-items: center;
@@ -60,6 +52,11 @@ export const NodeRow = styled.div<{
   padding-left: ${(props) => props.level * LEVEL_INDENT_WIDTH}px;
   cursor: pointer;
   position: relative;
+  background-color: ${(props) => (props.isSelected ? "#2b579a" : "transparent")};
+  color: ${(props) =>
+		props.isSelected
+			? "var(--list-active-selection-foreground, #ffffff)"
+			: "inherit"};
 `;
 
 /**

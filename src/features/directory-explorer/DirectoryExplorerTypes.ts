@@ -31,10 +31,10 @@ export type DropResult = {
 export type DirectoryExplorerProps = {
 	/** 表示する階層構造データ */
 	items: DirectoryItem[];
-	/** ドラッグ&ドロップで階層構造が変更された時のコールバック */
-	onItemsChange?: (items: DirectoryItem[]) => void;
 	/** 選択されたノードのID */
 	selectedNodeId?: string | null;
+	/** ドラッグ&ドロップで階層構造が変更された時のコールバック */
+	onItemsChange?: (items: DirectoryItem[]) => void;
 	/** ノード選択時のコールバック */
 	onSelect?: (nodeId: string) => void;
 };

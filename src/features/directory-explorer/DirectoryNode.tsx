@@ -167,7 +167,6 @@ const DirectoryNodeComponent = ({
 			return prev;
 		});
 	};
-
 	return (
 		<NodeContainer
 			ref={ref}
@@ -177,9 +176,8 @@ const DirectoryNodeComponent = ({
 				((item.isDirectory && isOverShallow) || dragOverNodeList.length > 0)
 			}
 			isFolder={item.isDirectory}
-			isSelected={isSelected}
 		>
-			<NodeRow level={level} onClick={handleClick}>
+			<NodeRow level={level} onClick={handleClick} isSelected={isSelected}>
 				{/* 展開/非展開アイコン */}
 				<ExpandIconContainer>
 					{item.isDirectory ? (

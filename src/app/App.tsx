@@ -287,6 +287,7 @@ const App = (): ReactElement => {
 					left={
 						<DirectoryExplorer
 							items={directoryItems}
+							selectedNodeId={selectedItem?.id}
 							onItemsChange={handleDirectoryItemsChange}
 							onSelect={handleDirectoryItemSelect}
 						/>
