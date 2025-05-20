@@ -25,10 +25,10 @@ const DirectoryNodeComponent = ({
 	toggleExpand,
 	level,
 	onDrop,
-	onItemClick,
 	onDragOver,
 	onDragLeave,
 	selectedNodeId,
+	onSelect,
 }: DirectoryNodeProps) => {
 	const [dragOverNodeList, setDragOverNodeList] = useState<string[]>([]);
 	const ref = useRef<HTMLDivElement>(null);
@@ -124,15 +124,16 @@ const DirectoryNodeComponent = ({
 
 	// ドラッグ＆ドロップの参照を結合
 	drag(drop(ref));
-
 	// アイテムのクリックハンドラー
 	const handleClick = () => {
 		// フォルダの場合は、子要素の有無にかかわらず展開/折りたたみを切り替える
 		if (item.isDirectory) {
 			toggleExpand(item.id);
 		}
-		if (onItemClick) {
-			onItemClick(item);
+
+		// 選択イベントの発火
+		if (onSelect) {
+			onSelect(item.id);
 		}
 	};
 
@@ -207,10 +208,10 @@ const DirectoryNodeComponent = ({
 						toggleExpand={toggleExpand}
 						level={level + 1}
 						onDrop={onDrop}
-						onItemClick={onItemClick}
 						onDragOver={handleFileDragOver}
 						onDragLeave={handleFileDragLeave}
 						selectedNodeId={selectedNodeId}
+						onSelect={onSelect}
 					/>
 				))}
 		</NodeContainer>

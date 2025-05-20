@@ -132,12 +132,16 @@ const App = (): ReactElement => {
 	);
 
 	const handleDirectoryItemSelect = useCallback(
-		(item: DirectoryItem) => {
-			const workingItem = workingItems.find((i) => i.id === item.id);
+		(itemId: string) => {
+			// itemIdからアイテムを検索
+			const item = directoryItems.find((i) => i.id === itemId);
+			if (!item) return;
+
+			const workingItem = workingItems.find((i) => i.id === itemId);
 			if (!workingItem) {
 				// 新しいワーキングアイテムを作成
 				const newItem: WorkingItem = {
-					id: item.id,
+					id: itemId,
 					content: "",
 				};
 				setWorkingItems((prevItems) => [...prevItems, newItem]);
@@ -145,7 +149,7 @@ const App = (): ReactElement => {
 
 			setSelectedItem(item);
 		},
-		[workingItems],
+		[workingItems, directoryItems],
 	);
 
 	// Load OpenAI API key from KeyManager on component mount
@@ -284,7 +288,7 @@ const App = (): ReactElement => {
 						<DirectoryExplorer
 							items={directoryItems}
 							onItemsChange={handleDirectoryItemsChange}
-							onItemClick={handleDirectoryItemSelect}
+							onSelect={handleDirectoryItemSelect}
 						/>
 					}
 					center={

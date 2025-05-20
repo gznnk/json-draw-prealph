@@ -33,8 +33,10 @@ export type DirectoryExplorerProps = {
 	items: DirectoryItem[];
 	/** ドラッグ&ドロップで階層構造が変更された時のコールバック */
 	onItemsChange?: (items: DirectoryItem[]) => void;
-	/** アイテムクリック時のコールバック */
-	onItemClick?: (item: DirectoryItem) => void;
+	/** 選択されたノードのID */
+	selectedNodeId?: string | null;
+	/** ノード選択時のコールバック */
+	onSelect?: (nodeId: string) => void;
 };
 
 /**
@@ -53,12 +55,12 @@ export type DirectoryNodeProps = {
 	level: number;
 	/** ドラッグ&ドロップで階層構造が変更された時のコールバック */
 	onDrop: (result: DropResult) => void;
-	/** アイテムクリック時のコールバック */
-	onItemClick?: (item: DirectoryItem) => void;
 	/** ドラッグオーバー時のコールバック */
 	onDragOver?: (item: DirectoryItem) => void;
 	/** ドラッグリーブ時のコールバック */
 	onDragLeave?: (item: DirectoryItem) => void;
 	/** 選択されたノードのID */
 	selectedNodeId?: string | null;
+	/** アイテム選択時のコールバック */
+	onSelect?: (itemId: string) => void;
 };
