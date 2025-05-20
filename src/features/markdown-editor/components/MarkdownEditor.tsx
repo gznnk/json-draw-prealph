@@ -26,13 +26,11 @@ import {
 } from "./MarkdownEditorFunctions";
 
 const MarkdownEditorComponent = ({
-	initialMarkdown = "",
+	markdown = "",
 	onChange,
 	placeholder = DEFAULT_PLACEHOLDER,
 	minHeight = DEFAULT_MIN_HEIGHT,
 }: MarkdownEditorProps): ReactElement => {
-	// マークダウンコンテンツの状態管理
-	const [markdown, setMarkdown] = useState(initialMarkdown);
 	// レンダリングされたHTMLの状態管理
 	const [renderedHtml, setRenderedHtml] = useState("");
 	// 表示状態の管理
@@ -125,13 +123,11 @@ const MarkdownEditorComponent = ({
 			};
 		}
 	}, [handleEditorScroll, handlePreviewScroll, showEditor, showPreview]);
-
 	// テキストエリアの変更イベントハンドラ
 	const handleChange = useCallback(
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
 			const newValue = e.target.value;
 			const textarea = e.target;
-			setMarkdown(newValue);
 
 			// 最後の行での入力を検出するための処理
 			const lines = newValue.split("\n");

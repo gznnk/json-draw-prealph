@@ -273,8 +273,7 @@ const App = (): ReactElement => {
 					center={
 						// マークダウンエディターサンプルを表示（中央ペイン）
 						<MarkdownEditor
-							key={selectedItem?.id} // 異なるアイテムを選択したときに再マウントするためのキー
-							initialMarkdown={content}
+							markdown={content}
 							onChange={(newMarkdown) => {
 								setWorkingItems((prevItems) =>
 									prevItems.map((item) =>

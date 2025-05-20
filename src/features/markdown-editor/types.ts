@@ -15,8 +15,8 @@ export enum MarkdownViewMode {
  * マークダウンエディターコンポーネントのプロパティ定義
  */
 export type MarkdownEditorProps = {
-	/** マークダウンコンテンツの初期値 */
-	initialMarkdown?: string;
+	/** マークダウンコンテンツ (制御コンポーネントとして) */
+	markdown?: string;
 	/** マークダウンコンテンツが変更された時のコールバック関数 */
 	onChange?: (markdown: string) => void;
 	/** デフォルトの表示モード */
