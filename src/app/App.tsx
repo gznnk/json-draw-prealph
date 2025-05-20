@@ -85,6 +85,16 @@ const App = (): ReactElement => {
 	const workEventBus = newWork.useTool(async (work) => {
 		try {
 			await addWork(work);
+			setWorkingItems((prevItems) => [
+				...prevItems,
+				{
+					id: work.id,
+					content: "",
+				},
+			]);
+			setSelectedItem({
+				id: work.id,
+			} as DirectoryItem);
 		} catch (error) {
 			console.error("Failed to add new work:", error);
 		}
@@ -215,6 +225,13 @@ const App = (): ReactElement => {
 								};
 								return updated;
 							});
+							setWorkingItems((prevItems) =>
+								prevItems.map((item) =>
+									item.id === selectedItem?.id
+										? { ...item, content: item.content + textChunk }
+										: item,
+								),
+							);
 						},
 					});
 				} catch (error) {
