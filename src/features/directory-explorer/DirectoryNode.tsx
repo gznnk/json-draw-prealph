@@ -30,6 +30,7 @@ const DirectoryNodeComponent = ({
 	selectedNodeId,
 	onSelect,
 	onContextMenu,
+	className,
 }: DirectoryNodeProps) => {
 	const [dragOverNodeList, setDragOverNodeList] = useState<string[]>([]);
 	const ref = useRef<HTMLDivElement>(null);
@@ -168,8 +169,7 @@ const DirectoryNodeComponent = ({
 			return prev;
 		});
 	};
-	return (
-		<NodeContainer
+	return (		<NodeContainer
 			ref={ref}
 			isDragging={isDragging}
 			isOver={
@@ -177,6 +177,7 @@ const DirectoryNodeComponent = ({
 				((item.isDirectory && isOverShallow) || dragOverNodeList.length > 0)
 			}
 			isFolder={item.isDirectory}
+			className={className}
 		>
 			<NodeRow
 				level={level}
@@ -208,8 +209,7 @@ const DirectoryNodeComponent = ({
 			</NodeRow>
 			{/* 子ノードの表示（展開時のみ） */}
 			{isExpanded &&
-				children.map((child) => (
-					<DirectoryNode
+				children.map((child) => (					<DirectoryNode
 						key={child.id}
 						item={child}
 						allItems={allItems}
@@ -222,6 +222,7 @@ const DirectoryNodeComponent = ({
 						selectedNodeId={selectedNodeId}
 						onSelect={onSelect}
 						onContextMenu={onContextMenu}
+						className="directory-node"
 					/>
 				))}
 		</NodeContainer>

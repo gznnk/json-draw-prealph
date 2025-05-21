@@ -71,6 +71,8 @@ export type DirectoryNodeProps = {
 	onSelect?: (itemId: string) => void;
 	/** コンテキストメニュー表示時のコールバック */
 	onContextMenu?: (item: DirectoryItem, x: number, y: number) => void;
+	/** カスタムクラス名 */
+	className?: string;
 };
 
 /**
