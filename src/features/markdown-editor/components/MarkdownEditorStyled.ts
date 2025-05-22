@@ -164,8 +164,48 @@ export const PreviewArea = styled.div`
  */
 export const Toolbar = styled.div`
   display: flex;
+  justify-content: space-between;
   padding: 8px;
   background-color: #0C0F1C;
+`;
+
+/**
+ * ツールバー左側のスタイル（タイトル入力欄用）
+ */
+export const ToolbarLeft = styled.div`
+  display: flex;
+  flex: 1;
+  padding-right: 8px;
+`;
+
+/**
+ * ツールバー右側のスタイル（ボタン用）
+ */
+export const ToolbarRight = styled.div`
+  display: flex;
+`;
+
+/**
+ * タイトル入力欄のスタイル
+ */
+export const TitleInput = styled.input`
+  flex: 1;
+  padding: 6px 12px;
+  border: 1px solid #3A4160;
+  border-radius: 4px;
+  background-color: #1A1F33;
+  color: #C0C4D2;
+  font-size: 14px;
+  outline: none;
+  
+  &::placeholder {
+    color: #666B82;
+  }
+  
+  &:focus {
+    border-color: #3A79B8;
+    box-shadow: 0 0 0 2px rgba(58, 121, 184, 0.2);
+  }
 `;
 
 /**

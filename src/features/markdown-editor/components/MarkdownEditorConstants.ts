@@ -9,6 +9,11 @@
 export const DEFAULT_PLACEHOLDER = "マークダウンを入力してください...";
 
 /**
+ * デフォルトのタイトルプレースホルダーテキスト
+ */
+export const DEFAULT_TITLE_PLACEHOLDER = "タイトルを入力...";
+
+/**
  * デフォルトの最小エディタ高さ（px）
  */
 export const DEFAULT_MIN_HEIGHT = 300;

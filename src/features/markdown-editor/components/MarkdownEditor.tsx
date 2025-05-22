@@ -11,6 +11,7 @@ import type { MarkdownEditorProps } from "../types";
 import {
 	DEFAULT_MIN_HEIGHT,
 	DEFAULT_PLACEHOLDER,
+	DEFAULT_TITLE_PLACEHOLDER,
 	VIEW_MODE_LABELS,
 } from "./MarkdownEditorConstants";
 import {
@@ -18,6 +19,9 @@ import {
 	MarkdownTextarea,
 	Toolbar,
 	ToolbarButton,
+	ToolbarLeft,
+	ToolbarRight,
+	TitleInput,
 } from "./MarkdownEditorStyled";
 import { SafeHtmlPreview } from "./SafeHtmlPreview";
 import {
@@ -28,6 +32,9 @@ import {
 const MarkdownEditorComponent = ({
 	markdown = "",
 	onChange,
+	title = "",
+	onTitleChange,
+	titlePlaceholder = DEFAULT_TITLE_PLACEHOLDER,
 	placeholder = DEFAULT_PLACEHOLDER,
 	minHeight = DEFAULT_MIN_HEIGHT,
 }: MarkdownEditorProps): ReactElement => {
@@ -231,37 +238,50 @@ const MarkdownEditorComponent = ({
 				minHeight: minHeight,
 			}}
 		>
+			{" "}
 			{/* ツールバー */}
 			<Toolbar>
-				<ToolbarButton
-					active={showEditor && showPreview}
-					onClick={() => {
-						setShowEditor(true);
-						setShowPreview(true);
-					}}
-				>
-					{VIEW_MODE_LABELS.split}
-				</ToolbarButton>
-				<ToolbarButton
-					active={showEditor && !showPreview}
-					onClick={() => {
-						setShowEditor(true);
-						setShowPreview(false);
-					}}
-				>
-					{VIEW_MODE_LABELS.editorOnly}
-				</ToolbarButton>
-				<ToolbarButton
-					active={!showEditor && showPreview}
-					onClick={() => {
-						setShowEditor(false);
-						setShowPreview(true);
-					}}
-				>
-					{VIEW_MODE_LABELS.previewOnly}
-				</ToolbarButton>
-			</Toolbar>
+				{/* 左側：タイトル入力欄 */}
+				<ToolbarLeft>
+					<TitleInput
+						type="text"
+						value={title}
+						onChange={(e) => onTitleChange?.(e.target.value)}
+						placeholder={titlePlaceholder}
+					/>
+				</ToolbarLeft>
 
+				{/* 右側：ビューモード切り替えボタン */}
+				<ToolbarRight>
+					<ToolbarButton
+						active={showEditor && showPreview}
+						onClick={() => {
+							setShowEditor(true);
+							setShowPreview(true);
+						}}
+					>
+						{VIEW_MODE_LABELS.split}
+					</ToolbarButton>
+					<ToolbarButton
+						active={showEditor && !showPreview}
+						onClick={() => {
+							setShowEditor(true);
+							setShowPreview(false);
+						}}
+					>
+						{VIEW_MODE_LABELS.editorOnly}
+					</ToolbarButton>
+					<ToolbarButton
+						active={!showEditor && showPreview}
+						onClick={() => {
+							setShowEditor(false);
+							setShowPreview(true);
+						}}
+					>
+						{VIEW_MODE_LABELS.previewOnly}
+					</ToolbarButton>
+				</ToolbarRight>
+			</Toolbar>
 			{/* エディタとプレビューのコンテナ */}
 			<EditorContainer>
 				{/* マークダウン入力エリア */}

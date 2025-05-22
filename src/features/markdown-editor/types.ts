@@ -19,6 +19,12 @@ export type MarkdownEditorProps = {
 	markdown?: string;
 	/** マークダウンコンテンツが変更された時のコールバック関数 */
 	onChange?: (markdown: string) => void;
+	/** タイトル */
+	title?: string;
+	/** タイトルが変更された時のコールバック関数 */
+	onTitleChange?: (title: string) => void;
+	/** タイトル入力欄のプレースホルダーテキスト */
+	titlePlaceholder?: string;
 	/** デフォルトの表示モード */
 	defaultViewMode?: MarkdownViewMode;
 	/** プレースホルダーテキスト */
