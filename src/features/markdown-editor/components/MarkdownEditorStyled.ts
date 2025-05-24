@@ -231,3 +231,13 @@ export const ToolbarButton = styled.button<{ active?: boolean }>`
     box-shadow: 0 0 0 2px rgba(66, 83, 225, 0.5);
   }
 `;
+
+/**
+ * エディタ全体のラッパー要素のスタイル
+ */
+export const EditorWrapper = styled.div<{ minHeight?: string | number }>`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: ${({ minHeight }) => (typeof minHeight === "number" ? `${minHeight}px` : minHeight || "auto")};
+`;

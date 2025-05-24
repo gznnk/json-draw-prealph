@@ -16,6 +16,7 @@ import {
 } from "./MarkdownEditorConstants";
 import {
 	EditorContainer,
+	EditorWrapper,
 	MarkdownTextarea,
 	Toolbar,
 	ToolbarButton,
@@ -226,17 +227,8 @@ const MarkdownEditorComponent = ({
 			lastKeyPressRef.current = null;
 		};
 	}, [showPreview, syncScrollWithTimeout]);
-
 	return (
-		<div
-			style={{
-				display: "flex",
-				flexDirection: "column",
-				height: "100%",
-				minHeight: minHeight,
-			}}
-		>
-			{" "}
+		<EditorWrapper minHeight={minHeight}>
 			{/* ツールバー */}
 			<Toolbar>
 				{/* 左側：タイトル入力欄 */}
@@ -295,9 +287,9 @@ const MarkdownEditorComponent = ({
 				{/* プレビュー表示エリア */}
 				{showPreview && (
 					<SafeHtmlPreview ref={previewRef} html={renderedHtml} />
-				)}
+				)}{" "}
 			</EditorContainer>
-		</div>
+		</EditorWrapper>
 	);
 };
 
