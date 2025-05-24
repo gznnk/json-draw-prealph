@@ -74,14 +74,11 @@ const MarkdownEditorComponent = ({
 					} else {
 						isScrollingPreview.current = true;
 					}
-				},
-				// 同期終了後に実行
+				}, // 同期終了後に実行
 				() => {
-					if (sourceIsEditor) {
-						isScrollingEditor.current = false;
-					} else {
-						isScrollingPreview.current = false;
-					}
+					// スクロール同期完了後は両方のフラグをリセット
+					isScrollingEditor.current = false;
+					isScrollingPreview.current = false;
 				},
 				50,
 			);
@@ -130,6 +127,7 @@ const MarkdownEditorComponent = ({
 			};
 		}
 	}, [handleEditorScroll, handlePreviewScroll, showEditor, showPreview]);
+
 	// テキストエリアの変更イベントハンドラ
 	const handleChange = useCallback(
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
