@@ -370,9 +370,21 @@ const App = (): ReactElement => {
 					?.content as string)
 			: undefined;
 
+	/**
+	 * 保存ボタンがクリックされた時のハンドラ
+	 */
+	const handleSave = useCallback(() => {
+		// 選択されているアイテムが存在する場合のみ処理を実行
+		if (selectedItem) {
+			console.log(`Saving content for item with ID: ${selectedItem}`);
+			// TODO: 実際の保存処理を実装する
+			// 例: APIを呼び出す、データベースに保存するなど
+		}
+	}, [selectedItem]);
+
 	return (
 		<div className="App">
-			<Page>
+			<Page onSave={selectedItem ? handleSave : undefined}>
 				<SplitView
 					initialRatio={[0.2, 0.6, 0.2]}
 					left={

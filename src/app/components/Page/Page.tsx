@@ -26,6 +26,10 @@ type PageProps = {
 	 * The content to render inside the body.
 	 */
 	children?: React.ReactNode;
+	/**
+	 * 保存ボタンがクリックされた時に呼び出されるコールバック関数
+	 */
+	onSave?: () => void;
 };
 
 /**
@@ -38,10 +42,11 @@ type PageProps = {
 const PageComponent: React.FC<PageProps> = ({
 	headerHeight = PAGE_CONSTANTS.HEADER_HEIGHT,
 	children,
+	onSave,
 }) => {
 	return (
 		<PageContainer>
-			<Header height={headerHeight} />
+			<Header height={headerHeight} onSave={onSave} />
 			<Body top={headerHeight}>{children}</Body>
 		</PageContainer>
 	);

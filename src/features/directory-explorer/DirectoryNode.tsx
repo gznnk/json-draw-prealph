@@ -212,7 +212,7 @@ const DirectoryNodeComponent = ({
 				{/* 編集中アイコン */}
 				{item.isEditing && (
 					<EditingIconContainer>
-						<div></div>
+						<div />
 					</EditingIconContainer>
 				)}
 			</NodeRow>

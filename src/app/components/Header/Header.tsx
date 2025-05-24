@@ -14,6 +14,10 @@ type HeaderProps = {
 	 * This value will be used to set the height of the header container.
 	 */
 	height?: number;
+	/**
+	 * 保存ボタンがクリックされた時に呼び出されるコールバック関数
+	 */
+	onSave?: () => void;
 };
 
 /**
@@ -23,12 +27,27 @@ type HeaderProps = {
  * @param props - Component props
  * @returns ReactElement representing the header
  */
-const HeaderComponent: React.FC<HeaderProps> = ({ height = 30 }) => {
+const HeaderComponent: React.FC<HeaderProps> = ({ height = 30, onSave }) => {
 	return (
 		<HeaderContainer height={height}>
 			<HeaderTitle />
 			<HeaderControls>
-				{/* ヘッダーの右側にはコントロールを配置できます */}
+				{onSave && (
+					<button
+						onClick={onSave}
+						style={{
+							background: "#3A79B8",
+							color: "#FFFFFF",
+							border: "none",
+							borderRadius: "4px",
+							padding: "4px 8px",
+							cursor: "pointer",
+							fontSize: "12px",
+						}}
+					>
+						保存
+					</button>
+				)}
 			</HeaderControls>
 		</HeaderContainer>
 	);
