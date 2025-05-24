@@ -79,7 +79,6 @@ const App = (): ReactElement => {
 	const [selectedItem, setSelectedItem] = useState<string | undefined>(
 		undefined,
 	);
-
 	// new_workイベントのハンドリングとEventBusの取得
 	const workEventBus = newWork.useTool(async (work) => {
 		try {
@@ -89,6 +88,7 @@ const App = (): ReactElement => {
 				{
 					id: work.id,
 					content: "",
+					isEditing: false,
 				},
 			]);
 			setSelectedItem(work.id);
@@ -168,12 +168,11 @@ const App = (): ReactElement => {
 				};
 
 				// ワーク配列に追加
-				await addWork(newFile);
-
-				// 作業アイテムとして追加
+				await addWork(newFile); // 作業アイテムとして追加
 				const newWorkingItem: WorkingItem = {
 					id: fileId,
 					content: "",
+					isEditing: false,
 				};
 				setWorkingItems((prev) => [...prev, newWorkingItem]);
 
@@ -237,6 +236,7 @@ const App = (): ReactElement => {
 				const newItem: WorkingItem = {
 					id: itemId,
 					content: "",
+					isEditing: false,
 				};
 				setWorkingItems((prevItems) => [...prevItems, newItem]);
 			}
@@ -370,9 +370,21 @@ const App = (): ReactElement => {
 					?.content as string)
 			: undefined;
 
+	/**
+	 * 保存ボタンがクリックされた時のハンドラ
+	 */
+	const handleSave = useCallback(() => {
+		// 選択されているアイテムが存在する場合のみ処理を実行
+		if (selectedItem) {
+			console.log(`Saving content for item with ID: ${selectedItem}`);
+			// TODO: 実際の保存処理を実装する
+			// 例: APIを呼び出す、データベースに保存するなど
+		}
+	}, [selectedItem]);
+
 	return (
 		<div className="App">
-			<Page>
+			<Page onSave={selectedItem ? handleSave : undefined}>
 				<SplitView
 					initialRatio={[0.2, 0.6, 0.2]}
 					left={
