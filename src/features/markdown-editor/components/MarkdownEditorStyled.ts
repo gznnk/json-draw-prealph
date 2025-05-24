@@ -9,6 +9,7 @@ export const EditorContainer = styled.div`
   width: 100%;
   height: 100%;
   min-height: 300px;
+  box-sizing: border-box;
   border: 1px solid #2A2F4C;
   border-radius: 4px;
   overflow: hidden;
@@ -237,6 +238,7 @@ export const ToolbarButton = styled.button<{ active?: boolean }>`
  */
 export const EditorWrapper = styled.div<{ minHeight?: string | number }>`
   display: flex;
+  box-sizing: border-box;
   flex-direction: column;
   height: 100%;
   min-height: ${({ minHeight }) => (typeof minHeight === "number" ? `${minHeight}px` : minHeight || "auto")};

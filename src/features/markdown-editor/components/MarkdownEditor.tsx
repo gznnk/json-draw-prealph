@@ -200,33 +200,6 @@ const MarkdownEditorComponent = ({
 		[showPreview, syncScrollWithTimeout],
 	);
 
-	// キー入力後のスクロール位置調整用のEffect
-	useEffect(() => {
-		// 直前のキー入力があった場合のみ実行
-		const key = lastKeyPressRef.current;
-		if (!key || !textareaRef.current) return;
-
-		const textarea = textareaRef.current;
-
-		// キー入力後、DOMが更新された後でスクロール位置を調整
-		// 特に最終行での入力に対応
-		if (key === "Enter" || key.length === 1) {
-			// 文字入力の場合
-
-			// キャレット位置に基づいてスクロールを調整
-			adjustScrollBasedOnCaret(textarea, key);
-
-			// プレビューも同期
-			if (showPreview && previewRef.current && !isScrollingPreview.current) {
-				syncScrollWithTimeout(textarea, previewRef.current, true);
-			}
-		}
-
-		// クリーンアップでキー入力情報をリセット
-		return () => {
-			lastKeyPressRef.current = null;
-		};
-	}, [showPreview, syncScrollWithTimeout]);
 	return (
 		<EditorWrapper minHeight={minHeight}>
 			{/* ツールバー */}
