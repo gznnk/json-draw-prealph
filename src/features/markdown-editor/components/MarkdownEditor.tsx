@@ -16,6 +16,7 @@ import {
 } from "./MarkdownEditorConstants";
 import {
 	EditorContainer,
+	EditorWrapper,
 	MarkdownTextarea,
 	Toolbar,
 	ToolbarButton,
@@ -74,14 +75,11 @@ const MarkdownEditorComponent = ({
 					} else {
 						isScrollingPreview.current = true;
 					}
-				},
-				// 同期終了後に実行
+				}, // 同期終了後に実行
 				() => {
-					if (sourceIsEditor) {
-						isScrollingEditor.current = false;
-					} else {
-						isScrollingPreview.current = false;
-					}
+					// スクロール同期完了後は両方のフラグをリセット
+					isScrollingEditor.current = false;
+					isScrollingPreview.current = false;
 				},
 				50,
 			);
@@ -130,6 +128,7 @@ const MarkdownEditorComponent = ({
 			};
 		}
 	}, [handleEditorScroll, handlePreviewScroll, showEditor, showPreview]);
+
 	// テキストエリアの変更イベントハンドラ
 	const handleChange = useCallback(
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -228,17 +227,8 @@ const MarkdownEditorComponent = ({
 			lastKeyPressRef.current = null;
 		};
 	}, [showPreview, syncScrollWithTimeout]);
-
 	return (
-		<div
-			style={{
-				display: "flex",
-				flexDirection: "column",
-				height: "100%",
-				minHeight: minHeight,
-			}}
-		>
-			{" "}
+		<EditorWrapper minHeight={minHeight}>
 			{/* ツールバー */}
 			<Toolbar>
 				{/* 左側：タイトル入力欄 */}
@@ -297,9 +287,9 @@ const MarkdownEditorComponent = ({
 				{/* プレビュー表示エリア */}
 				{showPreview && (
 					<SafeHtmlPreview ref={previewRef} html={renderedHtml} />
-				)}
+				)}{" "}
 			</EditorContainer>
-		</div>
+		</EditorWrapper>
 	);
 };
 
