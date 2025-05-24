@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 
 /**
- * コンテンツコンテナのルート要素
+ * コンテンツビューのルート要素
  * コンテンツ全体をラップするコンテナ
  */
 export const Container = styled.div`

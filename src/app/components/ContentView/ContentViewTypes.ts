@@ -2,9 +2,9 @@
 import type { ContentType } from "../../types/ContentType";
 
 /**
- * ContentContainerコンポーネントのプロパティ
+ * ContentViewコンポーネントのプロパティ
  */
-export type ContentContainerProps = {
+export type ContentViewProps = {
 	/** コンテンツの種類 */
 	type?: ContentType;
 	/** コンテンツの表示データ */

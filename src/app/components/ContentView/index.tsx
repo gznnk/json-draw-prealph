@@ -1,14 +1,14 @@
 // コンポーネントのエクスポート
-export { ContentContainer } from "./ContentContainer";
+export { ContentView } from "./ContentView";
 
 // 型のエクスポート
-export type { ContentContainerProps } from "./ContentContainerTypes";
+export type { ContentViewProps } from "./ContentViewTypes";
 
 // 定数のエクスポート
 export {
 	EMPTY_CONTENT_MESSAGE,
 	NO_SELECTION_MESSAGE,
-} from "./ContentContainerConstants";
+} from "./ContentViewConstants";
 
 // ContentTypeを再エクスポート（互換性のため）
 // 注意: ContentTypeは今後 import { ContentType } from "../../types/ContentType"; からインポートすることを推奨

@@ -13,7 +13,7 @@ import { Page } from "./components/Page";
 import { SplitView } from "./components/SplitView/SplitView";
 import { DirectoryExplorer } from "../features/directory-explorer";
 import type { DirectoryItem } from "../features/directory-explorer";
-import { ContentContainer } from "./components/ContentContainer";
+import { ContentView } from "./components/ContentView";
 import { ContentType } from "./types/ContentType";
 
 // Import utils.
@@ -462,8 +462,8 @@ const App = (): ReactElement => {
 						/>
 					}
 					center={
-						// ContentContainerを表示（中央ペイン）
-						<ContentContainer
+						// ContentViewを表示（中央ペイン）
+						<ContentView
 							type={selectedItem ? ContentType.MARKDOWN : undefined}
 							content={content}
 							id={selectedItem}

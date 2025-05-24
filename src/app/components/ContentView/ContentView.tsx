@@ -8,26 +8,26 @@ import { CanvasSheet } from "../CanvasSheet";
 
 // Import types and constants
 import { ContentType } from "../../types/ContentType";
-import type { ContentContainerProps } from "./ContentContainerTypes";
+import type { ContentViewProps } from "./ContentViewTypes";
 import {
 	EMPTY_CONTENT_MESSAGE,
 	NO_SELECTION_MESSAGE,
-} from "./ContentContainerConstants";
+} from "./ContentViewConstants";
 
 // Import styled components
-import { Container, EmptyContent } from "./ContentContainerStyled";
+import { Container, EmptyContent } from "./ContentViewStyled";
 
 /**
- * 様々な種類のコンテンツを表示するコンテナコンポーネント
+ * 様々な種類のコンテンツを表示するビューコンポーネント
  * マークダウン、キャンバス、サンドボックスなど異なるタイプのコンテンツを
  * 統一されたインターフェースで表示します
  */
-const ContentContainerComponent = ({
+const ContentViewComponent = ({
 	type,
 	content,
 	id,
 	onChange,
-}: ContentContainerProps): ReactElement => {
+}: ContentViewProps): ReactElement => {
 	return (
 		<Container>
 			{!type ? (
@@ -52,4 +52,4 @@ const ContentContainerComponent = ({
 	);
 };
 
-export const ContentContainer = memo(ContentContainerComponent);
+export const ContentView = memo(ContentViewComponent);
