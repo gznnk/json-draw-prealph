@@ -29,8 +29,8 @@ import { newWork } from "./tools/new_work";
 // Import repository and hooks.
 import { useWorks } from "./hooks/useWorks";
 import { useMarkdowns } from "./hooks/useMarkdowns";
-import type { WorkingItem } from "./model/WorkingItem";
-import type { Markdown } from "./model/Markdown";
+import type { WorkingItem } from "./models/WorkingItem";
+import type { Markdown } from "./models/Markdown";
 
 declare global {
 	interface Window {

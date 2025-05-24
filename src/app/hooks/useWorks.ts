@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import type { Work } from "../model/Work";
+import type { Work } from "../models/Work";
 import { createWorkRepository } from "../repository/work/factory";
 import type { WorkRepository } from "../repository/work/interface";
 

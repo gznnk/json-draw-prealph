@@ -1,4 +1,4 @@
-import type { Markdown } from "../../model/Markdown";
+import type { Markdown } from "../../models/Markdown";
 
 export interface MarkdownRepository {
 	saveMarkdowns(markdowns: Markdown[]): Promise<void>;

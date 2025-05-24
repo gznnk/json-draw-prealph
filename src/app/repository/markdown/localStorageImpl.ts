@@ -1,4 +1,4 @@
-import type { Markdown } from "../../model/Markdown";
+import type { Markdown } from "../../models/Markdown";
 import type { MarkdownRepository } from "./interface";
 
 /**

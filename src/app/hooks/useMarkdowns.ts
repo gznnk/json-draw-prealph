@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { Markdown } from "../model/Markdown";
+import type { Markdown } from "../models/Markdown";
 import { createMarkdownRepository } from "../repository/markdown/factory";
 import type { MarkdownRepository } from "../repository/markdown/interface";
 

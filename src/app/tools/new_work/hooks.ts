@@ -2,7 +2,7 @@
  * カスタムフック: new_workツールのイベントをリッスンするためのフック
  */
 import { useEffect, useMemo } from "react";
-import type { Work } from "../../model/Work";
+import type { Work } from "../../models/Work";
 import { EventBus } from "../../../shared/event-bus/EventBus";
 import { NEW_WORK_EVENT } from "./constants";
 
