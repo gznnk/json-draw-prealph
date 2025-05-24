@@ -34,6 +34,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({ height = 30, onSave }) => {
 			<HeaderControls>
 				{onSave && (
 					<button
+						type="button"
 						onClick={onSave}
 						style={{
 							background: "#3A79B8",

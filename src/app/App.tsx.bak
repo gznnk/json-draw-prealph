@@ -1,4 +1,4 @@
-// Import React.
+﻿// Import React.
 import { useState, useEffect, useCallback } from "react";
 import type { ReactElement } from "react";
 
@@ -28,7 +28,6 @@ import { newWork } from "./tools/new_work";
 import { useWorks } from "./hooks/useWorks";
 import { useMarkdowns } from "./hooks/useMarkdowns";
 import type { WorkingItem } from "./model/WorkingItem";
-import type { Markdown } from "./model/Markdown";
 import { MarkdownEditor } from "../features/markdown-editor";
 
 declare global {
@@ -42,10 +41,10 @@ if (!window.profiler) {
 }
 
 /**
- * 新しいシートを追加するためのイベントを発行します
- * @param id - シートのID
- * @param sheetName - シートの表示名
- * @param sheetType - シートのタイプ（canvas, sandboxなど）
+ * 譁ｰ縺励＞繧ｷ繝ｼ繝医ｒ霑ｽ蜉縺吶ｋ縺溘ａ縺ｮ繧､繝吶Φ繝医ｒ逋ｺ陦後＠縺ｾ縺・
+ * @param id - 繧ｷ繝ｼ繝医・ID
+ * @param sheetName - 繧ｷ繝ｼ繝医・陦ｨ遉ｺ蜷・
+ * @param sheetType - 繧ｷ繝ｼ繝医・繧ｿ繧､繝暦ｼ・anvas, sandbox縺ｪ縺ｩ・・
  */
 export const dispatchAddNewSheetEvent = ({
 	id,
@@ -67,11 +66,11 @@ export const dispatchAddNewSheetEvent = ({
 };
 
 /**
- * Appコンポーネント
- * アプリケーションのメインレイアウトを定義します
+ * App繧ｳ繝ｳ繝昴・繝阪Φ繝・
+ * 繧｢繝励Μ繧ｱ繝ｼ繧ｷ繝ｧ繝ｳ縺ｮ繝｡繧､繝ｳ繝ｬ繧､繧｢繧ｦ繝医ｒ螳夂ｾｩ縺励∪縺・
  */
 const App = (): ReactElement => {
-	// 状態管理
+	// 迥ｶ諷狗ｮ｡逅・
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [apiKey, setApiKey] = useState<string | null>(null);
@@ -82,7 +81,7 @@ const App = (): ReactElement => {
 	const [selectedItem, setSelectedItem] = useState<string | undefined>(
 		undefined,
 	);
-	// new_workイベントのハンドリングとEventBusの取得
+	// new_work繧､繝吶Φ繝医・繝上Φ繝峨Μ繝ｳ繧ｰ縺ｨEventBus縺ｮ蜿門ｾ・
 	const workEventBus = newWork.useTool(async (work) => {
 		try {
 			await addWork(work);
@@ -100,10 +99,10 @@ const App = (): ReactElement => {
 		}
 	});
 
-	// ドラッグ＆ドロップによるアイテム変更のハンドラ
+	// 繝峨Λ繝・げ・・ラ繝ｭ繝・・縺ｫ繧医ｋ繧｢繧､繝・Β螟画峩縺ｮ繝上Φ繝峨Λ
 	const handleDirectoryItemsChange = useCallback(
 		(newItems: DirectoryItem[]) => {
-			// DirectoryItemの配列をWorkの配列にマッピング
+			// DirectoryItem縺ｮ驟榊・繧淡ork縺ｮ驟榊・縺ｫ繝槭ャ繝斐Φ繧ｰ
 			const updatedWorks = newItems.map((item) => {
 				return {
 					id: item.id,
@@ -113,27 +112,27 @@ const App = (): ReactElement => {
 				};
 			});
 
-			// 状態とストレージを更新
+			// 迥ｶ諷九→繧ｹ繝医Ξ繝ｼ繧ｸ繧呈峩譁ｰ
 			updateWorks(updatedWorks);
 		},
 		[updateWorks],
 	);
 
-	// フォルダを作成する処理
+	// 繝輔か繝ｫ繝繧剃ｽ懈・縺吶ｋ蜃ｦ逅・
 	const handleCreateFolder = useCallback(
 		async (parentId: string, folderName: string) => {
 			try {
-				// 親フォルダの情報を取得
+				// 隕ｪ繝輔か繝ｫ繝縺ｮ諠・ｱ繧貞叙蠕・
 				const parentItem = works.find((work) => work.id === parentId);
 				const parentPath = parentItem ? parentItem.path : "";
 
-				// 新しいフォルダのパスと一意のIDを生成
+				// 譁ｰ縺励＞繝輔か繝ｫ繝縺ｮ繝代せ縺ｨ荳諢上・ID繧堤函謌・
 				const folderPath = parentPath
 					? `${parentPath}/${folderName}`
 					: folderName;
 				const folderId = `folder-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-				// 新しいワーク(フォルダ)を作成
+				// 譁ｰ縺励＞繝ｯ繝ｼ繧ｯ(繝輔か繝ｫ繝)繧剃ｽ懈・
 				const newFolder = {
 					id: folderId,
 					name: folderName,
@@ -141,7 +140,7 @@ const App = (): ReactElement => {
 					type: "group",
 				};
 
-				// ワーク配列に追加
+				// 繝ｯ繝ｼ繧ｯ驟榊・縺ｫ霑ｽ蜉
 				await addWork(newFolder);
 			} catch (error) {
 				console.error("Failed to create folder:", error);
@@ -150,19 +149,19 @@ const App = (): ReactElement => {
 		[works, addWork],
 	);
 
-	// ファイルを作成する処理
+	// 繝輔ぃ繧､繝ｫ繧剃ｽ懈・縺吶ｋ蜃ｦ逅・
 	const handleCreateFile = useCallback(
 		async (parentId: string, fileName: string) => {
 			try {
-				// 親フォルダの情報を取得
+				// 隕ｪ繝輔か繝ｫ繝縺ｮ諠・ｱ繧貞叙蠕・
 				const parentItem = works.find((work) => work.id === parentId);
 				const parentPath = parentItem ? parentItem.path : "";
 
-				// 新しいファイルのパスと一意のIDを生成
+				// 譁ｰ縺励＞繝輔ぃ繧､繝ｫ縺ｮ繝代せ縺ｨ荳諢上・ID繧堤函謌・
 				const filePath = parentPath ? `${parentPath}/${fileName}` : fileName;
 				const fileId = `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-				// 新しいワーク(ファイル)を作成
+				// 譁ｰ縺励＞繝ｯ繝ｼ繧ｯ(繝輔ぃ繧､繝ｫ)繧剃ｽ懈・
 				const newFile = {
 					id: fileId,
 					name: fileName,
@@ -170,8 +169,8 @@ const App = (): ReactElement => {
 					type: "document",
 				};
 
-				// ワーク配列に追加
-				await addWork(newFile); // 作業アイテムとして追加
+				// 繝ｯ繝ｼ繧ｯ驟榊・縺ｫ霑ｽ蜉
+				await addWork(newFile); // 菴懈･ｭ繧｢繧､繝・Β縺ｨ縺励※霑ｽ蜉
 				const newWorkingItem: WorkingItem = {
 					id: fileId,
 					content: "",
@@ -179,7 +178,7 @@ const App = (): ReactElement => {
 				};
 				setWorkingItems((prev) => [...prev, newWorkingItem]);
 
-				// 作成したファイルを選択
+				// 菴懈・縺励◆繝輔ぃ繧､繝ｫ繧帝∈謚・
 				setSelectedItem(fileId);
 			} catch (error) {
 				console.error("Failed to create file:", error);
@@ -188,35 +187,35 @@ const App = (): ReactElement => {
 		[works, addWork],
 	);
 
-	// ファイルまたはフォルダを削除する処理
+	// 繝輔ぃ繧､繝ｫ縺ｾ縺溘・繝輔か繝ｫ繝繧貞炎髯､縺吶ｋ蜃ｦ逅・
 	const handleDelete = useCallback(
 		async (itemId: string) => {
 			try {
-				// 削除対象のアイテムとその子孫を特定
+				// 蜑企勁蟇ｾ雎｡縺ｮ繧｢繧､繝・Β縺ｨ縺昴・蟄仙ｭｫ繧堤音螳・
 				const itemToDelete = works.find((work) => work.id === itemId);
 				if (!itemToDelete) return;
 
-				// アイテムのパスで始まるすべてのアイテムも削除対象に（子孫）
+				// 繧｢繧､繝・Β縺ｮ繝代せ縺ｧ蟋九∪繧九☆縺ｹ縺ｦ縺ｮ繧｢繧､繝・Β繧ょ炎髯､蟇ｾ雎｡縺ｫ・亥ｭ仙ｭｫ・・
 				const itemsToDelete = works.filter(
 					(work) =>
 						work.id === itemId || work.path.startsWith(`${itemToDelete.path}/`),
 				);
 				const idsToDelete = itemsToDelete.map((item) => item.id);
 
-				// 削除対象外のアイテムだけを残す
+				// 蜑企勁蟇ｾ雎｡螟悶・繧｢繧､繝・Β縺縺代ｒ谿九☆
 				const updatedWorks = works.filter(
 					(work) => !idsToDelete.includes(work.id),
 				);
 
-				// ワーク配列を更新
+				// 繝ｯ繝ｼ繧ｯ驟榊・繧呈峩譁ｰ
 				await updateWorks(updatedWorks);
 
-				// 選択中のアイテムが削除対象の場合、選択を解除
+				// 驕ｸ謚樔ｸｭ縺ｮ繧｢繧､繝・Β縺悟炎髯､蟇ｾ雎｡縺ｮ蝣ｴ蜷医・∈謚槭ｒ隗｣髯､
 				if (selectedItem && idsToDelete.includes(selectedItem)) {
 					setSelectedItem(undefined);
 				}
 
-				// 関連するワーキングアイテムも削除
+				// 髢｢騾｣縺吶ｋ繝ｯ繝ｼ繧ｭ繝ｳ繧ｰ繧｢繧､繝・Β繧ょ炎髯､
 				setWorkingItems((prev) =>
 					prev.filter((item) => !idsToDelete.includes(item.id)),
 				);
@@ -229,30 +228,31 @@ const App = (): ReactElement => {
 
 	const handleDirectoryItemSelect = useCallback(
 		async (itemId: string) => {
-			// itemIdからワークを検索
+			// itemId縺九ｉ繝ｯ繝ｼ繧ｯ繧呈､懃ｴ｢
 			const item = works.find((work) => work.id === itemId);
 			if (!item) return;
 
-			// 既存の作業アイテムを探す
+			// 譌｢蟄倥・菴懈･ｭ繧｢繧､繝・Β繧呈爾縺・
 			const workingItem = workingItems.find((item) => item.id === itemId);
-
+			
 			if (!workingItem && item.type !== "group") {
 				try {
-					// 保存済みのマークダウンデータがあるか確認
+					// 菫晏ｭ俶ｸ医∩縺ｮ繝槭・繧ｯ繝繧ｦ繝ｳ繝・・繧ｿ縺後≠繧九°遒ｺ隱・
 					const savedMarkdown = await getMarkdownById(itemId);
 					const content = savedMarkdown ? savedMarkdown.content : "";
-
-					// 新しいワーキングアイテムを作成
+					
+					// 譁ｰ縺励＞繝ｯ繝ｼ繧ｭ繝ｳ繧ｰ繧｢繧､繝・Β繧剃ｽ懈・
 					const newItem: WorkingItem = {
 						id: itemId,
 						content,
 						isEditing: false,
 					};
 					setWorkingItems((prevItems) => [...prevItems, newItem]);
+					
 				} catch (error) {
 					console.error(`Failed to load markdown for item ${itemId}:`, error);
-
-					// エラー時は空のコンテンツで作成
+					
+					// 繧ｨ繝ｩ繝ｼ譎ゅ・遨ｺ縺ｮ繧ｳ繝ｳ繝・Φ繝・〒菴懈・
 					const newItem: WorkingItem = {
 						id: itemId,
 						content: "",
@@ -276,7 +276,7 @@ const App = (): ReactElement => {
 	// Initialize LLM client if API key provided
 	useEffect(() => {
 		if (apiKey) {
-			// LLMClientFactoryを使用してクライアントを初期化
+			// LLMClientFactory繧剃ｽｿ逕ｨ縺励※繧ｯ繝ｩ繧､繧｢繝ｳ繝医ｒ蛻晄悄蛹・
 			const client = LLMClientFactory.createClient(apiKey, {
 				tools: [
 					workflowAgent.definition,
@@ -294,7 +294,7 @@ const App = (): ReactElement => {
 					"You are a general-purpose assistant that outputs responses in Markdown format. " +
 					"When including LaTeX expressions, do not use code blocks. " +
 					"Instead, use inline LaTeX syntax like $...$ for inline math and $$...$$ for block math." +
-					"When creating workflows, always create a new sheet first before creating the workflow itself. IMPORTANT TOOL SELECTION: When asked to create HTML content, interactive applications (like calculators, games, demos), you MUST use the create_sandbox tool, NOT workflow_agent. The create_sandbox tool is specifically designed for HTML/JavaScript applications with a complete document structure. If the user request contains keywords like 'アプリ', 'ゲーム', 'デモ', 'HTML', 'インタラクティブ', '計算機', 'アプリケーション', or any interactive content that would benefit from HTML rendering, you MUST use the create_sandbox tool. Use workflow_agent ONLY for workflow diagrams, not for web applications.",
+					"When creating workflows, always create a new sheet first before creating the workflow itself. IMPORTANT TOOL SELECTION: When asked to create HTML content, interactive applications (like calculators, games, demos), you MUST use the create_sandbox tool, NOT workflow_agent. The create_sandbox tool is specifically designed for HTML/JavaScript applications with a complete document structure. If the user request contains keywords like '繧｢繝励Μ', '繧ｲ繝ｼ繝', '繝・Δ', 'HTML', '繧､繝ｳ繧ｿ繝ｩ繧ｯ繝・ぅ繝・, '險育ｮ玲ｩ・, '繧｢繝励Μ繧ｱ繝ｼ繧ｷ繝ｧ繝ｳ', or any interactive content that would benefit from HTML rendering, you MUST use the create_sandbox tool. Use workflow_agent ONLY for workflow diagrams, not for web applications.",
 			});
 			setLLMClient(client);
 		} else {
@@ -302,14 +302,14 @@ const App = (): ReactElement => {
 		}
 	}, [apiKey, workEventBus]);
 
-	// チャットUIの設定
+	// 繝√Ε繝・ヨUI縺ｮ險ｭ螳・
 	const chatConfig = {
 		height: "100%",
 		width: "100%",
 		messages: messages,
 		isLoading: isLoading,
 		onSendMessage: async (message: string) => {
-			// ユーザーメッセージを追加
+			// 繝ｦ繝ｼ繧ｶ繝ｼ繝｡繝・そ繝ｼ繧ｸ繧定ｿｽ蜉
 			const userMessage: Message = {
 				role: "user",
 				content: message,
@@ -317,12 +317,12 @@ const App = (): ReactElement => {
 			};
 			setMessages((prevMessages) => [...prevMessages, userMessage]);
 
-			// LLMClientが利用可能な場合はAPIリクエストを実行
+			// LLMClient縺悟茜逕ｨ蜿ｯ閭ｽ縺ｪ蝣ｴ蜷医・API繝ｪ繧ｯ繧ｨ繧ｹ繝医ｒ螳溯｡・
 			if (llmClient) {
 				try {
 					setIsLoading(true);
 
-					// アシスタント応答のプレースホルダーを追加
+					// 繧｢繧ｷ繧ｹ繧ｿ繝ｳ繝亥ｿ懃ｭ斐・繝励Ξ繝ｼ繧ｹ繝帙Ν繝繝ｼ繧定ｿｽ蜉
 					const assistantMessage: Message = {
 						role: "assistant",
 						content: "",
@@ -330,14 +330,14 @@ const App = (): ReactElement => {
 					};
 					setMessages((prevMessages) => [...prevMessages, assistantMessage]);
 
-					// LLMClientを使用してレスポンスをストリーミング
+					// LLMClient繧剃ｽｿ逕ｨ縺励※繝ｬ繧ｹ繝昴Φ繧ｹ繧偵せ繝医Μ繝ｼ繝溘Φ繧ｰ
 					await llmClient.chat({
 						message: userMessage.content,
 						onTextChunk: (textChunk: string) => {
 							setMessages((prevMessages) => {
 								const updated = [...prevMessages];
 								const lastMessage = updated[updated.length - 1];
-								// 最後のメッセージ（assistant）を更新
+								// 譛蠕後・繝｡繝・そ繝ｼ繧ｸ・・ssistant・峨ｒ譖ｴ譁ｰ
 								updated[updated.length - 1] = {
 									...lastMessage,
 									content: lastMessage.content + textChunk,
@@ -355,13 +355,13 @@ const App = (): ReactElement => {
 					});
 				} catch (error) {
 					console.error("Error calling LLM service:", error);
-					// エラーメッセージを追加
+					// 繧ｨ繝ｩ繝ｼ繝｡繝・そ繝ｼ繧ｸ繧定ｿｽ蜉
 					setMessages((prevMessages) => [
 						...prevMessages,
 						{
 							role: "assistant",
 							content:
-								"申し訳ありませんが、応答の生成中にエラーが発生しました。もう一度お試しください。",
+								"逕ｳ縺苓ｨｳ縺ゅｊ縺ｾ縺帙ｓ縺後∝ｿ懃ｭ斐・逕滓・荳ｭ縺ｫ繧ｨ繝ｩ繝ｼ縺檎匱逕溘＠縺ｾ縺励◆縲ゅｂ縺・ｸ蠎ｦ縺願ｩｦ縺励￥縺縺輔＞縲・,
 							timestamp: new Date(),
 						},
 					]);
@@ -369,13 +369,13 @@ const App = (): ReactElement => {
 					setIsLoading(false);
 				}
 			} else {
-				// LLMClientが利用できない場合はエラーメッセージを表示
+				// LLMClient縺悟茜逕ｨ縺ｧ縺阪↑縺・ｴ蜷医・繧ｨ繝ｩ繝ｼ繝｡繝・そ繝ｼ繧ｸ繧定｡ｨ遉ｺ
 				setIsLoading(true);
 				setTimeout(() => {
 					const assistantMessage: Message = {
 						role: "assistant",
 						content:
-							"APIキーが設定されていないため、応答を生成できません。APIキーを設定してください。",
+							"API繧ｭ繝ｼ縺瑚ｨｭ螳壹＆繧後※縺・↑縺・◆繧√∝ｿ懃ｭ斐ｒ逕滓・縺ｧ縺阪∪縺帙ｓ縲・PI繧ｭ繝ｼ繧定ｨｭ螳壹＠縺ｦ縺上□縺輔＞縲・,
 						timestamp: new Date(),
 					};
 					setMessages((prevMessages) => [...prevMessages, assistantMessage]);
@@ -392,42 +392,38 @@ const App = (): ReactElement => {
 			: undefined;
 
 	/**
-	 * 保存ボタンがクリックされた時のハンドラ
+	 * 菫晏ｭ倥・繧ｿ繝ｳ縺後け繝ｪ繝・け縺輔ｌ縺滓凾縺ｮ繝上Φ繝峨Λ
 	 */
 	const handleSave = useCallback(async () => {
-		// 選択されているアイテムが存在する場合のみ処理を実行
+		// 驕ｸ謚槭＆繧後※縺・ｋ繧｢繧､繝・Β縺悟ｭ伜惠縺吶ｋ蝣ｴ蜷医・縺ｿ蜃ｦ逅・ｒ螳溯｡・
 		if (selectedItem) {
 			try {
 				console.log(`Saving content for item with ID: ${selectedItem}`);
-
-				// 選択中のアイテムの内容を取得
-				const selectedWorkingItem = workingItems.find(
-					(item) => item.id === selectedItem,
-				);
+				
+				// 驕ｸ謚樔ｸｭ縺ｮ繧｢繧､繝・Β縺ｮ蜀・ｮｹ繧貞叙蠕・
+				const selectedWorkingItem = workingItems.find(item => item.id === selectedItem);
 				if (!selectedWorkingItem) return;
-
-				// 対応するWorkを取得
-				const work = works.find((work) => work.id === selectedItem);
+				
+				// 蟇ｾ蠢懊☆繧妓ork繧貞叙蠕・
+				const work = works.find(work => work.id === selectedItem);
 				if (!work) return;
-
-				// マークダウンオブジェクトを作成
+				
+				// 繝槭・繧ｯ繝繧ｦ繝ｳ繧ｪ繝悶ず繧ｧ繧ｯ繝医ｒ菴懈・
 				const markdownToSave: Markdown = {
 					id: selectedItem,
 					name: work.name,
-					content: selectedWorkingItem.content || "",
+					content: selectedWorkingItem.content || ""
 				};
-
-				// マークダウンを保存
+				
+				// 繝槭・繧ｯ繝繧ｦ繝ｳ繧剃ｿ晏ｭ・
 				await saveMarkdown(markdownToSave);
-				console.log(
-					`Content saved successfully for item with ID: ${selectedItem}`,
-				);
-
-				// 編集フラグをリセット
-				setWorkingItems((prev) =>
-					prev.map((item) =>
-						item.id === selectedItem ? { ...item, isEditing: false } : item,
-					),
+				console.log(`Content saved successfully for item with ID: ${selectedItem}`);
+				
+				// 邱ｨ髮・ヵ繝ｩ繧ｰ繧偵Μ繧ｻ繝・ヨ
+				setWorkingItems(prev => 
+					prev.map(item => 
+						item.id === selectedItem ? { ...item, isEditing: false } : item
+					)
 				);
 			} catch (error) {
 				console.error("Failed to save markdown content:", error);
@@ -461,7 +457,7 @@ const App = (): ReactElement => {
 						/>
 					}
 					center={
-						// マークダウンエディターサンプルを表示（中央ペイン）
+						// 繝槭・繧ｯ繝繧ｦ繝ｳ繧ｨ繝・ぅ繧ｿ繝ｼ繧ｵ繝ｳ繝励Ν繧定｡ｨ遉ｺ・井ｸｭ螟ｮ繝壹う繝ｳ・・
 						<MarkdownEditor
 							markdown={content}
 							onChange={(newMarkdown) => {
@@ -476,7 +472,7 @@ const App = (): ReactElement => {
 						/>
 					}
 					right={
-						// チャットUIを表示（右ペイン）
+						// 繝√Ε繝・ヨUI繧定｡ｨ遉ｺ・亥承繝壹う繝ｳ・・
 						<ChatUI {...chatConfig} />
 					}
 				/>

@@ -1,5 +1,5 @@
 export type WorkingItem = {
 	id: string;
-	content: unknown;
+	content: string;
 	isEditing: boolean;
 };
