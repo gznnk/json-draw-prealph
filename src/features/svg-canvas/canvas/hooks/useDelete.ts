@@ -10,6 +10,7 @@ import { newEventId } from "../../utils/common/newEventId";
 import { isItemableData } from "../../utils/validation/isItemableData";
 import { isSelectableData } from "../../utils/validation/isSelectableData";
 import { addHistory } from "../utils/addHistory";
+import { svgCanvasStateToData } from "../utils/svgCanvasStateToData";
 import { applyRecursive } from "../utils/applyRecursive";
 import { getDiagramById } from "../utils/getDiagramById";
 
@@ -23,10 +24,9 @@ export const useDelete = (props: CanvasHooksProps) => {
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-
 	return useCallback(() => {
 		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current.props;
+		const { setCanvasState, onDataChange } = refBus.current.props;
 
 		setCanvasState((prevState) => {
 			// Remove selected items.
@@ -70,6 +70,9 @@ export const useDelete = (props: CanvasHooksProps) => {
 			// Add a new history entry.
 			newState.lastHistoryEventId = newEventId();
 			newState = addHistory(prevState, newState);
+
+			// Notify the data change.
+			onDataChange?.(svgCanvasStateToData(newState));
 
 			return newState;
 		});

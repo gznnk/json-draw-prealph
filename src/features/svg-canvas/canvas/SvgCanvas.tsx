@@ -56,7 +56,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 	(props, ref) => {
 		// In the SvgCanvas render function,
 		// we handle DOM events related to the SvgCanvas elements.
-
 		const {
 			title,
 			minX,
@@ -81,6 +80,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onRedo,
 			onTextEdit,
 			onTextChange,
+			onDataChange,
 			onNewDiagram,
 			onExecute,
 			onScroll,
@@ -125,7 +125,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 		// Use the diagram menu hook to handle diagram menu events.
 		const { diagramMenuProps } = useDiagramMenu(props);
-
 		// Create references bypass to avoid function creation in every render.
 		const refBusVal = {
 			scrollLeft,
@@ -140,6 +139,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onClearAllSelection,
 			onUndo,
 			onRedo,
+			onDataChange,
 			onScroll,
 			onCopy,
 			onPaste,

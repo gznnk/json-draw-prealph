@@ -67,6 +67,7 @@ export type CanvasHooksProps = {
 	canvasState: SvgCanvasState;
 	setCanvasState: React.Dispatch<React.SetStateAction<SvgCanvasState>>;
 	canvasRef?: SvgCanvasRef | null;
+	onDataChange?: (data: SvgCanvasData) => void;
 };
 
 /**
@@ -90,6 +91,7 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onUngroup?: () => void;
 	onUndo?: () => void;
 	onRedo?: () => void;
+	onDataChange?: (data: SvgCanvasData) => void;
 	onCanvasResize?: (e: SvgCanvasResizeEvent) => void;
 	onNewDiagram?: (e: NewDiagramEvent) => void;
 	onStackOrderChange?: (e: StackOrderChangeEvent) => void;

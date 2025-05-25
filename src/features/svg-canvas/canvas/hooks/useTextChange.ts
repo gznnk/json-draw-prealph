@@ -9,6 +9,7 @@ import type { TextEditorState } from "../../components/core/Textable/TextEditor/
 // Import functions related to SvgCanvas.
 import { addHistory } from "../utils/addHistory";
 import { applyRecursive } from "../utils/applyRecursive";
+import { svgCanvasStateToData } from "../utils/svgCanvasStateToData";
 
 /**
  * Custom hook to handle text change events on the canvas.
@@ -23,10 +24,10 @@ export const useTextChange = (props: CanvasHooksProps) => {
 
 	return useCallback((e: DiagramTextChangeEvent) => {
 		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current.props;
+		const { setCanvasState, onDataChange } = refBus.current.props;
 
 		setCanvasState((prevState) => {
-			// 新しい状態を作�E
+			// Create a new state with the updated text.
 			let newState = {
 				...prevState,
 				items: applyRecursive(prevState.items, (item) =>
@@ -42,6 +43,9 @@ export const useTextChange = (props: CanvasHooksProps) => {
 			// Add a new history entry.
 			newState.lastHistoryEventId = e.eventId;
 			newState = addHistory(prevState, newState);
+
+			// Notify about data change.
+			onDataChange?.(svgCanvasStateToData(newState));
 
 			return newState;
 		});

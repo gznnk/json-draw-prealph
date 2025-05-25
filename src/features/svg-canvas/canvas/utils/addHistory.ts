@@ -1,7 +1,6 @@
 import { MAX_HISTORY_SIZE } from "../SvgCanvasConstants";
 import type { SvgCanvasState } from "../SvgCanvasTypes";
 import { canvasStateToHistory } from "./canvasStateToHistory";
-import { saveCanvasDataToLocalStorage } from "./saveCanvasDataToLocalStorage";
 
 /**
  * Add a new state to the history stack.
@@ -45,11 +44,8 @@ export const addHistory = (
 		history: newHistory,
 		historyIndex: newHistory.length - 1,
 	};
-
 	// console.log("history", JSON.stringify(ret, null, 2));
 	// console.log("history", ret);
-
-	saveCanvasDataToLocalStorage(ret); // Save the canvas data to local storage.
 
 	return ret;
 };

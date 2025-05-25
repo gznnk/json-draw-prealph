@@ -9,6 +9,7 @@ import type { CanvasHooksProps, SvgCanvasState } from "../SvgCanvasTypes";
 import { newId } from "../../utils/shapes/common/newId";
 import { newEventId } from "../../utils/common/newEventId";
 import { addHistory } from "../utils/addHistory";
+import { svgCanvasStateToData } from "../utils/svgCanvasStateToData";
 import { clearMultiSelectSourceRecursive } from "../utils/clearMultiSelectSourceRecursive";
 import { getSelectedItems } from "../../utils/common/getSelectedItems";
 import { removeGroupedRecursive } from "../utils/removeGroupedRecursive";
@@ -23,10 +24,9 @@ export const useGroup = (props: CanvasHooksProps) => {
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-
 	return useCallback(() => {
 		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current.props;
+		const { setCanvasState, onDataChange } = refBus.current.props;
 
 		setCanvasState((prevState) => {
 			const selectedItems = getSelectedItems(prevState.items);
@@ -75,6 +75,9 @@ export const useGroup = (props: CanvasHooksProps) => {
 			// Add a new history entry.
 			newState.lastHistoryEventId = newEventId();
 			newState = addHistory(prevState, newState);
+
+			// Notify the data change.
+			onDataChange?.(svgCanvasStateToData(newState));
 
 			return newState;
 		});

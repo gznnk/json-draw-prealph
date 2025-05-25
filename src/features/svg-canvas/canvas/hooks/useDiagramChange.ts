@@ -21,6 +21,7 @@ import { addHistory } from "../utils/addHistory";
 import { applyRecursive } from "../utils/applyRecursive";
 import { isDiagramChangingEvent } from "../utils/isDiagramChangingEvent";
 import { isHistoryEvent } from "../utils/isHistoryEvent";
+import { svgCanvasStateToData } from "../utils/svgCanvasStateToData";
 import { updateConnectPointsAndCollectRecursive } from "../utils/updateConnectPointsAndCollectRecursive";
 import { updateOutlineOfAllGroups } from "../utils/updateOutlineOfAllGroups";
 
@@ -46,7 +47,7 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 	return useCallback((e: DiagramChangeEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const {
-			props: { setCanvasState },
+			props: { setCanvasState, onDataChange },
 			canvasResize,
 		} = refBus.current;
 
@@ -150,10 +151,13 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 				multiSelectGroup,
 			} as SvgCanvasState;
 
-			// Add a new history entry.
 			if (isHistoryEvent(e.eventType)) {
+				// Add a new history entry.
 				newState.lastHistoryEventId = e.eventId;
 				newState = addHistory(prevState, newState);
+
+				// Notify the data change.
+				onDataChange?.(svgCanvasStateToData(newState));
 			}
 
 			if (0 < connectPointMoveDataList.length) {
