@@ -5,6 +5,7 @@ import type {
 	ToolDefinition,
 	FunctionHandlerMap,
 	FunctionCallInfo,
+	LLMClientOptions,
 } from "../types";
 
 /**
@@ -17,24 +18,13 @@ export class OpenAIClient implements LLMClient {
 	private readonly tools?: ToolDefinition[];
 	private readonly functionHandlers: FunctionHandlerMap = {};
 	private messages: OpenAI.Responses.ResponseInput = [];
-
 	/**
 	 * OpenAIクライアントを初期化します.
 	 *
 	 * @param apiKey - OpenAI APIキー
 	 * @param options - 初期化オプション
-	 * @param options.tools - 利用可能なツール定義のリスト
-	 * @param options.systemPrompt - システムプロンプト
-	 * @param options.functionHandlers - 関数名とハンドラのマッピング
 	 */
-	constructor(
-		apiKey: string,
-		options?: {
-			tools?: ToolDefinition[];
-			systemPrompt?: string;
-			functionHandlers?: FunctionHandlerMap;
-		},
-	) {
+	constructor(apiKey: string, options?: LLMClientOptions) {
 		this.openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
 		this.tools = options?.tools;
 
@@ -46,6 +36,10 @@ export class OpenAIClient implements LLMClient {
 		// システムプロンプトが指定されていれば登録
 		if (options?.systemPrompt) {
 			this.systemPrompt = options.systemPrompt;
+		}
+		// 初期メッセージが指定されていれば復元
+		if (options?.initialMessages) {
+			this.messages = options.initialMessages as OpenAI.Responses.ResponseInput;
 		}
 	}
 
@@ -184,7 +178,6 @@ export class OpenAIClient implements LLMClient {
 			});
 		}
 	}
-
 	/**
 	 * 会話履歴をクリアします.
 	 */
@@ -194,5 +187,12 @@ export class OpenAIClient implements LLMClient {
 			(msg) => "role" in msg && msg.role === "system",
 		);
 		this.messages = systemMessage ? [systemMessage] : [];
+	}
+	/**
+	 * 現在の会話履歴をOpenAI固有の形式で取得します.
+	 * @returns OpenAI形式のメッセージのリスト
+	 */
+	getConversationHistory(): unknown[] {
+		return this.messages;
 	}
 }

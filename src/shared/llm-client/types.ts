@@ -51,3 +51,30 @@ export type ToolDefinition = {
 	description: string;
 	parameters: ToolParameter[];
 };
+
+/**
+ * LLMクライアントの初期化オプション.
+ * 全てのLLMプロバイダーで共通して使用される設定項目.
+ */
+export type LLMClientOptions = {
+	/**
+	 * 利用可能なツール定義のリスト.
+	 */
+	tools?: ToolDefinition[];
+
+	/**
+	 * システムプロンプト.
+	 */
+	systemPrompt?: string;
+
+	/**
+	 * 関数名とハンドラのマッピング.
+	 */
+	functionHandlers?: FunctionHandlerMap;
+
+	/**
+	 * 初期メッセージリスト（以前の会話を復元する場合）.
+	 * プロバイダー固有の形式のメッセージを受け取ります.
+	 */
+	initialMessages?: unknown[];
+};

@@ -30,4 +30,10 @@ export interface LLMClient {
 	 * 現在の会話履歴を削除します.
 	 */
 	clearConversation(): void;
+
+	/**
+	 * 現在の会話履歴をプロバイダー固有の形式で取得します.
+	 * @returns プロバイダー固有のメッセージのリスト
+	 */
+	getConversationHistory(): unknown[];
 }

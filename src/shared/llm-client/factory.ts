@@ -1,6 +1,6 @@
 // Import interfaces and types
 import type { LLMClient } from "./interface";
-import type { ToolDefinition, FunctionHandlerMap } from "./types";
+import type { LLMClientOptions } from "./types";
 import { OpenAIClient } from "./openai/client";
 
 /**
@@ -15,14 +15,7 @@ export const LLMClientFactory = {
 	 * @param options - Initialization options
 	 * @returns OpenAI-based LLM client instance
 	 */
-	createOpenAIClient(
-		apiKey: string,
-		options?: {
-			tools?: ToolDefinition[];
-			systemPrompt?: string;
-			functionHandlers?: FunctionHandlerMap;
-		},
-	): LLMClient {
+	createOpenAIClient(apiKey: string, options?: LLMClientOptions): LLMClient {
 		return new OpenAIClient(apiKey, options);
 	},
 
@@ -34,14 +27,7 @@ export const LLMClientFactory = {
 	 * @param options - Initialization options
 	 * @returns Default LLM client instance
 	 */
-	createClient(
-		apiKey: string,
-		options?: {
-			tools?: ToolDefinition[];
-			systemPrompt?: string;
-			functionHandlers?: FunctionHandlerMap;
-		},
-	): LLMClient {
+	createClient(apiKey: string, options?: LLMClientOptions): LLMClient {
 		// Currently, OpenAI is the default implementation.
 		// In the future, this can be extended to return the appropriate implementation
 		// based on environment variables or configuration.
