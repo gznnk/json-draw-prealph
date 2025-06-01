@@ -14,6 +14,7 @@ import type { GroupProps } from "../../../types/props/shapes/GroupProps";
 
 // Import components related to SvgCanvas.
 import { PositionLabel } from "../../core/PositionLabel";
+import { Selectable } from "../../core/Selectable";
 import { Transformative } from "../../core/Transformative";
 
 // Import utils.
@@ -485,10 +486,20 @@ const GroupComponent: React.FC<GroupProps> = ({
 
 		return React.createElement(component(), props);
 	});
-
 	return (
 		<>
 			{children}
+			<Selectable
+				x={x}
+				y={y}
+				width={width}
+				height={height}
+				rotation={rotation}
+				scaleX={scaleX}
+				scaleY={scaleY}
+				isSelected={isSelected}
+				isMultiSelectSource={isMultiSelectSource}
+			/>
 			{!isMultiSelectSource && !isGroupDragging && (
 				<Transformative
 					id={id}

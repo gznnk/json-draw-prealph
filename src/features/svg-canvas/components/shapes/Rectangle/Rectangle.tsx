@@ -11,6 +11,7 @@ import type { RectangleProps } from "../../../types/props/shapes/RectangleProps"
 
 // Import components related to SvgCanvas.
 import { PositionLabel } from "../../core/PositionLabel";
+import { Selectable } from "../../core/Selectable";
 import { Textable } from "../../core/Textable";
 import { Transformative } from "../../core/Transformative";
 import { ConnectPoint } from "../ConnectPoint";
@@ -272,6 +273,17 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					isTextEditing={isTextEditing}
 				/>
 			)}
+			<Selectable
+				x={x}
+				y={y}
+				width={width}
+				height={height}
+				rotation={rotation}
+				scaleX={scaleX}
+				scaleY={scaleY}
+				isSelected={isSelected}
+				isMultiSelectSource={isMultiSelectSource}
+			/>
 			{showTransformative && (
 				<Transformative
 					id={id}

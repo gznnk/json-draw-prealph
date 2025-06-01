@@ -24,7 +24,6 @@ import { calcRadians } from "../../../utils/math/points/calcRadians";
 import { calcRectangleVertices } from "../../../utils/math/geometry/calcRectangleVertices";
 import { createLinerX2yFunction } from "../../../utils/math/geometry/createLinerX2yFunction";
 import { createLinerY2xFunction } from "../../../utils/math/geometry/createLinerY2xFunction";
-import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { getCursorFromAngle } from "../../../utils/shapes/common/getCursorFromAngle";
 import { inverseAffineTransformation } from "../../../utils/math/transform/inverseAffineTransformation";
@@ -899,21 +898,6 @@ const TransformativeComponent: React.FC<Props> = ({
 
 	return (
 		<>
-			{/* アウトライン */}
-			<g transform="translate(0.5,0.5)">
-				<rect
-					x={-width / 2}
-					y={-height / 2}
-					width={width}
-					height={height}
-					fill="transparent"
-					stroke="rgb(100, 149, 237)"
-					strokeWidth="1px"
-					strokeDasharray="3,3"
-					pointerEvents={"none"}
-					transform={createSvgTransform(scaleX, scaleY, radians, x, y)}
-				/>
-			</g>
 			{!isRotating && (
 				<>
 					{/* Top DragLine */}
