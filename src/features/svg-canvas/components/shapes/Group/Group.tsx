@@ -14,7 +14,7 @@ import type { GroupProps } from "../../../types/props/shapes/GroupProps";
 
 // Import components related to SvgCanvas.
 import { PositionLabel } from "../../core/PositionLabel";
-import { Selectable } from "../../core/Selectable";
+import { Outline } from "../../core/Outline";
 import { Transformative } from "../../core/Transformative";
 
 // Import utils.
@@ -489,7 +489,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	return (
 		<>
 			{children}
-			<Selectable
+			<Outline
 				x={x}
 				y={y}
 				width={width}

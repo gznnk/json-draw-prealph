@@ -11,7 +11,7 @@ import type { EllipseProps } from "../../../types/props/shapes/EllipseProps";
 
 // SvgCanvas関連コンポーネントをインポート
 import { PositionLabel } from "../../core/PositionLabel";
-import { Selectable } from "../../core/Selectable";
+import { Outline } from "../../core/Outline";
 import { Textable } from "../../core/Textable";
 import { Transformative } from "../../core/Transformative";
 import { ConnectPoint } from "../ConnectPoint";
@@ -264,7 +264,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 					isTextEditing={isTextEditing}
 				/>
 			)}
-			<Selectable
+			<Outline
 				x={x}
 				y={y}
 				width={width}

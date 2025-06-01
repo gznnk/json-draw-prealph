@@ -11,7 +11,7 @@ import type { RectangleProps } from "../../../types/props/shapes/RectangleProps"
 
 // Import components related to SvgCanvas.
 import { PositionLabel } from "../../core/PositionLabel";
-import { Selectable } from "../../core/Selectable";
+import { Outline } from "../../core/Outline";
 import { Textable } from "../../core/Textable";
 import { Transformative } from "../../core/Transformative";
 import { ConnectPoint } from "../ConnectPoint";
@@ -273,7 +273,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					isTextEditing={isTextEditing}
 				/>
 			)}
-			<Selectable
+			<Outline
 				x={x}
 				y={y}
 				width={width}

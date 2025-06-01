@@ -9,7 +9,7 @@ import type { ImageProps } from "../../../types/props/shapes/ImageProps";
 
 // Import components.
 import { PositionLabel } from "../../core/PositionLabel";
-import { Selectable } from "../../core/Selectable";
+import { Outline } from "../../core/Outline";
 import { Transformative } from "../../core/Transformative";
 
 // Import hooks.
@@ -129,7 +129,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 					{...dragProps}
 				/>
 			</g>
-			<Selectable
+			<Outline
 				x={x}
 				y={y}
 				width={width}

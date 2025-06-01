@@ -7,9 +7,9 @@ import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransf
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 
 /**
- * Props for the Selectable component.
+ * Props for the Outline component.
  */
-type SelectableProps = {
+type OutlineProps = {
 	x: number;
 	y: number;
 	width: number;
@@ -25,7 +25,7 @@ type SelectableProps = {
  * Component that displays a selection outline around diagram elements.
  * Shows a dashed border when an element is selected but not the multi-select source.
  */
-const SelectableComponent: React.FC<SelectableProps> = ({
+const OutlineComponent: React.FC<OutlineProps> = ({
 	x,
 	y,
 	width,
@@ -66,4 +66,4 @@ const SelectableComponent: React.FC<SelectableProps> = ({
 	);
 };
 
-export const Selectable = memo(SelectableComponent);
+export const Outline = memo(OutlineComponent);
