@@ -451,6 +451,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			setIsGroupTransforming(false);
 		}
 	}, []);
+
 	const doShowConnectPoints =
 		showConnectPoints &&
 		!isSelected &&

@@ -82,7 +82,7 @@ const RotatePointComponent: React.FC<RotatePointProps> = ({
 				cy={y}
 				r={7}
 				fill="transparent"
-				cursor={"move"}
+				cursor="move"
 				tabIndex={0}
 				ref={svgRef}
 				{...dragProps}

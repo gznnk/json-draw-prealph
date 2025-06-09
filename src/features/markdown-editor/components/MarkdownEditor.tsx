@@ -260,7 +260,7 @@ const MarkdownEditorComponent = ({
 				{/* プレビュー表示エリア */}
 				{showPreview && (
 					<SafeHtmlPreview ref={previewRef} html={renderedHtml} />
-				)}{" "}
+				)}
 			</EditorContainer>
 		</EditorWrapper>
 	);

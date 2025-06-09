@@ -117,7 +117,6 @@ const ImageComponent: React.FC<ImageProps> = ({
 	return (
 		<>
 			<g transform={transform}>
-				{" "}
 				<ImageElement
 					id={id}
 					x={-width / 2}

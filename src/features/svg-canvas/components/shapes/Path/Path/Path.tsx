@@ -13,6 +13,7 @@ import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointe
 import type { PathProps } from "../../../../types/props/shapes/PathProps";
 
 // Import components.
+import { Outline } from "../../../core/Outline";
 import { PositionLabel } from "../../../core/PositionLabel";
 import { Group } from "../../Group";
 import { NewVertexList } from "../NewVertexList";
@@ -56,6 +57,7 @@ const PathComponent: React.FC<PathProps> = ({
 	strokeWidth = "1px",
 	isSelected = false,
 	isMultiSelectSource = false,
+	showAsChildOutline = false,
 	items = [],
 	syncWithSameId = false,
 	dragEnabled = true,
@@ -342,7 +344,6 @@ const PathComponent: React.FC<PathProps> = ({
 		<>
 			{/* 描画用のパス */}
 			<g transform="translate(0.5,0.5)">
-				{" "}
 				<PathElement
 					d={d}
 					fill="none"
@@ -385,6 +386,21 @@ const PathComponent: React.FC<PathProps> = ({
 					id={id}
 					items={items}
 					onDiagramChange={handleDiagramChangeBySegumentAndNewVertex}
+				/>
+			)}
+			{/* アウトライン（複数選択用） */}
+			{!showTransformGroup && (
+				<Outline
+					x={x}
+					y={y}
+					width={width}
+					height={height}
+					rotation={rotation}
+					scaleX={scaleX}
+					scaleY={scaleY}
+					isSelected={isSelected}
+					isMultiSelectSource={isMultiSelectSource}
+					showAsChildOutline={showAsChildOutline}
 				/>
 			)}
 			{/* 全体変形用グループ */}

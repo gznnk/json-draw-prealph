@@ -30,7 +30,6 @@ const ContentViewComponent = ({
 }: ContentViewProps): ReactElement => {
 	return (
 		<Container>
-			{" "}
 			{!type ? (
 				<EmptyContent>{NO_SELECTION_MESSAGE}</EmptyContent>
 			) : (

@@ -233,7 +233,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 
 	return (
 		<>
-			{" "}
 			<g transform="translate(0.5,0.5)">
 				<RectangleElement
 					id={id}

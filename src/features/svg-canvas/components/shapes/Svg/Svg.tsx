@@ -138,7 +138,6 @@ const SvgComponent: React.FC<SvgProps> = ({
 
 	return (
 		<>
-			{" "}
 			<g transform={transform}>
 				<SvgGroupElement
 					transform={`translate(${-width / 2}, ${-height / 2}) scale(${width / initialWidth}, ${height / initialHeight})`}
