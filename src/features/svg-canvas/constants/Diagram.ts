@@ -1,15 +1,13 @@
-import type { ConnectPointData } from "../components/shapes/ConnectPoint";
-import type { Diagram } from "../types/DiagramCatalog";
-import type {
-	DiagramBaseData,
-	SelectableData,
-	TransformativeData,
-	ItemableData,
-	StrokableData,
-	FillableData,
-	TextableData,
-	ConnectableData,
-} from "../types/DiagramTypes";
+import type { ConnectPointData } from "../types/data/shapes/ConnectPointData";
+import type { ConnectableData } from "../types/data/shapes/ConnectableData";
+import type { Diagram } from "../catalog/DiagramTypes";
+import type { DiagramBaseData } from "../types/base/DiagramBaseData";
+import type { FillableData } from "../types/data/core/FillableData";
+import type { StrokableData } from "../types/data/core/StrokableData";
+import type { ItemableData } from "../types/data/core/ItemableData";
+import type { SelectableData } from "../types/data/core/SelectableData";
+import type { TransformativeData } from "../types/data/core/TransformativeData";
+import type { TextableData } from "../types/data/core/TextableData";
 
 /**
  * Default diagram base data.
@@ -49,7 +47,7 @@ export const DEFAULT_TRANSFORMATIVE_DATA = {
  */
 export const DEFAULT_ITEMABLE_DATA = {
 	items: [] as Diagram[],
-} as const satisfies ItemableData;
+} as const satisfies ItemableData<Diagram>;
 
 /**
  * Default connectable data.

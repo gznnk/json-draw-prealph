@@ -1,9 +1,9 @@
-// Import functions related to SvgCanvas.
-import { newId } from "../../../utils/diagram";
-import { createEllipseConnectPoint } from "../../shapes/Ellipse";
+// Import types.
+import type { HubNodeData } from "../../../types/data/nodes/HubNodeData";
 
-// Import related to this component.
-import type { HubNodeData } from "./HubNodeTypes";
+// Import utils.
+import { newId } from "../../../utils/shapes/common/newId";
+import { createEllipseConnectPoint } from "../../../utils/shapes/ellipse/createEllipseConnectPoint";
 
 export const createHubNodeData = ({
 	x,

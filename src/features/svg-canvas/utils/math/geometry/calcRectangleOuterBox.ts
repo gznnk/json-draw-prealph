@@ -1,12 +1,16 @@
-import type { Box } from "../../../types/CoordinateTypes";
-import type { Shape } from "../../../types/DiagramTypes";
+// Import types.
+import type { Box } from "../../../types/base/Box";
+import type { Shape } from "../../../types/base/Shape";
+
+// Import utils.
 import { calcRectangleVertices } from "./calcRectangleVertices";
 
 /**
- * 短径の外接枠を計算する
+ * Calculates the outer bounding box of a rectangle.
+ * Takes into account rotation and scaling.
  *
- * @param shape - 短径
- * @returns 短径の外接枠
+ * @param shape - Rectangle shape parameters
+ * @returns The outer bounding box
  */
 export const calcRectangleOuterBox = (shape: Shape): Box => {
 	const { leftTopPoint, leftBottomPoint, rightTopPoint, rightBottomPoint } =

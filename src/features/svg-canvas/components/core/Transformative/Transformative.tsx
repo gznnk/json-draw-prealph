@@ -2,43 +2,41 @@
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
-// Import types related to SvgCanvas.
-import type { Point } from "../../../types/CoordinateTypes";
-import type { DiagramType } from "../../../types/DiagramCatalog";
-import type {
-	SelectableData,
-	TransformativeData,
-	TransformativeProps,
-} from "../../../types/DiagramTypes";
-import type { DiagramDragEvent, EventType } from "../../../types/EventTypes";
+// Import types.
+import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+import type { DiagramType } from "../../../types/base/DiagramType";
+import type { EventType } from "../../../types/events/EventType";
+import type { Point } from "../../../types/base/Point";
+import type { SelectableData } from "../../../types/data/core/SelectableData";
+import type { TransformativeData } from "../../../types/data/core/TransformativeData";
+import type { TransformativeProps } from "../../../types/props/core/TransformativeProps";
 
-// Import components related to SvgCanvas.
+// Import components.
 import { BottomLabel } from "../BottomLabel";
 import { DragLine } from "../DragLine";
 import { DragPoint } from "../DragPoint";
 import { RotatePoint } from "../RotatePoint";
 
-// Import functions related to SvgCanvas.
-import { createSvgTransform, getCursorFromAngle } from "../../../utils/diagram";
-import {
-	affineTransformation,
-	calcNearestCircleIntersectionPoint,
-	calcRadians,
-	calcRectangleVertices,
-	createLinerX2yFunction,
-	createLinerY2xFunction,
-	degreesToRadians,
-	inverseAffineTransformation,
-	nanToZero,
-	radiansToDegrees,
-	signNonZero,
-} from "../../../utils";
+// Import utils.
+import { affineTransformation } from "../../../utils/math/transform/affineTransformation";
+import { calcNearestCircleIntersectionPoint } from "../../../utils/math/points/calcNearestCircleIntersectionPoint";
+import { calcRadians } from "../../../utils/math/points/calcRadians";
+import { calcRectangleVertices } from "../../../utils/math/geometry/calcRectangleVertices";
+import { createLinerX2yFunction } from "../../../utils/math/geometry/createLinerX2yFunction";
+import { createLinerY2xFunction } from "../../../utils/math/geometry/createLinerY2xFunction";
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { getCursorFromAngle } from "../../../utils/shapes/common/getCursorFromAngle";
+import { inverseAffineTransformation } from "../../../utils/math/transform/inverseAffineTransformation";
+import { nanToZero } from "../../../utils/math/common/nanToZero";
+import { radiansToDegrees } from "../../../utils/math/common/radiansToDegrees";
+import { signNonZero } from "../../../utils/math/common/signNonZero";
 
-// Imports related to this component.
+// Import local module files.
 import { ROTATE_POINT_MARGIN } from "./TransformativeConstants";
 
 /**
- * 変形コンポーネントのプロパティ
+ * Props for the Transformative component.
+ * Combines transformation data, selection state, and transformation event handlers.
  */
 type Props = TransformativeData &
 	SelectableData &
@@ -48,7 +46,8 @@ type Props = TransformativeData &
 	};
 
 /**
- * 変形コンポーネント
+ * Component that handles transformation of diagram elements.
+ * Provides handles for resizing, rotating, and moving elements on the canvas.
  */
 const TransformativeComponent: React.FC<Props> = ({
 	id,
@@ -899,21 +898,6 @@ const TransformativeComponent: React.FC<Props> = ({
 
 	return (
 		<>
-			{/* アウトライン */}
-			<g transform="translate(0.5,0.5)">
-				<rect
-					x={-width / 2}
-					y={-height / 2}
-					width={width}
-					height={height}
-					fill="transparent"
-					stroke="rgb(100, 149, 237)"
-					strokeWidth="1px"
-					strokeDasharray="3,3"
-					pointerEvents={"none"}
-					transform={createSvgTransform(scaleX, scaleY, radians, x, y)}
-				/>
-			</g>
 			{!isRotating && (
 				<>
 					{/* Top DragLine */}

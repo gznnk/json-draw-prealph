@@ -1,4 +1,5 @@
-import type { SelectableData } from "../../types/DiagramTypes";
+// Import types.
+import type { SelectableData } from "../../types/data/core/SelectableData";
 
 /**
  * Check if an object is SelectableData.

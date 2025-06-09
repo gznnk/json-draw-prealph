@@ -2,14 +2,14 @@
 import type React from "react";
 import { memo, useEffect, useRef } from "react";
 
-// import markdown feature.
-import { renderMarkdown } from "../../../../../markdown";
+// import features.
+import { renderMarkdown } from "../../../../../../shared/markdown";
 
-// Import types related to SvgCanvas.
-import type { TextableData } from "../../../../types/DiagramTypes";
+// Import types.
+import type { TextableData } from "../../../../types/data/core/TextableData";
 
-// Imports related to this component.
-import { Text, TextWrapper } from "./TextableStyled";
+// Import local module files.
+import { ForeignObjectElement, Text, TextWrapper } from "./TextableStyled";
 
 /**
  * Props for rendering editable text inside the SVG shape.
@@ -20,6 +20,7 @@ type TextableProps = TextableData & {
 	width: number;
 	height: number;
 	transform: string;
+	isMultiSelectSource?: boolean;
 };
 
 /**
@@ -40,6 +41,7 @@ const TextableComponent: React.FC<TextableProps> = ({
 	fontFamily,
 	fontWeight,
 	isTextEditing,
+	isMultiSelectSource,
 }) => {
 	const textRef = useRef<HTMLDivElement>(null);
 
@@ -54,16 +56,15 @@ const TextableComponent: React.FC<TextableProps> = ({
 
 	if (!text) return null;
 	if (isTextEditing) return null;
-
 	return (
-		<foreignObject
-			className="diagram"
+		<ForeignObjectElement
 			x={x}
 			y={y}
 			width={width}
 			height={height}
 			transform={transform}
 			pointerEvents="none"
+			isTransparent={isMultiSelectSource}
 		>
 			<TextWrapper verticalAlign={verticalAlign}>
 				{textType === "markdown" ? (
@@ -73,8 +74,8 @@ const TextableComponent: React.FC<TextableProps> = ({
 						fontSize={fontSize}
 						fontFamily={fontFamily}
 						fontWeight={fontWeight}
-						wordBreak="break-word"
-						whiteSpace="pre-wrap"
+						wordBreak="normal"
+						whiteSpace="normal"
 						ref={textRef}
 					/>
 				) : (
@@ -91,7 +92,7 @@ const TextableComponent: React.FC<TextableProps> = ({
 					</Text>
 				)}
 			</TextWrapper>
-		</foreignObject>
+		</ForeignObjectElement>
 	);
 };
 

@@ -2,25 +2,23 @@
 import type React from "react";
 import { memo, useCallback, useRef, useState } from "react";
 
-// Import types related to ImageCanvas.
-import type {
-	DiagramDragEvent,
-	DiagramPointerEvent,
-} from "../../../types/EventTypes";
+// Import types.
+import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEvent";
+import type { ImageProps } from "../../../types/props/shapes/ImageProps";
 
-// Import components related to ImageCanvas.
+// Import components.
 import { PositionLabel } from "../../core/PositionLabel";
+import { Outline } from "../../core/Outline";
 import { Transformative } from "../../core/Transformative";
+import { ImageElement } from "./ImageStyled";
 
-// Import hooks related to ImageCanvas.
+// Import hooks.
 import { useDrag } from "../../../hooks/useDrag";
 
-// Import functions related to ImageCanvas.
-import { createSvgTransform } from "../../../utils/diagram";
-import { degreesToRadians } from "../../../utils";
-
-// Imports related to this component.
-import type { ImageProps } from "./ImageTypes";
+// Import utils.
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 
 /**
  * Image component.
@@ -39,6 +37,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 	isMultiSelectSource,
 	syncWithSameId = false,
 	base64Data,
+	showAsChildOutline = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -118,8 +117,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 	return (
 		<>
 			<g transform={transform}>
-				<image
-					className="diagram"
+				<ImageElement
 					id={id}
 					x={-width / 2}
 					y={-height / 2}
@@ -128,10 +126,23 @@ const ImageComponent: React.FC<ImageProps> = ({
 					tabIndex={0}
 					cursor="move"
 					href={`data:image/png;base64,${base64Data}`}
+					isTransparent={isMultiSelectSource}
 					ref={svgRef}
 					{...dragProps}
 				/>
 			</g>
+			<Outline
+				x={x}
+				y={y}
+				width={width}
+				height={height}
+				rotation={rotation}
+				scaleX={scaleX}
+				scaleY={scaleY}
+				isSelected={isSelected}
+				isMultiSelectSource={isMultiSelectSource}
+				showAsChildOutline={showAsChildOutline}
+			/>
 			{showTransformative && (
 				<Transformative
 					id={id}

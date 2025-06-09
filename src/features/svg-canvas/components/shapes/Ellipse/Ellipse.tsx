@@ -1,30 +1,29 @@
-// Reactのインポート
+// Import React.
 import type React from "react";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 
-// SvgCanvas関連型定義をインポート
-import type {
-	DiagramDragEvent,
-	DiagramHoverEvent,
-	DiagramPointerEvent,
-	DiagramTransformEvent,
-} from "../../../types/EventTypes";
+// Import types.
+import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+import type { DiagramHoverEvent } from "../../../types/events/DiagramHoverEvent";
+import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEvent";
+import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
+import type { EllipseProps } from "../../../types/props/shapes/EllipseProps";
 
 // SvgCanvas関連コンポーネントをインポート
 import { PositionLabel } from "../../core/PositionLabel";
+import { Outline } from "../../core/Outline";
 import { Textable } from "../../core/Textable";
 import { Transformative } from "../../core/Transformative";
 import { ConnectPoint } from "../ConnectPoint";
 
-// SvgCanvas関連カスタムフックをインポート
+// Import hooks.
 import { useDrag } from "../../../hooks/useDrag";
 
-// SvgCanvas関連関数をインポート
-import { createSvgTransform } from "../../../utils/diagram";
-import { degreesToRadians } from "../../../utils";
+// Import utils.
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 
-// Imports related to this component.
-import type { EllipseProps } from "./EllipseTypes";
+// Import local module files.
 import { EllipseElement } from "./EllipseStyled";
 
 /**
@@ -59,6 +58,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	isTextEditing,
 	isTextEditEnabled = true,
 	isTransparent,
+	showAsChildOutline = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -229,7 +229,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 		<>
 			<g transform="translate(0.5,0.5)">
 				<EllipseElement
-					className="diagram"
 					id={id}
 					cx={0}
 					cy={0}
@@ -240,7 +239,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 					strokeWidth={strokeWidth}
 					tabIndex={0}
 					cursor="move"
-					isTransparent={isTransparent}
+					isTransparent={isTransparent || isMultiSelectSource}
 					transform={transform}
 					ref={svgRef}
 					onDoubleClick={handleDoubleClick}
@@ -265,6 +264,18 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 					isTextEditing={isTextEditing}
 				/>
 			)}
+			<Outline
+				x={x}
+				y={y}
+				width={width}
+				height={height}
+				rotation={rotation}
+				scaleX={scaleX}
+				scaleY={scaleY}
+				isSelected={isSelected}
+				isMultiSelectSource={isMultiSelectSource}
+				showAsChildOutline={showAsChildOutline}
+			/>
 			{showTransformative && (
 				<Transformative
 					id={id}

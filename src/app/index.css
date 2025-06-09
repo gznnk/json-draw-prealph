@@ -27,3 +27,8 @@ body {
 ::-webkit-scrollbar-thumb:hover {
 	background-color: rgba(100, 100, 100, 0.5);
 }
+
+/* 右下の角（スクロールバーの交差部） */
+::-webkit-scrollbar-corner {
+	background-color: #0c0f1c;
+}

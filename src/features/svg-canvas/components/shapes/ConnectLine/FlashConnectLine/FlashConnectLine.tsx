@@ -1,18 +1,20 @@
 // Import React.
 import { memo, useEffect, useState } from "react";
 
-// Import functions related to SvgCanvas.
-import {
-	createDValue,
-	createEndPointArrowHead,
-	createStartPointArrowHead,
-	type PathData,
-} from "../../Path";
+// Import types.
+import type { PathData } from "../../../../types/data/shapes/PathData";
+import type { FlashConnectLineEvent } from "./FlashConnectLineTypes";
 
-// Import related to this component.
+// Import utils.
+import { createDValue } from "../../../../utils/shapes/path/createDValue";
+import {
+	createStartPointArrowHead,
+	createEndPointArrowHead,
+} from "../../../../utils/shapes/path/createArrowHeads";
+
+// Import constants and styled components.
 import { FLASH_CONNECT_LINE_EVENT_NAME } from "./FlashConnectLineConstants";
 import { FlashGroup } from "./FlashConnectLineStyled";
-import type { FlashConnectLineEvent } from "./FlashConnectLineTypes";
 
 export const FlashConnectLineComponent = () => {
 	const [connectLineList, setConnectLineList] = useState<
@@ -33,7 +35,7 @@ export const FlashConnectLineComponent = () => {
 								line.eventId !== event.eventId,
 						),
 					);
-				}, 500); // アニメ後にリセット
+				}, 500); // Reset after animation
 			}
 		};
 

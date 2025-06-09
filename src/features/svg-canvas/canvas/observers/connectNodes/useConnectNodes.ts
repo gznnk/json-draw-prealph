@@ -2,18 +2,19 @@
 import { useEffect, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type { ConnectLineData } from "../../../components/shapes/ConnectLine";
-import type { PathPointData } from "../../../components/shapes/Path";
-import type { Diagram } from "../../../types/DiagramCatalog";
-import type { ConnectableData, Shape } from "../../../types/DiagramTypes";
-import type { ConnectNodesEvent } from "../../../types/EventTypes";
+import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
+import type { PathPointData } from "../../../types/data/shapes/PathPointData";
+import type { Diagram } from "../../../catalog/DiagramTypes";
+import type { ConnectableData } from "../../../types/data/shapes/ConnectableData";
+import type { ConnectNodesEvent } from "../../../types/events/ConnectNodesEvent";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
+import type { Shape } from "../../../types/base/Shape";
 
 // Import functions related to SvgCanvas.
-import { createBestConnectPath } from "../../../components/shapes/ConnectPoint";
-import { newId } from "../../../utils/diagram";
-import { calcPointsOuterShape } from "../../../utils";
-import { getDiagramById } from "../../SvgCanvasFunctions";
+import { createBestConnectPath } from "../../../utils/shapes/connectPoint/createBestConnectPath";
+import { newId } from "../../../utils/shapes/common/newId";
+import { calcPointsOuterShape } from "../../../utils/math/geometry/calcPointsOuterShape";
+import { getDiagramById } from "../../utils/getDiagramById";
 import { dispatchNewItemEvent } from "../addNewItem";
 
 // Import related to this component.
@@ -94,7 +95,7 @@ export const useConnectNodes = (props: CanvasHooksProps) => {
 					y: shape.y,
 					width: shape.width,
 					height: shape.height,
-					stroke: "#fed579",
+					stroke: "#3A415C",
 					strokeWidth: "3px",
 					isSelected: false,
 					keepProportion: false,

@@ -1,14 +1,17 @@
-import type { RectangleVertices } from "../../../types/CoordinateTypes";
-import type { Shape } from "../../../types/DiagramTypes";
+// Import types.
+import type { RectangleVertices } from "../../../types/base/RectangleVertices";
+import type { Shape } from "../../../types/base/Shape";
+
+// Import utils.
 import { degreesToRadians } from "../common/degreesToRadians";
 import { nanToZero } from "../common/nanToZero";
 import { affineTransformation } from "../transform/affineTransformation";
 
 /**
- * 四角形の頂点を計算する
+ * Calculates the vertices of a rectangle.
  *
- * @param shape - 形状
- * @returns 頂点座標
+ * @param shape - The shape parameters (position, dimensions, rotation, scale)
+ * @returns The coordinates of the rectangle vertices
  */
 export const calcRectangleVertices = (shape: Shape): RectangleVertices => {
 	const { x, y, width, height, rotation, scaleX, scaleY } = shape;

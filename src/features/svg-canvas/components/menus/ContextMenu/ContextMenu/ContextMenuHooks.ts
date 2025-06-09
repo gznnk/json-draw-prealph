@@ -1,14 +1,12 @@
 // Import React.
 import { useCallback, useState } from "react";
 
-// TODO: 場所
-import { getSelectedItems } from "../../../../canvas/SvgCanvasFunctions";
-
 // Import types related to SvgCanvas.
 import type { SvgCanvasProps } from "../../../../canvas/SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { isExportable } from "../../../../utils";
+import { getSelectedItems } from "../../../../utils/common/getSelectedItems";
+import { isExportable } from "../../../../utils/validation/isExportable";
 
 // Imports related to this component.
 import type { ContextMenuStateMap, ContextMenuType } from "./ContextMenuTypes";

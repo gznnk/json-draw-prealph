@@ -2,13 +2,13 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type { ConnectLineData } from "../../components/shapes/ConnectLine";
-import type { Diagram } from "../../types/DiagramCatalog";
+import type { ConnectLineData } from "../../types/data/shapes/ConnectLineData";
+import type { Diagram } from "../../catalog/DiagramTypes";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { isItemableData } from "../../utils";
-import { getSelectedItems } from "../SvgCanvasFunctions";
+import { isItemableData } from "../../utils/validation/isItemableData";
+import { getSelectedItems } from "../../utils/common/getSelectedItems";
 
 /**
  * Collects all shape IDs contained in the specified list

@@ -2,21 +2,20 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type { DiagramTransformEvent } from "../../types/EventTypes";
+import type { DiagramTransformEvent } from "../../types/events/DiagramTransformEvent";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import hooks related to SvgCanvas.
 import { useCanvasResize } from "./useCanvasResize";
 
 // Import functions related to SvgCanvas.
-import {
-	addHistory,
-	applyRecursive,
-	isDiagramChangingEvent,
-	isHistoryEvent,
-	updateConnectPointsAndNotifyMove,
-	updateOutlineOfAllGroups,
-} from "../SvgCanvasFunctions";
+import { addHistory } from "../utils/addHistory";
+import { applyRecursive } from "../utils/applyRecursive";
+import { isDiagramChangingEvent } from "../utils/isDiagramChangingEvent";
+import { isHistoryEvent } from "../utils/isHistoryEvent";
+import { svgCanvasStateToData } from "../utils/svgCanvasStateToData";
+import { updateConnectPointsAndNotifyMove } from "../utils/updateConnectPointsAndNotifyMove";
+import { updateOutlineOfAllGroups } from "../utils/updateOutlineOfAllGroups";
 
 /**
  * Custom hook to handle transform events on the canvas.
@@ -36,7 +35,7 @@ export const useTransform = (props: CanvasHooksProps) => {
 	return useCallback((e: DiagramTransformEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const {
-			props: { setCanvasState },
+			props: { setCanvasState, onDataChange },
 			canvasResize,
 		} = refBus.current;
 
@@ -67,10 +66,13 @@ export const useTransform = (props: CanvasHooksProps) => {
 			// Update outline of all groups.
 			newState.items = updateOutlineOfAllGroups(newState.items);
 
-			// Add a new history entry.
 			if (isHistoryEvent(e.eventType)) {
+				// Add a new history entry.
 				newState.lastHistoryEventId = e.eventId;
 				newState = addHistory(prevState, newState);
+
+				// Notify the data change.
+				onDataChange?.(svgCanvasStateToData(newState));
 			}
 
 			return newState;

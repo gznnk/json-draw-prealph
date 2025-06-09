@@ -1,10 +1,11 @@
-// Import Emotion for styling.
+// Import Emotion
 import styled from "@emotion/styled";
 
-// Import types related to SvgCanvas.
-import type { TextAlign, VerticalAlign } from "../../../../types/DiagramTypes";
+// Import types.
+import type { TextAlign } from "../../../../types/base/TextAlign";
+import type { VerticalAlign } from "../../../../types/base/VerticalAlign";
 
-// Imports related to this component.
+// Import local module files.
 import { TextAlignMap, VerticalAlignMap } from "./TextableConstants";
 
 /**
@@ -57,48 +58,58 @@ export const Text = styled.div<TextProps>`
     white-space: ${(props) => props.whiteSpace};
     padding: 2px 6px;
     box-sizing: border-box;
-    & p {
-        margin: 0;
+
+    p {
+        margin: 0.5em 0;
     }
-    & ul {
-        margin: 0;
-        padding: 0;
-        padding-inline-start: 1.8em;
+    p:first-of-type {
+        margin-top: 0;
     }
-    & ol {
-        margin: 0;
-        padding: 0;
-        padding-inline-start: 1.8em;
+    p:last-of-type {
+        margin-bottom: 0;
     }
-    & li {
-        margin: 0;
-        padding: 0;
-    }
-    & h1 {
-        margin: 0;
-    }
-    & h2 {
-        margin: 0;
-    }
-    & h3 {
-        margin: 0;
-    }
-    & h4 {
-        margin: 0;
-    }
-    & h5 {
-        margin: 0;
-    }
-    & h6 {
-        margin: 0;
-    }
+
     & a {
+        color: #4EA1FF;
         pointer-events: auto;
+        transition: color 0.2s ease;
     }
-    pre code.hljs {
-        background: #f9f9f9;
-        border-radius: 6px;
-        border: 1px solid #d4d4d4;
-        overflow: hidden;
+    & a:hover {
+        color: #72B8FF;
     }
+
+    pre {
+        background-color: #141825;
+        padding: 0;
+        border-radius: 4px;
+        overflow-x: auto;
+
+        & > code {
+            background-color: #141825;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            margin: 0;
+        }
+    }
+
+    code {
+        font-family: "Courier New", monospace;
+        background-color: #141825;
+        padding: 1px 4px 1px 4px;
+        border-radius: 3px;
+        margin: 0 0.2em;
+    }
+`;
+
+/**
+ * Props for the SVG foreignObject element.
+ */
+type ForeignObjectProps = {
+	isTransparent?: boolean;
+};
+
+/**
+ * Styled foreignObject element for text display.
+ */
+export const ForeignObjectElement = styled.foreignObject<ForeignObjectProps>`
+    opacity: ${(props) => (props.isTransparent ? 0 : 1)};
 `;

@@ -2,14 +2,14 @@
 import type React from "react";
 import { memo } from "react";
 
-// Import types related to SvgCanvas.
-import type { RectangleVertices } from "../../../types/CoordinateTypes";
+// Import types.
+import type { RectangleVertices } from "../../../types/base/RectangleVertices";
 
-// Import components related to SvgCanvas.
+// Import components.
 import { calcBottomLabelPosition } from "../BottomLabel";
 
-// Import functions related to SvgCanvas.
-import { calcRectangleVertices } from "../../../utils";
+// Import utils.
+import { calcRectangleVertices } from "../../../utils/math/geometry/calcRectangleVertices";
 
 /**
  * Props for PositionLabel component.

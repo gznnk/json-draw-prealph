@@ -2,8 +2,8 @@
 import type React from "react";
 import { memo } from "react";
 
-// Import functions related to SvgCanvas.
-import { degreesToRadians } from "../../../utils";
+// Import utils.
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 
 /**
  * Props for IconContainer component.

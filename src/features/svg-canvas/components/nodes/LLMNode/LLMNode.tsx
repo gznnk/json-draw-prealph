@@ -1,23 +1,23 @@
 // Import React.
 import type React from "react";
-import { memo, useEffect, useState, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 // Import other libraries.
 import { OpenAI } from "openai";
 
-// Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../../../types/DiagramTypes";
+// Import types.
+import type { LLMNodeProps } from "../../../types/props/nodes/LLMNodeProps";
 
 // Import components related to SvgCanvas.
-import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
 import { IconContainer } from "../../core/IconContainer";
 import { CPU_1 } from "../../icons/CPU_1";
+import { Rectangle } from "../../shapes/Rectangle";
 
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import functions related to SvgCanvas.
-import { newEventId } from "../../../utils";
+import { newEventId } from "../../../utils/common/newEventId";
 
 // Import utilities.
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
@@ -26,19 +26,9 @@ import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 import { RectangleWrapper } from "./LLMNodeStyled";
 
 /**
- * Props for the LLMNode component.
- */
-type LLMProps = CreateDiagramProps<
-	RectangleProps,
-	{
-		executable: true;
-	}
->;
-
-/**
  * LLMNode component.
  */
-const LLMNodeComponent: React.FC<LLMProps> = (props) => {
+const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 	const [apiKey, setApiKey] = useState<string>("");
 	const [processIdList, setProcessIdList] = useState<string[]>([]);
 

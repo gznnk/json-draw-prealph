@@ -6,7 +6,6 @@ import { memo, useContext, useEffect, useRef, useState } from "react";
 import { OpenAI } from "openai";
 
 // Import components related to SvgCanvas.
-import { SvgCanvasContext } from "../../../canvas";
 import { IconContainer } from "../../core/IconContainer";
 import { Agent } from "../../icons/Agent";
 import { DEFAULT_RECTANGLE_DATA, Rectangle } from "../../shapes/Rectangle";
@@ -17,18 +16,21 @@ import { useExecutionChain } from "../../../hooks/useExecutionChain";
 // Import functions related to SvgCanvas.
 import { dispatchNewItemEvent } from "../../../canvas/observers/addNewItem";
 import { dispatchConnectNodesEvent } from "../../../canvas/observers/connectNodes";
-import { newEventId } from "../../../utils";
-import { createImageGenNodeData } from "../ImageGenNode";
-import { createLLMNodeData } from "../LLMNode";
-import { createSvgToDiagramNodeData } from "../SvgToDiagramNode";
-import { createTextAreaNodeData } from "../TextAreaNode";
+import { newEventId } from "../../../utils/common/newEventId";
+import { createImageGenNodeData } from "../../../utils/nodes/imageGenNode/createImageGenNodeData";
+import { createLLMNodeData } from "../../../utils/nodes/llmNodeData/createLLMNodeData";
+import { createSvgToDiagramNodeData } from "../../../utils/nodes/svgToDiagramNode/createSvgToDiagramNodeData";
+import { createTextAreaNodeData } from "../../../utils/nodes/textAreaNode/createTextAreaNodeData";
 
 // Import utilities.
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 
 // Import related to this component.
 import { AI_AGENT_INSTRUCTIONS, AI_AGENT_TOOLS } from "./AgentConstants";
-import type { AgentNodeProps } from "./AgentNodeTypes";
+import type { AgentNodeProps } from "../../../types/props/nodes/AgentNodeProps";
+
+// Import SvgCanvas context.
+import { SvgCanvasContext } from "../../../canvas/SvgCanvasContext";
 
 /**
  * AgentNode component.

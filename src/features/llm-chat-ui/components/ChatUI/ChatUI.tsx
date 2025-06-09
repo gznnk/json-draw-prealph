@@ -2,8 +2,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 // Import related to this component.
-import { OpenAIService } from "../../services/OpenAIService";
-import type { Message } from "../../types";
 import { MessageItem } from "../MessageItem/MessageItem";
 import {
 	ChatContainer,
@@ -14,26 +12,26 @@ import {
 import type { ChatUIProps } from "./ChatUITypes";
 
 /**
- * Main ChatUI component that provides a ChatGPT-like interface.
+ * Main ChatUI component that provides a chat interface.
  * Features include:
  * - Message history display with markdown support
  * - Customizable dimensions with props
  * - Message input with multiline support
- * - OpenAI API integration with streaming responses
- * - API key configuration form
+ * - External message handling
  *
  * @param props - Component properties
  * @returns React component
  */
 export const ChatUI = React.memo(
-	({ height, width, apiKey, initialMessages = [] }: ChatUIProps) => {
-		// State for managing messages and UI state
-		const [messages, setMessages] = useState<Message[]>(initialMessages);
+	({
+		height,
+		width,
+		messages,
+		onSendMessage,
+		isLoading = false,
+	}: ChatUIProps) => {
+		// State for the input field
 		const [input, setInput] = useState("");
-		const [isLoading, setIsLoading] = useState(false);
-		const [openAIService, setOpenAIService] = useState<OpenAIService | null>(
-			null,
-		);
 
 		// References for DOM elements
 		const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -70,15 +68,6 @@ export const ChatUI = React.memo(
 			[adjustTextareaHeight],
 		);
 
-		// Initialize OpenAI service if API key provided
-		useEffect(() => {
-			if (apiKey) {
-				setOpenAIService(new OpenAIService(apiKey));
-			} else {
-				setOpenAIService(null);
-			}
-		}, [apiKey]);
-
 		// Scroll to the bottom of the chat when messages change
 		// biome-ignore lint/correctness/useExhaustiveDependencies: To scroll to the bottom when messages change
 		useEffect(() => {
@@ -89,72 +78,22 @@ export const ChatUI = React.memo(
 
 		/**
 		 * Handles the submission of a new message.
-		 * Adds the user message to the chat and triggers OpenAI request if available.
+		 * Calls the external onSendMessage handler with the input text.
 		 */
-		const handleSendMessage = useCallback(async () => {
+		const handleSendMessage = useCallback(() => {
 			if (!input.trim() || isLoading) return;
 
-			const userMessage: Message = {
-				role: "user",
-				content: input.trim(),
-				timestamp: new Date(),
-			};
+			// Call the external handler with the message content
+			onSendMessage(input.trim());
 
-			// Add user message to the chat
-			setMessages((prev) => [...prev, userMessage]);
+			// Clear input field
 			setInput("");
 
 			// Focus back on the input after sending
 			if (inputRef.current) {
 				inputRef.current.focus();
 			}
-
-			// If OpenAI service is available, make the API call
-			if (openAIService) {
-				try {
-					setIsLoading(true);
-
-					// Create a placeholder for the assistant response
-					const assistantMessage: Message = {
-						role: "assistant",
-						content: "",
-						timestamp: new Date(),
-					};
-
-					setMessages((prev) => [...prev, assistantMessage]);
-
-					// Stream the response and update the message content
-					await openAIService.streamChatCompletion(
-						[...messages, userMessage],
-						(chunk) => {
-							setMessages((prev) => {
-								const updated = [...prev];
-								const lastMessage = updated[updated.length - 1];
-								updated[updated.length - 1] = {
-									...lastMessage,
-									content: lastMessage.content + chunk,
-								};
-								return updated;
-							});
-						},
-					);
-				} catch (error) {
-					console.error("Error calling OpenAI:", error);
-					// Add an error message
-					setMessages((prev) => [
-						...prev,
-						{
-							role: "assistant",
-							content:
-								"Sorry, I encountered an error while generating a response. Please try again.",
-							timestamp: new Date(),
-						},
-					]);
-				} finally {
-					setIsLoading(false);
-				}
-			}
-		}, [input, isLoading, messages, openAIService]);
+		}, [input, isLoading, onSendMessage]);
 
 		/**
 		 * Handles keyboard events in the textarea input.
@@ -175,7 +114,6 @@ export const ChatUI = React.memo(
 			},
 			[handleSendMessage],
 		);
-
 		return (
 			<ChatContainer width={width} height={height}>
 				<MessagesContainer>
@@ -183,13 +121,16 @@ export const ChatUI = React.memo(
 						<MessageItem
 							key={`${message.role}-${message.timestamp?.getTime() || index}`}
 							message={message}
+							showCaret={
+								message.role === "assistant" &&
+								index === messages.length - 1 &&
+								isLoading
+							}
 						/>
 					))}
-
 					{/* Empty div for scrolling to bottom */}
 					<div ref={messagesEndRef} />
 				</MessagesContainer>
-
 				<InputContainer>
 					<MessageInput
 						ref={inputRef}

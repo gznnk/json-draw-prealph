@@ -2,23 +2,21 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type { ConnectLineData } from "../../components/shapes/ConnectLine";
-import type { ConnectPointData } from "../../components/shapes/ConnectPoint";
-import type { GroupData } from "../../components/shapes/Group";
-import type { Diagram } from "../../types/DiagramCatalog";
-import type { Shape } from "../../types/DiagramTypes";
+import type { ConnectLineData } from "../../types/data/shapes/ConnectLineData";
+import type { ConnectPointData } from "../../types/data/shapes/ConnectPointData";
+import type { GroupData } from "../../types/data/shapes/GroupData";
+import type { Diagram } from "../../catalog/DiagramTypes";
+import type { Shape } from "../../types/base/Shape";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { calcGroupBoxOfNoRotation } from "../../components/shapes/Group";
-import { newId } from "../../utils/diagram";
-import {
-	isConnectableData,
-	isItemableData,
-	isSelectableData,
-} from "../../utils";
+import { calcGroupBoxOfNoRotation } from "../../components/shapes/Group/GroupFunctions";
+import { newId } from "../../utils/shapes/common/newId";
+import { isConnectableData } from "../../utils/validation/isConnectableData";
+import { isItemableData } from "../../utils/validation/isItemableData";
+import { isSelectableData } from "../../utils/validation/isSelectableData";
 import { MULTI_SELECT_GROUP } from "../SvgCanvasConstants";
-import { getDiagramById } from "../SvgCanvasFunctions";
+import { getDiagramById } from "../utils/getDiagramById";
 
 /**
  * Offset amount when pasting shapes

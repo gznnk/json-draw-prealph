@@ -2,39 +2,28 @@
 import type React from "react";
 import { memo, useCallback, useContext, useEffect, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../../types/DiagramCatalog";
-import type { CreateDiagramProps, Shape } from "../../../../types/DiagramTypes";
-import type {
-	ConnectPointMoveData,
-	ConnectPointsMoveEvent,
-	DiagramChangeEvent,
-} from "../../../../types/EventTypes";
+// Import types.
+import type { Diagram } from "../../../../catalog/DiagramTypes";
+import type { ConnectLineProps } from "../../../../types/props/shapes/ConnectLineProps";
+import type { ConnectPointMoveData } from "../../../../types/events/ConnectPointMoveData";
+import type { ConnectPointsMoveEvent } from "../../../../types/events/ConnectPointsMoveEvent";
+import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
+import type { Shape } from "../../../../types/base/Shape";
 
 // Import components related to SvgCanvas.
-import { SvgCanvasContext } from "../../../../canvas";
-import { createBestConnectPath } from "../../ConnectPoint";
+import { createBestConnectPath } from "../../../../utils/shapes/connectPoint/createBestConnectPath";
 import { Path } from "../../Path";
 
-// Import functions related to SvgCanvas.
-import { newId } from "../../../../utils/diagram";
-import { calcRadians, radiansToDegrees } from "../../../../utils";
+// Import utils.
+import { calcRadians } from "../../../../utils/math/points/calcRadians";
+import { newId } from "../../../../utils/shapes/common/newId";
+import { radiansToDegrees } from "../../../../utils/math/common/radiansToDegrees";
 
 // Imports related to this component.
 import { EVENT_NAME_CONNECT_POINTS_MOVE } from "./ConnectLineConstants";
-import type { ConnectLineData } from "./ConnectLineTypes";
 
-/**
- * Props for ConnectLine component.
- */
-type ConnectLineProps = CreateDiagramProps<
-	ConnectLineData,
-	{
-		selectable: true;
-		transformative: true;
-		itemable: true;
-	}
->;
+// Import SvgCanvas context.
+import { SvgCanvasContext } from "../../../../canvas/SvgCanvasContext";
 
 /**
  * ConnectLine component.

@@ -1,7 +1,8 @@
-import {
-	DiagramExportFunctions,
-	type DiagramType,
-} from "../../types/DiagramCatalog";
+// TODO: 依存関係を整理する
+import { DiagramExportFunctions } from "../../catalog/DiagramExportFunctions";
+
+// Import types.
+import type { DiagramType } from "../../types/base/DiagramType";
 
 /**
  * Check if an object is exportable.

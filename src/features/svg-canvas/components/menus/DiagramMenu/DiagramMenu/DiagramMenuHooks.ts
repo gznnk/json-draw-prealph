@@ -1,26 +1,20 @@
 // Import React.
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// TODO: 場所
-import { getSelectedItems } from "../../../../canvas/SvgCanvasFunctions";
-
 // Import types related to SvgCanvas.
 import type { SvgCanvasProps } from "../../../../canvas/SvgCanvasTypes";
-import type { Diagram } from "../../../../types/DiagramCatalog";
-import type {
-	FillableData,
-	StrokableData,
-	TextableData,
-} from "../../../../types/DiagramTypes";
-import type { RectangleData } from "../../../shapes/Rectangle";
+import type { Diagram } from "../../../../catalog/DiagramTypes";
+import type { FillableData } from "../../../../types/data/core/FillableData";
+import type { StrokableData } from "../../../../types/data/core/StrokableData";
+import type { TextableData } from "../../../../types/data/core/TextableData";
+import type { RectangleData } from "../../../../types/data/shapes/RectangleData";
 
 // Import functions related to SvgCanvas.
-import {
-	isItemableData,
-	isTextableData,
-	isTransformativeData,
-} from "../../../../utils";
-import { newEventId } from "../../../../utils";
+import { getSelectedItems } from "../../../../utils/common/getSelectedItems";
+import { newEventId } from "../../../../utils/common/newEventId";
+import { isItemableData } from "../../../../utils/validation/isItemableData";
+import { isTextableData } from "../../../../utils/validation/isTextableData";
+import { isTransformativeData } from "../../../../utils/validation/isTransformativeData";
 
 // Imports related to this component.
 import {

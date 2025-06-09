@@ -2,12 +2,13 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type { DiagramTextChangeEvent } from "../../types/EventTypes";
+import type { DiagramTextChangeEvent } from "../../types/events/DiagramTextChangeEvent";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
-import type { TextEditorState } from "../../components/core/Textable";
 
 // Import functions related to SvgCanvas.
-import { addHistory, applyRecursive } from "../SvgCanvasFunctions";
+import { addHistory } from "../utils/addHistory";
+import { applyRecursive } from "../utils/applyRecursive";
+import { svgCanvasStateToData } from "../utils/svgCanvasStateToData";
 
 /**
  * Custom hook to handle text change events on the canvas.
@@ -22,25 +23,32 @@ export const useTextChange = (props: CanvasHooksProps) => {
 
 	return useCallback((e: DiagramTextChangeEvent) => {
 		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current.props;
+		const { setCanvasState, onDataChange } = refBus.current.props;
 
 		setCanvasState((prevState) => {
-			// 新しい状態を作成
+			const isTextEditing = e.eventType !== "End";
+
+			// Create a new state with the updated text.
 			let newState = {
 				...prevState,
 				items: applyRecursive(prevState.items, (item) =>
-					item.id === e.id
-						? { ...item, text: e.text, isTextEditing: false }
-						: item,
+					item.id === e.id ? { ...item, text: e.text, isTextEditing } : item,
 				),
 				textEditorState: {
-					isActive: false,
-				} as TextEditorState,
+					...prevState.textEditorState,
+					text: e.text,
+					isActive: isTextEditing,
+				},
 			};
 
 			// Add a new history entry.
-			newState.lastHistoryEventId = e.eventId;
-			newState = addHistory(prevState, newState);
+			if (e.eventType === "End") {
+				newState.lastHistoryEventId = e.eventId;
+				newState = addHistory(prevState, newState);
+
+				// Notify about data change.
+				onDataChange?.(svgCanvasStateToData(newState));
+			}
 
 			return newState;
 		});

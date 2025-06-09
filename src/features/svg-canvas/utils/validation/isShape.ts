@@ -1,4 +1,5 @@
-import type { Shape } from "../../types/DiagramTypes";
+// Import types.
+import type { Shape } from "../../types/base/Shape";
 
 /**
  * Check if an object is a Shape.

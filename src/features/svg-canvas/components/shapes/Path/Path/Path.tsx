@@ -2,55 +2,35 @@
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
-// Import components related to SvgCanvas.
+// Import types.
+import type { Diagram } from "../../../../catalog/DiagramTypes";
+import type { DiagramBaseData } from "../../../../types/base/DiagramBaseData";
+import type { PathData } from "../../../../types/data/shapes/PathData";
+import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
+import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
+import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
+import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointerEvent";
+import type { PathProps } from "../../../../types/props/shapes/PathProps";
+
+// Import components.
+import { Outline } from "../../../core/Outline";
 import { PositionLabel } from "../../../core/PositionLabel";
 import { Group } from "../../Group";
-
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../../types/DiagramCatalog";
-import type { CreateDiagramProps } from "../../../../types/DiagramTypes";
-import type {
-	DiagramChangeEvent,
-	DiagramClickEvent,
-	DiagramDragEvent,
-	DiagramPointerEvent,
-} from "../../../../types/EventTypes";
-
-// Import SvgCanvas related hooks.
-import { useDrag } from "../../../../hooks/useDrag";
-
-// Import functions related to SvgCanvas.
-import { calcPointsOuterShape } from "../../../../utils";
-import { isItemableData } from "../../../../utils";
-
-// Imports related to this component.
 import { NewVertexList } from "../NewVertexList";
 import { SegmentList } from "../SegmentList";
+import { PathElement } from "./PathStyled";
+
+// Import hooks.
+import { useDrag } from "../../../../hooks/useDrag";
+
+// Import utils.
+import { calcPointsOuterShape } from "../../../../utils/math/geometry/calcPointsOuterShape";
 import {
-	createDValue,
 	createEndPointArrowHead,
 	createStartPointArrowHead,
-} from "./PathFunctions";
-import type { PathData } from "./PathTypes";
-
-/**
- * 折れ線コンポーネントのプロパティ
- */
-export type PathProps = CreateDiagramProps<
-	PathData,
-	{
-		selectable: true;
-		transformative: true;
-		itemable: true;
-	}
-> & {
-	dragEnabled?: boolean;
-	transformEnabled?: boolean;
-	segmentDragEnabled?: boolean;
-	rightAngleSegmentDrag?: boolean;
-	newVertexEnabled?: boolean;
-	fixBothEnds?: boolean;
-};
+} from "../../../../utils/shapes/path/createArrowHeads";
+import { createDValue } from "../../../../utils/shapes/path/createDValue";
+import { isItemableData } from "../../../../utils/validation/isItemableData";
 
 // TODO: 枠線と重なっていると頂点編集モードにできない
 /**
@@ -77,6 +57,7 @@ const PathComponent: React.FC<PathProps> = ({
 	strokeWidth = "1px",
 	isSelected = false,
 	isMultiSelectSource = false,
+	showAsChildOutline = false,
 	items = [],
 	syncWithSameId = false,
 	dragEnabled = true,
@@ -265,10 +246,9 @@ const PathComponent: React.FC<PathProps> = ({
 
 	/**
 	 * 線分および新規頂点の変更イベントハンドラ
-	 */
-	const handleDiagramChangeBySegumentAndNewVertex = useCallback(
+	 */ const handleDiagramChangeBySegumentAndNewVertex = useCallback(
 		(e: DiagramChangeEvent) => {
-			if (!isItemableData(e.endDiagram)) return; // Type guard
+			if (!isItemableData<DiagramBaseData>(e.endDiagram)) return; // Type guard with DiagramBaseData
 
 			const { rotation, scaleX, scaleY, onDiagramChange } = refBus.current;
 
@@ -364,12 +344,12 @@ const PathComponent: React.FC<PathProps> = ({
 		<>
 			{/* 描画用のパス */}
 			<g transform="translate(0.5,0.5)">
-				<path
-					className="diagram"
+				<PathElement
 					d={d}
 					fill="none"
 					stroke={stroke}
 					strokeWidth={strokeWidth}
+					isTransparent={isMultiSelectSource}
 				/>
 			</g>
 			{/* ドラッグ用のパス */}
@@ -406,6 +386,21 @@ const PathComponent: React.FC<PathProps> = ({
 					id={id}
 					items={items}
 					onDiagramChange={handleDiagramChangeBySegumentAndNewVertex}
+				/>
+			)}
+			{/* アウトライン（複数選択用） */}
+			{!showTransformGroup && (
+				<Outline
+					x={x}
+					y={y}
+					width={width}
+					height={height}
+					rotation={rotation}
+					scaleX={scaleX}
+					scaleY={scaleY}
+					isSelected={isSelected}
+					isMultiSelectSource={isMultiSelectSource}
+					showAsChildOutline={showAsChildOutline}
 				/>
 			)}
 			{/* 全体変形用グループ */}

@@ -1,45 +1,30 @@
 // Import React.
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../types/DiagramCatalog";
-import { DiagramComponentCatalog } from "../../../types/DiagramCatalog";
-import type { CreateDiagramProps } from "../../../types/DiagramTypes";
-import type {
-	DiagramChangeEvent,
-	DiagramConnectEvent,
-	DiagramDragEvent,
-	DiagramSelectEvent,
-	DiagramTextEditEvent,
-	DiagramTransformEvent,
-} from "../../../types/EventTypes";
+// Import types.
+import type { Diagram } from "../../../catalog/DiagramTypes";
+import { DiagramComponentCatalog } from "../../../catalog/DiagramComponentCatalog";
+import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEvent";
+import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";
+import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEvent";
+import type { DiagramTextEditEvent } from "../../../types/events/DiagramTextEditEvent";
+import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
+import type { GroupProps } from "../../../types/props/shapes/GroupProps";
 
 // Import components related to SvgCanvas.
 import { PositionLabel } from "../../core/PositionLabel";
+import { Outline } from "../../core/Outline";
 import { Transformative } from "../../core/Transformative";
 
-// Import functions related to SvgCanvas.
-import { degreesToRadians, rotatePoint } from "../../../utils";
-import { isItemableData, isTransformativeData } from "../../../utils";
+// Import utils.
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { isItemableData } from "../../../utils/validation/isItemableData";
+import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
+import { rotatePoint } from "../../../utils/math/points/rotatePoint";
 
 // Imports related to this component.
 import { getSelectedChildDiagram } from "./GroupFunctions";
-import type { GroupData } from "./GroupTypes";
-
-/**
- * Props for Group component.
- */
-export type GroupProps = CreateDiagramProps<
-	GroupData,
-	{
-		selectable: true;
-		transformative: true;
-		itemable: true;
-		connectable: true;
-		textable: true;
-		executable: true;
-	}
->;
 
 /**
  * Group component.
@@ -58,6 +43,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	isMultiSelectSource,
 	items,
 	showConnectPoints = true,
+	showAsChildOutline = false,
 	syncWithSameId = false,
 	onDrag,
 	onClick,
@@ -474,11 +460,22 @@ const GroupComponent: React.FC<GroupProps> = ({
 
 	// グループ内の図形の作成
 	const children = items.map((item) => {
-		const component = DiagramComponentCatalog[item.type];
+		// item.typeがDiagramType型であることを確認
+		if (!item.type) {
+			console.error("Item has no type", item);
+			return null;
+		}
+
+		const component =
+			DiagramComponentCatalog[
+				item.type as keyof typeof DiagramComponentCatalog
+			];
 		const props = {
 			...item,
 			key: item.id,
 			showConnectPoints: doShowConnectPoints,
+			// グループが選択されているか、親から子要素としてアウトライン表示指示があった場合に子要素にアウトラインを表示
+			showAsChildOutline: isSelected || showAsChildOutline,
 			syncWithSameId,
 			onClick: handleChildDiagramClick,
 			onSelect: handleChildDiagramSelect,
@@ -492,10 +489,21 @@ const GroupComponent: React.FC<GroupProps> = ({
 
 		return React.createElement(component(), props);
 	});
-
 	return (
 		<>
 			{children}
+			<Outline
+				x={x}
+				y={y}
+				width={width}
+				height={height}
+				rotation={rotation}
+				scaleX={scaleX}
+				scaleY={scaleY}
+				isSelected={isSelected}
+				showAsChildOutline={showAsChildOutline}
+				isMultiSelectSource={isMultiSelectSource}
+			/>
 			{!isMultiSelectSource && !isGroupDragging && (
 				<Transformative
 					id={id}

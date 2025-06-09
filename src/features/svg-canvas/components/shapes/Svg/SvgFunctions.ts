@@ -1,10 +1,10 @@
 // Import functions related to SvgCanvas.
-import type { Diagram } from "../../../types/DiagramCatalog";
-import { newId } from "../../../utils/diagram";
+import type { Diagram } from "../../../catalog/DiagramTypes";
+import { newId } from "../../../utils/shapes/common/newId";
 
 // Imports related to this component.
 import { DEFAULT_SVG_DATA } from "./SvgConstants";
-import type { SvgData } from "./SvgTypes";
+import type { SvgData } from "../../../types/data/shapes/SvgData";
 
 export const createSvgData = ({
 	x,

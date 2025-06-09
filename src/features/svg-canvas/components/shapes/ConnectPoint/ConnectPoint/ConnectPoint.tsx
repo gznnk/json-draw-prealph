@@ -1,51 +1,29 @@
-// Reactのインポート
+// Import React.
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
-// SvgCanvas関連型定義をインポート
-import type { Point } from "../../../../types/CoordinateTypes";
-import type { CreateDiagramProps, Shape } from "../../../../types/DiagramTypes";
-import type {
-	DiagramConnectEvent,
-	DiagramDragDropEvent,
-	DiagramDragEvent,
-	DiagramHoverEvent,
-} from "../../../../types/EventTypes";
+// Import types.
+import type { Point } from "../../../../types/base/Point";
+import type { DiagramDragDropEvent } from "../../../../types/events/DiagramDragDropEvent";
+import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
+import type { DiagramHoverEvent } from "../../../../types/events/DiagramHoverEvent";
+import type { ConnectPointProps } from "../../../../types/props/shapes/ConnectPointProps";
+import type { PathPointData } from "../../../../types/data/shapes/PathPointData";
 
 // SvgCanvas関連コンポーネントをインポート
 import { DragPoint } from "../../../core/DragPoint";
-import type { PathPointData } from "../../Path";
 
-// SvgCanvas関連関数をインポート
-import { newId } from "../../../../utils/diagram";
-import { calcRectangleOuterBox } from "../../../../utils";
+// Import utils.
+import { calcRectangleOuterBox } from "../../../../utils/math/geometry/calcRectangleOuterBox";
+import { newId } from "../../../../utils/shapes/common/newId";
 
 // Imports related to this component.
 import { triggerNewConnectLine } from "../NewConnectLine";
 import { EVENT_NAME_CONNECTTION } from "./ConnectPointConstants";
-import {
-	createBestConnectPath,
-	createConnectPathOnDrag,
-	getLineDirection,
-} from "./ConnectPointFunctions";
-import type {
-	ConnectingPoint,
-	ConnectionEvent,
-	ConnectPointData,
-} from "./ConnectPointTypes";
-
-/**
- * 接続ポイントプロパティ
- */
-type ConnectPointProps = CreateDiagramProps<
-	ConnectPointData,
-	{ connectable: true }
-> & {
-	ownerId: string;
-	ownerShape: Shape; // memo化して渡すこと
-	isTransparent: boolean;
-	onConnect?: (e: DiagramConnectEvent) => void;
-};
+import { createBestConnectPath } from "../../../../utils/shapes/connectPoint/createBestConnectPath";
+import { createConnectPathOnDrag } from "../../../../utils/shapes/connectPoint/createConnectPathOnDrag";
+import { getLineDirection } from "../../../../utils/shapes/connectPoint/getLineDirection";
+import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
 
 /**
  * 接続ポイントコンポーネント
@@ -120,7 +98,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			rotation: 0,
 			scaleX: 1,
 			scaleY: 1,
-			stroke: "#fed579",
+			stroke: "#3A415C",
 			strokeWidth: "3px",
 			keepProportion: false,
 			isSelected: false,

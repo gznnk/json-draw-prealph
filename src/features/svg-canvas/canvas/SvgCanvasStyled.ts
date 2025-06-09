@@ -1,6 +1,13 @@
 // Import Emotion for styling.
 import styled from "@emotion/styled";
 
+export const Viewport = styled.div`
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+`;
+
 /**
  * Styled wrapper element for the SVG canvas.
  */
@@ -19,19 +26,10 @@ export const Container = styled.div`
 export const Svg = styled.svg`
     display: block;
     box-sizing: border-box;
-    background-color: #76d0de;
+    background-color: #eeeeee;
     outline: none;
     * {
         outline: none;
-    }
-`;
-
-/**
- * Styled wrapper element for the multi-select group.
- */
-export const MultiSelectGroupContainer = styled.g`
-    .diagram {
-        opacity: 0;
     }
 `;
 
@@ -61,7 +59,7 @@ export const HTMLElementsContainer = styled.div<HTMLElementsContainerProps>`
  * Styled element for the viewport overlay.
  */
 export const ViewportOverlay = styled.div`
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;

@@ -3,34 +3,24 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../../../types/DiagramTypes";
+import type { TextAreaNodeProps } from "../../../types/props/nodes/TextAreaNodeProps";
 
 // Import components related to SvgCanvas.
-import { Rectangle, type RectangleProps } from "../../shapes/Rectangle";
+import { Rectangle } from "../../shapes/Rectangle";
 
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import functions related to SvgCanvas.
-import { newEventId } from "../../../utils";
+import { newEventId } from "../../../utils/common/newEventId";
 
 // Imports related to this component.
 import { TextAreaButton, TextAreaButtonText } from "./TextAreaNodeStyled";
 
 /**
- * Props for the TextAreaNode component.
- */
-type TextAreaProps = CreateDiagramProps<
-	RectangleProps,
-	{
-		executable: true;
-	}
->;
-
-/**
  * TextAreaNode component.
  */
-const TextAreaNodeComponent: React.FC<TextAreaProps> = (props) => {
+const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 	// State to manage the text content of the TextArea node.
 	const [text, setText] = useState<string>(props.text);
 
@@ -52,7 +42,6 @@ const TextAreaNodeComponent: React.FC<TextAreaProps> = (props) => {
 	const handleButtonClick = useCallback(() => {
 		// Bypass references to avoid function creation in every render.
 		const { props } = refBus.current;
-
 		props.onExecute?.({
 			id: props.id,
 			eventId: newEventId(),
@@ -109,14 +98,14 @@ const TextAreaNodeComponent: React.FC<TextAreaProps> = (props) => {
 						height={22}
 						rx="10"
 						ry="10"
-						fill="#5ea6cb"
+						fill="#2A3147"
 						onClick={handleButtonClick}
 					/>
 					<TextAreaButtonText
 						x={props.x + props.width / 2 - 31}
 						y={props.y + props.height / 2 - 10}
 						fontSize="14px"
-						fill="#ffffff"
+						fill="#C0C4D2"
 						pointerEvents="none"
 					>
 						Go

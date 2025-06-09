@@ -1,14 +1,15 @@
 // SvgCanvas関連型定義をインポート
-import type { Diagram } from "../../../types/DiagramCatalog";
-import type { GroupData } from "./GroupTypes";
+import type { Diagram } from "../../../catalog/DiagramTypes";
+import type { Bounds } from "../../../types/base/Bounds";
+import type { GroupData } from "../../../types/data/shapes/GroupData";
 
 // SvgCanvas関連関数をインポート
-import { degreesToRadians, nanToZero, rotatePoint } from "../../../utils";
-import {
-	isItemableData,
-	isSelectableData,
-	isTransformativeData,
-} from "../../../utils";
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { nanToZero } from "../../../utils/math/common/nanToZero";
+import { rotatePoint } from "../../../utils/math/points/rotatePoint";
+import { isItemableData } from "../../../utils/validation/isItemableData";
+import { isSelectableData } from "../../../utils/validation/isSelectableData";
+import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
 
 /**
  * 選択されたグループ内の図形を、配下のグループも含めて再帰的に取得する
@@ -23,13 +24,14 @@ export const getSelectedChildDiagram = (
 		if (isSelectableData(diagram) && diagram.isSelected) {
 			return diagram;
 		}
-		if (isItemableData(diagram)) {
+		if (isItemableData<Diagram>(diagram)) {
 			const ret = getSelectedChildDiagram(diagram.items || []);
 			if (ret) {
 				return ret;
 			}
 		}
 	}
+	return undefined;
 };
 
 /**
@@ -47,13 +49,14 @@ export const getChildDiagramById = (
 		if (diagram.id === id) {
 			return diagram;
 		}
-		if (isItemableData(diagram)) {
+		if (isItemableData<Diagram>(diagram)) {
 			const ret = getChildDiagramById(diagram.items || [], id);
 			if (ret) {
 				return ret;
 			}
 		}
 	}
+	return undefined;
 };
 
 /**
@@ -156,10 +159,9 @@ export const calcGroupBoxOfNoRotation = (
 	let left = Number.POSITIVE_INFINITY;
 	let bottom = Number.NEGATIVE_INFINITY;
 	let right = Number.NEGATIVE_INFINITY;
-
 	for (const item of items) {
 		// ConnectPointは形状の計算に含めない
-		const itemItems = isItemableData(item)
+		const itemItems = isItemableData<Diagram>(item)
 			? (item.items ?? []).filter((i) => i.type !== "ConnectPoint")
 			: [];
 		if (itemItems.length > 0) {
@@ -196,7 +198,7 @@ export const calcGroupBoxOfNoRotation = (
 	};
 };
 
-export const calcBoundsOfGroup = (group: GroupData) => {
+export const calcBoundsOfGroup = (group: GroupData): Bounds => {
 	const { items, x, y, rotation } = group;
 	const radians = degreesToRadians(rotation);
 	const box = calcGroupBoxOfNoRotation(items, x, y, rotation);

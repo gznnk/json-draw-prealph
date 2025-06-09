@@ -3,15 +3,11 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types related to this component.
-import type { CreateDiagramProps } from "../../../types/DiagramTypes";
-import type { Diagram } from "../../../types/DiagramCatalog";
+import type { Diagram } from "../../../catalog/DiagramTypes";
+import type { SvgToDiagramNodeProps } from "../../../types/props/nodes/SvgToDiagramNodeProps";
 
 // Import components related to SvgCanvas.
-import {
-	DEFAULT_RECTANGLE_DATA,
-	Rectangle,
-	type RectangleProps,
-} from "../../shapes/Rectangle";
+import { DEFAULT_RECTANGLE_DATA, Rectangle } from "../../shapes/Rectangle";
 import { Gachapon } from "../../icons/Gachapon";
 import { IconContainer } from "../../core/IconContainer";
 
@@ -20,18 +16,8 @@ import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import functions related to SvgCanvas.
 import { createSvgDataFromText } from "../../shapes/Svg/SvgFunctions";
-import { newEventId } from "../../../utils";
+import { newEventId } from "../../../utils/common/newEventId";
 import { dispatchNewItemEvent } from "../../../canvas/observers/addNewItem";
-
-/**
- * Props for the SvgToDiagramNode component.
- */
-type SvgToDiagramNodeProps = CreateDiagramProps<
-	RectangleProps,
-	{
-		executable: true;
-	}
->;
 
 /**
  * SvgToDiagramNode component.

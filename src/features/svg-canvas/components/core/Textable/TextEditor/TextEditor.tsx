@@ -1,13 +1,13 @@
 // Import React.
 import type React from "react";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 
-// Import functions related to SvgCanvas.
-import { createSvgTransform } from "../../../../utils/diagram";
-import { degreesToRadians } from "../../../../utils";
-import { newEventId } from "../../../../utils";
+// Import utils.
+import { createSvgTransform } from "../../../../utils/shapes/common/createSvgTransform";
+import { degreesToRadians } from "../../../../utils/math/common/degreesToRadians";
+import { newEventId } from "../../../../utils/common/newEventId";
 
-// Imports related to this component.
+// Import local module files.
 import { Input, TextArea } from "./TextEditorStyled";
 import type { TextEditorProps } from "./TextEditorTypes";
 
@@ -34,9 +34,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	isActive,
 	onTextChange,
 }) => {
-	// State for input text.
-	const [inputText, setInputText] = useState(text);
-
+	const prevIsActive = useRef(isActive);
 	// Refs for input and textarea elements.
 	// These refs are used to focus the input or textarea when the component is active.
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -44,8 +42,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 
 	// Focus the input or textarea when the component is active.
 	useEffect(() => {
-		if (isActive) {
-			setInputText(text);
+		if (prevIsActive.current === false && isActive) {
 			if (textType === "text") {
 				inputRef.current?.focus();
 				// Set the selection range to the end of the text in the input.
@@ -55,10 +52,15 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 				// Set the selection range to the end of the text in the textarea.
 				textAreaRef.current?.setSelectionRange(text.length, text.length);
 			}
-		} else {
-			setInputText("");
+			onTextChange?.({
+				eventId: newEventId(),
+				eventType: "Start",
+				id,
+				text: text,
+			});
 		}
-	}, [isActive, text, textType]);
+		prevIsActive.current = isActive;
+	}, [id, isActive, text, textType, onTextChange]);
 
 	// Hide the thext editor when not active.
 	if (!isActive) return null;
@@ -67,7 +69,12 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	 * Handle text change event for textarea.
 	 */
 	const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setInputText(e.target.value);
+		onTextChange?.({
+			eventId: newEventId(),
+			eventType: "InProgress",
+			id,
+			text: e.target.value,
+		});
 	};
 
 	/**
@@ -76,6 +83,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	const handleTextAreaBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
 		onTextChange?.({
 			eventId: newEventId(),
+			eventType: "End",
 			id,
 			text: e.target.value,
 		});
@@ -85,7 +93,12 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	 * Handle text change event for input.
 	 */
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setInputText(e.target.value);
+		onTextChange?.({
+			eventId: newEventId(),
+			eventType: "InProgress",
+			id,
+			text: e.target.value,
+		});
 	};
 
 	/**
@@ -94,6 +107,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
 		onTextChange?.({
 			eventId: newEventId(),
+			eventType: "End",
 			id,
 			text: e.target.value,
 		});
@@ -110,7 +124,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 
 	// Commom properties for both input and textarea.
 	const commonProps = {
-		value: inputText,
+		value: text,
 		left: -width / 2,
 		top: -height / 2,
 		transform,

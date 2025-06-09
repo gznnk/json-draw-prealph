@@ -1,29 +1,27 @@
 // Import React.
 import type React from "react";
-import { memo, useCallback, useRef, useState, useEffect } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import other libraries.
 import DOMPurify from "dompurify";
 
-// Import types related to SvgCanvas.
-import type {
-	DiagramDragEvent,
-	DiagramPointerEvent,
-} from "../../../types/EventTypes";
+// Import types.
+import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEvent";
+import type { SvgProps } from "../../../types/props/shapes/SvgProps";
 
-// Import components related to SvgCanvas.
+// Import components.
 import { PositionLabel } from "../../core/PositionLabel";
+import { Outline } from "../../core/Outline";
 import { Transformative } from "../../core/Transformative";
+import { SvgGroupElement, SvgRectElement } from "./SvgStyled";
 
-// Import hooks related to SvgCanvas.
+// Import hooks.
 import { useDrag } from "../../../hooks/useDrag";
 
-// Import functions related to SvgCanvas.
-import { createSvgTransform } from "../../../utils/diagram";
-import { degreesToRadians } from "../../../utils";
-
-// Imports related to this component.
-import type { SvgProps } from "./SvgTypes";
+// Import utils.
+import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 
 /**
  * Svg component.
@@ -44,6 +42,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 	initialWidth,
 	initialHeight,
 	svgText,
+	showAsChildOutline = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -140,14 +139,13 @@ const SvgComponent: React.FC<SvgProps> = ({
 	return (
 		<>
 			<g transform={transform}>
-				<g
-					className="diagram"
+				<SvgGroupElement
 					transform={`translate(${-width / 2}, ${-height / 2}) scale(${width / initialWidth}, ${height / initialHeight})`}
+					isTransparent={isMultiSelectSource}
 					ref={groupRef}
 				/>
 				{/* Element for handle pointer events */}
-				<rect
-					className="diagram"
+				<SvgRectElement
 					id={id}
 					x={-width / 2}
 					y={-height / 2}
@@ -156,10 +154,23 @@ const SvgComponent: React.FC<SvgProps> = ({
 					tabIndex={0}
 					cursor="move"
 					fill="transparent"
+					isTransparent={isMultiSelectSource}
 					ref={svgRef}
 					{...dragProps}
 				/>
 			</g>
+			<Outline
+				x={x}
+				y={y}
+				width={width}
+				height={height}
+				rotation={rotation}
+				scaleX={scaleX}
+				scaleY={scaleY}
+				isSelected={isSelected}
+				isMultiSelectSource={isMultiSelectSource}
+				showAsChildOutline={showAsChildOutline}
+			/>
 			{showTransformative && (
 				<Transformative
 					id={id}

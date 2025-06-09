@@ -2,31 +2,30 @@
 import type React from "react";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 
-// Import types related to SvgCanvas.
-import type {
-	DiagramDragEvent,
-	DiagramHoverEvent,
-	DiagramPointerEvent,
-	DiagramTransformEvent,
-} from "../../../types/EventTypes";
+// Import types.
+import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+import type { DiagramHoverEvent } from "../../../types/events/DiagramHoverEvent";
+import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEvent";
+import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
+import type { RectangleProps } from "../../../types/props/shapes/RectangleProps";
 
 // Import components related to SvgCanvas.
 import { PositionLabel } from "../../core/PositionLabel";
+import { Outline } from "../../core/Outline";
 import { Textable } from "../../core/Textable";
 import { Transformative } from "../../core/Transformative";
 import { ConnectPoint } from "../ConnectPoint";
 
-// Import hooks related to SvgCanvas.
+// Import hooks.
 import { useDrag } from "../../../hooks/useDrag";
 import { useFileDrop } from "../../../hooks/useFileDrop";
 
-// Import functions related to SvgCanvas.
-import { createSvgTransform } from "../../../utils/diagram";
-import { degreesToRadians } from "../../../utils";
+// Import utils.
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 
-// Imports related to this component.
+// Import local module files.
 import { RectangleElement } from "./RectangleStyled";
-import type { RectangleProps } from "./RectangleTypes";
 
 /**
  * 四角形コンポーネント
@@ -61,6 +60,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	isTextEditing,
 	isTextEditEnabled = true,
 	isTransparent,
+	showAsChildOutline = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -235,7 +235,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		<>
 			<g transform="translate(0.5,0.5)">
 				<RectangleElement
-					className="diagram"
 					id={id}
 					x={-width / 2}
 					y={-height / 2}
@@ -248,7 +247,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					strokeWidth={strokeWidth}
 					tabIndex={0}
 					cursor="move"
-					isTransparent={isTransparent}
+					isTransparent={isTransparent || isMultiSelectSource}
 					transform={transform}
 					ref={svgRef}
 					onDoubleClick={handleDoubleClick}
@@ -274,6 +273,18 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					isTextEditing={isTextEditing}
 				/>
 			)}
+			<Outline
+				x={x}
+				y={y}
+				width={width}
+				height={height}
+				rotation={rotation}
+				scaleX={scaleX}
+				scaleY={scaleY}
+				isSelected={isSelected}
+				isMultiSelectSource={isMultiSelectSource}
+				showAsChildOutline={showAsChildOutline}
+			/>
 			{showTransformative && (
 				<Transformative
 					id={id}

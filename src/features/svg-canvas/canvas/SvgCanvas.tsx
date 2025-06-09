@@ -1,6 +1,5 @@
 // Import React.
 import React, {
-	createContext,
 	forwardRef,
 	memo,
 	useCallback,
@@ -10,8 +9,8 @@ import React, {
 } from "react";
 
 // SvgCanvas関連型定義をインポート
-import { type Diagram, DiagramComponentCatalog } from "../types/DiagramCatalog";
-import type { DiagramSelectEvent } from "../types/EventTypes";
+import { DiagramComponentCatalog } from "../catalog/DiagramComponentCatalog";
+import type { DiagramSelectEvent } from "../types/events/DiagramSelectEvent";
 
 // SvgCanvas関連コンポーネントをインポート
 import { TextEditor } from "../components/core/Textable";
@@ -21,20 +20,18 @@ import { DiagramMenu, useDiagramMenu } from "../components/menus/DiagramMenu";
 import { FlashConnectLine } from "../components/shapes/ConnectLine";
 import { NewConnectLine } from "../components/shapes/ConnectPoint";
 import { Group } from "../components/shapes/Group";
+import UserMenu from "../components/menus/UserMenu/UserMenu";
 
 // SvgCanvas関連関数をインポート
-import { newEventId } from "../utils";
-
-import UserMenu from "../components/menus/UserMenu/UserMenu";
-import { getDiagramById } from "./SvgCanvasFunctions";
+import { newEventId } from "../utils/common/newEventId";
 
 // Imports related to this component.
 import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
 import {
 	Container,
 	HTMLElementsContainer,
-	MultiSelectGroupContainer,
 	Svg,
+	Viewport,
 	ViewportOverlay,
 } from "./SvgCanvasStyled";
 import type {
@@ -43,10 +40,8 @@ import type {
 	SvgCanvasState,
 } from "./SvgCanvasTypes";
 
-// SvgCanvasの状態を階層を跨いで提供するためにSvgCanvasStateProviderを保持するコンテキストを作成
-export const SvgCanvasContext = createContext<SvgCanvasStateProvider | null>(
-	null,
-);
+// Import SvgCanvas context.
+import { SvgCanvasContext, SvgCanvasStateProvider } from "./SvgCanvasContext";
 
 /**
  * SvgCanvasコンポーネント
@@ -55,7 +50,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 	(props, ref) => {
 		// In the SvgCanvas render function,
 		// we handle DOM events related to the SvgCanvas elements.
-
 		const {
 			title,
 			minX,
@@ -80,6 +74,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onRedo,
 			onTextEdit,
 			onTextChange,
+			onDataChange,
 			onNewDiagram,
 			onExecute,
 			onScroll,
@@ -124,7 +119,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 		// Use the diagram menu hook to handle diagram menu events.
 		const { diagramMenuProps } = useDiagramMenu(props);
-
 		// Create references bypass to avoid function creation in every render.
 		const refBusVal = {
 			scrollLeft,
@@ -139,6 +133,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onClearAllSelection,
 			onUndo,
 			onRedo,
+			onDataChange,
 			onScroll,
 			onCopy,
 			onPaste,
@@ -328,7 +323,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		});
 
 		return (
-			<>
+			<Viewport>
 				<Container ref={containerRef} onScroll={onScroll}>
 					<SvgCanvasContext.Provider value={stateProvider.current}>
 						<Svg
@@ -348,18 +343,14 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 							{renderedItems}
 							{/* Dummy group for multi-select. */}
 							{multiSelectGroup && (
-								// The MultiSelectGroupContainer makes the diagrams transparent and displays only the outline for transformations.
-								// This allows for the dragging and transformation of the multi-selected diagrams while maintaining their stacking order of rendering.
-								<MultiSelectGroupContainer>
-									<Group
-										{...multiSelectGroup}
-										id={MULTI_SELECT_GROUP}
-										syncWithSameId
-										onSelect={handleSelect}
-										onTransform={onTransform}
-										onDiagramChange={onDiagramChange}
-									/>
-								</MultiSelectGroupContainer>
+								<Group
+									{...multiSelectGroup}
+									id={MULTI_SELECT_GROUP}
+									syncWithSameId
+									onSelect={handleSelect}
+									onTransform={onTransform}
+									onDiagramChange={onDiagramChange}
+								/>
 							)}
 							{/* Render new connect line. */}
 							<NewConnectLine />
@@ -377,39 +368,16 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 						<TextEditor {...textEditorState} onTextChange={onTextChange} />
 						<DiagramMenu {...diagramMenuProps} />
 					</HTMLElementsContainer>
-					{/* Container for HTML elements fixed to the viewport. */}
-					<ViewportOverlay>
-						<CanvasMenu onNewDiagram={onNewDiagram} />
-						<UserMenu />
-						<ContextMenu {...contextMenuProps} />
-					</ViewportOverlay>
 				</Container>
-			</>
+				{/* Container for HTML elements fixed to the viewport. */}
+				<ViewportOverlay>
+					<CanvasMenu onNewDiagram={onNewDiagram} />
+					<UserMenu />
+					<ContextMenu {...contextMenuProps} />
+				</ViewportOverlay>
+			</Viewport>
 		);
 	},
 );
 
 export const SvgCanvas = memo(SvgCanvasComponent);
-
-/**
- * 階層を跨いでSvgCanvasの状態を提供するクラス.
- */
-class SvgCanvasStateProvider {
-	s: SvgCanvasState;
-	constructor(state: SvgCanvasState) {
-		this.s = state;
-	}
-	setState(state: SvgCanvasState) {
-		// 現時点ではシングルトン的に扱っているため、状態の更新関数を提供
-		this.s = state;
-	}
-	state(): SvgCanvasState {
-		return this.s;
-	}
-	items(): Diagram[] {
-		return this.s.items;
-	}
-	getDiagramById(id: string): Diagram | undefined {
-		return getDiagramById(this.s.items, id);
-	}
-}

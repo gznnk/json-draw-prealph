@@ -2,14 +2,14 @@
 import { useCallback } from "react";
 
 // Import types related to SvgCanvas.
-import type { ConnectLineData } from "../../components/shapes/ConnectLine";
-import type { PathPointData } from "../../components/shapes/Path";
-import type { DiagramConnectEvent } from "../../types/EventTypes";
+import type { ConnectLineData } from "../../types/data/shapes/ConnectLineData";
+import type { PathPointData } from "../../types/data/shapes/PathPointData";
+import type { DiagramConnectEvent } from "../../types/events/DiagramConnectEvent";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { newId } from "../../utils/diagram";
-import { calcPointsOuterShape } from "../../utils";
+import { newId } from "../../utils/shapes/common/newId";
+import { calcPointsOuterShape } from "../../utils/math/geometry/calcPointsOuterShape";
 import { dispatchNewItemEvent } from "../observers/addNewItem";
 
 /**
@@ -30,7 +30,7 @@ export const useConnect = (_props: CanvasHooksProps) => {
 				y: shape.y,
 				width: shape.width,
 				height: shape.height,
-				stroke: "#fed579",
+				stroke: "#3A415C",
 				strokeWidth: "3px",
 				isSelected: false,
 				isMultiSelectSource: false,

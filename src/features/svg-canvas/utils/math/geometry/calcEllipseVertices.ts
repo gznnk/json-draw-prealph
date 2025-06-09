@@ -1,13 +1,16 @@
-import type { EllipseVertices } from "../../../types/CoordinateTypes";
-import type { Shape } from "../../../types/DiagramTypes";
+// Import types.
+import type { EllipseVertices } from "../../../types/base/EllipseVertices";
+import type { Shape } from "../../../types/base/Shape";
+
+// Import utils.
 import { degreesToRadians } from "../common/degreesToRadians";
 import { affineTransformation } from "../transform/affineTransformation";
 
 /**
- * 楕円の頂点を計算する
+ * Calculates the vertices of an ellipse.
  *
- * @param shape - 形状
- * @returns 頂点座標
+ * @param shape - The shape parameters (position, dimensions, rotation, scale)
+ * @returns The coordinates of the ellipse vertices
  */
 export const calcEllipseVertices = (shape: Shape): EllipseVertices => {
 	const { x, y, width, height, rotation, scaleX, scaleY } = shape;

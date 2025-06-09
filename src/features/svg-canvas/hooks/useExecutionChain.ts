@@ -1,11 +1,9 @@
 // Import React.
 import { useEffect, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import {
-	EXECUTION_PROPAGATION_EVENT_NAME,
-	type ExecutionPropagationEvent,
-} from "../types/EventTypes";
+// Import types.
+import type { ExecutionPropagationEvent } from "../types/events/ExecutionPropagationEvent";
+import { EXECUTION_PROPAGATION_EVENT_NAME } from "../types/events/Constants";
 
 type ExecutionChainProps = {
 	id: string;

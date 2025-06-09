@@ -2,12 +2,14 @@
 import type React from "react";
 import { memo, useCallback, useRef, useState } from "react";
 
-// Import hooks related to SvgCanvas.
+// Import types.
+import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+
+// Import hooks.
 import type { DragProps } from "../../../hooks/useDrag";
 import { useDrag } from "../../../hooks/useDrag";
-import type { DiagramDragEvent } from "../../../types/EventTypes";
 
-// Import components related to SvgCanvas.
+// Import components.
 import { RotateRight } from "../../icons/RotateRight";
 
 /**
@@ -80,7 +82,7 @@ const RotatePointComponent: React.FC<RotatePointProps> = ({
 				cy={y}
 				r={7}
 				fill="transparent"
-				cursor={"move"}
+				cursor="move"
 				tabIndex={0}
 				ref={svgRef}
 				{...dragProps}

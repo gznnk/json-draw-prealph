@@ -2,11 +2,10 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type { GroupData } from "../../components/shapes/Group";
-import type {
-	ConnectPointMoveData,
-	DiagramChangeEvent,
-} from "../../types/EventTypes";
+import type { Diagram } from "../../catalog/DiagramTypes";
+import type { GroupData } from "../../types/data/shapes/GroupData";
+import type { ConnectPointMoveData } from "../../types/events/ConnectPointMoveData";
+import type { DiagramChangeEvent } from "../../types/events/DiagramChangeEvent";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import components related to SvgCanvas.
@@ -16,15 +15,15 @@ import { notifyConnectPointsMove } from "../../components/shapes/ConnectLine";
 import { useCanvasResize } from "./useCanvasResize";
 
 // Import functions related to SvgCanvas.
-import { isItemableData, isSelectableData } from "../../utils";
-import {
-	addHistory,
-	applyRecursive,
-	isDiagramChangingEvent,
-	isHistoryEvent,
-	updateConnectPointsAndCollectRecursive,
-	updateOutlineOfAllGroups,
-} from "../SvgCanvasFunctions";
+import { isItemableData } from "../../utils/validation/isItemableData";
+import { isSelectableData } from "../../utils/validation/isSelectableData";
+import { addHistory } from "../utils/addHistory";
+import { applyRecursive } from "../utils/applyRecursive";
+import { isDiagramChangingEvent } from "../utils/isDiagramChangingEvent";
+import { isHistoryEvent } from "../utils/isHistoryEvent";
+import { svgCanvasStateToData } from "../utils/svgCanvasStateToData";
+import { updateConnectPointsAndCollectRecursive } from "../utils/updateConnectPointsAndCollectRecursive";
+import { updateOutlineOfAllGroups } from "../utils/updateOutlineOfAllGroups";
 
 // Imports related to this component.
 import { MULTI_SELECT_GROUP } from "../SvgCanvasConstants";
@@ -48,7 +47,7 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 	return useCallback((e: DiagramChangeEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const {
-			props: { setCanvasState },
+			props: { setCanvasState, onDataChange },
 			canvasResize,
 		} = refBus.current;
 
@@ -73,11 +72,9 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 						multiSelectGroup,
 						connectPointMoveDataList,
 					);
-				}
-
-				// Propagate the multi-select group changes to the original diagrams.
+				} // Propagate the multi-select group changes to the original diagrams.
 				items = applyRecursive(prevState.items, (item) => {
-					if (!isItemableData(e.endDiagram)) return item; // Type guard.
+					if (!isItemableData<Diagram>(e.endDiagram)) return item; // Type guard with Diagram type
 
 					// Find the corresponding change data in the multi-select group.
 					const changedItem = (e.endDiagram.items ?? []).find(
@@ -154,10 +151,13 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 				multiSelectGroup,
 			} as SvgCanvasState;
 
-			// Add a new history entry.
 			if (isHistoryEvent(e.eventType)) {
+				// Add a new history entry.
 				newState.lastHistoryEventId = e.eventId;
 				newState = addHistory(prevState, newState);
+
+				// Notify the data change.
+				onDataChange?.(svgCanvasStateToData(newState));
 			}
 
 			if (0 < connectPointMoveDataList.length) {

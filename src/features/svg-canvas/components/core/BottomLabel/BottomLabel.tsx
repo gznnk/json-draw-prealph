@@ -2,10 +2,10 @@
 import type React from "react";
 import { memo } from "react";
 
-// Import functions related to SvgCanvas.
-import { calcRectangleVertices } from "../../../utils";
+// Import utils.
+import { calcRectangleVertices } from "../../../utils/math/geometry/calcRectangleVertices";
 
-// Imports related to this component.
+// Import local module files.
 import { calcBottomLabelPosition } from "./BottomLabelFunctions";
 
 /**
