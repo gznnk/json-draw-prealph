@@ -4,7 +4,6 @@ import { useCallback, useRef } from "react";
 // Import types related to SvgCanvas.
 import type { DiagramTextChangeEvent } from "../../types/events/DiagramTextChangeEvent";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
-import type { TextEditorState } from "../../components/core/Textable/TextEditor/TextEditorTypes";
 
 // Import functions related to SvgCanvas.
 import { addHistory } from "../utils/addHistory";
@@ -27,25 +26,29 @@ export const useTextChange = (props: CanvasHooksProps) => {
 		const { setCanvasState, onDataChange } = refBus.current.props;
 
 		setCanvasState((prevState) => {
+			const isTextEditing = e.eventType !== "End";
+
 			// Create a new state with the updated text.
 			let newState = {
 				...prevState,
 				items: applyRecursive(prevState.items, (item) =>
-					item.id === e.id
-						? { ...item, text: e.text, isTextEditing: false }
-						: item,
+					item.id === e.id ? { ...item, text: e.text, isTextEditing } : item,
 				),
 				textEditorState: {
-					isActive: false,
-				} as TextEditorState,
+					...prevState.textEditorState,
+					text: e.text,
+					isActive: isTextEditing,
+				},
 			};
 
 			// Add a new history entry.
-			newState.lastHistoryEventId = e.eventId;
-			newState = addHistory(prevState, newState);
+			if (e.eventType === "End") {
+				newState.lastHistoryEventId = e.eventId;
+				newState = addHistory(prevState, newState);
 
-			// Notify about data change.
-			onDataChange?.(svgCanvasStateToData(newState));
+				// Notify about data change.
+				onDataChange?.(svgCanvasStateToData(newState));
+			}
 
 			return newState;
 		});
