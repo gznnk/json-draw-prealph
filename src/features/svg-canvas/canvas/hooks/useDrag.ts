@@ -6,7 +6,7 @@ import type { DiagramDragEvent } from "../../types/events/DiagramDragEvent";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
 
 // Import hooks related to SvgCanvas.
-import { useCanvasResize } from "./useCanvasResize";
+import { useAutoEdgeScroll } from "./useAutoEdgeScroll";
 
 // Import functions related to SvgCanvas.
 import { addHistory } from "../utils/addHistory";
@@ -21,13 +21,12 @@ import { updateOutlineOfAllGroups } from "../utils/updateOutlineOfAllGroups";
  * Custom hook to handle drag events on the canvas.
  */
 export const useDrag = (props: CanvasHooksProps) => {
-	// Get the canvas resize function to handle canvas resizing.
-	const canvasResize = useCanvasResize(props);
-
+	// Get the auto edge scroll function to handle canvas auto scrolling.
+	const autoEdgeScroll = useAutoEdgeScroll(props);
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		canvasResize,
+		autoEdgeScroll,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -36,7 +35,7 @@ export const useDrag = (props: CanvasHooksProps) => {
 		// Bypass references to avoid function creation in every render.
 		const {
 			props: { setCanvasState, onDataChange },
-			canvasResize,
+			autoEdgeScroll,
 		} = refBus.current;
 
 		setCanvasState((prevState) => {
@@ -78,9 +77,8 @@ export const useDrag = (props: CanvasHooksProps) => {
 
 			return newState;
 		});
-
-		// Resize the canvas if the cursor is near the edges.
-		canvasResize({
+		// Auto scroll if the cursor is near the edges.
+		autoEdgeScroll({
 			cursorX: e.cursorX ?? e.endX,
 			cursorY: e.cursorY ?? e.endY,
 		});

@@ -12,7 +12,7 @@ import type { CanvasHooksProps } from "../SvgCanvasTypes";
 import { notifyConnectPointsMove } from "../../components/shapes/ConnectLine";
 
 // Import hooks related to SvgCanvas.
-import { useCanvasResize } from "./useCanvasResize";
+import { useAutoEdgeScroll } from "./useAutoEdgeScroll";
 
 // Import functions related to SvgCanvas.
 import { isItemableData } from "../../utils/validation/isItemableData";
@@ -33,13 +33,13 @@ import type { SvgCanvasState } from "../SvgCanvasTypes";
  * Custom hook to handle diagram change events on the canvas.
  */
 export const useDiagramChange = (props: CanvasHooksProps) => {
-	// Get the canvas resize function to handle canvas resizing.
-	const canvasResize = useCanvasResize(props);
+	// Get the auto edge scroll function to handle canvas auto scrolling.
+	const autoEdgeScroll = useAutoEdgeScroll(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		canvasResize,
+		autoEdgeScroll,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -48,7 +48,7 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 		// Bypass references to avoid function creation in every render.
 		const {
 			props: { setCanvasState, onDataChange },
-			canvasResize,
+			autoEdgeScroll,
 		} = refBus.current;
 
 		setCanvasState((prevState) => {
@@ -171,10 +171,9 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 
 			return newState;
 		});
-
-		// Resize the canvas if the cursor is near the edges.
+		// Auto scroll if the cursor is near the edges.
 		if (e.cursorX !== undefined && e.cursorY !== undefined) {
-			canvasResize({
+			autoEdgeScroll({
 				cursorX: e.cursorX,
 				cursorY: e.cursorY,
 			});

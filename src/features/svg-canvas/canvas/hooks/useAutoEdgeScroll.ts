@@ -44,37 +44,40 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 	}, []);
 
 	// Function to perform a single scroll action
-	const performScroll = useCallback((direction: ScrollDirection) => {
-		const { canvasState, setCanvasState } = refBus.current.props;
-		const { minX, minY } = canvasState;
+	const performScroll = useCallback(
+		(direction: ScrollDirection) => {
+			const { canvasState, setCanvasState } = refBus.current.props;
+			const { minX, minY } = canvasState;
 
-		switch (direction) {
-			case "left":
-				setCanvasState((prevState) => ({
-					...prevState,
-					minX: minX - AUTO_SCROLL_STEP_SIZE,
-				}));
-				break;
-			case "top":
-				setCanvasState((prevState) => ({
-					...prevState,
-					minY: minY - AUTO_SCROLL_STEP_SIZE,
-				}));
-				break;
-			case "right":
-				setCanvasState((prevState) => ({
-					...prevState,
-					minX: minX + AUTO_SCROLL_STEP_SIZE,
-				}));
-				break;
-			case "bottom":
-				setCanvasState((prevState) => ({
-					...prevState,
-					minY: minY + AUTO_SCROLL_STEP_SIZE,
-				}));
-				break;
-		}
-	}, []);
+			switch (direction) {
+				case "left":
+					setCanvasState((prevState) => ({
+						...prevState,
+						minX: minX - AUTO_SCROLL_STEP_SIZE,
+					}));
+					break;
+				case "top":
+					setCanvasState((prevState) => ({
+						...prevState,
+						minY: minY - AUTO_SCROLL_STEP_SIZE,
+					}));
+					break;
+				case "right":
+					setCanvasState((prevState) => ({
+						...prevState,
+						minX: minX + AUTO_SCROLL_STEP_SIZE,
+					}));
+					break;
+				case "bottom":
+					setCanvasState((prevState) => ({
+						...prevState,
+						minY: minY + AUTO_SCROLL_STEP_SIZE,
+					}));
+					break;
+			}
+		},
+		[],
+	);
 
 	// Function to start continuous scrolling
 	const startScrollInterval = useCallback(
@@ -137,7 +140,7 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 			// Get current container dimensions
 			const containerRect = containerRef.current.getBoundingClientRect();
 			const containerWidth = containerRect.width;
-			const containerHeight = containerRect.height; // Calculate distances from each edge in SVG coordinates
+			const containerHeight = containerRect.height;			// Calculate distances from each edge in SVG coordinates
 			const distFromLeft = cursorX - minX;
 			const distFromTop = cursorY - minY;
 			const distFromRight = minX + containerWidth - cursorX;
