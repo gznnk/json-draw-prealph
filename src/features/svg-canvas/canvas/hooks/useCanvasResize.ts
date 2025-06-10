@@ -1,5 +1,5 @@
 // Import React.
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 // Import types related to SvgCanvas.
 import {
@@ -7,6 +7,11 @@ import {
 	CANVAS_EXPANSION_THRESHOLD,
 } from "../SvgCanvasConstants";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
+
+/**
+ * Interval duration for continuous scrolling when cursor is at edge (in milliseconds).
+ */
+const SCROLL_INTERVAL_MS = 50;
 
 /**
  * Custom hook to handle scroll adjustments when cursor approaches canvas boundaries.
@@ -22,6 +27,92 @@ export const useCanvasResize = (props: CanvasHooksProps) => {
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
+	// Reference to store the current scroll interval ID
+	const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+	// Reference to store the last scroll direction for continuous scrolling
+	const lastScrollDirectionRef = useRef<{
+		direction: "left" | "top" | "right" | "bottom" | null;
+	}>({ direction: null });
+
+	// Function to clear the scroll interval
+	const clearScrollInterval = useCallback(() => {
+		if (scrollIntervalRef.current) {
+			clearInterval(scrollIntervalRef.current);
+			scrollIntervalRef.current = null;
+			lastScrollDirectionRef.current.direction = null;
+		}
+	}, []);
+
+	// Function to perform a single scroll action
+	const performScroll = useCallback(
+		(direction: "left" | "top" | "right" | "bottom") => {
+			const { canvasState, setCanvasState } = refBus.current.props;
+			const { minX, minY } = canvasState;
+
+			switch (direction) {
+				case "left":
+					setCanvasState((prevState) => ({
+						...prevState,
+						minX: minX - CANVAS_EXPANSION_SIZE,
+					}));
+					break;
+				case "top":
+					setCanvasState((prevState) => ({
+						...prevState,
+						minY: minY - CANVAS_EXPANSION_SIZE,
+					}));
+					break;
+				case "right":
+					setCanvasState((prevState) => ({
+						...prevState,
+						minX: minX + CANVAS_EXPANSION_SIZE,
+					}));
+					break;
+				case "bottom":
+					setCanvasState((prevState) => ({
+						...prevState,
+						minY: minY + CANVAS_EXPANSION_SIZE,
+					}));
+					break;
+			}
+		},
+		[],
+	);
+
+	// Function to start continuous scrolling
+	const startScrollInterval = useCallback(
+		(direction: "left" | "top" | "right" | "bottom") => {
+			// Clear existing interval if any
+			clearScrollInterval();
+
+			// Set the new direction
+			lastScrollDirectionRef.current.direction = direction;
+
+			// Perform initial scroll immediately
+			performScroll(direction);
+
+			// Start interval for continuous scrolling
+			scrollIntervalRef.current = setInterval(() => {
+				// Check if diagram is still changing before continuing
+				const { canvasState } = refBus.current.props;
+				if (!canvasState.isDiagramChanging) {
+					clearScrollInterval();
+					return;
+				}
+
+				performScroll(direction);
+			}, SCROLL_INTERVAL_MS);
+		},
+		[clearScrollInterval, performScroll],
+	);
+
+	// Cleanup interval on unmount
+	useEffect(() => {
+		return () => {
+			clearScrollInterval();
+		};
+	}, [clearScrollInterval]);
+
 	return useCallback(
 		({
 			cursorX,
@@ -31,15 +122,20 @@ export const useCanvasResize = (props: CanvasHooksProps) => {
 			cursorY: number;
 		}) => {
 			const {
-				canvasState: { minX, minY },
+				canvasState: { minX, minY, isDiagramChanging },
 				canvasRef,
-				setCanvasState,
 			} = refBus.current.props;
 
 			if (!canvasRef) return;
 
 			const { containerRef } = canvasRef;
 			if (!containerRef.current) return;
+
+			// Stop scrolling if diagram is not changing
+			if (!isDiagramChanging) {
+				clearScrollInterval();
+				return;
+			}
 
 			// Get current container dimensions
 			const containerRect = containerRef.current.getBoundingClientRect();
@@ -52,39 +148,37 @@ export const useCanvasResize = (props: CanvasHooksProps) => {
 			const distFromRight = minX + containerWidth - cursorX;
 			const distFromBottom = minY + containerHeight - cursorY;
 
+			// Determine which edge the cursor is closest to
+			let newDirection: "left" | "top" | "right" | "bottom" | null = null;
+
 			// Left edge scroll adjustment
 			if (distFromLeft < CANVAS_EXPANSION_THRESHOLD) {
-				// Update state with new scroll position
-				setCanvasState((prevState) => ({
-					...prevState,
-					minX: minX - CANVAS_EXPANSION_SIZE,
-				}));
+				newDirection = "left";
 			}
 			// Top edge scroll adjustment
 			else if (distFromTop < CANVAS_EXPANSION_THRESHOLD) {
-				// Update state with new scroll position
-				setCanvasState((prevState) => ({
-					...prevState,
-					minY: minY - CANVAS_EXPANSION_SIZE,
-				}));
+				newDirection = "top";
 			}
 			// Right edge scroll adjustment
 			else if (distFromRight < CANVAS_EXPANSION_THRESHOLD) {
-				// Expand the canvas area to the right by adjusting scroll
-				setCanvasState((prevState) => ({
-					...prevState,
-					minX: minX + CANVAS_EXPANSION_SIZE,
-				}));
+				newDirection = "right";
 			}
 			// Bottom edge scroll adjustment
 			else if (distFromBottom < CANVAS_EXPANSION_THRESHOLD) {
-				// Expand the canvas area downward by adjusting scroll
-				setCanvasState((prevState) => ({
-					...prevState,
-					minY: minY + CANVAS_EXPANSION_SIZE,
-				}));
+				newDirection = "bottom";
+			}
+
+			// Handle direction changes
+			if (newDirection !== lastScrollDirectionRef.current.direction) {
+				if (newDirection === null) {
+					// Cursor moved away from edge, stop scrolling
+					clearScrollInterval();
+				} else {
+					// Cursor moved to a different edge or started near an edge
+					startScrollInterval(newDirection);
+				}
 			}
 		},
-		[],
+		[clearScrollInterval, startScrollInterval],
 	);
 };
