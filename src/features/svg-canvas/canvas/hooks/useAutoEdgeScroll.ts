@@ -8,6 +8,10 @@ import {
 	AUTO_SCROLL_THRESHOLD,
 } from "../SvgCanvasConstants";
 import type { CanvasHooksProps } from "../SvgCanvasTypes";
+import {
+	type SvgCanvasScrollEvent,
+	SVG_CANVAS_SCROLL_EVENT_NAME,
+} from "../../types/events/SvgCanvasScrollEvent";
 
 /**
  * Type definition for scroll directions.
@@ -36,6 +40,7 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 
 	// Function to clear the scroll interval
 	const clearScrollInterval = useCallback(() => {
+		// console.log("clearScrollInterval");
 		if (scrollIntervalRef.current) {
 			clearInterval(scrollIntervalRef.current);
 			scrollIntervalRef.current = null;
@@ -43,53 +48,107 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 		}
 	}, []);
 
-	// Function to perform a single scroll action
-	const performScroll = useCallback(
-		(direction: ScrollDirection) => {
+	// Function to perform a single scroll action with known base client coordinates
+	const performScrollWithBaseClient = useCallback(
+		(direction: ScrollDirection, baseClientX: number, baseClientY: number) => {
 			const { canvasState, setCanvasState } = refBus.current.props;
 			const { minX, minY } = canvasState;
 
+			let newMinX = minX;
+			let newMinY = minY;
+			let scrollDeltaX = 0;
+			let scrollDeltaY = 0;
+
 			switch (direction) {
 				case "left":
+					scrollDeltaX = -AUTO_SCROLL_STEP_SIZE;
+					newMinX = minX + scrollDeltaX;
 					setCanvasState((prevState) => ({
 						...prevState,
-						minX: minX - AUTO_SCROLL_STEP_SIZE,
+						minX: newMinX,
 					}));
 					break;
 				case "top":
+					scrollDeltaY = -AUTO_SCROLL_STEP_SIZE;
+					newMinY = minY + scrollDeltaY;
 					setCanvasState((prevState) => ({
 						...prevState,
-						minY: minY - AUTO_SCROLL_STEP_SIZE,
+						minY: newMinY,
 					}));
 					break;
 				case "right":
+					scrollDeltaX = AUTO_SCROLL_STEP_SIZE;
+					newMinX = minX + scrollDeltaX;
 					setCanvasState((prevState) => ({
 						...prevState,
-						minX: minX + AUTO_SCROLL_STEP_SIZE,
+						minX: newMinX,
 					}));
 					break;
 				case "bottom":
+					scrollDeltaY = AUTO_SCROLL_STEP_SIZE;
+					newMinY = minY + scrollDeltaY;
 					setCanvasState((prevState) => ({
 						...prevState,
-						minY: minY + AUTO_SCROLL_STEP_SIZE,
+						minY: newMinY,
 					}));
 					break;
 			}
+
+			// Calculate adjusted client coordinates by adding scroll delta
+			// Similar to how handleWheel does: clientX: e.clientX + e.deltaX
+			const adjustedClientX = baseClientX + scrollDeltaX;
+			const adjustedClientY = baseClientY + scrollDeltaY;
+
+			// Dispatch a custom event with scroll position to notify other components
+			const scrollEvent: SvgCanvasScrollEvent = {
+				minX: newMinX,
+				minY: newMinY,
+				clientX: adjustedClientX,
+				clientY: adjustedClientY,
+			};
+
+			// console.log("autoEdgeScroll", adjustedClientX, adjustedClientY);
+
+			document.dispatchEvent(
+				new CustomEvent(SVG_CANVAS_SCROLL_EVENT_NAME, {
+					bubbles: true,
+					detail: scrollEvent,
+				}),
+			);
 		},
 		[],
 	);
 
 	// Function to start continuous scrolling
 	const startScrollInterval = useCallback(
-		(direction: ScrollDirection) => {
+		(direction: ScrollDirection, cursorX: number, cursorY: number) => {
 			// Clear existing interval if any
 			clearScrollInterval();
 
 			// Set the new direction
 			lastScrollDirectionRef.current.direction = direction;
 
+			// Convert initial cursor position to client coordinates and store it
+			let baseClientX = 0;
+			let baseClientY = 0;
+
+			const { canvasRef } = refBus.current.props;
+			if (canvasRef?.svgRef?.current) {
+				const svgElement = canvasRef.svgRef.current;
+				const svgPoint = svgElement.createSVGPoint();
+				svgPoint.x = cursorX;
+				svgPoint.y = cursorY;
+
+				const screenCTM = svgElement.getScreenCTM();
+				if (screenCTM) {
+					const clientPoint = svgPoint.matrixTransform(screenCTM);
+					baseClientX = clientPoint.x;
+					baseClientY = clientPoint.y;
+				}
+			}
+
 			// Perform initial scroll immediately
-			performScroll(direction);
+			performScrollWithBaseClient(direction, baseClientX, baseClientY);
 
 			// Start interval for continuous scrolling
 			scrollIntervalRef.current = setInterval(() => {
@@ -100,10 +159,11 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 					return;
 				}
 
-				performScroll(direction);
+				// Use the same base client coordinates for continuous scrolling
+				performScrollWithBaseClient(direction, baseClientX, baseClientY);
 			}, AUTO_SCROLL_INTERVAL_MS);
 		},
-		[clearScrollInterval, performScroll],
+		[clearScrollInterval, performScrollWithBaseClient],
 	);
 
 	// Cleanup interval on unmount
@@ -140,7 +200,7 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 			// Get current container dimensions
 			const containerRect = containerRef.current.getBoundingClientRect();
 			const containerWidth = containerRect.width;
-			const containerHeight = containerRect.height;			// Calculate distances from each edge in SVG coordinates
+			const containerHeight = containerRect.height; // Calculate distances from each edge in SVG coordinates
 			const distFromLeft = cursorX - minX;
 			const distFromTop = cursorY - minY;
 			const distFromRight = minX + containerWidth - cursorX;
@@ -165,7 +225,6 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 			else if (distFromBottom < AUTO_SCROLL_THRESHOLD) {
 				newDirection = "bottom";
 			}
-
 			// Handle direction changes
 			if (newDirection !== lastScrollDirectionRef.current.direction) {
 				if (newDirection === null) {
@@ -173,7 +232,7 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 					clearScrollInterval();
 				} else {
 					// Cursor moved to a different edge or started near an edge
-					startScrollInterval(newDirection);
+					startScrollInterval(newDirection, cursorX, cursorY);
 				}
 			}
 		},

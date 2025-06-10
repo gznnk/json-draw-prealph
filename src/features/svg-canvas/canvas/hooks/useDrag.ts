@@ -77,6 +77,7 @@ export const useDrag = (props: CanvasHooksProps) => {
 
 			return newState;
 		});
+
 		// Auto scroll if the cursor is near the edges.
 		autoEdgeScroll({
 			cursorX: e.cursorX ?? e.endX,

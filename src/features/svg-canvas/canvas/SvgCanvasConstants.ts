@@ -12,7 +12,7 @@ export const CANVAS_EXPANSION_SIZE = 10;
  * The threshold from the edge of the canvas to trigger auto-expansion.
  * Smaller value means closer to the edge to trigger expansion.
  */
-export const AUTO_SCROLL_THRESHOLD = 20;
+export const AUTO_SCROLL_THRESHOLD = 10;
 
 /**
  * The amount of space to scroll each time when auto-scrolling at canvas edge.
