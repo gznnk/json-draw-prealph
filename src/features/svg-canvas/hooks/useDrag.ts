@@ -3,15 +3,18 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 
 // Import types.
+import type { DiagramType } from "../types/base/DiagramType";
+import type { Point } from "../types/base/Point";
 import type { DiagramClickEvent } from "../types/events/DiagramClickEvent";
 import type { DiagramDragDropEvent } from "../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../types/events/DiagramDragEvent";
 import type { DiagramHoverEvent } from "../types/events/DiagramHoverEvent";
 import type { DiagramPointerEvent } from "../types/events/DiagramPointerEvent";
-import type { DiagramType } from "../types/base/DiagramType";
 import type { EventType } from "../types/events/EventType";
-import type { Point } from "../types/base/Point";
-import { SVG_CANVAS_SCROLL_EVENT_NAME } from "../types/events/Constants";
+import {
+	type SvgCanvasScrollEvent,
+	SVG_CANVAS_SCROLL_EVENT_NAME,
+} from "../types/events/SvgCanvasScrollEvent";
 
 // Import utils.
 import { newEventId } from "../utils/common/newEventId";
@@ -111,9 +114,6 @@ export const useDrag = (props: DragProps) => {
 	// ドラッグ開始時のドラッグ領域の座標
 	const startX = useRef(0);
 	const startY = useRef(0);
-	// ドラッグ中のブラウザウィンドウ上のポインタの座標
-	const currentClientX = useRef(0);
-	const currentClientY = useRef(0);
 	// The offset between the center and the pointer.
 	const offsetXBetweenCenterAndPointer = useRef(0);
 	const offsetYBetweenCenterAndPointer = useRef(0);
@@ -187,10 +187,6 @@ export const useDrag = (props: DragProps) => {
 			startX.current = x;
 			startY.current = y;
 
-			// 現在のブラウザウィンドウ上のポインタの座標を記憶
-			currentClientX.current = e.clientX;
-			currentClientY.current = e.clientY;
-
 			// Store the offset between the center and the pointer
 			const svgPoint = getSvgPoint(e.clientX, e.clientY);
 			offsetXBetweenCenterAndPointer.current = svgPoint.x - x;
@@ -212,10 +208,6 @@ export const useDrag = (props: DragProps) => {
 			// このドラッグ領域内でポインターが押されていない場合は何もしない
 			return;
 		}
-
-		// 現在のブラウザウィンドウ上のポインタの座標を記憶
-		currentClientX.current = e.clientX;
-		currentClientY.current = e.clientY;
 
 		// ドラッグ座標を取得
 		const dragPoint = getPointOnDrag(e.clientX, e.clientY);
@@ -661,20 +653,22 @@ export const useDrag = (props: DragProps) => {
 	 * Handle SvgCanvas scroll event.
 	 */
 	useEffect(() => {
-		let handleSvgCanvasScroll: () => void;
+		let handleSvgCanvasScroll: (e: Event) => void;
 		if (isDragging) {
-			handleSvgCanvasScroll = () => {
+			handleSvgCanvasScroll = (e: Event) => {
 				const { id, getPointOnDrag, onDrag, getSvgPoint } = refBus.current;
 
+				const customEvent = e as CustomEvent<SvgCanvasScrollEvent>;
+
 				const dragPoint = getPointOnDrag(
-					currentClientX.current,
-					currentClientY.current,
+					customEvent.detail.clientX,
+					customEvent.detail.clientY,
 				);
 
 				// SVG座標系でのカーソル位置を取得
 				const svgCursorPoint = getSvgPoint(
-					currentClientX.current,
-					currentClientY.current,
+					customEvent.detail.clientX,
+					customEvent.detail.clientY,
 				);
 
 				onDrag?.({

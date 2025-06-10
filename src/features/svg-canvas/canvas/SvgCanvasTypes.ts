@@ -15,9 +15,9 @@ import type { DiagramTextEditEvent } from "../types/events/DiagramTextEditEvent"
 import type { DiagramTransformEvent } from "../types/events/DiagramTransformEvent";
 import type { ExecuteEvent } from "../types/events/ExecuteEvent";
 import type { NewDiagramEvent } from "../types/events/NewDiagramEvent";
-import type { ScrollEvent } from "../types/events/ScrollEvent";
 import type { StackOrderChangeEvent } from "../types/events/StackOrderChangeEvent";
 import type { SvgCanvasResizeEvent } from "../types/events/SvgCanvasResizeEvent";
+import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
 
 /**
  * Type for the data of the SvgCanvas.
@@ -94,7 +94,7 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onStackOrderChange?: (e: StackOrderChangeEvent) => void;
 	onExecute?: (e: ExecuteEvent) => void;
 	onExport?: () => void;
-	onScroll?: (e: ScrollEvent) => void;
+	onScroll?: (e: SvgCanvasScrollEvent) => void;
 	onCopy?: () => void;
 	onPaste?: () => void;
 };

@@ -175,18 +175,14 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		 */
 		const handleWheel = useCallback(
 			(e: React.WheelEvent<SVGSVGElement>) => {
-				// e.preventDefault();
-
 				// Bypass references to avoid function creation in every render.
 				const { onScroll } = refBus.current;
 
-				// Calculate new scroll position
-				const deltaX = e.deltaX;
-				const deltaY = e.deltaY;
-
 				onScroll?.({
-					minX: minX + deltaX,
-					minY: minY + deltaY,
+					minX: minX + e.deltaX,
+					minY: minY + e.deltaY,
+					clientX: e.clientX + e.deltaX,
+					clientY: e.clientY + e.deltaY,
 				});
 			},
 			[minX, minY],
