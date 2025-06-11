@@ -124,7 +124,11 @@ const TransformativeComponent: React.FC<Props> = ({
 			startShape.current.y,
 		);
 
-	const triggerTransformStart = (eventId: string) => {
+	const triggerTransformStart = (
+		eventId: string,
+		cursorX: number,
+		cursorY: number,
+	) => {
 		startShape.current = {
 			x,
 			y,
@@ -143,6 +147,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			id,
 			startShape: startShape.current,
 			endShape: startShape.current,
+			cursorX,
+			cursorY,
 		});
 	};
 
@@ -152,8 +158,8 @@ const TransformativeComponent: React.FC<Props> = ({
 		newWidth: number,
 		newHeight: number,
 		eventType: EventType,
-		cursorX?: number,
-		cursorY?: number,
+		cursorX: number,
+		cursorY: number,
 	) => {
 		const event = {
 			eventId,
@@ -171,8 +177,8 @@ const TransformativeComponent: React.FC<Props> = ({
 				scaleY: signNonZero(newHeight),
 				rotation,
 			},
-			cursorX: cursorX ?? centerPoint.x, // カーソル位置が提供されない場合は中心点を使用
-			cursorY: cursorY ?? centerPoint.y, // カーソル位置が提供されない場合は中心点を使用
+			cursorX,
+			cursorY,
 		};
 
 		onTransform?.(event);
@@ -264,7 +270,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId);
+			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -328,7 +334,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId);
+			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -391,7 +397,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId);
+			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -454,7 +460,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId);
+			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -517,7 +523,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId);
+			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -585,7 +591,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId);
+			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -653,7 +659,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId);
+			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -721,7 +727,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId);
+			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -830,7 +836,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		if (e.eventType === "Start") {
 			setIsRotating(true);
-			return triggerTransformStart(e.eventId);
+			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
 		}
 
 		const radian = calcRadians(x, y, e.endX, e.endY);
@@ -853,8 +859,8 @@ const TransformativeComponent: React.FC<Props> = ({
 				scaleY,
 				rotation: newRotation,
 			},
-			cursorX: e.cursorX ?? e.endX, // カーソル位置情報を追加
-			cursorY: e.cursorY ?? e.endY, // カーソル位置情報を追加
+			cursorX: e.cursorX,
+			cursorY: e.cursorY,
 		};
 
 		onTransform?.(event);
