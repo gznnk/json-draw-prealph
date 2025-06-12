@@ -374,7 +374,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 						<Svg
 							width={containerWidth}
 							height={containerHeight}
-							viewBox={`${minX} ${minY} ${containerWidth} ${containerHeight}`}
+							viewBox={`${minX * zoom} ${minY * zoom} ${containerWidth * zoom} ${containerHeight * zoom}`}
 							tabIndex={0}
 							ref={svgRef}
 							onPointerDown={handlePointerDown}
