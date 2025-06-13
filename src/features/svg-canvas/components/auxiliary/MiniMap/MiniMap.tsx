@@ -40,13 +40,48 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 	height = 150,
 	onNavigate,
 }) => {
-	// Calculate canvas bounds based on all items
+	// Calculate canvas bounds based on all items and current viewport
 	const canvasBounds = useMemo(() => {
+		// Calculate current viewport bounds in canvas coordinates
+		const viewportWidth = containerWidth / zoom;
+		const viewportHeight = containerHeight / zoom;
+		const viewportLeft = minX / zoom;
+		const viewportTop = minY / zoom;
+		const viewportRight = viewportLeft + viewportWidth;
+		const viewportBottom = viewportTop + viewportHeight;
+
 		if (items.length === 0) {
-			return { x: 0, y: 0, width: containerWidth, height: containerHeight };
+			// If no items, use viewport bounds
+			return {
+				x: viewportLeft,
+				y: viewportTop,
+				width: viewportWidth,
+				height: viewportHeight,
+			};
 		}
-		return calcCanvasBounds(items);
-	}, [items, containerWidth, containerHeight]);
+
+		// Calculate bounds of all items
+		const itemBounds = calcCanvasBounds(items);
+
+		// Combine item bounds with viewport bounds
+		const combinedLeft = Math.min(itemBounds.x, viewportLeft);
+		const combinedTop = Math.min(itemBounds.y, viewportTop);
+		const combinedRight = Math.max(
+			itemBounds.x + itemBounds.width,
+			viewportRight,
+		);
+		const combinedBottom = Math.max(
+			itemBounds.y + itemBounds.height,
+			viewportBottom,
+		);
+
+		return {
+			x: combinedLeft,
+			y: combinedTop,
+			width: combinedRight - combinedLeft,
+			height: combinedBottom - combinedTop,
+		};
+	}, [items, containerWidth, containerHeight, minX, minY, zoom]);
 
 	// Calculate minimap scale
 	const scale = useMemo(() => {
