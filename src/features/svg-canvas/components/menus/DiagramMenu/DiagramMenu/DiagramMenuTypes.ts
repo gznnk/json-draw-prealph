@@ -9,6 +9,7 @@ export type DiagramMenuProps = {
 	rotation: number;
 	scaleX: number;
 	scaleY: number;
+	zoom: number;
 	isVisible: boolean;
 	menuStateMap: DiagramMenuStateMap;
 	bgColor: string;

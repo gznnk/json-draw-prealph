@@ -31,7 +31,7 @@ import type {
 
 export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 	// Extract properties from canvasProps.
-	const { items, isDiagramChanging, multiSelectGroup } = canvasProps;
+	const { items, isDiagramChanging, multiSelectGroup, zoom } = canvasProps;
 
 	// Diagram menu controls open/close state.
 	const [isBgColorPickerOpen, setIsBgColorPickerOpen] = useState(false);
@@ -213,13 +213,14 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 			const { x, y, width, height, rotation, scaleX, scaleY } =
 				multiSelectGroup;
 			diagramMenuProps = {
-				x,
-				y,
-				width,
-				height,
+				x: x * zoom,
+				y: y * zoom,
+				width: width * zoom,
+				height: height * zoom,
 				rotation,
 				scaleX,
 				scaleY,
+				zoom,
 				isVisible: true,
 				menuStateMap,
 				bgColor: firstFillableItem?.fill || "transparent",
@@ -232,13 +233,14 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 			// When a single item is selected, use the properties of the selected item.
 			if (isTransformativeData(singleSelectedItem)) {
 				diagramMenuProps = {
-					x: singleSelectedItem.x,
-					y: singleSelectedItem.y,
-					width: singleSelectedItem.width,
-					height: singleSelectedItem.height,
+					x: singleSelectedItem.x * zoom,
+					y: singleSelectedItem.y * zoom,
+					width: singleSelectedItem.width * zoom,
+					height: singleSelectedItem.height * zoom,
 					rotation: singleSelectedItem.rotation,
 					scaleX: singleSelectedItem.scaleX,
 					scaleY: singleSelectedItem.scaleY,
+					zoom,
 					isVisible: true,
 					menuStateMap,
 					bgColor: firstFillableItem?.fill || "transparent",
