@@ -40,6 +40,7 @@ import { useUndo } from "./hooks/useUndo";
 import { useUngroup } from "./hooks/useUngroup";
 import { useZoom } from "./hooks/useZoom";
 import { useCtrl } from "./hooks/useCtrl";
+import { useGrabScroll } from "./hooks/useGrabScroll";
 import { useNewItem } from "./observers/addNewItem";
 import { useConnectNodes } from "./observers/connectNodes";
 
@@ -180,6 +181,12 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		[onScroll],
 	);
 
+	// Use grab scroll hook for Ctrl+drag functionality
+	const { onGrabStart, onGrabMove, onGrabEnd } = useGrabScroll(
+		canvasHooksProps,
+		onScroll,
+	);
+
 	// Observer for the new item event.
 	useNewItem(canvasHooksProps);
 
@@ -212,6 +219,9 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onCopy,
 		onPaste,
 		onNavigate,
+		onGrabStart,
+		onGrabMove,
+		onGrabEnd,
 	};
 
 	return {

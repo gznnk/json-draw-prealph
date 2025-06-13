@@ -25,7 +25,6 @@ import { MiniMap } from "../components/auxiliary/MiniMap";
 
 // Imports related to this component.
 import { useShortcutKey } from "./hooks/useShortcutKey";
-import { useGrabScroll } from "./hooks/useGrabScroll";
 import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
 import {
 	Container,
@@ -58,6 +57,8 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			zoom,
 			multiSelectGroup,
 			textEditorState,
+			isGrabScrollReady,
+			isGrabScrolling,
 			onTransform,
 			onDiagramChange,
 			onDrag,
@@ -79,6 +80,9 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onCopy,
 			onPaste,
 			onNavigate,
+			onGrabStart,
+			onGrabMove,
+			onGrabEnd,
 		} = props;
 
 		// SVG要素のコンテナの参照
@@ -89,19 +93,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		// Container dimensions state
 		const [containerWidth, setContainerWidth] = useState(0);
 		const [containerHeight, setContainerHeight] = useState(0);
-
-		// Use grab scroll hook for Ctrl+drag functionality
-		const {
-			isGrabScrollReady,
-			isGrabScrolling,
-			handleGrabStart,
-			handleGrabMove,
-			handleGrabEnd,
-		} = useGrabScroll({
-			minX,
-			minY,
-			onScroll,
-		});
 
 		// Forward refs to parent using useImperativeHandle
 		useImperativeHandle(ref, () => ({
@@ -145,6 +136,8 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 		// Create references bypass to avoid function creation in every render.
 		const refBusVal = {
+			minX,
+			minY,
 			zoom,
 			hasFocus,
 			textEditorState,
@@ -154,6 +147,9 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onDataChange,
 			onScroll,
 			onZoom,
+			onGrabStart,
+			onGrabMove,
+			onGrabEnd,
 			contextMenuFunctions,
 		};
 		const refBus = useRef(refBusVal);
@@ -179,10 +175,11 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		const handlePointerDown = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
 				// Bypass references to avoid function creation in every render.
-				const { onClearAllSelection, contextMenuFunctions } = refBus.current;
+				const { onClearAllSelection, onGrabStart, contextMenuFunctions } =
+					refBus.current;
 
 				// Check for Ctrl+drag to start grab scrolling
-				if (handleGrabStart(e)) {
+				if (onGrabStart?.(e)) {
 					return;
 				}
 
@@ -194,17 +191,16 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				// Close the context menu.
 				contextMenuFunctions.closeContextMenu();
 			},
-			[handleGrabStart],
+			[],
 		);
-
 		/**
 		 * Handle the pointer move event for grab scrolling.
 		 */
 		const handlePointerMove = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
-				handleGrabMove(e);
+				refBus.current.onGrabMove?.(e);
 			},
-			[handleGrabMove],
+			[],
 		);
 
 		/**
@@ -212,28 +208,25 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		 */
 		const handlePointerUp = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
-				handleGrabEnd(e);
+				refBus.current.onGrabEnd?.(e);
 			},
-			[handleGrabEnd],
+			[],
 		);
 
 		/**
 		 * Handle the wheel event on the SVG canvas for scrolling.
 		 */
-		const handleWheel = useCallback(
-			(e: React.WheelEvent<SVGSVGElement>) => {
-				// Bypass references to avoid function creation in every render.
-				const { onScroll } = refBus.current;
+		const handleWheel = useCallback((e: React.WheelEvent<SVGSVGElement>) => {
+			// Bypass references to avoid function creation in every render.
+			const { minX, minY, onScroll } = refBus.current;
 
-				onScroll?.({
-					minX: minX + e.deltaX,
-					minY: minY + e.deltaY,
-					clientX: e.clientX + e.deltaX,
-					clientY: e.clientY + e.deltaY,
-				});
-			},
-			[minX, minY],
-		);
+			onScroll?.({
+				minX: minX + e.deltaX,
+				minY: minY + e.deltaY,
+				clientX: e.clientX + e.deltaX,
+				clientY: e.clientY + e.deltaY,
+			});
+		}, []);
 
 		/**
 		 * SvgCanvasのキーダウンイベントハンドラ

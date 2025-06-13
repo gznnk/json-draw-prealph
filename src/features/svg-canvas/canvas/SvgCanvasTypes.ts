@@ -40,6 +40,8 @@ export type SvgCanvasState = {
 	historyIndex: number;
 	lastHistoryEventId: string;
 	textEditorState: TextEditorState;
+	isGrabScrollReady?: boolean;
+	isGrabScrolling?: boolean;
 } & SvgCanvasData;
 
 /**
@@ -63,8 +65,8 @@ export interface SvgCanvasRef {
  */
 export type CanvasHooksProps = {
 	canvasState: SvgCanvasState;
-	setCanvasState: React.Dispatch<React.SetStateAction<SvgCanvasState>>;
 	canvasRef?: SvgCanvasRef | null;
+	setCanvasState: React.Dispatch<React.SetStateAction<SvgCanvasState>>;
 	onDataChange?: (data: SvgCanvasData) => void;
 };
 
@@ -100,4 +102,7 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onPaste?: () => void;
 	onZoom?: (zoom: number) => void;
 	onNavigate?: (minX: number, minY: number) => void;
+	onGrabStart?: (e: React.PointerEvent<SVGSVGElement>) => boolean;
+	onGrabMove?: (e: React.PointerEvent<SVGSVGElement>) => void;
+	onGrabEnd?: (e: React.PointerEvent<SVGSVGElement>) => void;
 };
