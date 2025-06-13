@@ -22,6 +22,7 @@ import { FlashConnectLine } from "../components/shapes/ConnectLine";
 import { NewConnectLine } from "../components/shapes/ConnectPoint";
 import { Group } from "../components/shapes/Group";
 import UserMenu from "../components/menus/UserMenu/UserMenu";
+import { MiniMap } from "../components/auxiliary/MiniMap";
 
 // SvgCanvas関連関数をインポート
 import { newEventId } from "../utils/common/newEventId";
@@ -80,6 +81,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onZoom,
 			onCopy,
 			onPaste,
+			onNavigate,
 		} = props;
 
 		// SVG要素のコンテナの参照
@@ -382,6 +384,15 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					<CanvasMenu onNewDiagram={onNewDiagram} />
 					<UserMenu />
 					<ContextMenu {...contextMenuProps} />
+					<MiniMap
+						items={items}
+						minX={minX}
+						minY={minY}
+						containerWidth={containerWidth}
+						containerHeight={containerHeight}
+						zoom={zoom}
+						onNavigate={onNavigate}
+					/>
 				</ViewportOverlay>
 			</Viewport>
 		);

@@ -1,5 +1,5 @@
 // Import React.
-import { useState, type RefObject } from "react";
+import { useState, useCallback, type RefObject } from "react";
 
 // Import types related to SvgCanvas.
 import type { Diagram } from "../catalog/DiagramTypes";
@@ -168,6 +168,14 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the paste event.
 	const onPaste = usePaste(canvasHooksProps);
 
+	// Handler for the navigate event (using scroll)
+	const onNavigate = useCallback(
+		(minX: number, minY: number) => {
+			onScroll({ minX, minY, clientX: 0, clientY: 0 });
+		},
+		[onScroll],
+	);
+
 	// Observer for the new item event.
 	useNewItem(canvasHooksProps);
 
@@ -199,6 +207,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onZoom,
 		onCopy,
 		onPaste,
+		onNavigate,
 	};
 
 	return {

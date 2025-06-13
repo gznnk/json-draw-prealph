@@ -99,4 +99,5 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onCopy?: () => void;
 	onPaste?: () => void;
 	onZoom?: (zoom: number) => void;
+	onNavigate?: (minX: number, minY: number) => void;
 };
