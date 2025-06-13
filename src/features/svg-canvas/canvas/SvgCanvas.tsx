@@ -371,7 +371,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 						<Svg
 							width={containerWidth}
 							height={containerHeight}
-							viewBox={`${minX * zoom} ${minY * zoom} ${containerWidth * zoom} ${containerHeight * zoom}`}
+							viewBox={`${minX / zoom} ${minY / zoom} ${containerWidth / zoom} ${containerHeight / zoom}`}
 							tabIndex={0}
 							ref={svgRef}
 							onPointerDown={handlePointerDown}
@@ -401,14 +401,23 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 							<FlashConnectLine />
 						</Svg>
 					</SvgCanvasContext.Provider>
-					{/* Container for HTML elements that follow the scroll of the SVG canvas. */}{" "}
+					{/* Container for HTML elements that follow the scroll of the SVG canvas with zoom scaling. */}
+					<HTMLElementsContainer
+						left={-minX}
+						top={-minY}
+						width={containerWidth + minX}
+						height={containerHeight + minY}
+						zoom={zoom}
+					>
+						<TextEditor {...textEditorState} onTextChange={onTextChange} />
+					</HTMLElementsContainer>
+					{/* Container for HTML elements that follow the scroll but not zoom. */}
 					<HTMLElementsContainer
 						left={-minX}
 						top={-minY}
 						width={containerWidth + minX}
 						height={containerHeight + minY}
 					>
-						<TextEditor {...textEditorState} onTextChange={onTextChange} />
 						<DiagramMenu {...diagramMenuProps} />
 					</HTMLElementsContainer>
 				</Container>

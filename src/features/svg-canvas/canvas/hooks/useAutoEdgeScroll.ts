@@ -240,10 +240,10 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 			currentCursorRef.current.y = cursorY;
 
 			// Calculate the viewBox boundaries considering zoom
-			const viewBoxX = minX * zoom;
-			const viewBoxY = minY * zoom;
-			const viewBoxWidth = containerWidth * zoom;
-			const viewBoxHeight = containerHeight * zoom;
+			const viewBoxX = minX / zoom;
+			const viewBoxY = minY / zoom;
+			const viewBoxWidth = containerWidth / zoom;
+			const viewBoxHeight = containerHeight / zoom;
 
 			// Calculate distances from each edge in viewBox coordinates
 			const distFromLeft = cursorX - viewBoxX;

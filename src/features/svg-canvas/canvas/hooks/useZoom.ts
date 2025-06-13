@@ -49,25 +49,26 @@ export const useZoom = (props: CanvasHooksProps) => {
 		} = canvasState;
 
 		// Calculate the current view center in SVG coordinates
-		// viewBox uses minX * zoom, so we need to divide by zoom to get actual SVG coordinates
-		const currentViewBoxX = currentMinX * currentZoom;
-		const currentViewBoxY = currentMinY * currentZoom;
-		const currentViewBoxWidth = containerWidth * currentZoom;
-		const currentViewBoxHeight = containerHeight * currentZoom;
+		// viewBox uses minX / zoom, minY / zoom, containerWidth / zoom, containerHeight / zoom
+		const currentViewBoxX = currentMinX / currentZoom;
+		const currentViewBoxY = currentMinY / currentZoom;
+		const currentViewBoxWidth = containerWidth / currentZoom;
+		const currentViewBoxHeight = containerHeight / currentZoom;
 
 		const viewCenterX = currentViewBoxX + currentViewBoxWidth / 2;
 		const viewCenterY = currentViewBoxY + currentViewBoxHeight / 2;
+
 		// Calculate new viewBox dimensions for the new zoom level
-		const newViewBoxWidth = containerWidth * clampedZoom;
-		const newViewBoxHeight = containerHeight * clampedZoom;
+		const newViewBoxWidth = containerWidth / clampedZoom;
+		const newViewBoxHeight = containerHeight / clampedZoom;
 
 		// Calculate new viewBox position to maintain the same center point
 		const newViewBoxX = viewCenterX - newViewBoxWidth / 2;
 		const newViewBoxY = viewCenterY - newViewBoxHeight / 2;
 
-		// Convert back to minX, minY format (divide by zoom to match viewBox calculation)
-		const newMinX = newViewBoxX / clampedZoom;
-		const newMinY = newViewBoxY / clampedZoom;
+		// Convert back to minX, minY format (multiply by zoom to match viewBox calculation)
+		const newMinX = newViewBoxX * clampedZoom;
+		const newMinY = newViewBoxY * clampedZoom;
 
 		setCanvasState((prevState) => ({
 			...prevState,
