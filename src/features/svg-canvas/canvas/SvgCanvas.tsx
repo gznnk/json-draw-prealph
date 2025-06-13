@@ -27,6 +27,7 @@ import UserMenu from "../components/menus/UserMenu/UserMenu";
 import { newEventId } from "../utils/common/newEventId";
 
 // Imports related to this component.
+import { useShortcutKey } from "./hooks/useShortcutKey";
 import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
 import {
 	Container,
@@ -119,6 +120,19 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		// Use the diagram menu hook to handle diagram menu events.
 		const { diagramMenuProps } = useDiagramMenu(props);
 
+		// Use the shortcut key hook to handle keyboard shortcuts
+		useShortcutKey({
+			hasFocus,
+			textEditorState,
+			onDelete,
+			onSelectAll,
+			onClearAllSelection,
+			onUndo,
+			onRedo,
+			onCopy,
+			onPaste,
+		});
+
 		// Create references bypass to avoid function creation in every render.
 		const refBusVal = {
 			zoom,
@@ -126,17 +140,11 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			textEditorState,
 			onDrag,
 			onDiagramChange,
-			onDelete,
 			onSelect,
-			onSelectAll,
 			onClearAllSelection,
-			onUndo,
-			onRedo,
 			onDataChange,
 			onScroll,
 			onZoom,
-			onCopy,
-			onPaste,
 			contextMenuFunctions,
 		};
 		const refBus = useRef(refBusVal);
@@ -221,63 +229,11 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			});
 		}, []);
 
-		// Monitor keyboard events.
+		// Monitor keyboard events for Ctrl key state
 		useEffect(() => {
 			const onDocumentKeyDown = (e: KeyboardEvent) => {
-				// Bypass references to avoid function creation in every render.
-				const {
-					hasFocus,
-					textEditorState,
-					onDelete,
-					onSelectAll,
-					onClearAllSelection,
-					onUndo,
-					onRedo,
-					onCopy,
-					onPaste,
-				} = refBus.current;
-
 				if (e.key === "Control") {
 					isCtrlDown.current = true;
-				}
-
-				// SVG要素にフォーカスがない場合は、以降の処理をスキップ
-				if (!hasFocus.current && !textEditorState.isActive) {
-					return;
-				}
-
-				if (e.key === "Escape") {
-					// Clear selection when Escape key is pressed.
-					onClearAllSelection?.();
-				}
-				if (e.key === "Delete") {
-					// Delete selected items when Delete key is pressed.
-					onDelete?.();
-				}
-				if (e.ctrlKey) {
-					if (e.key === "z") {
-						// Undo the last action when Ctrl+Z is pressed.
-						onUndo?.();
-					}
-					if (e.key === "y") {
-						// Redo the last action when Ctrl+Y is pressed.
-						onRedo?.();
-					}
-					if (e.key === "a" && !textEditorState.isActive) {
-						// Select all items when Ctrl+A is pressed.
-						e.preventDefault();
-						onSelectAll?.();
-					}
-					if (e.key === "c" && !textEditorState.isActive) {
-						// Copy selected items when Ctrl+C is pressed.
-						e.preventDefault();
-						onCopy?.();
-					}
-					if (e.key === "v" && !textEditorState.isActive) {
-						// Paste items from clipboard when Ctrl+V is pressed.
-						e.preventDefault();
-						onPaste?.();
-					}
 				}
 			};
 
@@ -287,7 +243,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				}
 			};
 
-			// Add event listeners for keydown and keyup events.
+			// Add event listeners for keydown and keyup events
 			document.addEventListener("keydown", onDocumentKeyDown);
 			document.addEventListener("keyup", onDocumentKeyUp);
 
