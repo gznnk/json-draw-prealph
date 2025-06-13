@@ -2,19 +2,14 @@
 import { memo, useCallback, useMemo } from "react";
 import type React from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../catalog/DiagramTypes";
-
-// Import functions related to SvgCanvas.
-import { calcCanvasBounds } from "../../../canvas/utils/calcCanvasBounds";
-
 // Imports related to this component.
 import {
+	calculateCombinedCanvasBounds,
 	calculateMiniMapScale,
+	calculateViewportBounds,
 	calculateViewportRect,
-	extractTransformativeItemsRecursive,
+	generateMiniMapItems,
 	transformFromMiniMapCoords,
-	transformToMiniMapCoords,
 } from "./MiniMapFunctions";
 import {
 	MiniMapBackground,
@@ -42,46 +37,16 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 }) => {
 	// Calculate canvas bounds based on all items and current viewport
 	const canvasBounds = useMemo(() => {
-		// Calculate current viewport bounds in canvas coordinates
-		const viewportWidth = containerWidth / zoom;
-		const viewportHeight = containerHeight / zoom;
-		const viewportLeft = minX / zoom;
-		const viewportTop = minY / zoom;
-		const viewportRight = viewportLeft + viewportWidth;
-		const viewportBottom = viewportTop + viewportHeight;
-
-		if (items.length === 0) {
-			// If no items, use viewport bounds
-			return {
-				x: viewportLeft,
-				y: viewportTop,
-				width: viewportWidth,
-				height: viewportHeight,
-			};
-		}
-
-		// Calculate bounds of all items
-		const itemBounds = calcCanvasBounds(items);
-
-		// Combine item bounds with viewport bounds
-		const combinedLeft = Math.min(itemBounds.x, viewportLeft);
-		const combinedTop = Math.min(itemBounds.y, viewportTop);
-		const combinedRight = Math.max(
-			itemBounds.x + itemBounds.width,
-			viewportRight,
-		);
-		const combinedBottom = Math.max(
-			itemBounds.y + itemBounds.height,
-			viewportBottom,
+		const viewportBounds = calculateViewportBounds(
+			minX,
+			minY,
+			containerWidth,
+			containerHeight,
+			zoom,
 		);
 
-		return {
-			x: combinedLeft,
-			y: combinedTop,
-			width: combinedRight - combinedLeft,
-			height: combinedBottom - combinedTop,
-		};
-	}, [items, containerWidth, containerHeight, minX, minY, zoom]);
+		return calculateCombinedCanvasBounds(items, viewportBounds);
+	}, [items, minX, minY, containerWidth, containerHeight, zoom]);
 
 	// Calculate minimap scale
 	const scale = useMemo(() => {
@@ -155,43 +120,27 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 			containerHeight,
 			zoom,
 		],
-	); // Render minimap items
+	);
+
+	// Render minimap items
 	const miniMapItems = useMemo(() => {
-		// Extract all transformative items recursively, including from groups
-		const allTransformativeItems = extractTransformativeItemsRecursive(items);
+		const itemData = generateMiniMapItems(
+			items,
+			canvasBounds,
+			scale,
+			width,
+			height,
+		);
 
-		return allTransformativeItems.map((item) => {
-			// At this point, item is guaranteed to be transformative by the extraction function
-			const transformativeItem = item as Diagram & {
-				x: number;
-				y: number;
-				width: number;
-				height: number;
-			};
-
-			// Transform item coordinates to minimap coordinates
-			const topLeft = transformToMiniMapCoords(
-				transformativeItem.x - transformativeItem.width / 2,
-				transformativeItem.y - transformativeItem.height / 2,
-				canvasBounds,
-				scale,
-				width,
-				height,
-			);
-
-			const itemWidth = transformativeItem.width * scale;
-			const itemHeight = transformativeItem.height * scale;
-
-			return (
-				<MiniMapItem
-					key={transformativeItem.id}
-					x={topLeft.x}
-					y={topLeft.y}
-					width={Math.max(1, itemWidth)}
-					height={Math.max(1, itemHeight)}
-				/>
-			);
-		});
+		return itemData.map((item) => (
+			<MiniMapItem
+				key={item.id}
+				x={item.x}
+				y={item.y}
+				width={item.width}
+				height={item.height}
+			/>
+		));
 	}, [items, canvasBounds, scale, width, height]);
 
 	return (

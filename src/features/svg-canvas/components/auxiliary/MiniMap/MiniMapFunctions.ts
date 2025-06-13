@@ -2,6 +2,7 @@ import type { Bounds } from "../../../types/base/Bounds";
 import type { Diagram } from "../../../catalog/DiagramTypes";
 import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
 import { isItemableData } from "../../../utils/validation/isItemableData";
+import { calcCanvasBounds } from "../../../canvas/utils/calcCanvasBounds";
 
 /**
  * Calculate the minimap scale factor based on canvas bounds and minimap size
@@ -143,4 +144,120 @@ export const extractTransformativeItemsRecursive = (
 	}
 
 	return result;
+};
+
+/**
+ * Calculate combined canvas bounds including both items and viewport.
+ * This ensures the minimap shows both content and current view area.
+ */
+export const calculateCombinedCanvasBounds = (
+	items: Diagram[],
+	viewportBounds: {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	},
+): Bounds => {
+	if (items.length === 0) {
+		// If no items, use viewport bounds
+		return viewportBounds;
+	}
+
+	// Calculate bounds of all items
+	const itemBounds = calcCanvasBounds(items);
+
+	// Combine item bounds with viewport bounds
+	const combinedLeft = Math.min(itemBounds.x, viewportBounds.x);
+	const combinedTop = Math.min(itemBounds.y, viewportBounds.y);
+	const combinedRight = Math.max(
+		itemBounds.x + itemBounds.width,
+		viewportBounds.x + viewportBounds.width,
+	);
+	const combinedBottom = Math.max(
+		itemBounds.y + itemBounds.height,
+		viewportBounds.y + viewportBounds.height,
+	);
+
+	return {
+		x: combinedLeft,
+		y: combinedTop,
+		width: combinedRight - combinedLeft,
+		height: combinedBottom - combinedTop,
+	};
+};
+
+/**
+ * Generate minimap item representations from diagram items.
+ * Transforms item coordinates to minimap coordinate system.
+ */
+export const generateMiniMapItems = (
+	items: Diagram[],
+	canvasBounds: Bounds,
+	scale: number,
+	miniMapWidth: number,
+	miniMapHeight: number,
+): Array<{
+	id: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}> => {
+	// Extract all transformative items recursively, including from groups
+	const allTransformativeItems = extractTransformativeItemsRecursive(items);
+
+	return allTransformativeItems.map((item) => {
+		// At this point, item is guaranteed to be transformative by the extraction function
+		const transformativeItem = item as Diagram & {
+			x: number;
+			y: number;
+			width: number;
+			height: number;
+		};
+
+		// Transform item coordinates to minimap coordinates
+		const topLeft = transformToMiniMapCoords(
+			transformativeItem.x - transformativeItem.width / 2,
+			transformativeItem.y - transformativeItem.height / 2,
+			canvasBounds,
+			scale,
+			miniMapWidth,
+			miniMapHeight,
+		);
+
+		const itemWidth = transformativeItem.width * scale;
+		const itemHeight = transformativeItem.height * scale;
+
+		return {
+			id: transformativeItem.id,
+			x: topLeft.x,
+			y: topLeft.y,
+			width: Math.max(1, itemWidth),
+			height: Math.max(1, itemHeight),
+		};
+	});
+};
+
+/**
+ * Calculate viewport bounds in canvas coordinates based on current view state
+ */
+export const calculateViewportBounds = (
+	minX: number,
+	minY: number,
+	containerWidth: number,
+	containerHeight: number,
+	zoom: number,
+): { x: number; y: number; width: number; height: number } => {
+	const viewportWidth = containerWidth / zoom;
+	const viewportHeight = containerHeight / zoom;
+	const viewportLeft = minX / zoom;
+	const viewportTop = minY / zoom;
+
+	return {
+		x: viewportLeft,
+		y: viewportTop,
+		width: viewportWidth,
+		height: viewportHeight,
+	};
 };
