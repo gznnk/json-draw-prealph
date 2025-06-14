@@ -23,10 +23,11 @@ import { isSelectableData } from "../../utils/validation/isSelectableData";
 /**
  * Custom hook to handle select events on the canvas.
  */
-export const useSelect = (props: CanvasHooksProps) => {
+export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
+		isCtrlPressed,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -36,8 +37,17 @@ export const useSelect = (props: CanvasHooksProps) => {
 		if (e.id === MULTI_SELECT_GROUP) return;
 
 		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current.props;
+		const {
+			props: { setCanvasState },
+			isCtrlPressed,
+		} = refBus.current;
 
+		// Override isMultiSelect based on Ctrl key state if isCtrlPressed is provided
+		const actualEvent = {
+			...e,
+			isMultiSelect:
+				isCtrlPressed !== undefined ? isCtrlPressed : e.isMultiSelect,
+		};
 		setCanvasState((prevState) => {
 			// Update the selected state of the items.
 			let items = applyRecursive(prevState.items, (item) => {
@@ -46,8 +56,8 @@ export const useSelect = (props: CanvasHooksProps) => {
 					return item;
 				}
 
-				if (item.id === e.id) {
-					if (e.isMultiSelect) {
+				if (item.id === actualEvent.id) {
+					if (actualEvent.isMultiSelect) {
 						// When multiple selection, toggle the selection state of the selected diagram.
 						return {
 							...item,
@@ -59,7 +69,7 @@ export const useSelect = (props: CanvasHooksProps) => {
 					return { ...item, isSelected: true };
 				}
 
-				if (e.isMultiSelect && item.isSelected) {
+				if (actualEvent.isMultiSelect && item.isSelected) {
 					// When multiple selection, do not change the selection state of the selected diagram.
 					return item;
 				}
@@ -86,7 +96,7 @@ export const useSelect = (props: CanvasHooksProps) => {
 					return prevState;
 				}
 
-				// 褁E��選択グループ�E初期値を作�E
+				// Create initial values for the multi-select group
 				const box = calcGroupBoxOfNoRotation(selectedItems);
 				multiSelectGroup = {
 					id: MULTI_SELECT_GROUP,
@@ -98,16 +108,16 @@ export const useSelect = (props: CanvasHooksProps) => {
 					scaleX: 1,
 					scaleY: 1,
 					keepProportion: prevState.multiSelectGroup?.keepProportion ?? true,
-					isSelected: true, // 褁E��選択用のグループ�E常に選択状態にする
-					isMultiSelectSource: false, // 褁E��選択�E選択�EではなぁE��設宁E
+					isSelected: true, // Multi-select group is always in selected state
+					isMultiSelectSource: false, // Multi-select group is not a multi-select source
 					items: applyRecursive(selectedItems, (item) => {
 						if (!isSelectableData(item)) {
 							return item;
 						}
 						return {
 							...item,
-							isSelected: false, // 褁E��選択用のグループ�Eの図形は選択状態を解除
-							isMultiSelectSource: false, // 褁E��選択�E選択�EではなぁE��設宁E
+							isSelected: false, // Shapes in multi-select group have their selection state cleared
+							isMultiSelectSource: false, // Multi-select source is not the selection source
 						};
 					}),
 				} as GroupData;
@@ -115,7 +125,7 @@ export const useSelect = (props: CanvasHooksProps) => {
 				// Set `isMultiSelectSource` to true to hide the transform outline of the original diagrams during multi-selection.
 				items = applyMultiSelectSourceRecursive(items);
 			} else {
-				// 褁E��選択でなぁE��合�E、�E図形に対して褁E��選択�E選択�EではなぁE��設宁E
+				// When not in multi-select mode, set all shapes to not be multi-select sources
 				items = applyRecursive(items, (item) => {
 					if (isSelectableData(item)) {
 						return {
@@ -131,7 +141,7 @@ export const useSelect = (props: CanvasHooksProps) => {
 				...prevState,
 				items,
 				multiSelectGroup,
-				selectedItemId: e.id,
+				selectedItemId: actualEvent.id,
 			};
 		});
 	}, []);

@@ -7,6 +7,7 @@ import styled from "@emotion/styled";
 type DiagramMenuWrapperProps = {
 	x: number;
 	y: number;
+	zoom: number;
 };
 
 /**
@@ -15,8 +16,8 @@ type DiagramMenuWrapperProps = {
 export const DiagramMenuWrapper = styled.div<DiagramMenuWrapperProps>`
     position: absolute;
     top: ${(props) => props.y}px;
-    left: ${(props) => props.x - 300}px;
-    width: 600px;
+    left: ${(props) => props.x - (300 * props.zoom)}px;
+    width: ${(props) => 600 * props.zoom}px;
     display: flex;
     justify-content: center;
 `;

@@ -11,6 +11,6 @@ export type DiagramDragEvent = {
 	startY: number;
 	endX: number;
 	endY: number;
-	cursorX?: number;
-	cursorY?: number;
+	cursorX: number;
+	cursorY: number;
 };

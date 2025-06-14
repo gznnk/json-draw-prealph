@@ -373,7 +373,6 @@ export const usePaste = (props: CanvasHooksProps) => {
 						return {
 							...prevState,
 							items: allItems,
-							isDiagramChanging: false,
 							multiSelectGroup,
 						};
 					});

@@ -2,9 +2,9 @@
 import type { RefObject } from "react";
 
 // Import types related to SvgCanvas.
+import type { Diagram } from "../catalog/DiagramTypes";
 import type { TextEditorState } from "../components/core/Textable";
 import type { GroupData } from "../types/data/shapes/GroupData";
-import type { Diagram } from "../catalog/DiagramTypes";
 import type { DiagramChangeEvent } from "../types/events/DiagramChangeEvent";
 import type { DiagramConnectEvent } from "../types/events/DiagramConnectEvent";
 import type { DiagramDragDropEvent } from "../types/events/DiagramDragDropEvent";
@@ -17,6 +17,7 @@ import type { ExecuteEvent } from "../types/events/ExecuteEvent";
 import type { NewDiagramEvent } from "../types/events/NewDiagramEvent";
 import type { StackOrderChangeEvent } from "../types/events/StackOrderChangeEvent";
 import type { SvgCanvasResizeEvent } from "../types/events/SvgCanvasResizeEvent";
+import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
 
 /**
  * Type for the data of the SvgCanvas.
@@ -25,8 +26,6 @@ export type SvgCanvasData = {
 	id: string;
 	minX: number;
 	minY: number;
-	width: number;
-	height: number;
 	items: Diagram[];
 };
 
@@ -34,14 +33,15 @@ export type SvgCanvasData = {
  * Type for the state of the SvgCanvas.
  */
 export type SvgCanvasState = {
-	scrollTop: number;
-	scrollLeft: number;
+	zoom: number;
 	multiSelectGroup?: GroupData;
 	isDiagramChanging: boolean;
 	history: SvgCanvasHistory[];
 	historyIndex: number;
 	lastHistoryEventId: string;
 	textEditorState: TextEditorState;
+	isGrabScrollReady?: boolean;
+	isGrabScrolling?: boolean;
 } & SvgCanvasData;
 
 /**
@@ -65,8 +65,8 @@ export interface SvgCanvasRef {
  */
 export type CanvasHooksProps = {
 	canvasState: SvgCanvasState;
-	setCanvasState: React.Dispatch<React.SetStateAction<SvgCanvasState>>;
 	canvasRef?: SvgCanvasRef | null;
+	setCanvasState: React.Dispatch<React.SetStateAction<SvgCanvasState>>;
 	onDataChange?: (data: SvgCanvasData) => void;
 };
 
@@ -97,7 +97,12 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onStackOrderChange?: (e: StackOrderChangeEvent) => void;
 	onExecute?: (e: ExecuteEvent) => void;
 	onExport?: () => void;
-	onScroll?: (e: React.UIEvent<HTMLDivElement, UIEvent>) => void;
+	onScroll?: (e: SvgCanvasScrollEvent) => void;
 	onCopy?: () => void;
 	onPaste?: () => void;
+	onZoom?: (zoom: number) => void;
+	onNavigate?: (minX: number, minY: number) => void;
+	onGrabStart?: (e: React.PointerEvent<SVGSVGElement>) => boolean;
+	onGrabMove?: (e: React.PointerEvent<SVGSVGElement>) => void;
+	onGrabEnd?: (e: React.PointerEvent<SVGSVGElement>) => void;
 };

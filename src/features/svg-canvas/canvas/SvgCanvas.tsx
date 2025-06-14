@@ -6,11 +6,11 @@ import React, {
 	useEffect,
 	useImperativeHandle,
 	useRef,
+	useState,
 } from "react";
 
 // SvgCanvas関連型定義をインポート
 import { DiagramComponentCatalog } from "../catalog/DiagramComponentCatalog";
-import type { DiagramSelectEvent } from "../types/events/DiagramSelectEvent";
 
 // SvgCanvas関連コンポーネントをインポート
 import { TextEditor } from "../components/core/Textable";
@@ -21,11 +21,10 @@ import { FlashConnectLine } from "../components/shapes/ConnectLine";
 import { NewConnectLine } from "../components/shapes/ConnectPoint";
 import { Group } from "../components/shapes/Group";
 import UserMenu from "../components/menus/UserMenu/UserMenu";
-
-// SvgCanvas関連関数をインポート
-import { newEventId } from "../utils/common/newEventId";
+import { MiniMap } from "../components/auxiliary/MiniMap";
 
 // Imports related to this component.
+import { useShortcutKey } from "./hooks/useShortcutKey";
 import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
 import {
 	Container,
@@ -54,13 +53,12 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			title,
 			minX,
 			minY,
-			width,
-			height,
 			items,
-			scrollLeft,
-			scrollTop,
+			zoom,
 			multiSelectGroup,
 			textEditorState,
+			isGrabScrollReady,
+			isGrabScrolling,
 			onTransform,
 			onDiagramChange,
 			onDrag,
@@ -78,8 +76,13 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onNewDiagram,
 			onExecute,
 			onScroll,
+			onZoom,
 			onCopy,
 			onPaste,
+			onNavigate,
+			onGrabStart,
+			onGrabMove,
+			onGrabEnd,
 		} = props;
 
 		// SVG要素のコンテナの参照
@@ -87,14 +90,16 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		// SVG要素の参照
 		const svgRef = useRef<SVGSVGElement>(null);
 
+		// Container dimensions state
+		const [containerWidth, setContainerWidth] = useState(0);
+		const [containerHeight, setContainerHeight] = useState(0);
+
 		// Forward refs to parent using useImperativeHandle
 		useImperativeHandle(ref, () => ({
 			containerRef,
 			svgRef,
 		}));
 
-		// Ctrlキーが押されているかどうかのフラグ
-		const isCtrlDown = useRef(false);
 		// SVG要素にフォーカスがあるかどうかのフラグ
 		const hasFocus = useRef(false);
 
@@ -106,11 +111,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		stateProvider.current.setState({
 			minX,
 			minY,
-			width,
-			height,
 			items,
-			scrollLeft,
-			scrollTop,
 		} as SvgCanvasState);
 
 		// Use the context menu hook to handle context menu events.
@@ -119,24 +120,38 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 		// Use the diagram menu hook to handle diagram menu events.
 		const { diagramMenuProps } = useDiagramMenu(props);
-		// Create references bypass to avoid function creation in every render.
-		const refBusVal = {
-			scrollLeft,
-			scrollTop,
+
+		// Use the shortcut key hook to handle keyboard shortcuts
+		useShortcutKey({
+			zoom,
 			hasFocus,
 			textEditorState,
-			onDrag,
-			onDiagramChange,
 			onDelete,
-			onSelect,
 			onSelectAll,
 			onClearAllSelection,
 			onUndo,
 			onRedo,
-			onDataChange,
-			onScroll,
 			onCopy,
 			onPaste,
+			onZoom,
+		});
+
+		// Create references bypass to avoid function creation in every render.
+		const refBusVal = {
+			minX,
+			minY,
+			zoom,
+			hasFocus,
+			textEditorState,
+			onDrag,
+			onDiagramChange,
+			onClearAllSelection,
+			onDataChange,
+			onScroll,
+			onZoom,
+			onGrabStart,
+			onGrabMove,
+			onGrabEnd,
 			contextMenuFunctions,
 		};
 		const refBus = useRef(refBusVal);
@@ -162,7 +177,13 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		const handlePointerDown = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
 				// Bypass references to avoid function creation in every render.
-				const { onClearAllSelection, contextMenuFunctions } = refBus.current;
+				const { onClearAllSelection, onGrabStart, contextMenuFunctions } =
+					refBus.current;
+
+				// Check for Ctrl+drag to start grab scrolling
+				if (onGrabStart?.(e)) {
+					return;
+				}
 
 				if (e.target === e.currentTarget) {
 					// Clear the selection when pointer is down on the canvas.
@@ -174,6 +195,40 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			},
 			[],
 		);
+		/**
+		 * Handle the pointer move event for grab scrolling.
+		 */
+		const handlePointerMove = useCallback(
+			(e: React.PointerEvent<SVGSVGElement>) => {
+				refBus.current.onGrabMove?.(e);
+			},
+			[],
+		);
+
+		/**
+		 * Handle the pointer up event to end grab scrolling.
+		 */
+		const handlePointerUp = useCallback(
+			(e: React.PointerEvent<SVGSVGElement>) => {
+				refBus.current.onGrabEnd?.(e);
+			},
+			[],
+		);
+
+		/**
+		 * Handle the wheel event on the SVG canvas for scrolling.
+		 */
+		const handleWheel = useCallback((e: React.WheelEvent<SVGSVGElement>) => {
+			// Bypass references to avoid function creation in every render.
+			const { minX, minY, onScroll } = refBus.current;
+
+			onScroll?.({
+				minX: minX + e.deltaX,
+				minY: minY + e.deltaY,
+				clientX: e.clientX + e.deltaX,
+				clientY: e.clientY + e.deltaY,
+			});
+		}, []);
 
 		/**
 		 * SvgCanvasのキーダウンイベントハンドラ
@@ -188,120 +243,53 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			[],
 		);
 
-		/**
-		 * 図形選択イベントハンドラ
-		 */
-		const handleSelect = useCallback((e: DiagramSelectEvent) => {
-			// Bypass references to avoid function creation in every render.
-			const { onSelect } = refBus.current;
+		// Monitor container size changes with ResizeObserver
+		useEffect(() => {
+			const container = containerRef.current;
+			if (!container) return;
 
-			// Ctrlキーの押下状態を付与して、処理をHooksに委譲
-			onSelect?.({
-				eventId: newEventId(),
-				id: e.id,
-				isMultiSelect: isCtrlDown.current,
+			const resizeObserver = new ResizeObserver((entries) => {
+				for (const entry of entries) {
+					const { width, height } = entry.contentRect;
+					setContainerWidth(width);
+					setContainerHeight(height);
+				}
 			});
-		}, []);
 
-		// Monitor keyboard events.
-		useEffect(() => {
-			const onDocumentKeyDown = (e: KeyboardEvent) => {
-				// Bypass references to avoid function creation in every render.
-				const {
-					hasFocus,
-					textEditorState,
-					onDelete,
-					onSelectAll,
-					onClearAllSelection,
-					onUndo,
-					onRedo,
-					onCopy,
-					onPaste,
-				} = refBus.current;
+			resizeObserver.observe(container);
 
-				if (e.key === "Control") {
-					isCtrlDown.current = true;
-				}
-
-				// SVG要素にフォーカスがない場合は、以降の処理をスキップ
-				if (!hasFocus.current && !textEditorState.isActive) {
-					return;
-				}
-
-				if (e.key === "Escape") {
-					// Clear selection when Escape key is pressed.
-					onClearAllSelection?.();
-				}
-				if (e.key === "Delete") {
-					// Delete selected items when Delete key is pressed.
-					onDelete?.();
-				}
-				if (e.ctrlKey) {
-					if (e.key === "z") {
-						// Undo the last action when Ctrl+Z is pressed.
-						onUndo?.();
-					}
-					if (e.key === "y") {
-						// Redo the last action when Ctrl+Y is pressed.
-						onRedo?.();
-					}
-					if (e.key === "a" && !textEditorState.isActive) {
-						// Select all items when Ctrl+A is pressed.
-						e.preventDefault();
-						onSelectAll?.();
-					}
-					if (e.key === "c" && !textEditorState.isActive) {
-						// Copy selected items when Ctrl+C is pressed.
-						e.preventDefault();
-						onCopy?.();
-					}
-					if (e.key === "v" && !textEditorState.isActive) {
-						// Paste items from clipboard when Ctrl+V is pressed.
-						e.preventDefault();
-						onPaste?.();
-					}
-				}
-			};
-
-			const onDocumentKeyUp = (e: KeyboardEvent) => {
-				if (e.key === "Control") {
-					isCtrlDown.current = false;
-				}
-			};
-
-			// Add event listeners for keydown and keyup events.
-			document.addEventListener("keydown", onDocumentKeyDown);
-			document.addEventListener("keyup", onDocumentKeyUp);
+			// Initialize with current dimensions
+			const rect = container.getBoundingClientRect();
+			setContainerWidth(rect.width);
+			setContainerHeight(rect.height);
 
 			return () => {
-				document.removeEventListener("keydown", onDocumentKeyDown);
-				document.removeEventListener("keyup", onDocumentKeyUp);
+				resizeObserver.disconnect();
 			};
 		}, []);
 
 		useEffect(() => {
-			if (containerRef.current) {
-				const { scrollLeft, scrollTop } = refBus.current;
-				containerRef.current.scrollLeft = scrollLeft;
-				containerRef.current.scrollTop = scrollTop;
-			}
-		}, []);
-
-		useEffect(() => {
-			const el = containerRef.current;
-
-			const handleTouchMove = (e: TouchEvent) => {
-				if (e.target !== e.currentTarget && e.target !== svgRef.current) {
+			// Prevent browser zoom with Ctrl+wheel at document level
+			const onDocumentWheel = (e: WheelEvent) => {
+				if (e.ctrlKey && !isGrabScrolling) {
 					e.preventDefault();
+					e.stopPropagation();
+
+					const delta = e.deltaY > 0 ? 0.9 : 1.1;
+					const newZoom = refBus.current.zoom * delta;
+					refBus.current.onZoom?.(newZoom);
 				}
 			};
 
-			el?.addEventListener("touchmove", handleTouchMove, { passive: false });
+			document.addEventListener("wheel", onDocumentWheel, {
+				passive: false,
+				capture: true,
+			});
 
 			return () => {
-				el?.removeEventListener("touchmove", handleTouchMove);
+				document.removeEventListener("wheel", onDocumentWheel, true);
 			};
-		}, []);
+		}, [isGrabScrolling]);
 
 		// 図形の描画
 		const renderedItems = items.map((item) => {
@@ -313,7 +301,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				onDiagramChange,
 				onDrag,
 				onDrop,
-				onSelect: handleSelect,
+				onSelect,
 				onConnect,
 				onTextEdit,
 				onExecute,
@@ -324,18 +312,23 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 		return (
 			<Viewport>
-				<Container ref={containerRef} onScroll={onScroll}>
+				<Container ref={containerRef}>
 					<SvgCanvasContext.Provider value={stateProvider.current}>
 						<Svg
-							width={width}
-							height={height}
-							viewBox={`${minX} ${minY} ${width} ${height}`}
+							width={containerWidth}
+							height={containerHeight}
+							viewBox={`${minX / zoom} ${minY / zoom} ${containerWidth / zoom} ${containerHeight / zoom}`}
 							tabIndex={0}
 							ref={svgRef}
+							isGrabScrollReady={isGrabScrollReady}
+							isGrabScrolling={isGrabScrolling}
 							onPointerDown={handlePointerDown}
+							onPointerMove={handlePointerMove}
+							onPointerUp={handlePointerUp}
 							onKeyDown={handleKeyDown}
 							onFocus={handleFocus}
 							onBlur={handleBlur}
+							onWheel={handleWheel}
 							onContextMenu={contextMenuHandlers.onContextMenu}
 						>
 							<title>{title}</title>
@@ -347,7 +340,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 									{...multiSelectGroup}
 									id={MULTI_SELECT_GROUP}
 									syncWithSameId
-									onSelect={handleSelect}
+									onSelect={onSelect}
 									onTransform={onTransform}
 									onDiagramChange={onDiagramChange}
 								/>
@@ -358,14 +351,23 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 							<FlashConnectLine />
 						</Svg>
 					</SvgCanvasContext.Provider>
-					{/* Container for HTML elements that follow the scroll of the SVG canvas. */}
+					{/* Container for HTML elements that follow the scroll of the SVG canvas with zoom scaling. */}
 					<HTMLElementsContainer
 						left={-minX}
 						top={-minY}
-						width={width + minX}
-						height={height + minY}
+						width={containerWidth + minX}
+						height={containerHeight + minY}
+						zoom={zoom}
 					>
 						<TextEditor {...textEditorState} onTextChange={onTextChange} />
+					</HTMLElementsContainer>
+					{/* Container for HTML elements that follow the scroll but not zoom. */}
+					<HTMLElementsContainer
+						left={-minX}
+						top={-minY}
+						width={containerWidth + minX}
+						height={containerHeight + minY}
+					>
 						<DiagramMenu {...diagramMenuProps} />
 					</HTMLElementsContainer>
 				</Container>
@@ -374,6 +376,15 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					<CanvasMenu onNewDiagram={onNewDiagram} />
 					<UserMenu />
 					<ContextMenu {...contextMenuProps} />
+					<MiniMap
+						items={items}
+						minX={minX}
+						minY={minY}
+						containerWidth={containerWidth}
+						containerHeight={containerHeight}
+						zoom={zoom}
+						onNavigate={onNavigate}
+					/>
 				</ViewportOverlay>
 			</Viewport>
 		);

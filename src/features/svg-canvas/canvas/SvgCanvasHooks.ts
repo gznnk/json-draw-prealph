@@ -7,13 +7,13 @@ import type { TextEditorState } from "../components/core/Textable";
 
 // Import functions related to SvgCanvas.
 import { deepCopy } from "../utils/common/deepCopy";
-import { calcOptimalCanvasSize } from "./utils/calcOptimalCanvasSize";
+import { calcCanvasBounds } from "./utils/calcCanvasBounds";
 
 // Imports related to this component.
 import type {
-	SvgCanvasState,
-	SvgCanvasRef,
 	SvgCanvasData,
+	SvgCanvasRef,
+	SvgCanvasState,
 } from "./SvgCanvasTypes";
 
 // Import canvas custom hooks.
@@ -23,11 +23,13 @@ import { useCopy } from "./hooks/useCopy";
 import { useDelete } from "./hooks/useDelete";
 import { useDiagramChange } from "./hooks/useDiagramChange";
 import { useDrag } from "./hooks/useDrag";
+import { useExecute } from "./hooks/useExecute";
+import { useExport } from "./hooks/useExport";
 import { useGroup } from "./hooks/useGroup";
 import { useNewDiagram } from "./hooks/useNewDiagram";
-import { useNewItem } from "./observers/addNewItem";
 import { usePaste } from "./hooks/usePaste";
 import { useRedo } from "./hooks/useRedo";
+import { useScroll } from "./hooks/useScroll";
 import { useSelect } from "./hooks/useSelect";
 import { useSelectAll } from "./hooks/useSelectAll";
 import { useStackOrderChange } from "./hooks/useStackOrderChange";
@@ -36,9 +38,11 @@ import { useTextEdit } from "./hooks/useTextEdit";
 import { useTransform } from "./hooks/useTransform";
 import { useUndo } from "./hooks/useUndo";
 import { useUngroup } from "./hooks/useUngroup";
-import { useExecute } from "./hooks/useExecute";
-import { useExport } from "./hooks/useExport";
-import { useScroll } from "./hooks/useScroll";
+import { useZoom } from "./hooks/useZoom";
+import { useCtrl } from "./hooks/useCtrl";
+import { useGrabScroll } from "./hooks/useGrabScroll";
+import { useNavigate } from "./hooks/useNavigate";
+import { useNewItem } from "./observers/addNewItem";
 import { useConnectNodes } from "./observers/connectNodes";
 
 /**
@@ -48,11 +52,8 @@ type SvgCanvasHooksProps = {
 	id: string;
 	minX: number;
 	minY: number;
-	width: number;
-	height: number;
 	items: Diagram[];
-	scrollLeft: number;
-	scrollTop: number;
+	zoom: number;
 	canvasRef: RefObject<SvgCanvasRef | null>;
 	onDataChange?: (data: SvgCanvasData) => void;
 };
@@ -68,11 +69,13 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	let initialBounds = {
 		minX: props.minX,
 		minY: props.minY,
-		width: props.width,
-		height: props.height,
 	};
 	if (props.items.length > 0) {
-		initialBounds = calcOptimalCanvasSize(props.items);
+		const optimalBounds = calcCanvasBounds(props.items);
+		initialBounds = {
+			minX: optimalBounds.x,
+			minY: optimalBounds.y,
+		};
 	}
 
 	// The state of the canvas.
@@ -80,9 +83,8 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		...initialBounds,
 		id: props.id,
 		items: props.items,
+		zoom: props.zoom,
 		isDiagramChanging: false,
-		scrollLeft: props.scrollLeft,
-		scrollTop: props.scrollTop,
 		history: [
 			{
 				...initialBounds,
@@ -103,6 +105,9 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onDataChange: props.onDataChange,
 	};
 
+	// Ctrl key state management
+	const { isCtrlPressed } = useCtrl();
+
 	// Handler for the drag event.
 	const onDrag = useDrag(canvasHooksProps);
 
@@ -113,7 +118,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onDiagramChange = useDiagramChange(canvasHooksProps);
 
 	// Handler for the select event.
-	const onSelect = useSelect(canvasHooksProps);
+	const onSelect = useSelect(canvasHooksProps, isCtrlPressed);
 
 	// Handler for the select all event.
 	const onSelectAll = useSelectAll(canvasHooksProps);
@@ -160,11 +165,23 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the scroll event.
 	const onScroll = useScroll(canvasHooksProps);
 
+	// Handler for the zoom event.
+	const onZoom = useZoom(canvasHooksProps);
+
 	// Handler for the copy event.
 	const onCopy = useCopy(canvasHooksProps);
 
 	// Handler for the paste event.
 	const onPaste = usePaste(canvasHooksProps);
+
+	// Handler for the navigate event (using scroll)
+	const onNavigate = useNavigate(onScroll);
+
+	// Use grab scroll hook for Ctrl+drag functionality
+	const { onGrabStart, onGrabMove, onGrabEnd } = useGrabScroll(
+		canvasHooksProps,
+		onScroll,
+	);
 
 	// Observer for the new item event.
 	useNewItem(canvasHooksProps);
@@ -194,8 +211,13 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onExecute,
 		onExport,
 		onScroll,
+		onZoom,
 		onCopy,
 		onPaste,
+		onNavigate,
+		onGrabStart,
+		onGrabMove,
+		onGrabEnd,
 	};
 
 	return {

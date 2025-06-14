@@ -54,6 +54,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	rotation,
 	scaleX,
 	scaleY,
+	zoom,
 	isVisible,
 	menuStateMap,
 	bgColor,
@@ -81,11 +82,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	});
 
 	// Calculate the menu Y position based on the vertices of the rectangle.
+	// Apply zoom to the offset as well for consistent positioning.
 	const menuY =
 		Object.keys(vertices).reduce((max, key) => {
 			const vertex = vertices[key as keyof RectangleVertices];
 			return Math.max(max, vertex.y);
-		}, Number.NEGATIVE_INFINITY) + 20;
+		}, Number.NEGATIVE_INFINITY) +
+		20 * zoom;
 
 	/**
 	 * Check if the menu section should be shown based on the menu types provided.
@@ -401,7 +404,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	menuItemComponents.pop();
 
 	return (
-		<DiagramMenuWrapper x={x} y={menuY}>
+		<DiagramMenuWrapper x={x} y={menuY} zoom={zoom}>
 			<DiagramMenuDiv>
 				{menuItemComponents.map((component) => component)}
 			</DiagramMenuDiv>

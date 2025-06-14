@@ -11,6 +11,6 @@ export type DiagramTransformEvent = {
 	eventType: EventType;
 	startShape: Shape;
 	endShape: Shape;
-	cursorX?: number;
-	cursorY?: number;
+	cursorX: number;
+	cursorY: number;
 };

@@ -24,6 +24,7 @@ export const useGroup = (props: CanvasHooksProps) => {
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
+
 	return useCallback(() => {
 		// Bypass references to avoid function creation in every render.
 		const { setCanvasState, onDataChange } = refBus.current.props;
