@@ -1,19 +1,19 @@
-import type { Box } from "../../../types/base/Box";
+import type { BoxGeometry } from "../../../types/base/BoxGeometry";
 import type { Point } from "../../../types/base/Point";
 import type { Direction } from "../../../components/shapes/ConnectPoint/ConnectPoint/ConnectPointTypes";
 import { closer } from "../../math/common/closer";
 import { lineIntersects } from "../../math/geometry/lineIntersects";
 import { getLineDirection } from "./getLineDirection";
 import { isUpDown } from "./isUpDown";
-import { addMarginToBox } from "./addMarginToBox";
+import { addMarginToBoxGeometry } from "./addMarginToBoxGeometry";
 
 /**
  * Creates connection path points during drag operation.
  *
  * @param startX - Start point x coordinate
- * @param startY - Start point y coordinate  
+ * @param startY - Start point y coordinate
  * @param startDirection - Direction from start shape
- * @param startOwnerOuterBox - Outer box of start shape
+ * @param startOwnerOuterBoxGeometry - Outer box geometry of start shape
  * @param endX - End point x coordinate
  * @param endY - End point y coordinate
  * @returns Array of points representing the connection path
@@ -22,7 +22,7 @@ export const createConnectPathOnDrag = (
 	startX: number,
 	startY: number,
 	startDirection: Direction,
-	startOwnerOuterBox: Box,
+	startOwnerOuterBoxGeometry: BoxGeometry,
 	endX: number,
 	endY: number,
 ) => {
@@ -32,7 +32,7 @@ export const createConnectPathOnDrag = (
 	// 開始方向が上下かどうか
 	const isDirectionUpDown = isUpDown(startDirection);
 
-	const marginBox = addMarginToBox(startOwnerOuterBox);
+	const marginBoxGeometry = addMarginToBoxGeometry(startOwnerOuterBoxGeometry);
 
 	// p1
 	const p1 = { x: startX, y: startY };
@@ -46,15 +46,15 @@ export const createConnectPathOnDrag = (
 
 	if (isDirectionUpDown) {
 		if (startDirection === "up") {
-			p2.y = marginBox.top;
+			p2.y = marginBoxGeometry.top;
 		} else {
-			p2.y = marginBox.bottom;
+			p2.y = marginBoxGeometry.bottom;
 		}
 	} else {
 		if (startDirection === "right") {
-			p2.x = marginBox.right;
+			p2.x = marginBoxGeometry.right;
 		} else {
-			p2.x = marginBox.left;
+			p2.x = marginBoxGeometry.left;
 		}
 	}
 	newPoints.push(p2);
@@ -89,56 +89,56 @@ export const createConnectPathOnDrag = (
 	let isAccrossFartherLine = false;
 	if (startDirection === "up") {
 		isAccrossCloserLine = lineIntersects(
-			marginBox.leftTop,
-			marginBox.rightTop,
+			marginBoxGeometry.leftTop,
+			marginBoxGeometry.rightTop,
 			p3,
 			p4,
 		);
 		isAccrossFartherLine = lineIntersects(
-			marginBox.leftBottom,
-			marginBox.rightBottom,
+			marginBoxGeometry.leftBottom,
+			marginBoxGeometry.rightBottom,
 			p3,
 			p4,
 		);
 	}
 	if (startDirection === "down") {
 		isAccrossCloserLine = lineIntersects(
-			marginBox.leftBottom,
-			marginBox.rightBottom,
+			marginBoxGeometry.leftBottom,
+			marginBoxGeometry.rightBottom,
 			p3,
 			p4,
 		);
 		isAccrossFartherLine = lineIntersects(
-			marginBox.leftTop,
-			marginBox.rightTop,
+			marginBoxGeometry.leftTop,
+			marginBoxGeometry.rightTop,
 			p3,
 			p4,
 		);
 	}
 	if (startDirection === "left") {
 		isAccrossCloserLine = lineIntersects(
-			marginBox.leftTop,
-			marginBox.leftBottom,
+			marginBoxGeometry.leftTop,
+			marginBoxGeometry.leftBottom,
 			p3,
 			p4,
 		);
 		isAccrossFartherLine = lineIntersects(
-			marginBox.rightTop,
-			marginBox.rightBottom,
+			marginBoxGeometry.rightTop,
+			marginBoxGeometry.rightBottom,
 			p3,
 			p4,
 		);
 	}
 	if (startDirection === "right") {
 		isAccrossCloserLine = lineIntersects(
-			marginBox.rightTop,
-			marginBox.rightBottom,
+			marginBoxGeometry.rightTop,
+			marginBoxGeometry.rightBottom,
 			p3,
 			p4,
 		);
 		isAccrossFartherLine = lineIntersects(
-			marginBox.leftTop,
-			marginBox.leftBottom,
+			marginBoxGeometry.leftTop,
+			marginBoxGeometry.leftBottom,
 			p3,
 			p4,
 		);
@@ -147,9 +147,9 @@ export const createConnectPathOnDrag = (
 	if (isAccrossCloserLine) {
 		// 近い辺と交差している場合は、p3を近い辺に移動
 		if (isDirectionUpDown) {
-			p3.x = closer(endX, marginBox.left, marginBox.right);
+			p3.x = closer(endX, marginBoxGeometry.left, marginBoxGeometry.right);
 		} else {
-			p3.y = closer(endY, marginBox.top, marginBox.bottom);
+			p3.y = closer(endY, marginBoxGeometry.top, marginBoxGeometry.bottom);
 		}
 		// p4が図形の中に入らないよう位置を修正
 		if (isDirectionUpDown) {

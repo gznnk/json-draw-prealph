@@ -1,6 +1,6 @@
 import type { Point } from "../../../types/base/Point";
 import type { Shape } from "../../../types/base/Shape";
-import { calcRectangleOuterBox } from "../../math/geometry/calcRectangleOuterBox";
+import { calcRectangleOuterBoxGeometry } from "../../math/geometry/calcRectangleOuterBoxGeometry";
 import { getLineDirection } from "./getLineDirection";
 import { CONNECT_LINE_MARGIN } from "../../../components/shapes/ConnectPoint/ConnectPoint/ConnectPointConstants";
 
@@ -17,20 +17,20 @@ export const getSecondConnectPoint = (
 	cx: number,
 	cy: number,
 ): Point => {
-	const ownerOuterBox = calcRectangleOuterBox(ownerShape);
+	const ownerOuterBoxGeometry = calcRectangleOuterBoxGeometry(ownerShape);
 	const direction = getLineDirection(ownerShape.x, ownerShape.y, cx, cy);
 
 	if (direction === "up") {
-		return { x: cx, y: ownerOuterBox.top - CONNECT_LINE_MARGIN };
+		return { x: cx, y: ownerOuterBoxGeometry.top - CONNECT_LINE_MARGIN };
 	}
 	if (direction === "down") {
-		return { x: cx, y: ownerOuterBox.bottom + CONNECT_LINE_MARGIN };
+		return { x: cx, y: ownerOuterBoxGeometry.bottom + CONNECT_LINE_MARGIN };
 	}
 	if (direction === "left") {
-		return { x: ownerOuterBox.left - CONNECT_LINE_MARGIN, y: cy };
+		return { x: ownerOuterBoxGeometry.left - CONNECT_LINE_MARGIN, y: cy };
 	}
 	if (direction === "right") {
-		return { x: ownerOuterBox.right + CONNECT_LINE_MARGIN, y: cy };
+		return { x: ownerOuterBoxGeometry.right + CONNECT_LINE_MARGIN, y: cy };
 	}
 	return { x: 0, y: 0 };
 };

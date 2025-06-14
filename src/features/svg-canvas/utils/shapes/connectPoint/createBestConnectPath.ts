@@ -1,7 +1,7 @@
 import type { Point } from "../../../types/base/Point";
 import type { Shape } from "../../../types/base/Shape";
-import { calcRectangleOuterBox } from "../../math/geometry/calcRectangleOuterBox";
-import { isLineIntersectingBox } from "../../math/geometry/isLineIntersectingBox";
+import { calcRectangleOuterBoxGeometry } from "../../math/geometry/calcRectangleOuterBoxGeometry";
+import { isLineIntersectingBoxGeometry } from "../../math/geometry/isLineIntersectingBoxGeometry";
 import { closer } from "../../math/common/closer";
 import { getLineDirection } from "./getLineDirection";
 import { getSecondConnectPoint } from "./getSecondConnectPoint";
@@ -37,9 +37,8 @@ export const createBestConnectPath = (
 		startX,
 		startY,
 	);
-
-	const startOuterBox = calcRectangleOuterBox(startOwnerShape);
-	const endOuterBox = calcRectangleOuterBox(endOwnerShape);
+	const startOuterBoxGeometry = calcRectangleOuterBoxGeometry(startOwnerShape);
+	const endOuterBoxGeometry = calcRectangleOuterBoxGeometry(endOwnerShape);
 
 	const startP2 = getSecondConnectPoint(startOwnerShape, startX, startY);
 	const endP2 = getSecondConnectPoint(endOwnerShape, endX, endY);
@@ -47,10 +46,26 @@ export const createBestConnectPath = (
 	const p2MidX = (startP2.x + endP2.x) / 2;
 	const p2MidY = (startP2.y + endP2.y) / 2;
 
-	const startCloserX = closer(p2MidX, startOuterBox.left, startOuterBox.right);
-	const startCloserY = closer(p2MidY, startOuterBox.top, startOuterBox.bottom);
-	const endCloserX = closer(p2MidX, endOuterBox.left, endOuterBox.right);
-	const endCloserY = closer(p2MidY, endOuterBox.top, endOuterBox.bottom);
+	const startCloserX = closer(
+		p2MidX,
+		startOuterBoxGeometry.left,
+		startOuterBoxGeometry.right,
+	);
+	const startCloserY = closer(
+		p2MidY,
+		startOuterBoxGeometry.top,
+		startOuterBoxGeometry.bottom,
+	);
+	const endCloserX = closer(
+		p2MidX,
+		endOuterBoxGeometry.left,
+		endOuterBoxGeometry.right,
+	);
+	const endCloserY = closer(
+		p2MidY,
+		endOuterBoxGeometry.top,
+		endOuterBoxGeometry.bottom,
+	);
 
 	const midPoint = {
 		x: Math.round((startCloserX + endCloserX) / 2),
@@ -73,7 +88,7 @@ export const createBestConnectPath = (
 			startX,
 			startY,
 			startDirection,
-			startOuterBox,
+			startOuterBoxGeometry,
 			p.x,
 			p.y,
 		);
@@ -91,7 +106,7 @@ export const createBestConnectPath = (
 			endX,
 			endY,
 			endDirection,
-			calcRectangleOuterBox(endOwnerShape),
+			calcRectangleOuterBoxGeometry(endOwnerShape),
 			p.x,
 			p.y,
 		);
@@ -104,8 +119,8 @@ export const createBestConnectPath = (
 				const p1 = connectPath[i];
 				const p2 = connectPath[i + 1];
 				if (
-					isLineIntersectingBox(p1, p2, startOuterBox) ||
-					isLineIntersectingBox(p1, p2, endOuterBox)
+					isLineIntersectingBoxGeometry(p1, p2, startOuterBoxGeometry) ||
+					isLineIntersectingBoxGeometry(p1, p2, endOuterBoxGeometry)
 				) {
 					return true;
 				}

@@ -14,7 +14,7 @@ import type { PathPointData } from "../../../../types/data/shapes/PathPointData"
 import { DragPoint } from "../../../core/DragPoint";
 
 // Import utils.
-import { calcRectangleOuterBox } from "../../../../utils/math/geometry/calcRectangleOuterBox";
+import { calcRectangleOuterBoxGeometry } from "../../../../utils/math/geometry/calcRectangleOuterBoxGeometry";
 import { newId } from "../../../../utils/shapes/common/newId";
 
 // Imports related to this component.
@@ -44,7 +44,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	// 接続中のポイント
 	const connectingPoint = useRef<ConnectingPoint | undefined>(undefined);
 	// 接続ポイントの所有者の外接矩形
-	const ownerOuterBox = calcRectangleOuterBox(ownerShape);
+	const ownerOuterBoxGeometry = calcRectangleOuterBoxGeometry(ownerShape);
 	// 接続ポイントの方向
 	const direction = getLineDirection(ownerShape.x, ownerShape.y, x, y);
 
@@ -60,7 +60,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 				x,
 				y,
 				direction,
-				ownerOuterBox,
+				ownerOuterBoxGeometry,
 				dragX,
 				dragY,
 			);
