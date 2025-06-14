@@ -11,12 +11,22 @@ import {
 	AUTO_SCROLL_STEP_SIZE,
 	AUTO_SCROLL_THRESHOLD,
 } from "../SvgCanvasConstants";
-import type { CanvasHooksProps } from "../SvgCanvasTypes";
+import type { CanvasHooksProps, SvgCanvasState } from "../SvgCanvasTypes";
 
 /**
  * Type definition for scroll directions.
  */
 type ScrollDirection = "left" | "top" | "right" | "bottom";
+
+/**
+ * Determines if auto scrolling should be stopped based on canvas state.
+ *
+ * @param canvasState - Current canvas state
+ * @returns true if auto scrolling should stop, false otherwise
+ */
+const shouldStopAutoScroll = (canvasState: SvgCanvasState): boolean => {
+	return !canvasState.isDiagramChanging;
+};
 
 /**
  * Custom hook to handle auto edge scrolling when cursor approaches canvas boundaries.
