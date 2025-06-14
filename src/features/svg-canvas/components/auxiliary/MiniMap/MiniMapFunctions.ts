@@ -2,7 +2,7 @@ import type { Bounds } from "../../../types/base/Bounds";
 import type { Diagram } from "../../../catalog/DiagramTypes";
 import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
 import { isItemableData } from "../../../utils/validation/isItemableData";
-import { calcCanvasBounds } from "../../../canvas/utils/calcCanvasBounds";
+import { calcBoundsOfAllItems } from "../../../canvas/utils/calcBoundsOfAllItems";
 
 /**
  * Calculate the minimap scale factor based on canvas bounds and minimap size
@@ -165,17 +165,17 @@ export const calculateCombinedCanvasBounds = (
 	}
 
 	// Calculate bounds of all items
-	const itemBounds = calcCanvasBounds(items);
+	const itemBounds = calcBoundsOfAllItems(items);
 
 	// Combine item bounds with viewport bounds
-	const combinedLeft = Math.min(itemBounds.x, viewportBounds.x);
-	const combinedTop = Math.min(itemBounds.y, viewportBounds.y);
+	const combinedLeft = Math.min(itemBounds.left, viewportBounds.x);
+	const combinedTop = Math.min(itemBounds.top, viewportBounds.y);
 	const combinedRight = Math.max(
-		itemBounds.x + itemBounds.width,
+		itemBounds.right,
 		viewportBounds.x + viewportBounds.width,
 	);
 	const combinedBottom = Math.max(
-		itemBounds.y + itemBounds.height,
+		itemBounds.bottom,
 		viewportBounds.y + viewportBounds.height,
 	);
 
