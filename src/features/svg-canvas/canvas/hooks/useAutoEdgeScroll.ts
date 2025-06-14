@@ -162,7 +162,7 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 			scrollIntervalRef.current = setInterval(() => {
 				// Check if diagram is still changing before continuing
 				const { canvasState } = refBus.current.props;
-				if (!canvasState.isDiagramChanging) {
+				if (shouldStopAutoScroll(canvasState)) {
 					clearScrollInterval();
 					return;
 				}
