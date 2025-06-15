@@ -120,14 +120,11 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 			containerHeight,
 			zoom,
 		],
-	);
-
-	// State to track if pointer is down and drag offset
+	); // State to track if pointer is down and drag offset
 	const [isPointerDown, setIsPointerDown] = useState(false);
 	const [dragOffsetRatio, setDragOffsetRatio] = useState({ x: 0, y: 0 });
 	const [hasDragged, setHasDragged] = useState(false);
 	const svgRef = useRef<SVGSVGElement>(null);
-
 	const handleClick = useCallback(
 		(e: React.MouseEvent<SVGSVGElement>) => {
 			// Only navigate on click if no drag operation occurred
@@ -137,50 +134,44 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 		},
 		[handleNavigate, hasDragged],
 	);
-
-	const handlePointerDown = useCallback(
-		(e: React.PointerEvent<SVGSVGElement>) => {
+	// ViewportIndicator specific handlers
+	const handleViewportPointerDown = useCallback(
+		(e: React.PointerEvent<SVGRectElement>) => {
+			e.stopPropagation();
 			setIsPointerDown(true);
-			setHasDragged(false);
+			setHasDragged(false); // Set pointer capture on the ViewportIndicator element itself
 			e.currentTarget.setPointerCapture(e.pointerId);
 
-			// Calculate offset from pointer position to viewport center
-			const rect = e.currentTarget.getBoundingClientRect();
+			// Calculate relative position within viewport (0 to 1)
+			const svgElement = e.currentTarget.ownerSVGElement;
+			const rect = svgElement?.getBoundingClientRect();
+			if (!rect) return;
+
 			const clickX = e.clientX - rect.left;
 			const clickY = e.clientY - rect.top;
 
-			// Check if click is within ViewportIndicator bounds
-			const isWithinViewport =
-				clickX >= viewportRect.x &&
-				clickX <= viewportRect.x + viewportRect.width &&
-				clickY >= viewportRect.y &&
-				clickY <= viewportRect.y + viewportRect.height;
+			const relativeX = (clickX - viewportRect.x) / viewportRect.width;
+			const relativeY = (clickY - viewportRect.y) / viewportRect.height;
 
-			if (isWithinViewport) {
-				// Calculate relative position within viewport (0 to 1)
-				const relativeX = (clickX - viewportRect.x) / viewportRect.width;
-				const relativeY = (clickY - viewportRect.y) / viewportRect.height;
-
-				// Store as ratio offset from center (range: -0.5 to 0.5)
-				setDragOffsetRatio({
-					x: relativeX - 0.5,
-					y: relativeY - 0.5,
-				});
-			} else {
-				// When clicking outside viewport, no offset (center the viewport on cursor)
-				setDragOffsetRatio({ x: 0, y: 0 });
-			}
+			// Store as ratio offset from center (range: -0.5 to 0.5)
+			setDragOffsetRatio({
+				x: relativeX - 0.5,
+				y: relativeY - 0.5,
+			});
 		},
 		[viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height],
 	);
-
-	const handlePointerMove = useCallback(
-		(e: React.PointerEvent<SVGSVGElement>) => {
+	const handleViewportPointerMove = useCallback(
+		(e: React.PointerEvent<SVGRectElement>) => {
 			if (!isPointerDown) return;
 
+			e.stopPropagation();
 			setHasDragged(true);
 
-			const rect = e.currentTarget.getBoundingClientRect();
+			const svgElement = e.currentTarget.ownerSVGElement;
+			if (!svgElement) return;
+
+			const rect = svgElement.getBoundingClientRect();
 			const currentX = e.clientX - rect.left;
 			const currentY = e.clientY - rect.top;
 
@@ -233,10 +224,12 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 			onNavigate,
 		],
 	);
-
-	const handlePointerUp = useCallback(
-		(e: React.PointerEvent<SVGSVGElement>) => {
+	const handleViewportPointerUp = useCallback(
+		(e: React.PointerEvent<SVGRectElement>) => {
+			e.stopPropagation();
 			setIsPointerDown(false);
+
+			// Release pointer capture from the ViewportIndicator element
 			e.currentTarget.releasePointerCapture(e.pointerId);
 		},
 		[],
@@ -271,9 +264,6 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 				height={height}
 				viewBox={`0 0 ${width} ${height}`}
 				onClick={handleClick}
-				onPointerDown={handlePointerDown}
-				onPointerMove={handlePointerMove}
-				onPointerUp={handlePointerUp}
 			>
 				{/* Background */}
 				<MiniMapBackground x={0} y={0} width={width} height={height} />
@@ -287,6 +277,9 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 					y={viewportRect.y}
 					width={viewportRect.width}
 					height={viewportRect.height}
+					onPointerDown={handleViewportPointerDown}
+					onPointerMove={handleViewportPointerMove}
+					onPointerUp={handleViewportPointerUp}
 				/>
 			</MiniMapSvg>
 		</MiniMapContainer>
