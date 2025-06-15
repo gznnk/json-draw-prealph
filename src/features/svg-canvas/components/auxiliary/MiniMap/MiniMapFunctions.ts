@@ -261,3 +261,122 @@ export const calculateViewportBounds = (
 		height: viewportHeight,
 	};
 };
+
+/**
+ * Calculate new viewport position for navigation based on click coordinates
+ */
+export const calculateNavigationPosition = (
+	clientX: number,
+	clientY: number,
+	svgElement: SVGSVGElement,
+	canvasBounds: Bounds,
+	scale: number,
+	miniMapWidth: number,
+	miniMapHeight: number,
+	containerWidth: number,
+	containerHeight: number,
+	zoom: number,
+): { minX: number; minY: number } => {
+	const rect = svgElement.getBoundingClientRect();
+	const clickX = clientX - rect.left;
+	const clickY = clientY - rect.top;
+
+	// Transform click coordinates to canvas coordinates
+	const canvasCoords = transformFromMiniMapCoords(
+		clickX,
+		clickY,
+		canvasBounds,
+		scale,
+		miniMapWidth,
+		miniMapHeight,
+	);
+
+	// Calculate new viewport position to center the clicked point
+	const viewportWidth = containerWidth / zoom;
+	const viewportHeight = containerHeight / zoom;
+
+	const newViewportX = canvasCoords.x - viewportWidth / 2;
+	const newViewportY = canvasCoords.y - viewportHeight / 2;
+
+	// Convert back to minX, minY format
+	const newMinX = newViewportX * zoom;
+	const newMinY = newViewportY * zoom;
+
+	return { minX: newMinX, minY: newMinY };
+};
+
+/**
+ * Calculate drag navigation position with offset adjustment
+ */
+export const calculateDragNavigationPosition = (
+	clientX: number,
+	clientY: number,
+	svgElement: SVGSVGElement,
+	dragOffsetRatio: { x: number; y: number },
+	viewportRect: { x: number; y: number; width: number; height: number },
+	canvasBounds: Bounds,
+	scale: number,
+	miniMapWidth: number,
+	miniMapHeight: number,
+	containerWidth: number,
+	containerHeight: number,
+	zoom: number,
+): { minX: number; minY: number } => {
+	const rect = svgElement.getBoundingClientRect();
+	const currentX = clientX - rect.left;
+	const currentY = clientY - rect.top;
+
+	// Calculate dynamic offset based on current viewport size and stored ratio
+	const dynamicOffsetX = dragOffsetRatio.x * viewportRect.width;
+	const dynamicOffsetY = dragOffsetRatio.y * viewportRect.height;
+
+	// Adjust for drag offset to maintain relative position
+	const targetX = currentX - dynamicOffsetX;
+	const targetY = currentY - dynamicOffsetY;
+
+	// Transform target coordinates to canvas coordinates
+	const canvasCoords = transformFromMiniMapCoords(
+		targetX,
+		targetY,
+		canvasBounds,
+		scale,
+		miniMapWidth,
+		miniMapHeight,
+	);
+
+	// Calculate new viewport position to center at target point
+	const viewportWidth = containerWidth / zoom;
+	const viewportHeight = containerHeight / zoom;
+
+	const newViewportX = canvasCoords.x - viewportWidth / 2;
+	const newViewportY = canvasCoords.y - viewportHeight / 2;
+
+	// Convert back to minX, minY format
+	const newMinX = newViewportX * zoom;
+	const newMinY = newViewportY * zoom;
+
+	return { minX: newMinX, minY: newMinY };
+};
+
+/**
+ * Calculate relative position within viewport for drag offset
+ */
+export const calculateDragOffsetRatio = (
+	clientX: number,
+	clientY: number,
+	svgElement: SVGSVGElement,
+	viewportRect: { x: number; y: number; width: number; height: number },
+): { x: number; y: number } => {
+	const rect = svgElement.getBoundingClientRect();
+	const clickX = clientX - rect.left;
+	const clickY = clientY - rect.top;
+
+	const relativeX = (clickX - viewportRect.x) / viewportRect.width;
+	const relativeY = (clickY - viewportRect.y) / viewportRect.height;
+
+	// Store as ratio offset from center (range: -0.5 to 0.5)
+	return {
+		x: relativeX - 0.5,
+		y: relativeY - 0.5,
+	};
+};

@@ -5,11 +5,13 @@ import type React from "react";
 // Imports related to this component.
 import {
 	calculateCombinedCanvasBounds,
+	calculateDragNavigationPosition,
+	calculateDragOffsetRatio,
 	calculateMiniMapScale,
+	calculateNavigationPosition,
 	calculateViewportBounds,
 	calculateViewportRect,
 	generateMiniMapItems,
-	transformFromMiniMapCoords,
 } from "./MiniMapFunctions";
 import {
 	MiniMapBackground,
@@ -77,36 +79,23 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 		width,
 		height,
 	]);
-
-	// Handle click on minimap to navigate
+	// Handle navigation based on click coordinates
 	const handleNavigate = useCallback(
 		(clientX: number, clientY: number, svgElement: SVGSVGElement) => {
 			if (!onNavigate) return;
 
-			const rect = svgElement.getBoundingClientRect();
-			const clickX = clientX - rect.left;
-			const clickY = clientY - rect.top;
-
-			// Transform click coordinates to canvas coordinates
-			const canvasCoords = transformFromMiniMapCoords(
-				clickX,
-				clickY,
+			const { minX: newMinX, minY: newMinY } = calculateNavigationPosition(
+				clientX,
+				clientY,
+				svgElement,
 				canvasBounds,
 				scale,
 				width,
 				height,
+				containerWidth,
+				containerHeight,
+				zoom,
 			);
-
-			// Calculate new viewport position to center the clicked point
-			const viewportWidth = containerWidth / zoom;
-			const viewportHeight = containerHeight / zoom;
-
-			const newViewportX = canvasCoords.x - viewportWidth / 2;
-			const newViewportY = canvasCoords.y - viewportHeight / 2;
-
-			// Convert back to minX, minY format
-			const newMinX = newViewportX * zoom;
-			const newMinY = newViewportY * zoom;
 
 			onNavigate(newMinX, newMinY);
 		},
@@ -120,11 +109,15 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 			containerHeight,
 			zoom,
 		],
-	); // State to track if pointer is down and drag offset
+	);
+
+	// State management for drag operations
 	const [isPointerDown, setIsPointerDown] = useState(false);
 	const [dragOffsetRatio, setDragOffsetRatio] = useState({ x: 0, y: 0 });
 	const [hasDragged, setHasDragged] = useState(false);
 	const svgRef = useRef<SVGSVGElement>(null);
+
+	// Click handler for minimap navigation
 	const handleClick = useCallback(
 		(e: React.MouseEvent<SVGSVGElement>) => {
 			// Only navigate on click if no drag operation occurred
@@ -137,32 +130,28 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 		},
 		[handleNavigate, hasDragged],
 	);
-	// ViewportIndicator specific handlers
+
+	// ViewportIndicator event handlers
 	const handleViewportPointerDown = useCallback(
 		(e: React.PointerEvent<SVGRectElement>) => {
 			e.stopPropagation();
 			setIsPointerDown(true);
-			setHasDragged(false); // Set pointer capture on the ViewportIndicator element itself
+			setHasDragged(false);
 			e.currentTarget.setPointerCapture(e.pointerId);
 
-			// Calculate relative position within viewport (0 to 1)
+			// Calculate relative position within viewport using pure function
 			const svgElement = e.currentTarget.ownerSVGElement;
-			const rect = svgElement?.getBoundingClientRect();
-			if (!rect) return;
+			if (!svgElement) return;
 
-			const clickX = e.clientX - rect.left;
-			const clickY = e.clientY - rect.top;
-
-			const relativeX = (clickX - viewportRect.x) / viewportRect.width;
-			const relativeY = (clickY - viewportRect.y) / viewportRect.height;
-
-			// Store as ratio offset from center (range: -0.5 to 0.5)
-			setDragOffsetRatio({
-				x: relativeX - 0.5,
-				y: relativeY - 0.5,
-			});
+			const offsetRatio = calculateDragOffsetRatio(
+				e.clientX,
+				e.clientY,
+				svgElement,
+				viewportRect,
+			);
+			setDragOffsetRatio(offsetRatio);
 		},
-		[viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height],
+		[viewportRect],
 	);
 	const handleViewportPointerMove = useCallback(
 		(e: React.PointerEvent<SVGRectElement>) => {
@@ -174,38 +163,21 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 			const svgElement = e.currentTarget.ownerSVGElement;
 			if (!svgElement) return;
 
-			const rect = svgElement.getBoundingClientRect();
-			const currentX = e.clientX - rect.left;
-			const currentY = e.clientY - rect.top;
-
-			// Calculate dynamic offset based on current viewport size and stored ratio
-			const dynamicOffsetX = dragOffsetRatio.x * viewportRect.width;
-			const dynamicOffsetY = dragOffsetRatio.y * viewportRect.height;
-
-			// Adjust for drag offset to maintain relative position
-			const targetX = currentX - dynamicOffsetX;
-			const targetY = currentY - dynamicOffsetY;
-
-			// Transform target coordinates to canvas coordinates
-			const canvasCoords = transformFromMiniMapCoords(
-				targetX,
-				targetY,
+			// Calculate new navigation position using pure function
+			const { minX: newMinX, minY: newMinY } = calculateDragNavigationPosition(
+				e.clientX,
+				e.clientY,
+				svgElement,
+				dragOffsetRatio,
+				viewportRect,
 				canvasBounds,
 				scale,
 				width,
 				height,
+				containerWidth,
+				containerHeight,
+				zoom,
 			);
-
-			// Calculate new viewport position to center at target point
-			const viewportWidth = containerWidth / zoom;
-			const viewportHeight = containerHeight / zoom;
-
-			const newViewportX = canvasCoords.x - viewportWidth / 2;
-			const newViewportY = canvasCoords.y - viewportHeight / 2;
-
-			// Convert back to minX, minY format
-			const newMinX = newViewportX * zoom;
-			const newMinY = newViewportY * zoom;
 
 			if (onNavigate) {
 				onNavigate(newMinX, newMinY);
@@ -213,10 +185,8 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 		},
 		[
 			isPointerDown,
-			dragOffsetRatio.x,
-			dragOffsetRatio.y,
-			viewportRect.width,
-			viewportRect.height,
+			dragOffsetRatio,
+			viewportRect,
 			canvasBounds,
 			scale,
 			width,
@@ -227,6 +197,7 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 			onNavigate,
 		],
 	);
+
 	const handleViewportPointerUp = useCallback(
 		(e: React.PointerEvent<SVGRectElement>) => {
 			e.stopPropagation();
@@ -249,7 +220,7 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 		[],
 	);
 
-	// Render minimap items
+	// Generate minimap items for rendering
 	const miniMapItems = useMemo(() => {
 		const itemData = generateMiniMapItems(
 			items,
