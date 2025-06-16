@@ -3,7 +3,7 @@ import type { Diagram } from "../../../types/data/catalog/Diagram";
 import { newId } from "../../../utils/shapes/common/newId";
 
 // Imports related to this component.
-import { DEFAULT_SVG_DATA } from "./SvgConstants";
+import { DEFAULT_SVG_DATA } from "../../../constants/DefaultData";
 import type { SvgData } from "../../../types/data/shapes/SvgData";
 
 export const createSvgData = ({

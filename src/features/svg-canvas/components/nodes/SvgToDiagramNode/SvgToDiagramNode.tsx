@@ -7,9 +7,12 @@ import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { SvgToDiagramNodeProps } from "../../../types/props/nodes/SvgToDiagramNodeProps";
 
 // Import components related to SvgCanvas.
-import { DEFAULT_RECTANGLE_DATA, Rectangle } from "../../shapes/Rectangle";
+import { Rectangle } from "../../shapes/Rectangle";
 import { Gachapon } from "../../icons/Gachapon";
 import { IconContainer } from "../../core/IconContainer";
+
+// Import constants.
+import { DEFAULT_RECTANGLE_DATA } from "../../../constants/DefaultData";
 
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";

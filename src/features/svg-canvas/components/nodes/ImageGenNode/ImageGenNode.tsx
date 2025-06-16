@@ -11,7 +11,10 @@ import type { ImageGenNodeProps } from "../../../types/props/nodes/ImageGenNodeP
 // Import components.
 import { IconContainer } from "../../core/IconContainer";
 import { Picture } from "../../icons/Picture";
-import { DEFAULT_RECTANGLE_DATA, Rectangle } from "../../shapes/Rectangle";
+import { Rectangle } from "../../shapes/Rectangle";
+
+// Import constants.
+import { DEFAULT_RECTANGLE_DATA } from "../../../constants/DefaultData";
 
 // Import hooks.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";

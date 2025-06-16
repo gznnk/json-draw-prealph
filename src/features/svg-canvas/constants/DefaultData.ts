@@ -8,6 +8,11 @@ import type { ItemableData } from "../types/data/core/ItemableData";
 import type { SelectableData } from "../types/data/core/SelectableData";
 import type { TransformativeData } from "../types/data/core/TransformativeData";
 import type { TextableData } from "../types/data/core/TextableData";
+import type { RectangleData } from "../types/data/shapes/RectangleData";
+import type { EllipseData } from "../types/data/shapes/EllipseData";
+import type { ImageData } from "../types/data/shapes/ImageData";
+import type { SvgData } from "../types/data/shapes/SvgData";
+import type { PathData } from "../types/data/shapes/PathData";
 
 /**
  * Default diagram base data.
@@ -85,3 +90,68 @@ export const DEFAULT_TEXTABLE_DATA = {
 	verticalAlign: "center",
 	isTextEditing: false,
 } as const satisfies TextableData;
+
+/**
+ * Default rectangle data.
+ */
+export const DEFAULT_RECTANGLE_DATA = {
+	...DEFAULT_DIAGRAM_BASE_DATA,
+	...DEFAULT_SELECTABLE_DATA,
+	...DEFAULT_TRANSFORMATIVE_DATA,
+	...DEFAULT_CONNECTABLE_DATA,
+	...DEFAULT_STROKABLE_DATA,
+	...DEFAULT_FILLABLE_DATA,
+	...DEFAULT_TEXTABLE_DATA,
+	type: "Rectangle",
+	radius: 0,
+} as const satisfies RectangleData;
+
+/**
+ * Default ellipse data.
+ */
+export const DEFAULT_ELLIPSE_DATA = {
+	...DEFAULT_DIAGRAM_BASE_DATA,
+	...DEFAULT_SELECTABLE_DATA,
+	...DEFAULT_TRANSFORMATIVE_DATA,
+	...DEFAULT_CONNECTABLE_DATA,
+	...DEFAULT_STROKABLE_DATA,
+	...DEFAULT_FILLABLE_DATA,
+	...DEFAULT_TEXTABLE_DATA,
+	type: "Ellipse",
+} as const satisfies EllipseData;
+
+/**
+ * Default image data.
+ */
+export const DEFAULT_IMAGE_DATA = {
+	...DEFAULT_DIAGRAM_BASE_DATA,
+	...DEFAULT_SELECTABLE_DATA,
+	...DEFAULT_TRANSFORMATIVE_DATA,
+	type: "Image",
+	base64Data: "",
+} as const satisfies ImageData;
+
+/**
+ * Default svg data.
+ */
+export const DEFAULT_SVG_DATA = {
+	...DEFAULT_DIAGRAM_BASE_DATA,
+	...DEFAULT_SELECTABLE_DATA,
+	...DEFAULT_TRANSFORMATIVE_DATA,
+	type: "Svg",
+	initialWidth: 100,
+	initialHeight: 100,
+	svgText: "",
+} as const satisfies SvgData;
+
+/**
+ * Default path data.
+ */
+export const DEFAULT_PATH_DATA = {
+	...DEFAULT_DIAGRAM_BASE_DATA,
+	...DEFAULT_SELECTABLE_DATA,
+	...DEFAULT_TRANSFORMATIVE_DATA,
+	...DEFAULT_ITEMABLE_DATA,
+	...DEFAULT_STROKABLE_DATA,
+	type: "Path",
+} as const satisfies PathData;
