@@ -2,10 +2,8 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import {
-	type SvgCanvasScrollEvent,
-	SVG_CANVAS_SCROLL_EVENT_NAME,
-} from "../../../types/events/SvgCanvasScrollEvent";
+import type { SvgCanvasScrollEvent } from "../../../types/events/SvgCanvasScrollEvent";
+import { EVENT_NAME_SVG_CANVAS_SCROLL } from "../../../constants/EventNames";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
 /**
@@ -31,7 +29,7 @@ export const useScroll = (props: CanvasHooksProps) => {
 
 		// Dispatch a custom event with scroll position.
 		document.dispatchEvent(
-			new CustomEvent(SVG_CANVAS_SCROLL_EVENT_NAME, {
+			new CustomEvent(EVENT_NAME_SVG_CANVAS_SCROLL, {
 				bubbles: true,
 				detail: e,
 			}),

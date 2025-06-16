@@ -3,7 +3,7 @@ import type { PathData } from "../../../../types/data/shapes/PathData";
 import type { EventBus } from "../../../../../../shared/event-bus/EventBus";
 
 // Imports related to this component.
-import { NEW_CONNECT_LINE_EVENT_NAME } from "./NewConnectLineConstants";
+import { EVENT_NAME_NEW_CONNECT_LINE } from "../../../../constants/EventNames";
 
 /**
  * Function to trigger a new connection line event.
@@ -16,7 +16,7 @@ export const triggerNewConnectLine = (
 	pathData?: PathData,
 ) => {
 	eventBus.dispatchEvent(
-		new CustomEvent(NEW_CONNECT_LINE_EVENT_NAME, {
+		new CustomEvent(EVENT_NAME_NEW_CONNECT_LINE, {
 			detail: {
 				data: pathData,
 			},

@@ -2,10 +2,8 @@
 import { useCallback, useEffect, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import {
-	type SvgCanvasScrollEvent,
-	SVG_CANVAS_SCROLL_EVENT_NAME,
-} from "../../../types/events/SvgCanvasScrollEvent";
+import type { SvgCanvasScrollEvent } from "../../../types/events/SvgCanvasScrollEvent";
+import { EVENT_NAME_SVG_CANVAS_SCROLL } from "../../../constants/EventNames";
 import {
 	AUTO_SCROLL_INTERVAL_MS,
 	AUTO_SCROLL_STEP_SIZE,
@@ -124,7 +122,7 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 			};
 
 			document.dispatchEvent(
-				new CustomEvent(SVG_CANVAS_SCROLL_EVENT_NAME, {
+				new CustomEvent(EVENT_NAME_SVG_CANVAS_SCROLL, {
 					bubbles: true,
 					detail: scrollEvent,
 				}),

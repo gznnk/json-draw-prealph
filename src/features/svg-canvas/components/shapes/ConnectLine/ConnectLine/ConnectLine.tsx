@@ -20,7 +20,7 @@ import { newId } from "../../../../utils/shapes/common/newId";
 import { radiansToDegrees } from "../../../../utils/math/common/radiansToDegrees";
 
 // Imports related to this component.
-import { EVENT_NAME_CONNECT_POINTS_MOVE } from "./ConnectLineConstants";
+import { EVENT_NAME_CONNECT_POINTS_MOVE } from "../../../../constants/EventNames";
 
 // Import SvgCanvas context.
 import { SvgCanvasContext } from "../../../../canvas/SvgCanvasContext";

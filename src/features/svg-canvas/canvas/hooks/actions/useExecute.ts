@@ -3,7 +3,7 @@ import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
-import { EXECUTION_PROPAGATION_EVENT_NAME } from "../../../types/events/Constants";
+import { EVENT_NAME_EXECUTION_PROPAGATION } from "../../../constants/EventNames";
 import type { ExecuteEvent } from "../../../types/events/ExecuteEvent";
 import type { ExecutionPropagationEvent } from "../../../types/events/ExecutionPropagationEvent";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
@@ -45,7 +45,7 @@ export const useExecute = (props: CanvasHooksProps) => {
 		} as ExecutionPropagationEvent;
 
 		document.dispatchEvent(
-			new CustomEvent(EXECUTION_PROPAGATION_EVENT_NAME, {
+			new CustomEvent(EVENT_NAME_EXECUTION_PROPAGATION, {
 				detail,
 			}),
 		);

@@ -7,13 +7,16 @@ graph TD
     utils --> types
     utils --> registry
     hooks --> types
+    hooks --> constants
     hooks --> utils
     hooks --> registry
     components --> types
+    components --> constants
     components --> utils
     components --> hooks
     components --> registry
     canvas --> types
+    canvas --> constants
     canvas --> utils
     canvas --> hooks
     canvas --> components

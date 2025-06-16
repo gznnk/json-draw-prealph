@@ -11,10 +11,7 @@ import type { DiagramDragEvent } from "../types/events/DiagramDragEvent";
 import type { DiagramHoverEvent } from "../types/events/DiagramHoverEvent";
 import type { DiagramPointerEvent } from "../types/events/DiagramPointerEvent";
 import type { EventType } from "../types/events/EventType";
-import {
-	type SvgCanvasScrollEvent,
-	SVG_CANVAS_SCROLL_EVENT_NAME,
-} from "../types/events/SvgCanvasScrollEvent";
+import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
 
 // Import utils.
 import { newEventId } from "../utils/common/newEventId";
@@ -22,8 +19,11 @@ import { newEventId } from "../utils/common/newEventId";
 // Import EventBus.
 import type { EventBus } from "../../../shared/event-bus/EventBus";
 
-/** 全体通知用ドラッグイベントの名前 */
-const EVENT_NAME_BROADCAST_DRAG = "BroadcastDrag";
+// Import event names
+import {
+	EVENT_NAME_BROADCAST_DRAG,
+	EVENT_NAME_SVG_CANVAS_SCROLL,
+} from "../constants/EventNames";
 
 /** ドラッグのあそび */
 const DRAG_DEAD_ZONE = 5;
@@ -686,7 +686,7 @@ export const useDrag = (props: DragProps) => {
 				});
 			};
 			document.addEventListener(
-				SVG_CANVAS_SCROLL_EVENT_NAME,
+				EVENT_NAME_SVG_CANVAS_SCROLL,
 				handleSvgCanvasScroll,
 				true,
 			);
@@ -694,7 +694,7 @@ export const useDrag = (props: DragProps) => {
 		return () => {
 			if (handleSvgCanvasScroll) {
 				document.removeEventListener(
-					SVG_CANVAS_SCROLL_EVENT_NAME,
+					EVENT_NAME_SVG_CANVAS_SCROLL,
 					handleSvgCanvasScroll,
 					true,
 				);

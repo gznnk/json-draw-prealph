@@ -7,7 +7,7 @@ import type { PathData } from "../../../../types/data/shapes/PathData";
 import type { EventBus } from "../../../../../../shared/event-bus/EventBus";
 
 // Import related to this component.
-import { NEW_CONNECT_LINE_EVENT_NAME } from "./NewConnectLineConstants";
+import { EVENT_NAME_NEW_CONNECT_LINE } from "../../../../constants/EventNames";
 import type { NewConnectLineEvent } from "./NewConnectLineTypes";
 
 type NewConnectLineProps = {
@@ -32,12 +32,12 @@ const NewConnectLineComponent: React.FC<NewConnectLineProps> = ({
 		};
 
 		eventBus.addEventListener(
-			NEW_CONNECT_LINE_EVENT_NAME,
+			EVENT_NAME_NEW_CONNECT_LINE,
 			handleNewConnectLine,
 		);
 		return () => {
 			eventBus.removeEventListener(
-				NEW_CONNECT_LINE_EVENT_NAME,
+				EVENT_NAME_NEW_CONNECT_LINE,
 				handleNewConnectLine,
 			);
 		};
