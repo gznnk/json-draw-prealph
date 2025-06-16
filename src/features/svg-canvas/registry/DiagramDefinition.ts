@@ -1,6 +1,6 @@
 import type { DiagramType } from "../types/base/DiagramType";
 import type { ConnectPointMoveData } from "../types/events/ConnectPointMoveData";
-import type { Diagram } from "../catalog/DiagramTypes";
+import type { Diagram } from "../types/data/catalog/Diagram";
 
 /**
  * Definition of a diagram that includes all necessary functions and components.

@@ -1,4 +1,4 @@
-import type { Diagram } from "../../catalog/DiagramTypes";
+import type { Diagram } from "../../types/data/catalog/Diagram";
 import { calcBoundsOfGroup } from "../../components/shapes/Group";
 import { isItemableData } from "../../utils/validation/isItemableData";
 import { applyRecursive } from "./applyRecursive";

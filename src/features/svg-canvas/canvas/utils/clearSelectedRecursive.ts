@@ -1,4 +1,4 @@
-import type { Diagram } from "../../catalog/DiagramTypes";
+import type { Diagram } from "../../types/data/catalog/Diagram";
 import { isSelectableData } from "../../utils/validation/isSelectableData";
 import { applyRecursive } from "./applyRecursive";
 

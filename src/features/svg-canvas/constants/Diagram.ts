@@ -1,6 +1,6 @@
 import type { ConnectPointData } from "../types/data/shapes/ConnectPointData";
 import type { ConnectableData } from "../types/data/shapes/ConnectableData";
-import type { Diagram } from "../catalog/DiagramTypes";
+import type { Diagram } from "../types/data/catalog/Diagram";
 import type { DiagramBaseData } from "../types/base/DiagramBaseData";
 import type { FillableData } from "../types/data/core/FillableData";
 import type { StrokableData } from "../types/data/core/StrokableData";

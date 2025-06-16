@@ -2,7 +2,7 @@
 import { createContext } from "react";
 
 // SvgCanvas関連型定義をインポート
-import type { Diagram } from "../catalog/DiagramTypes";
+import type { Diagram } from "../types/data/catalog/Diagram";
 
 // SvgCanvas関連関数をインポート
 import { getDiagramById } from "./utils/getDiagramById";

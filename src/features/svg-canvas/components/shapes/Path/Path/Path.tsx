@@ -3,7 +3,7 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
-import type { Diagram } from "../../../../catalog/DiagramTypes";
+import type { Diagram } from "../../../../types/data/catalog/Diagram";
 import type { DiagramBaseData } from "../../../../types/base/DiagramBaseData";
 import type { PathData } from "../../../../types/data/shapes/PathData";
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";

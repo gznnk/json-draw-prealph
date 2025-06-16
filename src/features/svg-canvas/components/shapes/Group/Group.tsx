@@ -2,7 +2,7 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
-import type { Diagram } from "../../../catalog/DiagramTypes";
+import type { Diagram } from "../../../types/data/catalog/Diagram";
 import { DiagramRegistry } from "../../../registry";
 import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEvent";
 import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";

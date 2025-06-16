@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 // Import types related to SvgCanvas.
 import type { ConnectLineData } from "../../../../types/data/shapes/ConnectLineData";
 import type { PathPointData } from "../../../../types/data/shapes/PathPointData";
-import type { Diagram } from "../../../../catalog/DiagramTypes";
+import type { Diagram } from "../../../../types/data/catalog/Diagram";
 import type { ConnectableData } from "../../../../types/data/shapes/ConnectableData";
 import type { ConnectNodesEvent } from "../../../../types/events/ConnectNodesEvent";
 import type { CanvasHooksProps } from "../../../SvgCanvasTypes";

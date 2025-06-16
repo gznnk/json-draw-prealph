@@ -3,7 +3,7 @@ import type React from "react";
 import { memo, useCallback, useContext, useEffect, useRef } from "react";
 
 // Import types.
-import type { Diagram } from "../../../../catalog/DiagramTypes";
+import type { Diagram } from "../../../../types/data/catalog/Diagram";
 import type { ConnectLineProps } from "../../../../types/props/shapes/ConnectLineProps";
 import type { ConnectPointMoveData } from "../../../../types/events/ConnectPointMoveData";
 import type { ConnectPointsMoveEvent } from "../../../../types/events/ConnectPointsMoveEvent";

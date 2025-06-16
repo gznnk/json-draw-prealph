@@ -1,5 +1,5 @@
 import type { Bounds } from "../../../types/base/Bounds";
-import type { Diagram } from "../../../catalog/DiagramTypes";
+import type { Diagram } from "../../../types/data/catalog/Diagram";
 import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { calcBoundsOfAllItems } from "../../../canvas/utils/calcBoundsOfAllItems";
