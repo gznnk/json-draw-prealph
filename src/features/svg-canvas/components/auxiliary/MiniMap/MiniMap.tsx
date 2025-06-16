@@ -9,8 +9,8 @@ import {
 	calculateDragOffsetRatio,
 	calculateMiniMapScale,
 	calculateNavigationPosition,
-	calculateViewportBounds,
-	calculateViewportRect,
+	calculateCanvasViewportBounds,
+	calculateMiniMapViewportIndicatorBounds,
 	generateMiniMapItems,
 } from "./MiniMapFunctions";
 import {
@@ -39,7 +39,7 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 }) => {
 	// Calculate all minimap properties in a single memoized computation for efficiency
 	const { canvasBounds, scale, viewportRect } = useMemo(() => {
-		const viewportBounds = calculateViewportBounds(
+		const viewportBounds = calculateCanvasViewportBounds(
 			minX,
 			minY,
 			containerWidth,
@@ -49,7 +49,7 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 
 		const bounds = calculateCombinedCanvasBounds(items, viewportBounds);
 		const computedScale = calculateMiniMapScale(bounds, width, height);
-		const rect = calculateViewportRect(
+		const rect = calculateMiniMapViewportIndicatorBounds(
 			minX,
 			minY,
 			containerWidth,
