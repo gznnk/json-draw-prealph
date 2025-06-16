@@ -6,7 +6,7 @@ import {
 	DEFAULT_TRANSFORMATIVE_DATA,
 	DEFAULT_ITEMABLE_DATA,
 	DEFAULT_STROKABLE_DATA,
-} from "../../../../constants/Diagram";
+} from "../../../../constants/DefaultData";
 
 /**
  * Default path data.

@@ -4,7 +4,7 @@ import {
 	DEFAULT_DIAGRAM_BASE_DATA,
 	DEFAULT_SELECTABLE_DATA,
 	DEFAULT_TRANSFORMATIVE_DATA,
-} from "../../../constants/Diagram";
+} from "../../../constants/DefaultData";
 
 /**
  * Default svg data.

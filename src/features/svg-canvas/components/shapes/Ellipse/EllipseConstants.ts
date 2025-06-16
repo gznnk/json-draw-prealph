@@ -8,7 +8,7 @@ import {
 	DEFAULT_STROKABLE_DATA,
 	DEFAULT_TEXTABLE_DATA,
 	DEFAULT_TRANSFORMATIVE_DATA,
-} from "../../../constants/Diagram";
+} from "../../../constants/DefaultData";
 
 /**
  * Default ellipse data.
