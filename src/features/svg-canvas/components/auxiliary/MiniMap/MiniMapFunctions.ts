@@ -13,7 +13,7 @@ export const calculateViewportBounds = (
 	containerWidth: number,
 	containerHeight: number,
 	zoom: number,
-): { x: number; y: number; width: number; height: number } => {
+): Bounds => {
 	const viewportWidth = containerWidth / zoom;
 	const viewportHeight = containerHeight / zoom;
 	const viewportLeft = minX / zoom;
@@ -33,12 +33,7 @@ export const calculateViewportBounds = (
  */
 export const calculateCombinedCanvasBounds = (
 	items: Diagram[],
-	viewportBounds: {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	},
+	viewportBounds: Bounds,
 ): Bounds => {
 	if (items.length === 0) {
 		// If no items, use viewport bounds
