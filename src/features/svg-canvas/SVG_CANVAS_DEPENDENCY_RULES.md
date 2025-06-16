@@ -27,6 +27,7 @@ graph TD
     data --> base
     events --> base
     events --> data
+    props --> base
     props --> data
     props --> events
 ```
