@@ -42,13 +42,6 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 			isCtrlPressed,
 		} = refBus.current;
 
-		// Override isMultiSelect based on Ctrl key state if isCtrlPressed is provided
-		const actualEvent = {
-			...e,
-			isMultiSelect:
-				isCtrlPressed !== undefined ? isCtrlPressed : e.isMultiSelect,
-		};
-
 		setCanvasState((prevState) => {
 			// Update the selected state of the items.
 			let items = applyRecursive(prevState.items, (item) => {
@@ -57,13 +50,12 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 					return item;
 				}
 
-				if (item.id === actualEvent.id) {
-					if (actualEvent.isMultiSelect) {
+				if (item.id === e.id) {
+					if (isCtrlPressed) {
 						// When multiple selection, toggle the selection state of the selected diagram.
 						return {
 							...item,
 							isSelected: !item.isSelected,
-							showOutline: false, // Clear outline when selecting
 						};
 					}
 
@@ -71,11 +63,10 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 					return {
 						...item,
 						isSelected: true,
-						showOutline: false, // Clear outline when selecting
 					};
 				}
 
-				if (actualEvent.isMultiSelect && item.isSelected) {
+				if (isCtrlPressed && item.isSelected) {
 					// When multiple selection, do not change the selection state of the selected diagram.
 					return item;
 				}
@@ -85,7 +76,6 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 					// When single selection, clear the selection state of all diagrams except the selected one.
 					isSelected: false,
 					isMultiSelectSource: false,
-					showOutline: false, // Clear outline when selecting
 				};
 			});
 
@@ -138,7 +128,6 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 						return {
 							...item,
 							isMultiSelectSource: false,
-							showOutline: false, // Clear outline when not in multi-select
 						};
 					}
 					return item;
@@ -149,7 +138,7 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 				...prevState,
 				items,
 				multiSelectGroup,
-				selectedItemId: actualEvent.id,
+				selectedItemId: e.id,
 			};
 		});
 	}, []);

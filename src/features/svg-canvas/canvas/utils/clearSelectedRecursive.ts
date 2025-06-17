@@ -15,7 +15,6 @@ export const clearSelectedRecursive = (items: Diagram[]) => {
 					...item,
 					isSelected: false,
 					isMultiSelectSource: false,
-					showOutline: false, // Clear outline when clearing selection
 				}
 			: item,
 	);

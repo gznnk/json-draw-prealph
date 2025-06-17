@@ -129,7 +129,6 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 				onSelect({
 					eventId: newEventId(),
 					id: itemsToSelect[0],
-					isMultiSelect: false,
 				});
 
 				// Add remaining items with multi-select
@@ -137,7 +136,6 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 					onSelect({
 						eventId: newEventId(),
 						id: itemsToSelect[i],
-						isMultiSelect: true,
 					});
 				}
 			}
@@ -230,12 +228,14 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 
 	const onUpdateAreaSelection = useCallback(
 		(clientX: number, clientY: number) => {
+			const { selectionState } = refBus.current;
+
 			const { x, y } = clientToCanvasCoords(clientX, clientY);
 
 			const newSelectionState = {
 				isSelecting: true,
-				startX: refBus.current.selectionState.startX,
-				startY: refBus.current.selectionState.startY,
+				startX: selectionState.startX,
+				startY: selectionState.startY,
 				endX: x,
 				endY: y,
 			};
@@ -249,12 +249,12 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 	);
 
 	const onEndAreaSelection = useCallback(() => {
-		const { selectionState: currentSelectionState } = refBus.current;
+		const { selectionState } = refBus.current;
 
-		if (!currentSelectionState.isSelecting) return;
+		if (!selectionState.isSelecting) return;
 
 		// Update items selection with current selection bounds
-		updateItemsSelection(currentSelectionState);
+		updateItemsSelection(selectionState);
 
 		// Clear outline display for all items
 		clearOutlineDisplay();
