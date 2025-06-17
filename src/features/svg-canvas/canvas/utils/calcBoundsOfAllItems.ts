@@ -1,5 +1,5 @@
 import type { Diagram } from "../../types/data/catalog/Diagram";
-import { calcBoundsOfGroup } from "../../components/shapes/Group";
+import { calcBoundsOfGroup } from "../../utils/shapes/group/calcBoundsOfGroup";
 import type { Box } from "../../types/base/Box";
 import { isItemableData } from "../../utils/validation/isItemableData";
 import { isTransformativeData } from "../../utils/validation/isTransformativeData";

@@ -3,7 +3,7 @@ import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { GroupData } from "../../../types/data/shapes/GroupData";
 
 // Import utils.
-import { calcGroupBoxOfNoRotation } from "../../../components/shapes/Group";
+import { calcGroupBoxOfNoRotation } from "../group/calcGroupBoxOfNoRotation";
 import { nanToZero } from "../../math/common/nanToZero";
 import { newId } from "../common/newId";
 

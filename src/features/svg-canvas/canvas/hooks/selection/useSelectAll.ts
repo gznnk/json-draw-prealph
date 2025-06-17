@@ -7,7 +7,7 @@ import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
 // Import components related to SvgCanvas.
-import { calcGroupBoxOfNoRotation } from "../../../components/shapes/Group";
+import { calcGroupBoxOfNoRotation } from "../../../utils/shapes/group/calcGroupBoxOfNoRotation";
 
 // Import functions related to SvgCanvas.
 import { isSelectableData } from "../../../utils/validation/isSelectableData";

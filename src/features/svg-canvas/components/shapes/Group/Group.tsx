@@ -24,7 +24,7 @@ import { isTransformativeData } from "../../../utils/validation/isTransformative
 import { rotatePoint } from "../../../utils/math/points/rotatePoint";
 
 // Imports related to this component.
-import { getSelectedChildDiagram } from "./GroupFunctions";
+import { getSelectedChildDiagram } from "../../../utils/shapes/group/getSelectedChildDiagram";
 
 /**
  * Group component.

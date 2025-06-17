@@ -6,7 +6,7 @@ import type { GroupData } from "../../../types/data/shapes/GroupData";
 import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEvent";
 
 // Import components related to SvgCanvas.
-import { calcGroupBoxOfNoRotation } from "../../../components/shapes/Group/GroupFunctions";
+import { calcGroupBoxOfNoRotation } from "../../../utils/shapes/group/calcGroupBoxOfNoRotation";
 
 // Import functions related to SvgCanvas.
 import { applyMultiSelectSourceRecursive } from "../../utils/applyMultiSelectSourceRecursive";

@@ -10,7 +10,7 @@ import type { Shape } from "../../../types/base/Shape";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { calcGroupBoxOfNoRotation } from "../../../components/shapes/Group/GroupFunctions";
+import { calcGroupBoxOfNoRotation } from "../../../utils/shapes/group/calcGroupBoxOfNoRotation";
 import { newId } from "../../../utils/shapes/common/newId";
 import { isConnectableData } from "../../../utils/validation/isConnectableData";
 import { isItemableData } from "../../../utils/validation/isItemableData";
