@@ -1,5 +1,5 @@
 import type { Diagram } from "../../types/data/catalog/Diagram";
-import { calcBoundsOfGroup } from "../../utils/shapes/group/calcBoundsOfGroup";
+import { calcGroupOrientedBox } from "../../utils/shapes/group/calcGroupOrientedBox";
 import type { Box } from "../../types/base/Box";
 import { isItemableData } from "../../utils/validation/isItemableData";
 import { isTransformativeData } from "../../utils/validation/isTransformativeData";
@@ -23,11 +23,17 @@ export const calcBoundsOfAllItems = (items: Diagram[]): Box => {
 	for (const item of items) {
 		if (isItemableData(item) && item.type === "Group") {
 			// Calculate the bounds of the group.
-			const groupBox = calcBoundsOfGroup(item);
-			box.top = Math.min(box.top, groupBox.y);
-			box.left = Math.min(box.left, groupBox.x);
-			box.right = Math.max(box.right, groupBox.x + groupBox.width);
-			box.bottom = Math.max(box.bottom, groupBox.y + groupBox.height);
+			const groupOrientedBox = calcGroupOrientedBox(item);
+			box.top = Math.min(box.top, groupOrientedBox.y);
+			box.left = Math.min(box.left, groupOrientedBox.x);
+			box.right = Math.max(
+				box.right,
+				groupOrientedBox.x + groupOrientedBox.width,
+			);
+			box.bottom = Math.max(
+				box.bottom,
+				groupOrientedBox.y + groupOrientedBox.height,
+			);
 		} else if (isTransformativeData(item)) {
 			const radians = degreesToRadians(item.rotation);
 			const leftTop = rotatePoint(
