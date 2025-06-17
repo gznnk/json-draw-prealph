@@ -3,7 +3,7 @@ import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { GroupData } from "../../../types/data/shapes/GroupData";
 
 // Import utils.
-import { calcGroupBoundingBoxOfNoRotation } from "../group/calcGroupBoundingBoxOfNoRotation";
+import { calcUnrotatedGroupBoundingBox } from "../group/calcUnrotatedGroupBoundingBox";
 import { nanToZero } from "../../math/common/nanToZero";
 import { newId } from "../common/newId";
 
@@ -45,7 +45,7 @@ export const svgDataToDiagram = (data: string): GroupData => {
 		}
 	}
 
-	const boundingBox = calcGroupBoundingBoxOfNoRotation(newData);
+	const boundingBox = calcUnrotatedGroupBoundingBox(newData);
 
 	const ret = {
 		id: newId(),

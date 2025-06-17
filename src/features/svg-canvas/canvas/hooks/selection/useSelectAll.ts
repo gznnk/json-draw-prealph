@@ -7,7 +7,7 @@ import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
 // Import components related to SvgCanvas.
-import { calcGroupBoundingBoxOfNoRotation } from "../../../utils/shapes/group/calcGroupBoundingBoxOfNoRotation";
+import { calcUnrotatedGroupBoundingBox } from "../../../utils/shapes/group/calcUnrotatedGroupBoundingBox";
 
 // Import functions related to SvgCanvas.
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
@@ -62,9 +62,7 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 				return prevState;
 			}
 
-			const boundingBox = calcGroupBoundingBoxOfNoRotation(
-				multiSelectGroupItems,
-			);
+			const boundingBox = calcUnrotatedGroupBoundingBox(multiSelectGroupItems);
 
 			const multiSelectGroup = {
 				id: MULTI_SELECT_GROUP,
@@ -76,16 +74,16 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 				scaleX: 1,
 				scaleY: 1,
 				keepProportion: prevState.multiSelectGroup?.keepProportion ?? true,
-				isSelected: true, // 褁E��選択用のグループ�E常に選択状態にする
-				isMultiSelectSource: false, // 褁E��選択�E選択�EではなぁE��設宁E
+				isSelected: true, // Multi-select group is always in selected state
+				isMultiSelectSource: false, // Set as not being a multi-select source
 				items: applyRecursive(multiSelectGroupItems, (item) => {
 					if (!isSelectableData(item)) {
 						return item;
 					}
 					return {
 						...item,
-						isSelected: false, // 褁E��選択用のグループ�Eの図形は選択状態を解除
-						isMultiSelectSource: false, // 褁E��選択�E選択�EではなぁE��設宁E
+						isSelected: false, // Shapes in the multi-select group have their selection state cleared
+						isMultiSelectSource: false, // Set as not being a multi-select source
 					};
 				}),
 			} as GroupData;

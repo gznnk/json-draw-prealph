@@ -10,7 +10,7 @@ import type { Shape } from "../../../types/base/Shape";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
-import { calcGroupBoundingBoxOfNoRotation } from "../../../utils/shapes/group/calcGroupBoundingBoxOfNoRotation";
+import { calcUnrotatedGroupBoundingBox } from "../../../utils/shapes/group/calcUnrotatedGroupBoundingBox";
 import { newId } from "../../../utils/shapes/common/newId";
 import { isConnectableData } from "../../../utils/validation/isConnectableData";
 import { isItemableData } from "../../../utils/validation/isItemableData";
@@ -347,7 +347,7 @@ export const usePaste = (props: CanvasHooksProps) => {
 						if (isMultiSelect) {
 							// Create multi-select group
 							const boundingBox =
-								calcGroupBoundingBoxOfNoRotation(pastedNormalItems);
+								calcUnrotatedGroupBoundingBox(pastedNormalItems);
 							multiSelectGroup = {
 								id: MULTI_SELECT_GROUP,
 								type: "Group",

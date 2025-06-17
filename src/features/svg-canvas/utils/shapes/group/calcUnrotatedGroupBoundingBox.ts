@@ -1,36 +1,39 @@
+// Import types.
 import type { Diagram } from "../../../types/data/catalog/Diagram";
+
+// Import utils.
 import { isItemableData } from "../../validation/isItemableData";
 import { calcItemBoundingBoxOfNoGroupRotation } from "./calcItemBoundingBoxOfNoGroupRotation";
 
 /**
- * グループの回転を戻した時の、グループのbounding boxを計算する
+ * Calculates the bounding box of a group when its rotation is reset
  *
- * @param changeItem - グループ内の変更された図形
- * @param items - グループ内の図形リスト
- * @param groupCenterX - グループの中心X座標
- * @param groupCenterY - グループの中心Y座標
- * @param groupRotation - グループの回転角度
- * @returns グループのbounding box
+ * @param items - List of shapes in the group
+ * @param groupCenterX - Group center X coordinate
+ * @param groupCenterY - Group center Y coordinate
+ * @param groupRotation - Group rotation angle
+ * @param changeItem - Changed shape within the group
+ * @returns Group bounding box
  */
-export const calcGroupBoundingBoxOfNoRotation = (
+export const calcUnrotatedGroupBoundingBox = (
 	items: Diagram[],
 	groupCenterX = 0,
 	groupCenterY = 0,
 	groupRotation = 0,
 	changeItem?: Diagram,
 ) => {
-	// グループ内の図形を再帰的に取得し、グループの四辺の座標を計算する
+	// Recursively process shapes in the group and calculate the coordinates of the group's four sides
 	let top = Number.POSITIVE_INFINITY;
 	let left = Number.POSITIVE_INFINITY;
 	let bottom = Number.NEGATIVE_INFINITY;
 	let right = Number.NEGATIVE_INFINITY;
 	for (const item of items) {
-		// ConnectPointは形状の計算に含めない
+		// Exclude ConnectPoint from shape calculations
 		const itemItems = isItemableData<Diagram>(item)
 			? (item.items ?? []).filter((i) => i.type !== "ConnectPoint")
 			: [];
 		if (itemItems.length > 0) {
-			const groupBoundingBox = calcGroupBoundingBoxOfNoRotation(
+			const groupBoundingBox = calcUnrotatedGroupBoundingBox(
 				itemItems,
 				groupCenterX,
 				groupCenterY,

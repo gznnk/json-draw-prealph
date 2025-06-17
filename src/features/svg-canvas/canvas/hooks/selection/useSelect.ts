@@ -6,7 +6,7 @@ import type { GroupData } from "../../../types/data/shapes/GroupData";
 import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEvent";
 
 // Import components related to SvgCanvas.
-import { calcGroupBoundingBoxOfNoRotation } from "../../../utils/shapes/group/calcGroupBoundingBoxOfNoRotation";
+import { calcUnrotatedGroupBoundingBox } from "../../../utils/shapes/group/calcUnrotatedGroupBoundingBox";
 
 // Import functions related to SvgCanvas.
 import { applyMultiSelectSourceRecursive } from "../../utils/applyMultiSelectSourceRecursive";
@@ -97,7 +97,7 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 				}
 
 				// Create initial values for the multi-select group
-				const boundingBox = calcGroupBoundingBoxOfNoRotation(selectedItems);
+				const boundingBox = calcUnrotatedGroupBoundingBox(selectedItems);
 				multiSelectGroup = {
 					id: MULTI_SELECT_GROUP,
 					x: boundingBox.left + (boundingBox.right - boundingBox.left) / 2,

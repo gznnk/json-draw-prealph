@@ -6,7 +6,7 @@ import type { GroupData } from "../../../types/data/shapes/GroupData";
 import { degreesToRadians } from "../../math/common/degreesToRadians";
 import { nanToZero } from "../../math/common/nanToZero";
 import { rotatePoint } from "../../math/points/rotatePoint";
-import { calcGroupBoundingBoxOfNoRotation } from "./calcGroupBoundingBoxOfNoRotation";
+import { calcUnrotatedGroupBoundingBox } from "./calcUnrotatedGroupBoundingBox";
 
 /**
  * Calculates the oriented bounding box of a group shape.
@@ -20,7 +20,7 @@ export const calcGroupOrientedBox = (group: GroupData): Bounds => {
 	const radians = degreesToRadians(rotation);
 
 	// Calculate bounding box without rotation applied
-	const boundingBox = calcGroupBoundingBoxOfNoRotation(items, x, y, rotation);
+	const boundingBox = calcUnrotatedGroupBoundingBox(items, x, y, rotation);
 
 	// Rotate corner points around the group center
 	const leftTop = rotatePoint(boundingBox.left, boundingBox.top, x, y, radians);
