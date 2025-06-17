@@ -20,7 +20,7 @@ import type {
 } from "./SvgCanvasTypes";
 
 // Import canvas custom hooks.
-import { useAreaSelection } from "./hooks/actions/useAreaSelection";
+import { useAreaSelection } from "./hooks/selection/useAreaSelection";
 import { useConnect } from "./hooks/actions/useConnect";
 import { useCopy } from "./hooks/actions/useCopy";
 import { useDelete } from "./hooks/actions/useDelete";

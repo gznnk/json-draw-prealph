@@ -21,7 +21,7 @@ import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent"
 import type { EventBus } from "../../../shared/event-bus/EventBus";
 
 // Import area selection types.
-import type { AreaSelectionState } from "./hooks/actions/useAreaSelection";
+import type { AreaSelectionState } from "./hooks/selection/useAreaSelection";
 
 /**
  * Type for the data of the SvgCanvas.
