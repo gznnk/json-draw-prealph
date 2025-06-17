@@ -11,7 +11,12 @@ import { applyRecursive } from "./applyRecursive";
 export const clearSelectedRecursive = (items: Diagram[]) => {
 	return applyRecursive(items, (item) =>
 		isSelectableData(item)
-			? { ...item, isSelected: false, isMultiSelectSource: false } // 全ての図形の選択状態を解除し、かつ表示状態を元に戻す
+			? {
+					...item,
+					isSelected: false,
+					isMultiSelectSource: false,
+					showOutline: false, // Clear outline when clearing selection
+				}
 			: item,
 	);
 };

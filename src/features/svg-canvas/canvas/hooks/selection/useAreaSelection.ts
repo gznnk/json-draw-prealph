@@ -145,6 +145,71 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 		[],
 	);
 
+	/**
+	 * Update outline display for items within the selection bounds during area selection
+	 */
+	const updateOutlineDisplay = useCallback(
+		(selectionBounds: {
+			startX: number;
+			startY: number;
+			endX: number;
+			endY: number;
+		}) => {
+			const {
+				props: { setCanvasState },
+			} = refBus.current;
+
+			// Calculate selection bounds in canvas coordinates
+			const minX = Math.min(selectionBounds.startX, selectionBounds.endX);
+			const maxX = Math.max(selectionBounds.startX, selectionBounds.endX);
+			const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
+			const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
+
+			setCanvasState((prevState) => ({
+				...prevState,
+				items: prevState.items.map((item) => {
+					if (!isSelectableData(item)) return item;
+
+					// Calculate item bounding box using calcItemBoundingBox function
+					const itemBounds = calcItemBoundingBox(item);
+
+					// Check if item's bounding box is completely contained within selection rectangle
+					const isInSelection =
+						itemBounds.left >= minX &&
+						itemBounds.right <= maxX &&
+						itemBounds.top >= minY &&
+						itemBounds.bottom <= maxY;
+
+					return {
+						...item,
+						showOutline: isInSelection,
+					};
+				}),
+			}));
+		},
+		[],
+	);
+
+	/**
+	 * Clear outline display for all items
+	 */
+	const clearOutlineDisplay = useCallback(() => {
+		const {
+			props: { setCanvasState },
+		} = refBus.current;
+
+		setCanvasState((prevState) => ({
+			...prevState,
+			items: prevState.items.map((item) => {
+				if (!isSelectableData(item)) return item;
+				return {
+					...item,
+					showOutline: false,
+				};
+			}),
+		}));
+	}, []);
+
 	const onStartAreaSelection = useCallback(
 		(clientX: number, clientY: number) => {
 			const { x, y } = clientToCanvasCoords(clientX, clientY);
@@ -167,13 +232,20 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 		(clientX: number, clientY: number) => {
 			const { x, y } = clientToCanvasCoords(clientX, clientY);
 
-			setSelectionState((prev) => ({
-				...prev,
+			const newSelectionState = {
+				isSelecting: true,
+				startX: refBus.current.selectionState.startX,
+				startY: refBus.current.selectionState.startY,
 				endX: x,
 				endY: y,
-			}));
+			};
+
+			setSelectionState(newSelectionState);
+
+			// Update outline display for items within selection bounds
+			updateOutlineDisplay(newSelectionState);
 		},
-		[clientToCanvasCoords],
+		[clientToCanvasCoords, updateOutlineDisplay],
 	);
 
 	const onEndAreaSelection = useCallback(() => {
@@ -184,6 +256,9 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 		// Update items selection with current selection bounds
 		updateItemsSelection(currentSelectionState);
 
+		// Clear outline display for all items
+		clearOutlineDisplay();
+
 		// Reset selection state
 		setSelectionState({
 			isSelecting: false,
@@ -192,9 +267,12 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 			endX: 0,
 			endY: 0,
 		});
-	}, [updateItemsSelection]);
+	}, [updateItemsSelection, clearOutlineDisplay]);
 
 	const onCancelAreaSelection = useCallback(() => {
+		// Clear outline display for all items
+		clearOutlineDisplay();
+
 		setSelectionState({
 			isSelecting: false,
 			startX: 0,
@@ -202,7 +280,7 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 			endX: 0,
 			endY: 0,
 		});
-	}, []);
+	}, [clearOutlineDisplay]);
 
 	return {
 		selectionState,

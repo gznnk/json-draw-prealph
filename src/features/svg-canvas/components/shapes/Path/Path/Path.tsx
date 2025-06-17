@@ -57,7 +57,7 @@ const PathComponent: React.FC<PathProps> = ({
 	strokeWidth = "1px",
 	isSelected = false,
 	isMultiSelectSource = false,
-	showAsChildOutline = false,
+	showOutline = false,
 	items = [],
 	syncWithSameId = false,
 	dragEnabled = true,
@@ -404,7 +404,7 @@ const PathComponent: React.FC<PathProps> = ({
 					scaleY={scaleY}
 					isSelected={isSelected}
 					isMultiSelectSource={isMultiSelectSource}
-					showAsChildOutline={showAsChildOutline}
+					showOutline={showOutline}
 				/>
 			)}
 			{/* 全体変形用グループ */}

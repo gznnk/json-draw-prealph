@@ -42,7 +42,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 	initialWidth,
 	initialHeight,
 	svgText,
-	showAsChildOutline = false,
+	showOutline = false,
 	eventBus,
 	onDrag,
 	onClick,
@@ -171,7 +171,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 				scaleY={scaleY}
 				isSelected={isSelected}
 				isMultiSelectSource={isMultiSelectSource}
-				showAsChildOutline={showAsChildOutline}
+				showOutline={showOutline}
 			/>
 			{showTransformative && (
 				<Transformative

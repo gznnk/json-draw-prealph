@@ -42,11 +42,13 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 					return {
 						...item,
 						isSelected: false, // Deselect ConnectLine items.
+						showOutline: false, // Clear outline
 					};
 				}
 				return {
 					...item,
 					isSelected: true,
+					showOutline: false, // Clear outline when selecting all
 				};
 			});
 
@@ -84,6 +86,7 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 						...item,
 						isSelected: false, // Shapes in the multi-select group have their selection state cleared
 						isMultiSelectSource: false, // Set as not being a multi-select source
+						showOutline: false, // Clear outline
 					};
 				}),
 			} as GroupData;

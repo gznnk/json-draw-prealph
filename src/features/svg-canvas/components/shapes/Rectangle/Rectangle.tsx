@@ -60,7 +60,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	isTextEditing,
 	isTextEditEnabled = true,
 	isTransparent,
-	showAsChildOutline = false,
+	showOutline = false,
 	eventBus,
 	onDrag,
 	onClick,
@@ -285,7 +285,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 				scaleY={scaleY}
 				isSelected={isSelected}
 				isMultiSelectSource={isMultiSelectSource}
-				showAsChildOutline={showAsChildOutline}
+				showOutline={showOutline}
 			/>
 			{showTransformative && (
 				<Transformative

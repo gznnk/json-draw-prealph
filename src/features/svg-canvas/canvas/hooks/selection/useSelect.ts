@@ -48,6 +48,7 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 			isMultiSelect:
 				isCtrlPressed !== undefined ? isCtrlPressed : e.isMultiSelect,
 		};
+
 		setCanvasState((prevState) => {
 			// Update the selected state of the items.
 			let items = applyRecursive(prevState.items, (item) => {
@@ -62,11 +63,16 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 						return {
 							...item,
 							isSelected: !item.isSelected,
+							showOutline: false, // Clear outline when selecting
 						};
 					}
 
 					// Apply the selected state to the diagram.
-					return { ...item, isSelected: true };
+					return {
+						...item,
+						isSelected: true,
+						showOutline: false, // Clear outline when selecting
+					};
 				}
 
 				if (actualEvent.isMultiSelect && item.isSelected) {
@@ -79,6 +85,7 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 					// When single selection, clear the selection state of all diagrams except the selected one.
 					isSelected: false,
 					isMultiSelectSource: false,
+					showOutline: false, // Clear outline when selecting
 				};
 			});
 
@@ -131,6 +138,7 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 						return {
 							...item,
 							isMultiSelectSource: false,
+							showOutline: false, // Clear outline when not in multi-select
 						};
 					}
 					return item;
