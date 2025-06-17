@@ -1,18 +1,21 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
-import { calcGroupOrientedBox } from "../../utils/shapes/group/calcGroupOrientedBox";
+// Import types.
 import type { Box } from "../../types/base/Box";
-import { isItemableData } from "../../utils/validation/isItemableData";
-import { isTransformativeData } from "../../utils/validation/isTransformativeData";
+import type { Diagram } from "../../types/data/catalog/Diagram";
+
+// Import utils.
 import { degreesToRadians } from "../../utils/math/common/degreesToRadians";
 import { rotatePoint } from "../../utils/math/points/rotatePoint";
+import { calcGroupOrientedBox } from "../../utils/shapes/group/calcGroupOrientedBox";
+import { isItemableData } from "../../utils/validation/isItemableData";
+import { isTransformativeData } from "../../utils/validation/isTransformativeData";
 
 /**
- * Calculate the bounds of all items in the diagram.
+ * Calculate the bounding box of all provided items.
  *
- * @param items - The list of items to calculate the bounds for.
- * @returns - The bounds of all items.
+ * @param items - The list of items to calculate the bounding box for.
+ * @returns The bounding box that encompasses all provided items.
  */
-export const calcBoundsOfAllItems = (items: Diagram[]): Box => {
+export const calcItemsBoundingBox = (items: Diagram[]): Box => {
 	const box = {
 		top: Number.MAX_VALUE,
 		left: Number.MAX_VALUE,
@@ -22,7 +25,6 @@ export const calcBoundsOfAllItems = (items: Diagram[]): Box => {
 
 	for (const item of items) {
 		if (isItemableData(item) && item.type === "Group") {
-			// Calculate the bounds of the group.
 			const groupOrientedBox = calcGroupOrientedBox(item);
 			box.top = Math.min(box.top, groupOrientedBox.y);
 			box.left = Math.min(box.left, groupOrientedBox.x);

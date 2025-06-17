@@ -2,7 +2,7 @@ import type { Bounds } from "../../../types/base/Bounds";
 import type { Diagram } from "../../../types/data/catalog/Diagram";
 import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
 import { isItemableData } from "../../../utils/validation/isItemableData";
-import { calcBoundsOfAllItems } from "../../../canvas/utils/calcBoundsOfAllItems";
+import { calcItemsBoundingBox } from "../../../canvas/utils/calcItemsBoundingBox";
 
 /**
  * Calculate viewport bounds in canvas coordinates based on current view state
@@ -52,7 +52,7 @@ export const calculateCombinedCanvasBounds = (
 	}
 
 	// Calculate bounds of all items
-	const itemBounds = calcBoundsOfAllItems(items);
+	const itemBounds = calcItemsBoundingBox(items);
 
 	// Combine item bounds with viewport bounds
 	const combinedLeft = Math.min(itemBounds.left, viewportBounds.x);
