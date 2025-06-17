@@ -7,6 +7,11 @@ import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 // Import functions related to SvgCanvas.
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundingBox";
+import { newEventId } from "../../../utils/common/newEventId";
+
+// Import selection hooks
+import { useSelect } from "./useSelect";
+import { useClearAllSelection } from "./useClearAllSelection";
 
 /**
  * Area selection state type
@@ -31,10 +36,17 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 		endY: 0,
 	});
 
+	// Get the select function from useSelect hook with Ctrl key pressed (for multi-select)
+	const onSelect = useSelect(props, true);
+
+	// Get the clear all selection function
+	const onClearAllSelection = useClearAllSelection(props);
+
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
 		selectionState,
+		onSelect,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -77,40 +89,58 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 			endX: number;
 			endY: number;
 		}) => {
-			const { setCanvasState } = refBus.current.props;
+			const {
+				props: { canvasState },
+				onSelect,
+			} = refBus.current;
 
-			setCanvasState((prevCanvasState) => {
-				// Calculate selection bounds in canvas coordinates
-				const minX = Math.min(selectionBounds.startX, selectionBounds.endX);
-				const maxX = Math.max(selectionBounds.startX, selectionBounds.endX);
-				const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
-				const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
+			// Calculate selection bounds in canvas coordinates
+			const minX = Math.min(selectionBounds.startX, selectionBounds.endX);
+			const maxX = Math.max(selectionBounds.startX, selectionBounds.endX);
+			const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
+			const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
 
-				// Update selection state of items
-				const updatedItems = prevCanvasState.items.map((item) => {
-					if (!isSelectableData(item)) return item;
+			// Find items that are within the selection bounds
+			const itemsToSelect: string[] = [];
 
-					// Calculate item bounding box using calcItemBoundingBox function
-					const itemBounds = calcItemBoundingBox(item);
+			for (const item of canvasState.items) {
+				if (!isSelectableData(item)) continue;
 
-					// Check if item's bounding box is completely contained within selection rectangle
-					const isSelected =
-						itemBounds.left >= minX &&
-						itemBounds.right <= maxX &&
-						itemBounds.top >= minY &&
-						itemBounds.bottom <= maxY;
+				// Calculate item bounding box using calcItemBoundingBox function
+				const itemBounds = calcItemBoundingBox(item);
 
-					return {
-						...item,
-						isSelected,
-					};
+				// Check if item's bounding box is completely contained within selection rectangle
+				const isSelected =
+					itemBounds.left >= minX &&
+					itemBounds.right <= maxX &&
+					itemBounds.top >= minY &&
+					itemBounds.bottom <= maxY;
+
+				if (isSelected) {
+					itemsToSelect.push(item.id);
+				}
+			}
+
+			// Apply selection using the proper useSelect logic
+			// For area selection, we want to select the first item (clearing previous selections)
+			// then add additional items with multi-select behavior
+			if (itemsToSelect.length > 0) {
+				// Select first item (this clears existing selections)
+				onSelect({
+					eventId: newEventId(),
+					id: itemsToSelect[0],
+					isMultiSelect: false,
 				});
 
-				return {
-					...prevCanvasState,
-					items: updatedItems,
-				};
-			});
+				// Add remaining items with multi-select
+				for (let i = 1; i < itemsToSelect.length; i++) {
+					onSelect({
+						eventId: newEventId(),
+						id: itemsToSelect[i],
+						isMultiSelect: true,
+					});
+				}
+			}
 		},
 		[],
 	);
@@ -118,6 +148,10 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 	const onStartAreaSelection = useCallback(
 		(clientX: number, clientY: number) => {
 			const { x, y } = clientToCanvasCoords(clientX, clientY);
+
+			// Clear existing selections when starting area selection
+			onClearAllSelection();
+
 			setSelectionState({
 				isSelecting: true,
 				startX: x,
@@ -126,27 +160,20 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 				endY: y,
 			});
 		},
-		[clientToCanvasCoords],
+		[clientToCanvasCoords, onClearAllSelection],
 	);
 
 	const onUpdateAreaSelection = useCallback(
 		(clientX: number, clientY: number) => {
 			const { x, y } = clientToCanvasCoords(clientX, clientY);
 
-			setSelectionState((prev) => {
-				const newState = {
-					...prev,
-					endX: x,
-					endY: y,
-				};
-
-				// Perform real-time selection update
-				updateItemsSelection(newState);
-
-				return newState;
-			});
+			setSelectionState((prev) => ({
+				...prev,
+				endX: x,
+				endY: y,
+			}));
 		},
-		[clientToCanvasCoords, updateItemsSelection],
+		[clientToCanvasCoords],
 	);
 
 	const onEndAreaSelection = useCallback(() => {
