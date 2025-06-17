@@ -30,6 +30,7 @@ import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
 import {
 	Container,
 	HTMLElementsContainer,
+	SelectionRect,
 	Svg,
 	Viewport,
 	ViewportOverlay,
@@ -64,6 +65,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			textEditorState,
 			isGrabScrollReady,
 			isGrabScrolling,
+			selectionState,
 			onTransform,
 			onDiagramChange,
 			onDrag,
@@ -88,6 +90,10 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onGrabStart,
 			onGrabMove,
 			onGrabEnd,
+			onStartAreaSelection,
+			onUpdateAreaSelection,
+			onEndAreaSelection,
+			onCancelAreaSelection,
 		} = props;
 
 		// SVG要素のコンテナの参照
@@ -184,12 +190,18 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				const { onClearAllSelection, onGrabStart, contextMenuFunctions } =
 					refBus.current;
 
-				// Check for Ctrl+drag to start grab scrolling
-				if (onGrabStart?.(e)) {
-					return;
-				}
-
 				if (e.target === e.currentTarget) {
+					// Check for Ctrl+drag to start grab scrolling
+					if (e.ctrlKey && onGrabStart?.(e)) {
+						return;
+					}
+
+					// Start area selection if not pressing Ctrl key
+					if (!e.ctrlKey) {
+						onStartAreaSelection?.(e.clientX, e.clientY);
+						return;
+					}
+
 					// Clear the selection when pointer is down on the canvas.
 					onClearAllSelection?.();
 				}
@@ -197,26 +209,40 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				// Close the context menu.
 				contextMenuFunctions.closeContextMenu();
 			},
-			[],
+			[onStartAreaSelection],
 		);
 		/**
-		 * Handle the pointer move event for grab scrolling.
+		 * Handle the pointer move event for grab scrolling and area selection.
 		 */
 		const handlePointerMove = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
+				// Handle area selection if active
+				if (selectionState?.isSelecting) {
+					if (onUpdateAreaSelection) {
+						onUpdateAreaSelection(e.clientX, e.clientY);
+					}
+					return;
+				}
+
 				refBus.current.onGrabMove?.(e);
 			},
-			[],
+			[selectionState?.isSelecting, onUpdateAreaSelection],
 		);
 
 		/**
-		 * Handle the pointer up event to end grab scrolling.
+		 * Handle the pointer up event to end grab scrolling and area selection.
 		 */
 		const handlePointerUp = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
+				// Handle area selection end
+				if (selectionState?.isSelecting) {
+					onEndAreaSelection?.();
+					return;
+				}
+
 				refBus.current.onGrabEnd?.(e);
 			},
-			[],
+			[selectionState?.isSelecting, onEndAreaSelection],
 		);
 
 		/**
@@ -239,12 +265,21 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		 */
 		const handleKeyDown = useCallback(
 			(e: React.KeyboardEvent<SVGSVGElement>) => {
+				// Cancel area selection on Escape key
+				if (e.key === "Escape" && selectionState?.isSelecting) {
+					e.preventDefault();
+					if (onCancelAreaSelection) {
+						onCancelAreaSelection();
+					}
+					return;
+				}
+
 				// キャンバスにフォーカスがない場合はイベントをキャンセルし、スクロールを無効化
 				if (e.target !== e.currentTarget) {
 					e.preventDefault();
 				}
 			},
-			[],
+			[selectionState?.isSelecting, onCancelAreaSelection],
 		);
 
 		// Monitor container size changes with ResizeObserver
@@ -357,8 +392,17 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 							)}
 							{/* Render new connect line. */}
 							<NewConnectLine eventBus={eventBus} />
-							{/* Render flash connect lines */}
-							<FlashConnectLine />
+							{/* Render flash connect lines */} <FlashConnectLine />
+							{/* Render area selection rectangle */}
+							{selectionState && (
+								<SelectionRect
+									x={Math.min(selectionState.startX, selectionState.endX)}
+									y={Math.min(selectionState.startY, selectionState.endY)}
+									width={Math.abs(selectionState.endX - selectionState.startX)}
+									height={Math.abs(selectionState.endY - selectionState.startY)}
+									visible={selectionState.isSelecting}
+								/>
+							)}
 						</Svg>
 					</SvgCanvasContext.Provider>
 					{/* Container for HTML elements that follow the scroll of the SVG canvas with zoom scaling. */}

@@ -20,6 +20,7 @@ import type {
 } from "./SvgCanvasTypes";
 
 // Import canvas custom hooks.
+import { useAreaSelection } from "./hooks/actions/useAreaSelection";
 import { useConnect } from "./hooks/actions/useConnect";
 import { useCopy } from "./hooks/actions/useCopy";
 import { useDelete } from "./hooks/actions/useDelete";
@@ -115,6 +116,15 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Ctrl key state management
 	const { isCtrlPressed } = useCtrl();
 
+	// Handler for area selection
+	const {
+		selectionState,
+		onStartAreaSelection,
+		onUpdateAreaSelection,
+		onEndAreaSelection,
+		onCancelAreaSelection,
+	} = useAreaSelection(canvasHooksProps);
+
 	// Handler for the drag event.
 	const onDrag = useDrag(canvasHooksProps);
 
@@ -197,6 +207,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const canvasProps = {
 		...canvasState,
 		eventBus: eventBusRef.current,
+		selectionState,
 		onDrag,
 		onSelect,
 		onSelectAll,
@@ -224,6 +235,10 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onGrabStart,
 		onGrabMove,
 		onGrabEnd,
+		onStartAreaSelection,
+		onUpdateAreaSelection,
+		onEndAreaSelection,
+		onCancelAreaSelection,
 	};
 
 	return {
