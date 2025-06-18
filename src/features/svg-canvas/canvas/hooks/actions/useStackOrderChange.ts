@@ -60,11 +60,11 @@ export const useStackOrderChange = (props: CanvasHooksProps) => {
 				return newItems;
 			};
 
-			// 再帰皁E��探し、idが一致する図形の属する親のitems配�Eを対象に並び替える
+			// Recursively search for the item with matching id and reorder the parent's items array
 			const updateOrderRecursive = (items: Diagram[]): Diagram[] => {
 				return items.map((item) => {
 					if (isItemableData(item)) {
-						// グループ�Eを�E帰皁E��調査
+						// Check if this group contains the target item
 						if (item.items?.some((child) => child.id === e.id)) {
 							return {
 								...item,
@@ -80,7 +80,7 @@ export const useStackOrderChange = (props: CanvasHooksProps) => {
 				});
 			};
 
-			// top-level にある場合�E対忁E
+			// Handle items at the top level
 			let items = prevState.items;
 			if (items.some((item) => item.id === e.id)) {
 				items = moveInList(items);
@@ -88,14 +88,14 @@ export const useStackOrderChange = (props: CanvasHooksProps) => {
 				items = updateOrderRecursive(items);
 			}
 
-			// 履歴に追加
+			// Add to history
 			let newState: SvgCanvasState = {
 				...prevState,
 				items,
 			};
 
 			// Add a new history entry.
-			newState.lastHistoryEventId = newEventId(); // TODO: Trigger側で設定するよぁE��する
+			newState.lastHistoryEventId = newEventId(); // TODO: Should be set by the trigger side
 			newState = addHistory(prevState, newState);
 
 			// Notify the data change.
