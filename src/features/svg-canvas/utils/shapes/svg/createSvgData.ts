@@ -26,7 +26,6 @@ export const createSvgData = ({
     svgText: string;
     width?: number;
     height?: number;
-    radius?: number;
     rotation?: number;
     scaleX?: number;
     scaleY?: number;
