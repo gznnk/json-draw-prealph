@@ -31,7 +31,12 @@ export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 
 	// Use Ctrl key hook for grab scrolling
 	const { isCtrlPressed } = useCtrl();
-	const dragStartPos = useRef<{ x: number; y: number } | null>(null);
+	const dragStartState = useRef<{
+		clientX: number;
+		clientY: number;
+		minX: number;
+		minY: number;
+	} | null>(null);
 
 	// Get scroll handler
 	const onScroll = useScroll(props);
@@ -40,6 +45,7 @@ export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 	const refBusVal = {
 		minX,
 		minY,
+		isCtrlPressed,
 		isGrabScrolling,
 		setCanvasState,
 		onScroll,
@@ -51,13 +57,17 @@ export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 	useEffect(() => {
 		// Bypass references to avoid function creation in every render.
 		const { setCanvasState } = refBus.current;
+
+		// Update canvas state based on Ctrl key state
 		setCanvasState((prevState) => ({
 			...prevState,
 			isGrabScrollReady: isCtrlPressed,
 			isGrabScrolling: prevState.isGrabScrolling && !isCtrlPressed,
 		}));
+
+		// If Ctrl is released, reset the drag start state
 		if (!isCtrlPressed) {
-			dragStartPos.current = null;
+			dragStartState.current = null;
 		}
 	}, [isCtrlPressed]);
 
@@ -72,12 +82,22 @@ export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 			// Check for Ctrl+drag to start grab scrolling
 			if (e.ctrlKey && e.target === e.currentTarget) {
 				// Bypass references to avoid function creation in every render.
-				const { setCanvasState } = refBus.current;
+				const { setCanvasState, minX, minY } = refBus.current;
+
 				setCanvasState((prevState) => ({
 					...prevState,
 					isGrabScrolling: true,
 				}));
-				dragStartPos.current = { x: e.clientX, y: e.clientY };
+
+				// Store the initial drag start state
+				dragStartState.current = {
+					clientX: e.clientX,
+					clientY: e.clientY,
+					minX,
+					minY,
+				};
+
+				// Capture the pointer to keep receiving events
 				e.currentTarget.setPointerCapture(e.pointerId);
 				e.preventDefault();
 				return true;
@@ -95,21 +115,23 @@ export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 	const onGrabMove = useCallback(
 		(e: React.PointerEvent<SVGSVGElement>): void => {
 			// Bypass references to avoid function creation in every render.
-			const { isGrabScrolling, minX, minY, onScroll } = refBus.current;
-			if (isGrabScrolling && dragStartPos.current) {
-				const deltaX = e.clientX - dragStartPos.current.x;
-				const deltaY = e.clientY - dragStartPos.current.y;
+			const { isGrabScrolling, onScroll } = refBus.current;
+			if (isGrabScrolling && dragStartState.current) {
+				// Calculate total movement from the start position
+				const totalDeltaX = e.clientX - dragStartState.current.clientX;
+				const totalDeltaY = e.clientY - dragStartState.current.clientY;
+
+				// Calculate new scroll position from the initial canvas position
+				const newMinX = dragStartState.current.minX - totalDeltaX;
+				const newMinY = dragStartState.current.minY - totalDeltaY;
 
 				// Update scroll position
 				onScroll?.({
-					minX: minX - deltaX,
-					minY: minY - deltaY,
+					minX: newMinX,
+					minY: newMinY,
 					clientX: e.clientX,
 					clientY: e.clientY,
 				});
-
-				// Update drag start position for next move
-				dragStartPos.current = { x: e.clientX, y: e.clientY };
 			}
 		},
 		[],
@@ -122,18 +144,21 @@ export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 	 */
 	const onGrabEnd = useCallback(
 		(e: React.PointerEvent<SVGSVGElement>): void => {
+			// Bypass references to avoid function creation in every render.
+			const { isGrabScrolling, setCanvasState } = refBus.current;
+
 			if (isGrabScrolling) {
-				// Bypass references to avoid function creation in every render.
-				const { setCanvasState } = refBus.current;
 				setCanvasState((prevState) => ({
 					...prevState,
 					isGrabScrolling: false,
 				}));
-				dragStartPos.current = null;
+
+				// Reset drag start state
+				dragStartState.current = null;
 				e.currentTarget.releasePointerCapture(e.pointerId);
 			}
 		},
-		[isGrabScrolling],
+		[],
 	);
 
 	return {
