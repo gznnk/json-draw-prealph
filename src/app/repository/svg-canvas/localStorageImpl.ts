@@ -15,15 +15,18 @@ export class LocalStorageSvgCanvasRepository implements SvgCanvasRepository {
 	 * @returns Promise that resolves when the operation is complete
 	 */
 	private async saveCanvasesInternal(canvases: SvgCanvas[]): Promise<void> {
-		try {
-			const serialized = JSON.stringify(canvases);
-			window.localStorage.setItem(this.storageKey, serialized);
-		} catch (error) {
-			// Rethrow with context for easier debugging
-			throw new Error(
-				`Failed to save SVG canvases to localStorage: ${(error as Error).message}`,
-			);
-		}
+		setTimeout(() => {
+			// This is a workaround to avoid blocking the main thread.
+			try {
+				const serialized = JSON.stringify(canvases);
+				window.localStorage.setItem(this.storageKey, serialized);
+			} catch (error) {
+				// Rethrow with context for easier debugging
+				throw new Error(
+					`Failed to save SVG canvases to localStorage: ${(error as Error).message}`,
+				);
+			}
+		}, 0);
 	}
 
 	/**

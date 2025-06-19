@@ -53,7 +53,7 @@ const App = (): ReactElement => {
 	}, []);
 
 	const handleCanvasUpdate = useCallback(
-		async (data: SvgCanvasData) => {
+		(data: SvgCanvasData) => {
 			try {
 				// Reconstruct the full canvas object with the updated data
 				const updatedCanvas: SvgCanvas = {
@@ -62,7 +62,7 @@ const App = (): ReactElement => {
 					content: data,
 				};
 				// Update the canvas in the repository
-				await svgCanvasRepository.updateCanvas(updatedCanvas);
+				svgCanvasRepository.updateCanvas(updatedCanvas);
 			} catch (error) {
 				console.error("Failed to update canvas:", error);
 			}
