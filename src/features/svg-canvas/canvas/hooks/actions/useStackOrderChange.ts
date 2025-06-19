@@ -8,7 +8,6 @@ import type { CanvasHooksProps, SvgCanvasState } from "../../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
 import { isItemableData } from "../../../utils/validation/isItemableData";
-import { newEventId } from "../../../utils/common/newEventId";
 import { addHistory } from "../../utils/addHistory";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 
@@ -95,7 +94,7 @@ export const useStackOrderChange = (props: CanvasHooksProps) => {
 			};
 
 			// Add a new history entry.
-			newState.lastHistoryEventId = newEventId(); // TODO: Should be set by the trigger side
+			newState.lastHistoryEventId = e.eventId;
 			newState = addHistory(prevState, newState);
 
 			// Notify the data change.

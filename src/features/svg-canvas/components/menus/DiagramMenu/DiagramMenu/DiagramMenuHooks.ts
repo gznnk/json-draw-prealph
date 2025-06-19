@@ -411,24 +411,28 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				break;
 			case "BringToFront":
 				onStackOrderChange?.({
+					eventId: newEventId(),
 					changeType: "bringToFront",
 					id: singleSelectedItem.id,
 				});
 				break;
 			case "BringForward":
 				onStackOrderChange?.({
+					eventId: newEventId(),
 					changeType: "bringForward",
 					id: singleSelectedItem.id,
 				});
 				break;
 			case "SendBackward":
 				onStackOrderChange?.({
+					eventId: newEventId(),
 					changeType: "sendBackward",
 					id: singleSelectedItem.id,
 				});
 				break;
 			case "SendToBack":
 				onStackOrderChange?.({
+					eventId: newEventId(),
 					changeType: "sendToBack",
 					id: singleSelectedItem.id,
 				});
