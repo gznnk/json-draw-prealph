@@ -93,7 +93,6 @@ const SegmentComponent: React.FC<SegmentProps> = ({
 			endX={endX}
 			endY={endY}
 			cursor={cursor}
-
 			onPointerDown={onPointerDown}
 			onClick={onClick}
 			onDrag={onDrag}

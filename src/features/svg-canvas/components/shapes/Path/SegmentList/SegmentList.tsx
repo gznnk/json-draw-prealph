@@ -10,9 +10,6 @@ import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEve
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointerEvent";
 
-// Import hooks
-import { useEventBus } from "../../../../context/EventBusContext";
-
 // Import functions related to SvgCanvas.
 import { newId } from "../../../../utils/shapes/common/newId";
 
@@ -44,9 +41,6 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 	onClick,
 	onDiagramChange,
 }) => {
-	// Get eventBus from context
-	const eventBus = useEventBus();
-	
 	const [draggingSegment, setDraggingSegment] = useState<
 		SegmentData | undefined
 	>();
@@ -236,7 +230,6 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 			key={item.id}
 			{...item}
 			rightAngleSegmentDrag={rightAngleSegmentDrag}
-
 			onPointerDown={onPointerDown}
 			onClick={onClick}
 			onDrag={handleSegmentDrag}
