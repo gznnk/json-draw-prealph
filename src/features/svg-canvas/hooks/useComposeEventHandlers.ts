@@ -5,11 +5,11 @@ import { useCallback, useMemo, useRef } from "react";
  * Each handler will be called in the order they are provided.
  * The memoization is based on the individual function references, not the array reference.
  *
- * @param listeners - Array of event handler functions to compose
+ * @param listeners - Variable number of event handler functions to compose
  * @returns Memoized composed event handler function
  */
 export const useComposeEventHandlers = <T>(
-	listeners: Array<(event: T) => void>,
+	...listeners: Array<(event: T) => void>
 ): ((event: T) => void) => {
 	const prevListenersRef = useRef<Array<(event: T) => void>>([]);
 	const memoizedListenersRef = useRef<Array<(event: T) => void>>([]);

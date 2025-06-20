@@ -5,7 +5,6 @@ import { memo, useCallback, useMemo, useRef, useState } from "react";
 // Import types.
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
-import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEvent";
 import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
 import type { RectangleProps } from "../../../types/props/shapes/RectangleProps";
 
@@ -17,9 +16,11 @@ import { Transformative } from "../../core/Transformative";
 import { ConnectPoint } from "../ConnectPoint";
 
 // Import hooks.
+import { useComposeEventHandlers } from "../../../hooks/useComposeEventHandlers";
 import { useDrag } from "../../../hooks/useDrag";
-import { useHover } from "../../../hooks/useHover";
 import { useFileDrop } from "../../../hooks/useFileDrop";
+import { useHover } from "../../../hooks/useHover";
+import { useSelect } from "../../../hooks/useSelect";
 
 // Import utils.
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
@@ -86,7 +87,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		isSelected,
 		isTextEditEnabled,
 		onDrag,
-		onSelect,
 		onTransform,
 		onTextEdit,
 	};
@@ -124,18 +124,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		if (e.eventType === "End") {
 			setIsTransforming(false);
 		}
-	}, []);
-	/**
-	 * Pointer down event handler
-	 */
-	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
-		const { id, onSelect } = refBus.current;
-
-		// Fire shape selection event
-		onSelect?.({
-			eventId: e.eventId,
-			id,
-		});
 	}, []);
 	/**
 	 * Hover state change event handler
@@ -180,11 +168,15 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		y,
 		syncWithSameId,
 		ref: svgRef,
-		onPointerDown: handlePointerDown,
-		onClick: onClick,
+		onClick,
 		onDrag: handleDrag,
 		onDragOver: handleDragOver,
 		onDragLeave: handleDragLeave,
+	});
+	// Generate properties for selection
+	const selectProps = useSelect({
+		id,
+		onSelect,
 	});
 	// Generate properties for hovering
 	const hoverProps = useHover({
@@ -193,6 +185,17 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	});
 	// Generate properties for file drop
 	const fileDropProps = useFileDrop({ id, onFileDrop });
+
+	// Compose onPointerDown handler
+	const composedPointerDownHandler = useComposeEventHandlers(
+		selectProps.onPointerDown,
+		dragProps.onPointerDown,
+	);
+	// Compose onPointerUp handler
+	const composedPointerUpHandler = useComposeEventHandlers(
+		selectProps.onPointerUp,
+		dragProps.onPointerUp,
+	);
 
 	// Suppress ConnectPoint re-rendering by memoization
 	// If separated by key and passed as individual props, each ConnectPoint side
@@ -251,6 +254,9 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					{...dragProps}
 					{...hoverProps}
 					{...fileDropProps}
+					{...selectProps}
+					onPointerDown={composedPointerDownHandler}
+					onPointerUp={composedPointerUpHandler}
 				/>
 			</g>
 			{isTextEditEnabled && (
