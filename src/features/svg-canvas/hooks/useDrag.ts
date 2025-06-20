@@ -18,6 +18,7 @@ import { newEventId } from "../utils/common/newEventId";
 
 // Import EventBus.
 import type { EventBus } from "../../../shared/event-bus/EventBus";
+import { useEventBus } from "../context/EventBusContext";
 
 // Import event names
 import {
@@ -54,7 +55,7 @@ export type DragProps = {
 	y: number;
 	syncWithSameId?: boolean;
 	ref: React.RefObject<SVGElement>;
-	eventBus: EventBus;
+	eventBus?: EventBus;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onPointerUp?: (e: DiagramPointerEvent) => void;
 	onClick?: (e: DiagramClickEvent) => void;
@@ -89,6 +90,7 @@ export type DragProps = {
  * @param {(x: number, y: number) => Point} [props.dragPositioningFunction] ドラッグ位置変換関数
  */
 export const useDrag = (props: DragProps) => {
+	const contextEventBus = useEventBus();
 	const {
 		id,
 		x,
@@ -96,7 +98,7 @@ export const useDrag = (props: DragProps) => {
 		type,
 		syncWithSameId = false,
 		ref,
-		eventBus,
+		eventBus: propsEventBus,
 		onPointerDown,
 		onPointerUp,
 		onClick,
@@ -107,6 +109,9 @@ export const useDrag = (props: DragProps) => {
 		onHover,
 		dragPositioningFunction,
 	} = props;
+
+	// Use eventBus from props if provided, otherwise use from context
+	const eventBus = propsEventBus || contextEventBus;
 
 	// ドラッグ中かのフラグ
 	const [isDragging, setIsDragging] = useState(false);
@@ -523,7 +528,6 @@ export const useDrag = (props: DragProps) => {
 			isHovered: false,
 		});
 	};
-
 	// 全体周知用ドラッグイベントリスナー登録
 	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
 	const refBusVal = {
@@ -534,7 +538,6 @@ export const useDrag = (props: DragProps) => {
 		type,
 		ref,
 		syncWithSameId,
-		eventBus,
 		onDrag,
 		onDragOver,
 		onDragLeave,
@@ -549,9 +552,7 @@ export const useDrag = (props: DragProps) => {
 	useEffect(() => {
 		let handleBroadcastDrag: (e: CustomEvent) => void;
 		let handleBroadcastDragForSync: (e: CustomEvent) => void;
-
-		const { ref, eventBus, onDrag, onDragOver, onDrop, syncWithSameId } =
-			refBus.current;
+		const { ref, onDrag, onDragOver, onDrop, syncWithSameId } = refBus.current;
 
 		if (onDragOver || onDrop) {
 			handleBroadcastDrag = (e: CustomEvent) => {
@@ -649,7 +650,7 @@ export const useDrag = (props: DragProps) => {
 				);
 			}
 		};
-	}, []);
+	}, [eventBus]);
 
 	/**
 	 * Handle SvgCanvas scroll event.

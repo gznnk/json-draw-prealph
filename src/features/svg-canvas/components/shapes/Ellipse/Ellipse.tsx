@@ -9,7 +9,7 @@ import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEv
 import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
 import type { EllipseProps } from "../../../types/props/shapes/EllipseProps";
 
-// SvgCanvas関連コンポーネントをインポート
+// SvgCanvas関連コンポ�Eネントをインポ�EチE
 import { PositionLabel } from "../../core/PositionLabel";
 import { Outline } from "../../core/Outline";
 import { Textable } from "../../core/Textable";
@@ -27,7 +27,7 @@ import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransf
 import { EllipseElement } from "./EllipseStyled";
 
 /**
- * 楕円コンポーネント
+ * 楕�Eコンポ�EネンチE
  */
 const EllipseComponent: React.FC<EllipseProps> = ({
 	id,
@@ -67,16 +67,16 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	onConnect,
 	onTextEdit,
 }) => {
-	// ドラッグ中かのフラグ
+	// ドラチE��中か�Eフラグ
 	const [isDragging, setIsDragging] = useState(false);
-	// 変形中かのフラグ
+	// 変形中か�Eフラグ
 	const [isTransformimg, setIsTransforming] = useState(false);
-	// ホバー中かのフラグ
+	// ホバー中か�Eフラグ
 	const [isHovered, setIsHovered] = useState(false);
-	// 変形対象のSVG要素への参照
+	// 変形対象のSVG要素への参�E
 	const svgRef = useRef<SVGEllipseElement>({} as SVGEllipseElement);
 
-	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	// ハンドラ生�Eの頻発を回避するため、参照する値をuseRefで保持する
 	const refBusVal = {
 		// プロパティ
 		id,
@@ -91,7 +91,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	refBus.current = refBusVal;
 
 	/**
-	 * 楕円のドラッグイベントハンドラ
+	 * 楕�EのドラチE��イベントハンドラ
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
 		const { onDrag } = refBus.current;
@@ -108,7 +108,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	}, []);
 
 	/**
-	 * 楕円の変形イベントハンドラ
+	 * 楕�Eの変形イベントハンドラ
 	 */
 	const handleTransform = useCallback((e: DiagramTransformEvent) => {
 		const { onTransform } = refBus.current;
@@ -145,21 +145,21 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	}, []);
 
 	/**
-	 * ドラッグオーバーイベントハンドラ
+	 * ドラチE��オーバ�Eイベントハンドラ
 	 */
 	const handleDragOver = useCallback(() => {
 		setIsHovered(true);
 	}, []);
 
 	/**
-	 * ドラッグリーブイベントハンドラ
+	 * ドラチE��リーブイベントハンドラ
 	 */
 	const handleDragLeave = useCallback(() => {
 		setIsHovered(false);
 	}, []);
 
 	/**
-	 * ダブルクリックイベントハンドラ
+	 * ダブルクリチE��イベントハンドラ
 	 */
 	const handleDoubleClick = useCallback(() => {
 		const { id, isSelected, isTextEditEnabled, onTextEdit } = refBus.current;
@@ -168,13 +168,13 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 
 		if (!isSelected) return;
 
-		// テキスト編集イベントを発火
+		// チE��スト編雁E��ベントを発火
 		onTextEdit?.({
 			id,
 		});
 	}, []);
 
-	// ドラッグ用のプロパティを生成
+	// ドラチE��用のプロパティを生戁E
 	const dragProps = useDrag({
 		id,
 		type: "Ellipse",
@@ -192,8 +192,8 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	});
 
 	// memo化によりConnectPointの再描画を抑制
-	// keyで分解してばらばらにpropsで渡すと、各ConnectPoint側それぞれで各keyに対して
-	// 比較処理が走り非効率なので、ここでまとめてShapeの差異を検知する
+	// keyで刁E��してばら�Eらにpropsで渡すと、各ConnectPoint側それぞれで吁Eeyに対して
+	// 比輁E�E琁E��走り非効玁E��ので、ここでまとめてShapeの差異を検知する
 	const ownerShape = useMemo(
 		() => ({
 			x,
@@ -207,7 +207,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 		[x, y, width, height, rotation, scaleX, scaleY],
 	);
 
-	// ellipseのtransform属性を生成
+	// ellipseのtransform属性を生戁E
 	const transform = createSvgTransform(
 		scaleX,
 		scaleY,
@@ -216,10 +216,10 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 		y,
 	);
 
-	// 変形コンポーネントを表示するかのフラグ
+	// 変形コンポ�Eネントを表示するか�Eフラグ
 	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
 
-	// 接続ポイントを表示するかのフラグ
+	// 接続�Eイントを表示するか�Eフラグ
 	const doShowConnectPoints =
 		showConnectPoints &&
 		!isSelected &&
@@ -292,7 +292,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 					keepProportion={keepProportion}
 					isSelected={isSelected}
 					isMultiSelectSource={isMultiSelectSource}
-					eventBus={eventBus}
+
 					onTransform={handleTransform}
 				/>
 			)}
@@ -307,7 +307,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 						ownerId={id}
 						ownerShape={ownerShape}
 						isTransparent={!isHovered || isDragging || isTransformimg}
-						eventBus={eventBus}
+
 						onConnect={onConnect}
 					/>
 				))}

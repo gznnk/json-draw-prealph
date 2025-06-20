@@ -159,7 +159,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 					keepProportion={keepProportion}
 					isSelected={isSelected}
 					isMultiSelectSource={isMultiSelectSource}
-					eventBus={eventBus}
+
 					onTransform={onTransform}
 				/>
 			)}

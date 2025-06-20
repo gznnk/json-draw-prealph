@@ -6,6 +6,6 @@ import type { EventBus } from "../../../../../shared/event-bus/EventBus";
  * Provides event handlers for transformation operations like resizing and rotation.
  */
 export type TransformativeProps = {
-	eventBus: EventBus;
+	eventBus?: EventBus;
 	onTransform?: (e: DiagramTransformEvent) => void;
 };

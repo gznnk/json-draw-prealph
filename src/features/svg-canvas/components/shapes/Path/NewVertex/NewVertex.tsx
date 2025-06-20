@@ -21,7 +21,7 @@ type NewVertexProps = NewVertexData & {
 };
 
 /**
- * 新規頂点コンポーネント
+ * 新規頂点コンポ�EネンチE
  */
 const NewVertexComponent: React.FC<NewVertexProps> = ({
 	id,
@@ -36,7 +36,7 @@ const NewVertexComponent: React.FC<NewVertexProps> = ({
 			x={x}
 			y={y}
 			fill="white"
-			eventBus={eventBus}
+
 			onDrag={onDrag}
 		/>
 	);

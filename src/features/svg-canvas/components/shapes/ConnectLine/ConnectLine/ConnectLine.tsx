@@ -100,7 +100,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 				// 移動開始時のitemsを保持
 				startItems.current = items;
 
-				// 垂直と水平の線のみかどうかを判定
+				// 垂直と水平の線�EみかどぁE��を判宁E
 				isVerticalHorizontalLines.current = items.every((item, idx) => {
 					if (idx === 0) {
 						return true;
@@ -114,10 +114,10 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 				});
 			}
 
-			// 移動中と移動終了時の処理
+			// 移動中と移動終亁E��の処琁E
 			if (startItems.current.length === 0) {
-				// 移動開始時のitemsがない場合は何もしない
-				// フェイルセーフの処理で、ここにくる場合はバグ
+				// 移動開始時のitemsがなぁE��合�E何もしなぁE
+				// フェイルセーフ�E処琁E��、ここにくる場合�Eバグ
 				console.error("Illegal state: startItems is empty.");
 				return;
 			}
@@ -128,7 +128,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 				(item) => item.id === movedPoint.id,
 			);
 
-			// 動いた接続ポイントの反対側の点を取得
+			// 動いた接続�Eイント�E反対側の点を取征E
 			const oppositeItem =
 				movedPointIdx === 0
 					? _startItems[_startItems.length - 1]
@@ -138,21 +138,21 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 				y: oppositeItem.y,
 			};
 
-			// 反対側の点も動いているかどうかを確認
+			// 反対側の点も動ぁE��ぁE��かどぁE��を確誁E
 			const movedOppositPoint = event.points.find(
 				(p) => p.id === oppositeItem.id,
 			);
 
 			if (!autoRouting) {
-				// 自動ルーティング無効時
+				// 自動ルーチE��ング無効晁E
 
-				// 移動後のポイント作成関数
+				// 移動後�Eポイント作�E関数
 				const createNewPoint = (
 					movedBothEndsPoint: ConnectPointMoveData,
 					oldPoint: Diagram,
 					idx: number,
 				) => {
-					// 接続ポイントの移動にあわせて末端の点も移動
+					// 接続�Eイント�E移動にあわせて末端の点も移勁E
 					if (oldPoint.id === movedBothEndsPoint.id) {
 						return {
 							...oldPoint,
@@ -161,7 +161,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 						};
 					}
 
-					// 移動した点の隣の点かどうか TODO: 反対の点の時の判定がうまくいかん
+					// 移動した点の隣の点かどぁE�� TODO: 反対の点の時�E判定がぁE��くいかん
 					const movedBothEndsPointIdx = _startItems.findIndex(
 						(item) => item.id === movedBothEndsPoint.id,
 					);
@@ -171,19 +171,19 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 							idx === _startItems.length - 2);
 
 					if (isNextPoint) {
-						// 接続線が垂直と水平の線のみでない場合は、２番目の点はそのまま
+						// 接続線が垂直と水平の線�EみでなぁE��合�E、E��番目の点はそ�Eまま
 						if (!_isVerticalHorizontalLines) {
 							return oldPoint;
 						}
 
-						// 接続線が垂直と水平の線のみは、それが維持されるよう２番目の点も移動する
+						// 接続線が垂直と水平の線�Eみは、それが維持されるよう�E�番目の点も移動すめE
 
-						// 移動量を計算
+						// 移動量を計箁E
 						const movedPointOldData = _startItems[movedBothEndsPointIdx];
 						const dx = movedBothEndsPoint.x - movedPointOldData.x;
 						const dy = movedBothEndsPoint.y - movedPointOldData.y;
 
-						// ２点間の角度を計算
+						// �E�点間�E角度を計箁E
 						const direction = calcRadians(
 							movedPointOldData.x,
 							movedPointOldData.y,
@@ -193,7 +193,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 						const degrees = radiansToDegrees(direction);
 						const isVertical = (degrees + 405) % 180 > 90;
 
-						// ２点間の線が水平であればx座標のみ、垂直であればy座標のみ移動
+						// �E�点間�E線が水平であればx座標�Eみ、垂直であればy座標�Eみ移勁E
 						return {
 							...oldPoint,
 							x: !isVertical ? oldPoint.x + dx : oldPoint.x,
@@ -215,7 +215,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 					return item;
 				}) as Diagram[];
 
-				// 接続線の変更イベントを発火
+				// 接続線�E変更イベントを発火
 				onDiagramChange?.({
 					eventId: event.eventId,
 					eventType: event.eventType,
@@ -229,25 +229,25 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 					},
 				});
 			} else {
-				// 自動ルーティング有効時は、最適な接続線を再計算
+				// 自動ルーチE��ング有効時�E、最適な接続線を再計箁E
 
 				if (movedOppositPoint) {
-					// 反対側の点が動いている場合は、その座標を利用
+					// 反対側の点が動ぁE��ぁE��場合�E、その座標を利用
 					oppositePoint = movedOppositPoint;
 				}
 
-				// 反対側の図形の情報を取得
+				// 反対側の図形の惁E��を取征E
 				let oppositeOwnerShape: Shape;
 				if (movedOppositPoint) {
 					oppositeOwnerShape = movedOppositPoint.ownerShape;
 				} else {
-					// 反対側の図形が動いていない場合はcanvasStateProviderから情報を取得（１フレーム前の情報しか取れないが、接続先の図形に移動はない場合なので問題ない）
+					// 反対側の図形が動ぁE��ぁE��ぁE��合�EcanvasStateProviderから惁E��を取得（１フレーム前�E惁E��しか取れなぁE��、接続�Eの図形に移動�EなぁE��合なので問題なぁE��E
 					oppositeOwnerShape = canvasStateProvider?.getDiagramById(
 						movedPoint.ownerId === startOwnerId ? endOwnerId : startOwnerId,
 					) as Shape;
 				}
 
-				// 最適な接続線を再計算
+				// 最適な接続線を再計箁E
 				const newPath = createBestConnectPath(
 					movedPoint.x,
 					movedPoint.y,
@@ -257,7 +257,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 					oppositeOwnerShape,
 				);
 
-				// 接続線の点のデータを作成
+				// 接続線�E点のチE�Eタを作�E
 				const newItems = (
 					movedPointIdx === 0 ? newPath : newPath.reverse()
 				).map((p, idx) => ({
@@ -267,12 +267,12 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 					x: p.x,
 					y: p.y,
 				})) as Diagram[];
-				// 両端の点のIDは維持する
+				// 両端の点のIDは維持すめE
 				newItems[0].id = _startItems[0].id;
 				newItems[newItems.length - 1].id =
 					_startItems[_startItems.length - 1].id;
 
-				// 接続線の変更イベントを発火
+				// 接続線�E変更イベントを発火
 				onDiagramChange?.({
 					eventId: event.eventId,
 					eventType: event.eventType,
@@ -341,7 +341,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 			startArrowHead={startArrowHead}
 			endArrowHead={endArrowHead}
 			items={items}
-			eventBus={eventBus}
+
 			onClick={onClick}
 			onSelect={onSelect}
 			onDiagramChange={handlePathChange}

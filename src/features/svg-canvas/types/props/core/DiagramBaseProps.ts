@@ -10,7 +10,7 @@ import type { EventBus } from "../../../../../shared/event-bus/EventBus";
  */
 export type DiagramBaseProps = {
 	isTransparent?: boolean;
-	eventBus: EventBus;
+	eventBus?: EventBus; // Optional during migration, will be removed after full context migration
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDrop?: (e: DiagramDragDropEvent) => void;
 	onClick?: (e: DiagramClickEvent) => void;

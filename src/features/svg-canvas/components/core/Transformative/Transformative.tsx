@@ -2,6 +2,9 @@
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
+// Import context.
+import { useEventBus } from "../../../context/EventBusContext";
+
 // Import types.
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramType } from "../../../types/base/DiagramType";
@@ -61,9 +64,10 @@ const TransformativeComponent: React.FC<Props> = ({
 	keepProportion,
 	isSelected,
 	isMultiSelectSource,
-	eventBus,
 	onTransform,
 }) => {
+	const contextEventBus = useEventBus();
+	const eventBus = contextEventBus; // Always use context eventBus for now
 	const [isResizing, setIsResizing] = useState(false);
 	const [isRotating, setIsRotating] = useState(false);
 	const [isShiftKeyDown, setShiftKeyDown] = useState(false);
@@ -917,11 +921,10 @@ const TransformativeComponent: React.FC<Props> = ({
 						endX={vertices.topRightPoint.x}
 						endY={vertices.topRightPoint.y}
 						cursor={cursors.topCenter}
-						eventBus={eventBus}
 						onDrag={handleDragTopCenter}
 						dragPositioningFunction={linerDragFunctionTopCenter}
 					/>
-					{/* Left DragLine */}
+					{/* Left DragLine */}{" "}
 					<DragLine
 						id={`${id}-leftCenter-line`}
 						x={vertices.leftCenterPoint.x}
@@ -931,7 +934,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						endX={vertices.bottomLeftPoint.x}
 						endY={vertices.bottomLeftPoint.y}
 						cursor={cursors.leftCenter}
-						eventBus={eventBus}
 						onDrag={handleDragLeftCenter}
 						dragPositioningFunction={linerDragFunctionLeftCenter}
 					/>

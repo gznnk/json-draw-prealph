@@ -10,7 +10,6 @@ import type { Point } from "../../../../types/base/Point";
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointerEvent";
-import type { EventBus } from "../../../../../../shared/event-bus/EventBus";
 
 // Import functions related to SvgCanvas.
 import { getCursorFromAngle } from "../../../../utils/shapes/common/getCursorFromAngle";
@@ -24,11 +23,10 @@ import { rotatePoint } from "../../../../utils/math/points/rotatePoint";
 import type { SegmentData } from "./SegmentTypes";
 
 /**
- * 線分プロパティ
+ * 線�Eプロパティ
  */
 type SegmentProps = SegmentData & {
 	rightAngleSegmentDrag: boolean;
-	eventBus: EventBus;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onClick?: (e: DiagramClickEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
@@ -36,7 +34,7 @@ type SegmentProps = SegmentData & {
 };
 
 /**
- * 線分コンポーネント
+ * 線�Eコンポ�EネンチE
  */
 const SegmentComponent: React.FC<SegmentProps> = ({
 	id,
@@ -45,7 +43,6 @@ const SegmentComponent: React.FC<SegmentProps> = ({
 	endX,
 	endY,
 	rightAngleSegmentDrag,
-	eventBus,
 	onPointerDown,
 	onClick,
 	onDrag,
@@ -66,9 +63,9 @@ const SegmentComponent: React.FC<SegmentProps> = ({
 		? getCursorFromAngle(radiansToDegrees(radian))
 		: "move";
 
-	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	// ハンドラ生�Eの頻発を回避するため、参照する値をuseRefで保持する
 	const refBusVal = {
-		// 内部変数・内部関数
+		// 冁E��変数・冁E��関数
 		radian,
 		rotateStartPoint,
 		rotateEndPoint,
@@ -96,7 +93,7 @@ const SegmentComponent: React.FC<SegmentProps> = ({
 			endX={endX}
 			endY={endY}
 			cursor={cursor}
-			eventBus={eventBus}
+
 			onPointerDown={onPointerDown}
 			onClick={onClick}
 			onDrag={onDrag}

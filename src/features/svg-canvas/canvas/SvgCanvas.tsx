@@ -43,6 +43,7 @@ import type {
 
 // Import SvgCanvas context.
 import { SvgCanvasContext, SvgCanvasStateProvider } from "./SvgCanvasContext";
+import { EventBusProvider } from "../context/EventBusContext";
 
 // Initialize all diagram types when this module is loaded
 initializeSvgCanvasDiagrams();
@@ -337,7 +338,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			const props = {
 				...item,
 				key: item.id,
-				eventBus,
 				onTransform,
 				onDiagramChange,
 				onDrag,
@@ -350,77 +350,82 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 			return React.createElement(component(), props);
 		});
-
 		return (
 			<Viewport>
 				<Container ref={containerRef}>
-					<SvgCanvasContext.Provider value={stateProvider.current}>
-						<Svg
-							width={containerWidth}
-							height={containerHeight}
-							viewBox={`${minX / zoom} ${minY / zoom} ${containerWidth / zoom} ${containerHeight / zoom}`}
-							tabIndex={0}
-							ref={svgRef}
-							isGrabScrollReady={isGrabScrollReady}
-							isGrabScrolling={isGrabScrolling}
-							onPointerDown={handlePointerDown}
-							onPointerMove={handlePointerMove}
-							onPointerUp={handlePointerUp}
-							onKeyDown={handleKeyDown}
-							onFocus={handleFocus}
-							onBlur={handleBlur}
-							onWheel={handleWheel}
-							onContextMenu={contextMenuHandlers.onContextMenu}
+					<EventBusProvider eventBus={eventBus}>
+						<SvgCanvasContext.Provider value={stateProvider.current}>
+							<Svg
+								width={containerWidth}
+								height={containerHeight}
+								viewBox={`${minX / zoom} ${minY / zoom} ${containerWidth / zoom} ${containerHeight / zoom}`}
+								tabIndex={0}
+								ref={svgRef}
+								isGrabScrollReady={isGrabScrollReady}
+								isGrabScrolling={isGrabScrolling}
+								onPointerDown={handlePointerDown}
+								onPointerMove={handlePointerMove}
+								onPointerUp={handlePointerUp}
+								onKeyDown={handleKeyDown}
+								onFocus={handleFocus}
+								onBlur={handleBlur}
+								onWheel={handleWheel}
+								onContextMenu={contextMenuHandlers.onContextMenu}
+							>
+								<title>{title}</title>
+								{/* Render the items in the SvgCanvas. */}
+								{renderedItems}
+								{/* Dummy group for multi-select. */}{" "}
+								{multiSelectGroup && (
+									<Group
+										{...multiSelectGroup}
+										id={MULTI_SELECT_GROUP}
+										syncWithSameId
+										onSelect={onSelect}
+										onTransform={onTransform}
+										onDiagramChange={onDiagramChange}
+									/>
+								)}{" "}
+								{/* Render new connect line. */}
+								<NewConnectLine />
+								{/* Render flash connect lines */} <FlashConnectLine />
+								{/* Render area selection rectangle */}
+								{selectionState && (
+									<SelectionRect
+										x={Math.min(selectionState.startX, selectionState.endX)}
+										y={Math.min(selectionState.startY, selectionState.endY)}
+										width={Math.abs(
+											selectionState.endX - selectionState.startX,
+										)}
+										height={Math.abs(
+											selectionState.endY - selectionState.startY,
+										)}
+										visible={selectionState.isSelecting}
+									/>
+								)}{" "}
+							</Svg>
+						</SvgCanvasContext.Provider>
+						{/* Container for HTML elements that follow the scroll of the SVG canvas with zoom scaling. */}
+						<HTMLElementsContainer
+							left={-minX}
+							top={-minY}
+							width={containerWidth + minX}
+							height={containerHeight + minY}
+							zoom={zoom}
 						>
-							<title>{title}</title>
-							{/* Render the items in the SvgCanvas. */}
-							{renderedItems}
-							{/* Dummy group for multi-select. */}
-							{multiSelectGroup && (
-								<Group
-									{...multiSelectGroup}
-									id={MULTI_SELECT_GROUP}
-									syncWithSameId
-									eventBus={eventBus}
-									onSelect={onSelect}
-									onTransform={onTransform}
-									onDiagramChange={onDiagramChange}
-								/>
-							)}
-							{/* Render new connect line. */}
-							<NewConnectLine eventBus={eventBus} />
-							{/* Render flash connect lines */} <FlashConnectLine />
-							{/* Render area selection rectangle */}
-							{selectionState && (
-								<SelectionRect
-									x={Math.min(selectionState.startX, selectionState.endX)}
-									y={Math.min(selectionState.startY, selectionState.endY)}
-									width={Math.abs(selectionState.endX - selectionState.startX)}
-									height={Math.abs(selectionState.endY - selectionState.startY)}
-									visible={selectionState.isSelecting}
-								/>
-							)}
-						</Svg>
-					</SvgCanvasContext.Provider>
-					{/* Container for HTML elements that follow the scroll of the SVG canvas with zoom scaling. */}
-					<HTMLElementsContainer
-						left={-minX}
-						top={-minY}
-						width={containerWidth + minX}
-						height={containerHeight + minY}
-						zoom={zoom}
-					>
-						<TextEditor {...textEditorState} onTextChange={onTextChange} />
-					</HTMLElementsContainer>
-					{/* Container for HTML elements that follow the scroll but not zoom. */}
-					<HTMLElementsContainer
-						left={-minX}
-						top={-minY}
-						width={containerWidth + minX}
-						height={containerHeight + minY}
-					>
-						<DiagramMenu {...diagramMenuProps} />
-					</HTMLElementsContainer>
+							<TextEditor {...textEditorState} onTextChange={onTextChange} />
+						</HTMLElementsContainer>
+						{/* Container for HTML elements that follow the scroll but not zoom. */}
+						<HTMLElementsContainer
+							left={-minX}
+							top={-minY}
+							width={containerWidth + minX}
+							height={containerHeight + minY}
+						>
+							{" "}
+							<DiagramMenu {...diagramMenuProps} />
+						</HTMLElementsContainer>
+					</EventBusProvider>
 				</Container>
 				{/* Container for HTML elements fixed to the viewport. */}
 				<ViewportOverlay>

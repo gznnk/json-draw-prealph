@@ -12,6 +12,9 @@ import type { DiagramTextEditEvent } from "../../../types/events/DiagramTextEdit
 import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
 import type { GroupProps } from "../../../types/props/shapes/GroupProps";
 
+// Import hooks
+import { useEventBus } from "../../../context/EventBusContext";
+
 // Import components related to SvgCanvas.
 import { PositionLabel } from "../../core/PositionLabel";
 import { Outline } from "../../core/Outline";
@@ -45,7 +48,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 	showConnectPoints = true,
 	showOutline = false,
 	syncWithSameId = false,
-	eventBus,
 	onDrag,
 	onClick,
 	onSelect,
@@ -55,6 +57,10 @@ const GroupComponent: React.FC<GroupProps> = ({
 	onTextEdit,
 	onExecute,
 }) => {
+	// Get eventBus from context, fallback to prop during migration
+	const contextEventBus = useEventBus();
+	const eventBus = contextEventBus; // Use context eventBus
+
 	// Flag indicating whether the entire group is being dragged.
 	// Set to true only when this group is selected and currently being dragged.
 	const [isGroupDragging, setIsGroupDragging] = useState(false);
@@ -74,7 +80,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	// Group's oriented box at the start of a drag or transform.
 	const startBox = useRef({ x, y, width, height });
 
-	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	// ハンドラ生�Eの頻発を回避するため、参照する値をuseRefで保持する
 	const refBusVal = {
 		// プロパティ
 		id,
@@ -91,55 +97,55 @@ const GroupComponent: React.FC<GroupProps> = ({
 		onDiagramChange,
 		onConnect,
 		onTextEdit,
-		// 内部変数・内部関数
+		// 冁E��変数・冁E��関数
 		isGroupDragging,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	/**
-	 * グループ内の図形の選択イベントハンドラ
+	 * グループ�Eの図形の選択イベントハンドラ
 	 */
 	const handleChildDiagramSelect = useCallback((e: DiagramSelectEvent) => {
 		const { id, isSelected, items, onSelect } = refBus.current;
 
 		const selectedChild = getSelectedChildDiagram(items);
 		if (!selectedChild) {
-			// グループ内の図形が選択されていない場合は、このグループの選択イベントを発火させる。
-			// これにより、グループ内の図形が選択されていないグループのうち、最も上位のグループのイベントが
-			// SvgCanvasまで伝番され、そのグループが選択状態になる。
+			// グループ�Eの図形が選択されてぁE��ぁE��合�E、このグループ�E選択イベントを発火させる、E
+			// これにより、グループ�Eの図形が選択されてぁE��ぁE��ループ�EぁE��、最も上位�Eグループ�Eイベントが
+			// SvgCanvasまで伝番され、そのグループが選択状態になる、E
 			onSelect?.({
 				eventId: e.eventId,
 				id,
 			});
 		} else if (selectedChild.id !== e.id) {
-			// グループ内の図形が選択されていて、かつグループ内の別の図形が選択された場合、その図形を選択状態にする
+			// グループ�Eの図形が選択されてぁE��、かつグループ�Eの別の図形が選択された場合、その図形を選択状態にする
 			onSelect?.(e);
 		}
 
 		if (isSelected) {
-			// グループ連続選択時のクリック（ポインターアップ）時に、グループ内でクリックされた図形を選択状態にしたいので、
-			// フラグを立てておき、クリックイベント側で参照する。
+			// グループ連続選択時のクリチE���E��EインターアチE�E�E�時に、グループ�EでクリチE��された図形を選択状態にしたぁE�Eで、E
+			// フラグを立てておき、クリチE��イベント�Eで参�Eする、E
 			isSequentialSelection.current = true;
 		}
 	}, []);
 
 	/**
-	 * グループ内の図形のクリックイベントハンドラ
+	 * グループ�Eの図形のクリチE��イベントハンドラ
 	 */
 	const handleChildDiagramClick = useCallback((e: DiagramSelectEvent) => {
 		const { id, onSelect, onClick } = refBus.current;
 
 		if (isSequentialSelection.current) {
-			// グループ連続選択時のクリック（ポインターアップ）時であれば、そのグループ内の図形を選択状態にする。
-			// これにより、グループがネストしている場合は、選択の階層が１つずつ下がっていき、最終的にクリックされた図形が選択される。
+			// グループ連続選択時のクリチE���E��EインターアチE�E�E�時であれば、そのグループ�Eの図形を選択状態にする、E
+			// これにより、グループがネストしてぁE��場合�E、E��択�E階層が１つずつ下がってぁE��、最終的にクリチE��された図形が選択される、E
 			onSelect?.(e);
 			isSequentialSelection.current = false;
 		} else {
-			// グループ連続選択時でない場合は、このグループのクリックイベントを発火させる。
-			// これにより、連続選択でないグループのうち、最も上位のグループのクリックイベントが
-			// 連続選択されたグループまで伝番し、そのグループの連続選択時の処理（当該分岐のtrue側）が実行され、
-			// その直下のグループが選択状態になる。
+			// グループ連続選択時でなぁE��合�E、このグループ�EクリチE��イベントを発火させる、E
+			// これにより、E��続選択でなぁE��ループ�EぁE��、最も上位�Eグループ�EクリチE��イベントが
+			// 連続選択されたグループまで伝番し、そのグループ�E連続選択時の処琁E��当該刁E���Etrue側�E�が実行され、E
+			// そ�E直下�Eグループが選択状態になる、E
 			onClick?.({
 				eventId: e.eventId,
 				id,
@@ -147,7 +153,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 		}
 	}, []);
 
-	// グループの選択状態制御
+	// グループ�E選択状態制御
 	useEffect(() => {
 		// グループから選択が外れたら連続選択フラグも解除
 		if (!isSelected) {
@@ -156,7 +162,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	}, [isSelected]);
 
 	/**
-	 * グループ内の図形のドラッグ中イベントハンドラ
+	 * グループ�Eの図形のドラチE��中イベントハンドラ
 	 */
 	const handleChildDiagramDrag = useCallback((e: DiagramDragEvent) => {
 		const {
@@ -172,21 +178,21 @@ const GroupComponent: React.FC<GroupProps> = ({
 			isGroupDragging,
 		} = refBus.current;
 
-		// ドラッグ開始時の処理
+		// ドラチE��開始時の処琁E
 		if (e.eventType === "Start") {
 			if (!isSelected) {
-				// グループ選択時でなければ、ドラッグイベントをそのまま伝番し、
-				// 選択されている図形のみ移動を行う
+				// グループ選択時でなければ、ドラチE��イベントをそ�Eまま伝番し、E
+				// 選択されてぁE��図形のみ移動を行う
 				onDrag?.(e);
 			} else {
-				// グループ選択時であれば、グループ全体をドラッグ可能にする
+				// グループ選択時であれば、グループ�E体をドラチE��可能にする
 				setIsGroupDragging(true);
 
-				// ドラッグ開始時のグループの形状を記憶
+				// ドラチE��開始時のグループ�E形状を記�E
 				startItems.current = items;
 				startBox.current = { x, y, width, height };
 
-				// グループ全体の変更開始を通知
+				// グループ�E体�E変更開始を通知
 				onDiagramChange?.({
 					eventId: e.eventId,
 					eventType: "Start",
@@ -209,17 +215,17 @@ const GroupComponent: React.FC<GroupProps> = ({
 			return;
 		}
 
-		// 以降ドラッグ中・ドラッグ終了時の処理
+		// 以降ドラチE��中・ドラチE��終亁E��の処琁E
 		if (!isGroupDragging) {
-			// グループ全体のドラッグでなければ、ドラッグイベントをそのまま伝番し、
-			// 選択されている図形のみ移動を行う
+			// グループ�E体�EドラチE��でなければ、ドラチE��イベントをそ�Eまま伝番し、E
+			// 選択されてぁE��図形のみ移動を行う
 			onDrag?.(e);
 		} else {
-			// グループ全体のドラッグの場合、グループ内の図形を再帰的に移動させる
+			// グループ�E体�EドラチE��の場合、グループ�Eの図形を�E帰皁E��移動させる
 			const dx = e.endX - e.startX;
 			const dy = e.endY - e.startY;
 
-			// グループ内の図形を再帰的に移動させる（接続ポイントは含まない）
+			// グループ�Eの図形を�E帰皁E��移動させる�E�接続�Eイント�E含まなぁE��E
 			const moveRecursive = (diagrams: Diagram[]) => {
 				const newItems: Diagram[] = [];
 				for (const item of diagrams) {
@@ -252,40 +258,40 @@ const GroupComponent: React.FC<GroupProps> = ({
 				cursorY: e.cursorY,
 			};
 
-			// グループ内の全ての図形の移動をまとめて通知
+			// グループ�Eの全ての図形の移動をまとめて通知
 			onDiagramChange?.(event);
 		}
 
-		// ドラッグ終了時にドラッグ中フラグを解除
+		// ドラチE��終亁E��にドラチE��中フラグを解除
 		if (e.eventType === "End") {
 			setIsGroupDragging(false);
 		}
 	}, []);
 
 	/**
-	 * グループ内の図形の変形イベントハンドラ
+	 * グループ�Eの図形の変形イベントハンドラ
 	 */
 	const handleChildDiagramTransfrom = useCallback(
 		(e: DiagramTransformEvent) => {
 			const { onTransform } = refBus.current;
 
-			// 変形イベントをそのまま伝番する
-			// アウトライン更新はCanvas側で行うので、ここでは何もしない
+			// 変形イベントをそ�Eまま伝番する
+			// アウトライン更新はCanvas側で行うので、ここでは何もしなぁE
 			onTransform?.(e);
 		},
 		[],
 	);
 
 	/**
-	 * グループ内の図形の変更イベントハンドラ
+	 * グループ�Eの図形の変更イベントハンドラ
 	 */
 	const handleChildDiagramChange = useCallback(
 		(e: DiagramChangeEvent) => {
 			const { id, isSelected, onDiagramChange } = refBus.current;
 
 			if (isSelected) {
-				// TODO: 必要か？
-				// グループ選択時の場合、ここに来るのはドラッグ相当の操作の場合なので、ドラッグイベントに変換して伝番する
+				// TODO: 忁E��か�E�E
+				// グループ選択時の場合、ここに来る�EはドラチE��相当�E操作�E場合なので、ドラチE��イベントに変換して伝番する
 				const dragEvent = {
 					eventType: e.eventType,
 					id,
@@ -297,7 +303,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 
 				handleChildDiagramDrag(dragEvent);
 			} else {
-				// グループ選択時でない場合、アウトライン以外はグループへの影響はないので、変更イベントをそのまま伝番する
+				// グループ選択時でなぁE��合、アウトライン以外�Eグループへの影響はなぁE�Eで、変更イベントをそ�Eまま伝番する
 				onDiagramChange?.(e);
 			}
 		},
@@ -305,38 +311,38 @@ const GroupComponent: React.FC<GroupProps> = ({
 	);
 
 	/**
-	 * グループ内の図形の接続イベントハンドラ
+	 * グループ�Eの図形の接続イベントハンドラ
 	 */
 	const handleChildDiagramConnect = useCallback((e: DiagramConnectEvent) => {
 		const { onConnect } = refBus.current;
 
-		// 特にすることはないのでそのまま伝番する
+		// 特にすることはなぁE�Eでそ�Eまま伝番する
 		onConnect?.(e);
 	}, []);
 
 	/**
-	 * グループ内の図形のテキスト編集イベントハンドラ
+	 * グループ�Eの図形のチE��スト編雁E��ベントハンドラ
 	 */
 	const handleChildDiagramTextEdit = useCallback((e: DiagramTextEditEvent) => {
 		const { onTextEdit } = refBus.current;
 
-		// グループ内の図形のテキスト編集イベントをそのまま伝番する
+		// グループ�Eの図形のチE��スト編雁E��ベントをそ�Eまま伝番する
 		onTextEdit?.(e);
 	}, []);
 
 	/**
-	 * グループの変形イベントハンドラ
+	 * グループ�E変形イベントハンドラ
 	 */
 	const handleTransform = useCallback((e: DiagramTransformEvent) => {
 		const { id, x, y, width, height, items, onDiagramChange } = refBus.current;
 
-		// グループの変形開始時の処理
+		// グループ�E変形開始時の処琁E
 		if (e.eventType === "Start") {
-			// 変形開始時のグループの形状を記憶
+			// 変形開始時のグループ�E形状を記�E
 			startBox.current = { x, y, width, height };
 			startItems.current = items;
 
-			// まだ何も変形してないので、開始の通知のみ行う
+			// まだ何も変形してなぁE�Eで、E��始�E通知のみ行う
 			onDiagramChange?.({
 				eventId: e.eventId,
 				eventType: "Start",
@@ -358,13 +364,13 @@ const GroupComponent: React.FC<GroupProps> = ({
 			return;
 		}
 
-		// 以降グループの変形中・変形終了時の処理
+		// 以降グループ�E変形中・変形終亁E��の処琁E
 
-		// グループの拡縮を計算
+		// グループ�E拡縮を計箁E
 		const groupScaleX = e.endShape.width / e.startShape.width;
 		const groupScaleY = e.endShape.height / e.startShape.height;
 
-		// グループ内の図形を再帰的に変形させる（接続ポイントも含む）
+		// グループ�Eの図形を�E帰皁E��変形させる（接続�Eイントも含む�E�E
 		const transformRecursive = (diagrams: Diagram[]) => {
 			const newItems: Diagram[] = [];
 			for (const item of diagrams) {
@@ -445,7 +451,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			cursorY: e.cursorY,
 		};
 
-		// グループ内の全ての図形の変形をまとめて通知
+		// グループ�Eの全ての図形の変形をまとめて通知
 		onDiagramChange?.(event);
 
 		if (e.eventType === "End") {
@@ -459,9 +465,9 @@ const GroupComponent: React.FC<GroupProps> = ({
 		!isGroupDragging &&
 		!isGroupTransforming;
 
-	// グループ内の図形の作成
+	// グループ�Eの図形の作�E
 	const children = items.map((item) => {
-		// item.typeがDiagramType型であることを確認
+		// item.typeがDiagramType型であることを確誁E
 		if (!item.type) {
 			console.error("Item has no type", item);
 			return null;
@@ -475,7 +481,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			...item,
 			key: item.id,
 			showConnectPoints: doShowConnectPoints,
-			// グループが選択されているか、親から子要素としてアウトライン表示指示があった場合に子要素にアウトラインを表示
+			// グループが選択されてぁE��か、親から子要素としてアウトライン表示持E��があった場合に子要素にアウトラインを表示
 			showOutline: isSelected || showOutline,
 			syncWithSameId,
 			eventBus,
@@ -520,7 +526,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 					keepProportion={keepProportion}
 					isSelected={isSelected}
 					isMultiSelectSource={isMultiSelectSource}
-					eventBus={eventBus}
+
 					onTransform={handleTransform}
 				/>
 			)}

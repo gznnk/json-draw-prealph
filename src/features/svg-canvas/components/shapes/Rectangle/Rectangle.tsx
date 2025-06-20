@@ -28,7 +28,7 @@ import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransf
 import { RectangleElement } from "./RectangleStyled";
 
 /**
- * 四角形コンポーネント
+ * 四角形コンポ�EネンチE
  */
 const RectangleComponent: React.FC<RectangleProps> = ({
 	id,
@@ -70,16 +70,16 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	onTextEdit,
 	onFileDrop,
 }) => {
-	// ドラッグ中かのフラグ
+	// ドラチE��中か�Eフラグ
 	const [isDragging, setIsDragging] = useState(false);
-	// 変形中かのフラグ
+	// 変形中か�Eフラグ
 	const [isTransformimg, setIsTransforming] = useState(false);
-	// ホバー中かのフラグ
+	// ホバー中か�Eフラグ
 	const [isHovered, setIsHovered] = useState(false);
-	// 変形対象のSVG要素への参照
+	// 変形対象のSVG要素への参�E
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
-	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	// ハンドラ生�Eの頻発を回避するため、参照する値をuseRefで保持する
 	const refBusVal = {
 		// プロパティ
 		id,
@@ -94,7 +94,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	refBus.current = refBusVal;
 
 	/**
-	 * 四角形のドラッグイベントハンドラ
+	 * 四角形のドラチE��イベントハンドラ
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
 		const { onDrag } = refBus.current;
@@ -148,21 +148,21 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	}, []);
 
 	/**
-	 * ドラッグオーバーイベントハンドラ
+	 * ドラチE��オーバ�Eイベントハンドラ
 	 */
 	const handleDragOver = useCallback(() => {
 		setIsHovered(true);
 	}, []);
 
 	/**
-	 * ドラッグリーブイベントハンドラ
+	 * ドラチE��リーブイベントハンドラ
 	 */
 	const handleDragLeave = useCallback(() => {
 		setIsHovered(false);
 	}, []);
 
 	/**
-	 * ダブルクリックイベントハンドラ
+	 * ダブルクリチE��イベントハンドラ
 	 */
 	const handleDoubleClick = useCallback(() => {
 		const { id, isSelected, isTextEditEnabled, onTextEdit } = refBus.current;
@@ -171,13 +171,13 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 
 		if (!isSelected) return;
 
-		// テキスト編集イベントを発火
+		// チE��スト編雁E��ベントを発火
 		onTextEdit?.({
 			id,
 		});
 	}, []);
 
-	// ドラッグ用のプロパティを生成
+	// ドラチE��用のプロパティを生戁E
 	const dragProps = useDrag({
 		id,
 		type: "Rectangle",
@@ -194,12 +194,12 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		onDragLeave: handleDragLeave,
 	});
 
-	// ファイルドロップ用のプロパティを生成
+	// ファイルドロチE�E用のプロパティを生戁E
 	const fileDropProps = useFileDrop({ id, onFileDrop });
 
 	// memo化によりConnectPointの再描画を抑制
-	// keyで分解してばらばらにpropsで渡すと、各ConnectPoint側それぞれで各keyに対して
-	// 比較処理が走り非効率なので、ここでまとめてShapeの差異を検知する
+	// keyで刁E��してばら�Eらにpropsで渡すと、各ConnectPoint側それぞれで吁Eeyに対して
+	// 比輁E�E琁E��走り非効玁E��ので、ここでまとめてShapeの差異を検知する
 	const ownerShape = useMemo(
 		() => ({
 			x,
@@ -213,7 +213,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		[x, y, width, height, rotation, scaleX, scaleY],
 	);
 
-	// rectのtransform属性を生成
+	// rectのtransform属性を生戁E
 	const transform = createSvgTransform(
 		scaleX,
 		scaleY,
@@ -222,10 +222,10 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		y,
 	);
 
-	// 変形コンポーネントを表示するかのフラグ
+	// 変形コンポ�Eネントを表示するか�Eフラグ
 	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
 
-	// 接続ポイントを表示するかのフラグ
+	// 接続�Eイントを表示するか�Eフラグ
 	const doShowConnectPoints =
 		showConnectPoints &&
 		!isSelected &&
@@ -301,7 +301,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					keepProportion={keepProportion}
 					isSelected={isSelected}
 					isMultiSelectSource={isMultiSelectSource}
-					eventBus={eventBus}
+
 					onTransform={handleTransform}
 				/>
 			)}
@@ -316,7 +316,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 						ownerId={id}
 						ownerShape={ownerShape}
 						isTransparent={!isHovered || isDragging || isTransformimg}
-						eventBus={eventBus}
+
 						onConnect={onConnect}
 					/>
 				))}

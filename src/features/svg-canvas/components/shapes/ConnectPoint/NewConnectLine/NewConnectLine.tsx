@@ -4,22 +4,17 @@ import { memo, useEffect, useState } from "react";
 // Import components related to SvgCanvas.
 import { Path } from "../../Path";
 import type { PathData } from "../../../../types/data/shapes/PathData";
-import type { EventBus } from "../../../../../../shared/event-bus/EventBus";
+import { useEventBus } from "../../../../context/EventBusContext";
 
 // Import related to this component.
 import { EVENT_NAME_NEW_CONNECT_LINE } from "../../../../constants/EventNames";
 import type { NewConnectLineEvent } from "./NewConnectLineTypes";
 
-type NewConnectLineProps = {
-	eventBus: EventBus;
-};
-
 /**
  * Component for rendering a new connection line.
  */
-const NewConnectLineComponent: React.FC<NewConnectLineProps> = ({
-	eventBus,
-}) => {
+const NewConnectLineComponent: React.FC = () => {
+	const eventBus = useEventBus();
 	const [connectLine, setConnectLine] = useState<PathData>();
 
 	useEffect(() => {
@@ -47,7 +42,7 @@ const NewConnectLineComponent: React.FC<NewConnectLineProps> = ({
 		return null;
 	}
 
-	return <Path {...connectLine} eventBus={eventBus} />;
+	return <Path {...connectLine} />;
 };
 
 export const NewConnectLine = memo(NewConnectLineComponent);

@@ -10,7 +10,10 @@ import type { DiagramHoverEvent } from "../../../../types/events/DiagramHoverEve
 import type { ConnectPointProps } from "../../../../types/props/shapes/ConnectPointProps";
 import type { PathPointData } from "../../../../types/data/shapes/PathPointData";
 
-// SvgCanvas関連コンポーネントをインポート
+// Import hooks
+import { useEventBus } from "../../../../context/EventBusContext";
+
+// SvgCanvas関連コンポ�Eネントをインポ�EチE
 import { DragPoint } from "../../../core/DragPoint";
 
 // Import utils.
@@ -26,7 +29,7 @@ import { getLineDirection } from "../../../../utils/shapes/connectPoint/getLineD
 import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
 
 /**
- * 接続ポイントコンポーネント
+ * 接続�Eイントコンポ�EネンチE
  */
 const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	id,
@@ -35,28 +38,30 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	ownerId,
 	ownerShape,
 	isTransparent,
-	eventBus,
 	onConnect,
 }) => {
-	// ホバー状態の管理
+	// Get eventBus from context
+	const eventBus = useEventBus();
+
+	// ホバー状態�E管琁E
 	const [isHovered, setIsHovered] = useState(false);
-	// 接続線の座標
+	// 接続線�E座樁E
 	const [pathPoints, setPathPoints] = useState<PathPointData[]>([]);
-	// 接続中のポイント
+	// 接続中のポインチE
 	const connectingPoint = useRef<ConnectingPoint | undefined>(undefined);
-	// 接続ポイントの所有者の外接矩形
+	// 接続�Eイント�E所有老E�E外接矩形
 	const ownerBoundingBoxGeometry = calcRectangleBoundingBoxGeometry(ownerShape);
-	// 接続ポイントの方向
+	// 接続�Eイント�E方吁E
 	const direction = getLineDirection(ownerShape.x, ownerShape.y, x, y);
 
 	/**
-	 * 接続線の座標を更新
+	 * 接続線�E座標を更新
 	 */
 	const updatePathPoints = (dragX: number, dragY: number) => {
 		let newPoints: Point[] = [];
 
 		if (!connectingPoint.current) {
-			// ドラッグ中の接続線
+			// ドラチE��中の接続緁E
 			newPoints = createConnectPathOnDrag(
 				x,
 				y,
@@ -66,21 +71,21 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 				dragY,
 			);
 		} else {
-			// 接続中のポイントがある場合の接続線
+			// 接続中のポイントがある場合�E接続緁E
 			newPoints = createBestConnectPath(
 				x,
 				y,
 				ownerShape,
-				connectingPoint.current.x, // 接続先のX座標
-				connectingPoint.current.y, // 接続先のY座標
-				connectingPoint.current.ownerShape, // 接続先の所有者の形状
+				connectingPoint.current.x, // 接続�EのX座樁E
+				connectingPoint.current.y, // 接続�EのY座樁E
+				connectingPoint.current.ownerShape, // 接続�Eの所有老E�E形状
 			);
 		}
 
 		const newPathPoints = newPoints.map(
 			(p, i) =>
 				({
-					id: `${id}-${i}`, // 仮のIDを付与
+					id: `${id}-${i}`, // 仮のIDを付丁E
 					x: p.x,
 					y: p.y,
 				}) as PathPointData,
@@ -109,7 +114,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		});
 	};
 
-	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	// ハンドラ生�Eの頻発を回避するため、参照する値をuseRefで保持する
 	const refBusVal = {
 		// プロパティ
 		id,
@@ -119,7 +124,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		ownerShape,
 		onConnect,
 		eventBus,
-		// 内部変数・内部関数
+		// 冁E��変数・冁E��関数
 		pathPoints,
 		updatePathPoints,
 	};
@@ -127,15 +132,15 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	refBus.current = refBusVal;
 
 	/**
-	 * 接続ポイントのドラッグイベントハンドラ
+	 * 接続�Eイント�EドラチE��イベントハンドラ
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
 		if (connectingPoint.current) {
-			// 接続中のポイントがある場合は、そのポイントを終点とする
+			// 接続中のポイントがある場合�E、そのポイントを終点とする
 			return;
 		}
 
-		// 接続線の座標を再計算
+		// 接続線�E座標を再計箁E
 		refBus.current.updatePathPoints(e.endX, e.endY);
 
 		if (e.eventType === "End") {
@@ -147,7 +152,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	}, []);
 
 	/**
-	 * この接続ポイントの上に要素が乗った時のイベントハンドラ
+	 * こ�E接続�Eイント�E上に要素が乗った時のイベントハンドラ
 	 */
 	const handleDragOver = useCallback((e: DiagramDragDropEvent) => {
 		if (e.dropItem.type === "ConnectPoint") {
@@ -155,7 +160,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 
 			const { id, x, y, ownerId, ownerShape, eventBus } = refBus.current;
 
-			// 接続元に情報を送信
+			// 接続�Eに惁E��を送信
 			eventBus.dispatchEvent(
 				new CustomEvent(EVENT_NAME_CONNECTTION, {
 					detail: {
@@ -175,15 +180,15 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		}
 	}, []);
 	/**
-	 * この接続ポイントの上から要素が外れた時のイベントハンドラ
+	 * こ�E接続�Eイント�E上から要素が外れた時のイベントハンドラ
 	 */
 	const handleDragLeave = useCallback((e: DiagramDragDropEvent) => {
 		setIsHovered(false);
-		// 接続が切れた時の処理
+		// 接続が刁E��た時の処琁E
 		if (e.dropItem.type === "ConnectPoint") {
 			const { id, x, y, ownerId, ownerShape, eventBus } = refBus.current;
 
-			// 接続元に情報を送信
+			// 接続�Eに惁E��を送信
 			eventBus.dispatchEvent(
 				new CustomEvent(EVENT_NAME_CONNECTTION, {
 					detail: {
@@ -203,14 +208,14 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		}
 	}, []);
 	/**
-	 * この接続ポイントに要素がドロップされた時のイベントハンドラ
+	 * こ�E接続�Eイントに要素がドロチE�Eされた時のイベントハンドラ
 	 */
 	const handleDrop = useCallback((e: DiagramDragDropEvent) => {
-		// ドロップされたときの処理
+		// ドロチE�Eされたとき�E処琁E
 		if (e.dropItem.type === "ConnectPoint") {
 			const { id, x, y, ownerId, ownerShape, eventBus } = refBus.current;
 
-			// 接続元に情報を送信
+			// 接続�Eに惁E��を送信
 			eventBus.dispatchEvent(
 				new CustomEvent(EVENT_NAME_CONNECTTION, {
 					detail: {
@@ -234,7 +239,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	/**
 	 * ホバー状態変更イベントハンドラ
 	 *
-	 * @param {DiagramHoverEvent} e ホバー状態変更イベント
+	 * @param {DiagramHoverEvent} e ホバー状態変更イベンチE
 	 * @returns {void}
 	 */
 	const handleHover = useCallback((e: DiagramHoverEvent) => {
@@ -243,15 +248,15 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 
 	useEffect(() => {
 		const handleConnection = (e: Event) => {
-			// refBusを介して参照値を取得
+			// refBusを介して参�E値を取征E
 			const { id, pathPoints, ownerId, onConnect, updatePathPoints, eventBus } =
 				refBus.current;
 
 			const customEvent = e as CustomEvent<ConnectionEvent>;
 			if (customEvent.detail.startPointId === id) {
 				if (customEvent.detail.type === "connecting") {
-					// 接続が始まった時の処理
-					// 接続先のポイントを保持
+					// 接続が始まった時の処琁E
+					// 接続�Eのポイントを保持
 					connectingPoint.current = {
 						id: customEvent.detail.endPointId,
 						x: customEvent.detail.endX,
@@ -260,19 +265,19 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 						ownerShape: customEvent.detail.endOwnerShape,
 					};
 
-					// 接続先のポイントと線がつながるよう、パスポイントを再計算
+					// 接続�Eのポイントと線がつながるよう、パスポイントを再計箁E
 					updatePathPoints(customEvent.detail.endX, customEvent.detail.endY);
 				}
 
 				if (customEvent.detail.type === "disconnect") {
-					// 切断時の処理
+					// 刁E��時�E処琁E
 					// 接続中のポイントを解除
 					connectingPoint.current = undefined;
 				}
 
 				if (customEvent.detail.type === "connect") {
-					// 接続完了時の処理
-					// 接続線のデータを生成してイベント発火
+					// 接続完亁E��の処琁E
+					// 接続線�EチE�Eタを生成してイベント発火
 
 					const points: PathPointData[] = [...pathPoints];
 					points[0].id = id;
@@ -319,7 +324,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			// Show when hovered, even if isTransparent is true.
 			// If you want to hide when hovered, do not render this component.
 			isTransparent={isTransparent && !isHovered}
-			eventBus={eventBus}
+
 			onDrag={handleDrag}
 			onDragOver={handleDragOver}
 			onDragLeave={handleDragLeave}
