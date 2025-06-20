@@ -9,11 +9,11 @@ import React, {
 	useState,
 } from "react";
 
-// SvgCanvas関連型定義をインポート
+// Import SvgCanvas related type definitions
 import { DiagramRegistry } from "../registry";
 import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
 
-// SvgCanvas関連コンポーネントをインポート
+// Import SvgCanvas related components
 import { TextEditor } from "../components/core/Textable";
 import { CanvasMenu } from "../components/menus/CanvasMenu";
 import { ContextMenu, useContextMenu } from "../components/menus/ContextMenu";
@@ -49,7 +49,7 @@ import { EventBusProvider } from "../context/EventBusContext";
 initializeSvgCanvasDiagrams();
 
 /**
- * SvgCanvasコンポーネント
+ * SvgCanvas component
  */
 const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 	(props, ref) => {
@@ -97,9 +97,9 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onCancelAreaSelection,
 		} = props;
 
-		// SVG要素のコンテナの参照
+		// Reference to the SVG element container
 		const containerRef = useRef<HTMLDivElement>(null);
-		// SVG要素の参照
+		// Reference to the SVG element
 		const svgRef = useRef<SVGSVGElement>(null);
 		// Container dimensions state
 		const [containerWidth, setContainerWidth] = useState(0);
@@ -111,11 +111,10 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			svgRef,
 		}));
 
-		// SVG要素にフォーカスがあるかどうかのフラグ
+		// Flag indicating whether the SVG element has focus
 		const hasFocus = useRef(false);
-
-		// SvgCanvasStateProviderのインスタンスを生成
-		// 現時点ではシングルトン的に扱うため、useRefで保持し、以降再作成しない
+		// Create instance of SvgCanvasStateProvider
+		// Currently treated as singleton, so hold in useRef and do not recreate
 		const stateProvider = useRef(
 			new SvgCanvasStateProvider({} as SvgCanvasState),
 		);
@@ -167,16 +166,14 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		};
 		const refBus = useRef(refBusVal);
 		refBus.current = refBusVal;
-
 		/**
-		 * SVG要素のフォーカスイベントハンドラ
+		 * Focus event handler for SVG element
 		 */
 		const handleFocus = useCallback(() => {
 			hasFocus.current = true;
 		}, []);
-
 		/**
-		 * SVG要素のブラーイベントハンドラ
+		 * Blur event handler for SVG element
 		 */
 		const handleBlur = useCallback(() => {
 			hasFocus.current = false;
@@ -257,9 +254,8 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				clientY: e.clientY + e.deltaY,
 			});
 		}, []);
-
 		/**
-		 * SvgCanvasのキーダウンイベントハンドラ
+		 * SvgCanvas key down event handler
 		 */
 		const handleKeyDown = useCallback(
 			(e: React.KeyboardEvent<SVGSVGElement>) => {
@@ -272,7 +268,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					return;
 				}
 
-				// キャンバスにフォーカスがない場合はイベントをキャンセルし、スクロールを無効化
+				// Cancel event if canvas doesn't have focus to disable scrolling
 				if (e.target !== e.currentTarget) {
 					e.preventDefault();
 				}
@@ -328,7 +324,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			};
 		}, [isGrabScrolling]);
 
-		// 図形の描画
+		// Render diagrams
 		const renderedItems = items.map((item) => {
 			const component = DiagramRegistry.getComponent(item.type);
 			if (!component) {

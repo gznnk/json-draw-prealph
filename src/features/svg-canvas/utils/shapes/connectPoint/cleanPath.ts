@@ -11,7 +11,7 @@ export const cleanPath = (list: Point[]): Point[] => {
 	const points: Point[] = [...list];
 	for (let i = points.length - 3; i >= 0; i--) {
 		if (
-			// 3点が一直線上にある場合は中間の点を削除
+			// Remove middle point if three points are in a straight line
 			isStraight(points[i], points[i + 1], points[i + 2])
 		) {
 			points.splice(i + 1, 1);

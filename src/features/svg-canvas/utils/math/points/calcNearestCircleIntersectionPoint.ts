@@ -26,16 +26,15 @@ export const calcNearestCircleIntersectionPoint = (
 	const dx = px - cx;
 	const dy = py - cy;
 	const dist = Math.sqrt(dx * dx + dy * dy);
-
-	// 任意の点が円の中心と一致する場合
+	// If the arbitrary point coincides with the center of the circle
 	if (dist === 0) {
-		return { x: cx + r, y: cy }; // ラジアンが0の円周上の点を返す
+		return { x: cx + r, y: cy }; // Return a point on the circle with radian 0
 	}
 
-	// 円の中心と任意の点を結ぶ直線が円周と交わる場合
+	// When the line connecting the center of the circle and the arbitrary point intersects the circumference
 	const a = (r * dx) / dist;
 	const b = (r * dy) / dist;
 
-	// 任意の点に近い方の交点を返す
+	// Return the intersection point closer to the arbitrary point
 	return closerPoint(px, py, cx + a, cy + b, cx - a, cy - b);
 };

@@ -3,10 +3,10 @@ import { isItemableData } from "../../utils/validation/isItemableData";
 import { isSelectableData } from "../../utils/validation/isSelectableData";
 
 /**
- * 複数選択時に、選択元として設定された図形の非表示を解除する
+ * Clear the hidden state of shapes set as selection sources during multi-selection
  *
- * @param items 図形配列
- * @returns 更新後の図形配列
+ * @param items Shape array
+ * @returns Updated shape array
  */
 export const clearMultiSelectSourceRecursive = (
 	items: Diagram[],

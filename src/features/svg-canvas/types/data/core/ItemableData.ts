@@ -1,10 +1,10 @@
-// 循環参照を避けるため、Diagramの直接インポートを削除
+// Direct import of Diagram removed to avoid circular references
 
 /**
  * Interface for diagram elements that can contain child elements.
  * Used for composite elements like groups that can hold other diagrams.
  *
- * Note: 型パラメータTを使用して循環参照を避けています。
+ * Note: Using type parameter T to avoid circular references.
  */
 export type ItemableData<T = unknown> = {
 	items: T[];

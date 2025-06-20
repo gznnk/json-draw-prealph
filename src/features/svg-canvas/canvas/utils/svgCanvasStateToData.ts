@@ -1,11 +1,11 @@
 import type { SvgCanvasData, SvgCanvasState } from "../SvgCanvasTypes";
 
 /**
- * SvgCanvasState から SvgCanvasData への変換関数。
- * SvgCanvasData に含まれる必要なプロパティのみを抽出します。
+ * Conversion function from SvgCanvasState to SvgCanvasData.
+ * Extracts only the necessary properties included in SvgCanvasData.
  *
- * @param state - 変換元のSvgCanvasState
- * @returns SvgCanvasDataオブジェクト
+ * @param state - Source SvgCanvasState
+ * @returns SvgCanvasData object
  */
 export const svgCanvasStateToData = (state: SvgCanvasState): SvgCanvasData => {
 	return {

@@ -27,7 +27,7 @@ export const lineIntersects = (
 	const s = subtract(q2, q1);
 	const denominator = crossProduct(r, s);
 
-	if (denominator === 0) return false; // 平行な場合
+	if (denominator === 0) return false; // Parallel lines
 
 	const u = crossProduct(subtract(q1, p1), r) / denominator;
 	const t = crossProduct(subtract(q1, p1), s) / denominator;

@@ -13,12 +13,12 @@ import { isImageData } from "../../../utils/validation/isImageData";
 export const imageToBlob = (data: Diagram): Blob | undefined => {
 	if (!isImageData(data)) return undefined;
 
-	// 1. base64 → バイナリ文字列
+	// 1. base64 → binary string
 	const binary = atob(data.base64Data.replace(/\s/g, ""));
 
-	// 2. バイナリ文字列 → Uint8Array
+	// 2. binary string → Uint8Array
 	const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0));
 
-	// 3. Blob 化
+	// 3. Convert to Blob
 	return new Blob([bytes], { type: "image/png" });
 };

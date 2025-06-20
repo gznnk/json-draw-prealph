@@ -3,10 +3,10 @@ import { isItemableData } from "../../utils/validation/isItemableData";
 import { isSelectableData } from "../../utils/validation/isSelectableData";
 
 /**
- * グループ化された図形を図形配列から削除する
+ * Remove grouped shapes from the shape array
  *
- * @param items 図形配列
- * @returns 更新後の図形配列
+ * @param items Shape array
+ * @returns Updated shape array
  */
 export const removeGroupedRecursive = (items: Diagram[]) => {
 	return items.filter((item) => {

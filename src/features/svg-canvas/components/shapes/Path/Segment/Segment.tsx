@@ -23,7 +23,7 @@ import { rotatePoint } from "../../../../utils/math/points/rotatePoint";
 import type { SegmentData } from "./SegmentTypes";
 
 /**
- * 線�Eプロパティ
+ * Line segment properties
  */
 type SegmentProps = SegmentData & {
 	rightAngleSegmentDrag: boolean;
@@ -34,7 +34,7 @@ type SegmentProps = SegmentData & {
 };
 
 /**
- * 線�Eコンポ�EネンチE
+ * Line segment component
  */
 const SegmentComponent: React.FC<SegmentProps> = ({
 	id,
@@ -62,10 +62,9 @@ const SegmentComponent: React.FC<SegmentProps> = ({
 	const cursor = rightAngleSegmentDrag
 		? getCursorFromAngle(radiansToDegrees(radian))
 		: "move";
-
-	// ハンドラ生�Eの頻発を回避するため、参照する値をuseRefで保持する
+	// Use ref to hold referenced values to avoid frequent handler generation
 	const refBusVal = {
-		// 冁E��変数・冁E��関数
+		// State variables and functions
 		radian,
 		rotateStartPoint,
 		rotateEndPoint,

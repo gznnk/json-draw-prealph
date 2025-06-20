@@ -3,7 +3,7 @@ import type { Point } from "../../../../types/base/Point";
 import type { Shape } from "../../../../types/base/Shape";
 
 /**
- * 接続ポイントの方向
+ * Connect point direction
  */
 export type Direction = "up" | "down" | "left" | "right";
 

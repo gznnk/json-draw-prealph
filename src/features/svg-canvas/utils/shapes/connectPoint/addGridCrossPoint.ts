@@ -10,9 +10,8 @@ export const addGridCrossPoint = (grid: GridPoint[], point: GridPoint) => {
 	if (!grid.some((p) => p.x === point.x && p.y === point.y)) {
 		const len = grid.length;
 		for (let i = 0; i < len; i++) {
-			const p = grid[i];
-			// すでにある点を中心とする水平線および垂直線上と
-			// 追加した点を中心とする水平線および垂直線上との交点を追加
+			const p = grid[i]; // Add intersection points between horizontal/vertical lines centered on existing points
+			// and horizontal/vertical lines centered on the added point
 			if (p.x !== point.x) {
 				grid.push({ x: p.x, y: point.y, score: p.score });
 			}

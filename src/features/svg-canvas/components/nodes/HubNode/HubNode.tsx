@@ -23,7 +23,7 @@ const HubNodeComponent: React.FC<HubNodeProps> = (props) => {
 		id: props.id,
 		onPropagation: (e) => {
 			setIsFlashing(true);
-			setTimeout(() => setIsFlashing(false), 500); // アニメ終了でリセット
+			setTimeout(() => setIsFlashing(false), 500); // Reset when animation ends
 
 			props.onExecute?.({
 				id: props.id,

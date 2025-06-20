@@ -72,10 +72,9 @@ const GroupComponent: React.FC<GroupProps> = ({
 
 	// Group's oriented box at the start of a drag or transform.
 	const startBox = useRef({ x, y, width, height });
-
-	// ハンドラ生�Eの頻発を回避するため、参照する値をuseRefで保持する
+	// To avoid frequent handler generation, hold referenced values in useRef
 	const refBusVal = {
-		// プロパティ
+		// Properties
 		id,
 		x,
 		y,
@@ -90,55 +89,53 @@ const GroupComponent: React.FC<GroupProps> = ({
 		onDiagramChange,
 		onConnect,
 		onTextEdit,
-		// 冁E��変数・冁E��関数
+		// Internal variables and functions
 		isGroupDragging,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	/**
-	 * グループ�Eの図形の選択イベントハンドラ
+	 * Selection event handler for shapes within the group
 	 */
 	const handleChildDiagramSelect = useCallback((e: DiagramSelectEvent) => {
 		const { id, isSelected, items, onSelect } = refBus.current;
-
 		const selectedChild = getSelectedChildDiagram(items);
 		if (!selectedChild) {
-			// グループ�Eの図形が選択されてぁE��ぁE��合�E、このグループ�E選択イベントを発火させる、E
-			// これにより、グループ�Eの図形が選択されてぁE��ぁE��ループ�EぁE��、最も上位�Eグループ�Eイベントが
-			// SvgCanvasまで伝番され、そのグループが選択状態になる、E
+			// If no shape in the group is selected, fire the selection event for this group.
+			// This way, when no shape in the group is selected, the event from the topmost group
+			// is propagated to SvgCanvas, and that group becomes selected.
 			onSelect?.({
 				eventId: e.eventId,
 				id,
 			});
 		} else if (selectedChild.id !== e.id) {
-			// グループ�Eの図形が選択されてぁE��、かつグループ�Eの別の図形が選択された場合、その図形を選択状態にする
+			// If a shape in the group is selected and a different shape in the group is selected, make that shape selected
 			onSelect?.(e);
 		}
 
 		if (isSelected) {
-			// グループ連続選択時のクリチE���E��EインターアチE�E�E�時に、グループ�EでクリチE��された図形を選択状態にしたぁE�Eで、E
-			// フラグを立てておき、クリチE��イベント�Eで参�Eする、E
+			// When a group is continuously selected and clicked, we want to make the clicked shape within the group selected
+			// for interactive purposes, so we set a flag and reference it in the click event.
 			isSequentialSelection.current = true;
 		}
 	}, []);
-
 	/**
-	 * グループ�Eの図形のクリチE��イベントハンドラ
+	 * Click event handler for shapes within the group
 	 */
 	const handleChildDiagramClick = useCallback((e: DiagramSelectEvent) => {
 		const { id, onSelect, onClick } = refBus.current;
 
 		if (isSequentialSelection.current) {
-			// グループ連続選択時のクリチE���E��EインターアチE�E�E�時であれば、そのグループ�Eの図形を選択状態にする、E
-			// これにより、グループがネストしてぁE��場合�E、E��択�E階層が１つずつ下がってぁE��、最終的にクリチE��された図形が選択される、E
+			// If it's during interactive group sequential selection, make the clicked shape in that group selected.
+			// This way, when groups are nested, the selection hierarchy goes down one level at a time, and finally the clicked shape is selected.
 			onSelect?.(e);
 			isSequentialSelection.current = false;
 		} else {
-			// グループ連続選択時でなぁE��合�E、このグループ�EクリチE��イベントを発火させる、E
-			// これにより、E��続選択でなぁE��ループ�EぁE��、最も上位�Eグループ�EクリチE��イベントが
-			// 連続選択されたグループまで伝番し、そのグループ�E連続選択時の処琁E��当該刁E���Etrue側�E�が実行され、E
-			// そ�E直下�Eグループが選択状態になる、E
+			// If it's not during group sequential selection, fire the click event for this group.
+			// This way, when it's not for sequential selection of groups, the click event from the topmost group
+			// is propagated to the sequentially selected group, and the sequential selection processing for that group (the true side) is executed,
+			// and the group directly below it becomes selected.
 			onClick?.({
 				eventId: e.eventId,
 				id,
@@ -146,16 +143,16 @@ const GroupComponent: React.FC<GroupProps> = ({
 		}
 	}, []);
 
-	// グループ�E選択状態制御
+	// Group selection state control
 	useEffect(() => {
-		// グループから選択が外れたら連続選択フラグも解除
+		// Clear sequential selection flag when selection is removed from group
 		if (!isSelected) {
 			isSequentialSelection.current = false;
 		}
 	}, [isSelected]);
 
 	/**
-	 * グループ�Eの図形のドラチE��中イベントハンドラ
+	 * Drag event handler for shapes within the group
 	 */
 	const handleChildDiagramDrag = useCallback((e: DiagramDragEvent) => {
 		const {
@@ -171,21 +168,21 @@ const GroupComponent: React.FC<GroupProps> = ({
 			isGroupDragging,
 		} = refBus.current;
 
-		// ドラチE��開始時の処琁E
+		// Processing at drag start
 		if (e.eventType === "Start") {
 			if (!isSelected) {
-				// グループ選択時でなければ、ドラチE��イベントをそ�Eまま伝番し、E
-				// 選択されてぁE��図形のみ移動を行う
+				// If not in group selection, propagate the drag event as is and
+				// move only the selected shapes
 				onDrag?.(e);
 			} else {
-				// グループ選択時であれば、グループ�E体をドラチE��可能にする
+				// If in group selection, enable dragging of the entire group
 				setIsGroupDragging(true);
 
-				// ドラチE��開始時のグループ�E形状を記�E
+				// Record the group's shape at drag start
 				startItems.current = items;
 				startBox.current = { x, y, width, height };
 
-				// グループ�E体�E変更開始を通知
+				// Notify the start of entire group change
 				onDiagramChange?.({
 					eventId: e.eventId,
 					eventType: "Start",
@@ -207,18 +204,17 @@ const GroupComponent: React.FC<GroupProps> = ({
 			}
 			return;
 		}
-
-		// 以降ドラチE��中・ドラチE��終亁E��の処琁E
+		// Following processing for during drag and drag end
 		if (!isGroupDragging) {
-			// グループ�E体�EドラチE��でなければ、ドラチE��イベントをそ�Eまま伝番し、E
-			// 選択されてぁE��図形のみ移動を行う
+			// If not dragging the entire group, propagate the drag event as is and
+			// move only the selected shapes
 			onDrag?.(e);
 		} else {
-			// グループ�E体�EドラチE��の場合、グループ�Eの図形を�E帰皁E��移動させる
+			// If dragging the entire group, recursively move the shapes in the group
 			const dx = e.endX - e.startX;
 			const dy = e.endY - e.startY;
 
-			// グループ�Eの図形を�E帰皁E��移動させる�E�接続�Eイント�E含まなぁE��E
+			// Recursively move shapes in the group (does not include connection points)
 			const moveRecursive = (diagrams: Diagram[]) => {
 				const newItems: Diagram[] = [];
 				for (const item of diagrams) {
@@ -249,42 +245,39 @@ const GroupComponent: React.FC<GroupProps> = ({
 				},
 				cursorX: e.cursorX,
 				cursorY: e.cursorY,
-			};
-
-			// グループ�Eの全ての図形の移動をまとめて通知
+			}; // Notify the movement of all shapes in the group collectively
 			onDiagramChange?.(event);
 		}
 
-		// ドラチE��終亁E��にドラチE��中フラグを解除
+		// Clear the dragging flag at drag end
 		if (e.eventType === "End") {
 			setIsGroupDragging(false);
 		}
 	}, []);
 
 	/**
-	 * グループ�Eの図形の変形イベントハンドラ
+	 * Transform event handler for shapes within the group
 	 */
 	const handleChildDiagramTransfrom = useCallback(
 		(e: DiagramTransformEvent) => {
 			const { onTransform } = refBus.current;
 
-			// 変形イベントをそ�Eまま伝番する
-			// アウトライン更新はCanvas側で行うので、ここでは何もしなぁE
+			// Propagate the transform event as is
+			// Outline update is done on the Canvas side, so nothing is done here
 			onTransform?.(e);
 		},
 		[],
 	);
-
 	/**
-	 * グループ�Eの図形の変更イベントハンドラ
+	 * Change event handler for shapes within the group
 	 */
 	const handleChildDiagramChange = useCallback(
 		(e: DiagramChangeEvent) => {
 			const { id, isSelected, onDiagramChange } = refBus.current;
 
 			if (isSelected) {
-				// TODO: 忁E��か�E�E
-				// グループ選択時の場合、ここに来る�EはドラチE��相当�E操作�E場合なので、ドラチE��イベントに変換して伝番する
+				// TODO: Check if this logic is necessary
+				// When group is selected, operations that come here are equivalent to drag operations, so convert to drag event and propagate
 				const dragEvent = {
 					eventType: e.eventType,
 					id,
@@ -296,46 +289,43 @@ const GroupComponent: React.FC<GroupProps> = ({
 
 				handleChildDiagramDrag(dragEvent);
 			} else {
-				// グループ選択時でなぁE��合、アウトライン以外�Eグループへの影響はなぁE�Eで、変更イベントをそ�Eまま伝番する
+				// When group is not selected, there is no impact on the group other than outline, so propagate the change event as is
 				onDiagramChange?.(e);
 			}
 		},
 		[handleChildDiagramDrag],
 	);
-
 	/**
-	 * グループ�Eの図形の接続イベントハンドラ
+	 * Connection event handler for shapes within the group
 	 */
 	const handleChildDiagramConnect = useCallback((e: DiagramConnectEvent) => {
 		const { onConnect } = refBus.current;
 
-		// 特にすることはなぁE�Eでそ�Eまま伝番する
+		// Nothing special to do, just propagate as is
 		onConnect?.(e);
 	}, []);
-
 	/**
-	 * グループ�Eの図形のチE��スト編雁E��ベントハンドラ
+	 * Text edit event handler for shapes within the group
 	 */
 	const handleChildDiagramTextEdit = useCallback((e: DiagramTextEditEvent) => {
 		const { onTextEdit } = refBus.current;
 
-		// グループ�Eの図形のチE��スト編雁E��ベントをそ�Eまま伝番する
+		// Propagate the text edit event for shapes within the group as is
 		onTextEdit?.(e);
 	}, []);
-
 	/**
-	 * グループ�E変形イベントハンドラ
+	 * Group transform event handler
 	 */
 	const handleTransform = useCallback((e: DiagramTransformEvent) => {
 		const { id, x, y, width, height, items, onDiagramChange } = refBus.current;
 
-		// グループ�E変形開始時の処琁E
+		// Processing at group transform start
 		if (e.eventType === "Start") {
-			// 変形開始時のグループ�E形状を記�E
+			// Record the group's shape at transform start
 			startBox.current = { x, y, width, height };
 			startItems.current = items;
 
-			// まだ何も変形してなぁE�Eで、E��始�E通知のみ行う
+			// Nothing has been transformed yet, so only send start notification
 			onDiagramChange?.({
 				eventId: e.eventId,
 				eventType: "Start",
@@ -357,13 +347,13 @@ const GroupComponent: React.FC<GroupProps> = ({
 			return;
 		}
 
-		// 以降グループ�E変形中・変形終亁E��の処琁E
+		// Following processing for during group transform and transform end
 
-		// グループ�E拡縮を計箁E
+		// Calculate group scaling
 		const groupScaleX = e.endShape.width / e.startShape.width;
 		const groupScaleY = e.endShape.height / e.startShape.height;
 
-		// グループ�Eの図形を�E帰皁E��変形させる（接続�Eイントも含む�E�E
+		// Recursively transform shapes within the group (including connection points)
 		const transformRecursive = (diagrams: Diagram[]) => {
 			const newItems: Diagram[] = [];
 			for (const item of diagrams) {
@@ -443,8 +433,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			cursorX: e.cursorX,
 			cursorY: e.cursorY,
 		};
-
-		// グループ�Eの全ての図形の変形をまとめて通知
+		// Notify the transformation of all shapes in the group collectively
 		onDiagramChange?.(event);
 
 		if (e.eventType === "End") {
@@ -457,10 +446,9 @@ const GroupComponent: React.FC<GroupProps> = ({
 		!isSelected &&
 		!isGroupDragging &&
 		!isGroupTransforming;
-
-	// グループ�Eの図形の作�E
+	// Create shapes within the group
 	const children = items.map((item) => {
-		// item.typeがDiagramType型であることを確誁E
+		// Ensure that item.type is of DiagramType
 		if (!item.type) {
 			console.error("Item has no type", item);
 			return null;
@@ -474,7 +462,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			...item,
 			key: item.id,
 			showConnectPoints: doShowConnectPoints,
-			// グループが選択されてぁE��か、親から子要素としてアウトライン表示持E��があった場合に子要素にアウトラインを表示
+			// Show outline on child elements when group is selected or when parent requests outline display for child elements
 			showOutline: isSelected || showOutline,
 			syncWithSameId,
 			onClick: handleChildDiagramClick,

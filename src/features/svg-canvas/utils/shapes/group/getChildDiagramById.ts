@@ -2,11 +2,11 @@ import type { Diagram } from "../../../types/data/catalog/Diagram";
 import { isItemableData } from "../../validation/isItemableData";
 
 /**
- * 指定したIDの図形を、配下のグループも含めて再帰的に取得する
+ * Recursively retrieves a shape with the specified ID, including shapes in nested groups
  *
- * @param diagrams - 図形リスト
+ * @param diagrams - List of diagrams
  * @param id - ID
- * @returns 指定したIDの図形
+ * @returns Shape with the specified ID
  */
 export const getChildDiagramById = (
 	diagrams: Diagram[],

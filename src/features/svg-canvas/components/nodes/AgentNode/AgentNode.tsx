@@ -69,10 +69,9 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 
 			const processId = newEventId();
 			setProcessIdList((prev) => [...prev, processId]);
-
 			const openai = new OpenAI({
 				apiKey: apiKey,
-				dangerouslyAllowBrowser: true, // ブラウザで直接使用する場合に必要
+				dangerouslyAllowBrowser: true, // Required for direct browser usage
 			});
 
 			// Initialize the input for the OpenAI API.
@@ -119,7 +118,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 					const stream = await openai.responses.create({
 						model: "gpt-4o",
 						input,
-						stream: true, // 必須！
+						stream: true, // Required!
 						tools: AI_AGENT_TOOLS,
 					});
 
@@ -278,7 +277,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 				}
 			} catch (error) {
 				console.error("Error fetching data from OpenAI API:", error);
-				alert("APIリクエスト中にエラーが発生しました。");
+				alert("An error occurred during the API request.");
 			}
 
 			setProcessIdList((prev) => prev.filter((id) => id !== processId));

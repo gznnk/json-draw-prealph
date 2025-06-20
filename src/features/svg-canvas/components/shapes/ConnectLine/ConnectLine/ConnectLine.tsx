@@ -94,12 +94,11 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 				// Ignore unrelated ConnectPoint components move events.
 				return;
 			}
-
 			if (event.eventType === "Start") {
-				// 移動開始時のitemsを保持
+				// Hold items at the start of movement
 				startItems.current = items;
 
-				// 垂直と水平の線�EみかどぁE��を判宁E
+				// Check if all lines are vertical and horizontal only
 				isVerticalHorizontalLines.current = items.every((item, idx) => {
 					if (idx === 0) {
 						return true;
@@ -111,12 +110,10 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 					);
 					return degrees % 90 === 0;
 				});
-			}
-
-			// 移動中と移動終亁E��の処琁E
+			} // Process during movement and end of movement
 			if (startItems.current.length === 0) {
-				// 移動開始時のitemsがなぁE��合�E何もしなぁE
-				// フェイルセーフ�E処琁E��、ここにくる場合�Eバグ
+				// If there are no items at movement start, do nothing
+				// This is failsafe processing - if we reach here, it's a bug
 				console.error("Illegal state: startItems is empty.");
 				return;
 			}
@@ -125,9 +122,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 			const _isVerticalHorizontalLines = isVerticalHorizontalLines.current;
 			const movedPointIdx = _startItems.findIndex(
 				(item) => item.id === movedPoint.id,
-			);
-
-			// 動いた接続�Eイント�E反対側の点を取征E
+			); // Get the point on the opposite side of the moved connection point
 			const oppositeItem =
 				movedPointIdx === 0
 					? _startItems[_startItems.length - 1]
@@ -137,21 +132,21 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 				y: oppositeItem.y,
 			};
 
-			// 反対側の点も動ぁE��ぁE��かどぁE��を確誁E
+			// Check if the opposite point also moved
 			const movedOppositPoint = event.points.find(
 				(p) => p.id === oppositeItem.id,
 			);
 
 			if (!autoRouting) {
-				// 自動ルーチE��ング無効晁E
+				// Auto-routing disabled
 
-				// 移動後�Eポイント作�E関数
+				// Function to create points after movement
 				const createNewPoint = (
 					movedBothEndsPoint: ConnectPointMoveData,
 					oldPoint: Diagram,
 					idx: number,
 				) => {
-					// 接続�Eイント�E移動にあわせて末端の点も移勁E
+					// Move end points along with connection point movement
 					if (oldPoint.id === movedBothEndsPoint.id) {
 						return {
 							...oldPoint,
@@ -160,7 +155,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 						};
 					}
 
-					// 移動した点の隣の点かどぁE�� TODO: 反対の点の時�E判定がぁE��くいかん
+					// Check if it's a point adjacent to the moved point. TODO: Logic doesn't work well for opposite points
 					const movedBothEndsPointIdx = _startItems.findIndex(
 						(item) => item.id === movedBothEndsPoint.id,
 					);
@@ -168,21 +163,20 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 						(movedBothEndsPointIdx === 0 && idx === 1) ||
 						(movedBothEndsPointIdx === _startItems.length - 1 &&
 							idx === _startItems.length - 2);
-
 					if (isNextPoint) {
-						// 接続線が垂直と水平の線�EみでなぁE��合�E、E��番目の点はそ�Eまま
+						// If connection lines are not only vertical and horizontal, keep the second point as is
 						if (!_isVerticalHorizontalLines) {
 							return oldPoint;
 						}
 
-						// 接続線が垂直と水平の線�Eみは、それが維持されるよう�E�番目の点も移動すめE
+						// For connection lines with only vertical and horizontal lines, move the second point to maintain this constraint
 
-						// 移動量を計箁E
+						// Calculate movement amount
 						const movedPointOldData = _startItems[movedBothEndsPointIdx];
 						const dx = movedBothEndsPoint.x - movedPointOldData.x;
 						const dy = movedBothEndsPoint.y - movedPointOldData.y;
 
-						// �E�点間�E角度を計箁E
+						// Calculate angle between two points
 						const direction = calcRadians(
 							movedPointOldData.x,
 							movedPointOldData.y,
@@ -192,7 +186,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 						const degrees = radiansToDegrees(direction);
 						const isVertical = (degrees + 405) % 180 > 90;
 
-						// �E�点間�E線が水平であればx座標�Eみ、垂直であればy座標�Eみ移勁E
+						// If the line between two points is horizontal, move only x coordinate; if vertical, move only y coordinate
 						return {
 							...oldPoint,
 							x: !isVertical ? oldPoint.x + dx : oldPoint.x,
@@ -214,7 +208,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 					return item;
 				}) as Diagram[];
 
-				// 接続線�E変更イベントを発火
+				// Fire connection line change event
 				onDiagramChange?.({
 					eventId: event.eventId,
 					eventType: event.eventType,
@@ -228,25 +222,25 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 					},
 				});
 			} else {
-				// 自動ルーチE��ング有効時�E、最適な接続線を再計箁E
+				// When auto-routing is enabled, recalculate the optimal connection line
 
 				if (movedOppositPoint) {
-					// 反対側の点が動ぁE��ぁE��場合�E、その座標を利用
+					// If the opposite point has moved, use its coordinates
 					oppositePoint = movedOppositPoint;
 				}
 
-				// 反対側の図形の惁E��を取征E
+				// Get the information of the opposite shape
 				let oppositeOwnerShape: Shape;
 				if (movedOppositPoint) {
 					oppositeOwnerShape = movedOppositPoint.ownerShape;
 				} else {
-					// 反対側の図形が動ぁE��ぁE��ぁE��合�EcanvasStateProviderから惁E��を取得（１フレーム前�E惁E��しか取れなぁE��、接続�Eの図形に移動�EなぁE��合なので問題なぁE��E
+					// If the opposite shape hasn't moved, get the information from canvasStateProvider (only the previous frame's information is available, but this is fine since the connected shape hasn't moved)
 					oppositeOwnerShape = canvasStateProvider?.getDiagramById(
 						movedPoint.ownerId === startOwnerId ? endOwnerId : startOwnerId,
 					) as Shape;
 				}
 
-				// 最適な接続線を再計箁E
+				// Recalculate the optimal connection line
 				const newPath = createBestConnectPath(
 					movedPoint.x,
 					movedPoint.y,
@@ -254,9 +248,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 					oppositePoint.x,
 					oppositePoint.y,
 					oppositeOwnerShape,
-				);
-
-				// 接続線�E点のチE�Eタを作�E
+				); // Create connection line point data
 				const newItems = (
 					movedPointIdx === 0 ? newPath : newPath.reverse()
 				).map((p, idx) => ({
@@ -266,12 +258,12 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 					x: p.x,
 					y: p.y,
 				})) as Diagram[];
-				// 両端の点のIDは維持すめE
+				// Maintain IDs of both end points
 				newItems[0].id = _startItems[0].id;
 				newItems[newItems.length - 1].id =
 					_startItems[_startItems.length - 1].id;
 
-				// 接続線�E変更イベントを発火
+				// Fire connection line change event
 				onDiagramChange?.({
 					eventId: event.eventId,
 					eventType: event.eventType,

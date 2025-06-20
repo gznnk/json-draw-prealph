@@ -28,7 +28,7 @@ import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransf
 import { RectangleElement } from "./RectangleStyled";
 
 /**
- * 四角形コンポ�EネンチE
+ * Rectangle component
  */
 const RectangleComponent: React.FC<RectangleProps> = ({
 	id,
@@ -69,18 +69,18 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	onTextEdit,
 	onFileDrop,
 }) => {
-	// ドラチE��中か�Eフラグ
+	// Flag whether dragging
 	const [isDragging, setIsDragging] = useState(false);
-	// 変形中か�Eフラグ
+	// Flag whether transforming
 	const [isTransformimg, setIsTransforming] = useState(false);
-	// ホバー中か�Eフラグ
+	// Flag whether hovering
 	const [isHovered, setIsHovered] = useState(false);
-	// 変形対象のSVG要素への参�E
+	// Reference to the SVG element to be transformed
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
-	// ハンドラ生�Eの頻発を回避するため、参照する値をuseRefで保持する
+	// To avoid frequent handler generation, hold referenced values in useRef
 	const refBusVal = {
-		// プロパティ
+		// Properties
 		id,
 		isSelected,
 		isTextEditEnabled,
@@ -93,7 +93,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	refBus.current = refBusVal;
 
 	/**
-	 * 四角形のドラチE��イベントハンドラ
+	 * Rectangle drag event handler
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
 		const { onDrag } = refBus.current;
@@ -108,9 +108,8 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 			setIsDragging(false);
 		}
 	}, []);
-
 	/**
-	 * 四角形の変形イベントハンドラ
+	 * Rectangle transform event handler
 	 */
 	const handleTransform = useCallback((e: DiagramTransformEvent) => {
 		const { onTransform } = refBus.current;
@@ -125,58 +124,55 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 			setIsTransforming(false);
 		}
 	}, []);
-
 	/**
-	 * ポインターダウンイベントハンドラ
+	 * Pointer down event handler
 	 */
 	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
 		const { id, onSelect } = refBus.current;
 
-		// 図形選択イベントを発火
+		// Fire shape selection event
 		onSelect?.({
 			eventId: e.eventId,
 			id,
 		});
 	}, []);
-
 	/**
-	 * ホバー状態変更イベントハンドラ
+	 * Hover state change event handler
 	 */
 	const handleHover = useCallback((e: DiagramHoverEvent) => {
 		setIsHovered(e.isHovered);
 	}, []);
 
 	/**
-	 * ドラチE��オーバ�Eイベントハンドラ
+	 * Drag over event handler
 	 */
 	const handleDragOver = useCallback(() => {
 		setIsHovered(true);
 	}, []);
 
 	/**
-	 * ドラチE��リーブイベントハンドラ
+	 * Drag leave event handler
 	 */
 	const handleDragLeave = useCallback(() => {
 		setIsHovered(false);
 	}, []);
 
 	/**
-	 * ダブルクリチE��イベントハンドラ
+	 * Double click event handler
 	 */
 	const handleDoubleClick = useCallback(() => {
 		const { id, isSelected, isTextEditEnabled, onTextEdit } = refBus.current;
-
 		if (!isTextEditEnabled) return;
 
 		if (!isSelected) return;
 
-		// チE��スト編雁E��ベントを発火
+		// Fire text edit event
 		onTextEdit?.({
 			id,
 		});
 	}, []);
 
-	// ドラチE��用のプロパティを生戁E
+	// Generate properties for dragging
 	const dragProps = useDrag({
 		id,
 		type: "Rectangle",
@@ -191,13 +187,12 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		onDragOver: handleDragOver,
 		onDragLeave: handleDragLeave,
 	});
-
-	// ファイルドロチE�E用のプロパティを生戁E
+	// Generate properties for file drop
 	const fileDropProps = useFileDrop({ id, onFileDrop });
 
-	// memo化によりConnectPointの再描画を抑制
-	// keyで刁E��してばら�Eらにpropsで渡すと、各ConnectPoint側それぞれで吁Eeyに対して
-	// 比輁E�E琁E��走り非効玁E��ので、ここでまとめてShapeの差異を検知する
+	// Suppress ConnectPoint re-rendering by memoization
+	// If separated by key and passed as individual props, each ConnectPoint side
+	// performs comparison processing for each key which is inefficient, so detect Shape differences collectively here
 	const ownerShape = useMemo(
 		() => ({
 			x,
@@ -210,8 +205,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		}),
 		[x, y, width, height, rotation, scaleX, scaleY],
 	);
-
-	// rectのtransform属性を生戁E
+	// Generate rect transform attribute
 	const transform = createSvgTransform(
 		scaleX,
 		scaleY,
@@ -219,11 +213,10 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		x,
 		y,
 	);
-
-	// 変形コンポ�Eネントを表示するか�Eフラグ
+	// Flag whether to show transform component
 	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
 
-	// 接続�Eイントを表示するか�Eフラグ
+	// Flag whether to show connect points
 	const doShowConnectPoints =
 		showConnectPoints &&
 		!isSelected &&

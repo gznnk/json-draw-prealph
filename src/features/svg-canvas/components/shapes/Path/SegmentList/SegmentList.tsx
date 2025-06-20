@@ -17,7 +17,7 @@ import { newId } from "../../../../utils/shapes/common/newId";
 import { Segment, type SegmentData } from "../Segment";
 
 /**
- * 線�Eリスト�Eロパティ
+ * Segment list properties
  */
 type SegmentListProps = {
 	id: string;
@@ -30,7 +30,7 @@ type SegmentListProps = {
 };
 
 /**
- * 線�Eリストコンポ�EネンチE
+ * Segment list component
  */
 const SegmentListComponent: React.FC<SegmentListProps> = ({
 	id,
@@ -210,7 +210,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 				},
 				endDiagram: {
 					items: items.map((item) => {
-						// ドラチE��が完亁E��たら、線�E用のIDから新しいIDに変更
+						// When dragging is complete, change from temporary ID to new ID
 						if (item.id === draggingSegment.startPointId) {
 							return { ...item, x: newStartX, y: newStartY };
 						}

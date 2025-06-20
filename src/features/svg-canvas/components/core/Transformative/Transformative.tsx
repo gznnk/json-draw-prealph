@@ -297,7 +297,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		// カーソル位置を渡して自動スクロールを有効にする
+		// Pass cursor position to enable auto-scrolling
 		triggerTransform(
 			e.eventId,
 			center,
@@ -780,7 +780,7 @@ const TransformativeComponent: React.FC<Props> = ({
 	);
 	// --- BottomCenter End --- //
 
-	// シフトキーの状態を監視
+	// Monitor shift key state
 	useEffect(() => {
 		let handleKeyDown: (e: KeyboardEvent) => void;
 		let handleKeyUp: (e: KeyboardEvent) => void;
@@ -799,7 +799,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		}
 
 		return () => {
-			// クリーンアップ
+			// Cleanup
 			if (isSelected) {
 				window.removeEventListener("keydown", handleKeyDown);
 				window.removeEventListener("keyup", handleKeyUp);
@@ -807,7 +807,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		};
 	}, [isSelected]);
 
-	// 回転
+	// Rotation
 	const rotationPoint = affineTransformation(
 		width / 2 + ROTATE_POINT_MARGIN,
 		-(height / 2 + ROTATE_POINT_MARGIN),
@@ -817,9 +817,8 @@ const TransformativeComponent: React.FC<Props> = ({
 		x,
 		y,
 	);
-
 	/**
-	 * 回転ポイントのドラッグハンドラ
+	 * Rotation point drag handler
 	 */
 	const handleDragRotationPoint = useCallback((e: DiagramDragEvent) => {
 		const {

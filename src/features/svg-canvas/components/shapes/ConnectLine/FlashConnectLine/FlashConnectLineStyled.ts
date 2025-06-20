@@ -2,7 +2,7 @@
 import styled from "@emotion/styled";
 import { keyframes, css } from "@emotion/react";
 
-/* brightness を一時的に上げて「光ったように」見せる */
+/* Temporarily increase brightness to make it appear "flashing" */
 const flashBrightness = keyframes`
     0%   { filter: brightness(1); }
     30%  { filter: brightness(2); }

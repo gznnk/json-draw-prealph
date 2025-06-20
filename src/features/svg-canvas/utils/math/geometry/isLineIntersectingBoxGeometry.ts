@@ -22,19 +22,19 @@ export const isLineIntersectingBoxGeometry = (
 		[
 			{ x: boxGeometry.left, y: boxGeometry.top },
 			{ x: boxGeometry.right, y: boxGeometry.top },
-		], // 上辺
+		], // Top edge
 		[
 			{ x: boxGeometry.right, y: boxGeometry.top },
 			{ x: boxGeometry.right, y: boxGeometry.bottom },
-		], // 右辺
+		], // Right edge
 		[
 			{ x: boxGeometry.right, y: boxGeometry.bottom },
 			{ x: boxGeometry.left, y: boxGeometry.bottom },
-		], // 下辺
+		], // Bottom edge
 		[
 			{ x: boxGeometry.left, y: boxGeometry.bottom },
 			{ x: boxGeometry.left, y: boxGeometry.top },
-		], // 左辺
+		], // Left edge
 	];
 
 	return boxEdges.some(([q1, q2]) => lineIntersects(p1, p2, q1, q2));

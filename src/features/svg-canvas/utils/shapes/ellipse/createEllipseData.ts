@@ -60,7 +60,7 @@ export const createEllipseData = ({
 	fontFamily?: string;
 	fontWeight?: string;
 }): EllipseData => {
-	// 接続ポイントを生成
+	// Generate connection points
 	const connectPoints = createEllipseConnectPoint({
 		x,
 		y,

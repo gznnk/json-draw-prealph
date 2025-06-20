@@ -29,7 +29,7 @@ export const useUngroup = (props: CanvasHooksProps) => {
 			let newItems = ungroupSelectedGroupsRecursive(prevState.items);
 			newItems = clearMultiSelectSourceRecursive(newItems);
 
-			// 新しい状態を作�E
+			// Create new state
 			let newState = {
 				...prevState,
 				items: newItems,

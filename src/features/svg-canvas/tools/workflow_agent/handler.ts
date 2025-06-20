@@ -16,7 +16,7 @@ import { connectNodes } from "../connect_nodes";
 import AI_AGENT_INSTRUCTIONS from "./prompts/agent-instructions.md?raw";
 
 /**
- * ワークフローエージェントで使用可能なツール定義のリスト
+ * List of tool definitions available in the workflow agent
  */
 export const AI_TOOLS = [
 	addImageGenNode.definition,
@@ -27,8 +27,8 @@ export const AI_TOOLS = [
 ];
 
 /**
- * llm-client用のFunctionHandlerMap
- * 各ツールのハンドラーを直接利用します
+ * FunctionHandlerMap for llm-client
+ * Directly utilizes each tool's handler
  */
 const functionHandlerMap: FunctionHandlerMap = {
 	add_image_gen_node: addImageGenNode.handler,
@@ -45,11 +45,11 @@ import type {
 } from "../../../../shared/llm-client/types";
 
 /**
- * ワークフローエージェントのハンドラー関数
- * ユーザーの目標に基づいてワークフローを自動生成します
+ * Workflow agent handler function
+ * Automatically generates workflows based on user goals
  *
- * @param functionCall - 関数コール情報（user_goalを含む）
- * @returns 成功/失敗状態とコンテンツを含む結果オブジェクト、またはnull
+ * @param functionCall - Function call information (including user_goal)
+ * @returns Result object containing success/failure status and content, or null
  */
 export const handler: FunctionCallHandler = async (
 	functionCall: FunctionCallInfo,
@@ -57,34 +57,34 @@ export const handler: FunctionCallHandler = async (
 	const args = functionCall.arguments as { user_goal: string };
 
 	if (typeof args.user_goal === "string") {
-		// APIキーの取得
+		// Get API key
 		const storedApiKey = OpenAiKeyManager.loadKey();
 		if (!storedApiKey) return { success: false, content: "API key not found." };
 
-		// 出力テキスト用の変数
+		// Variable for output text
 		let outputContent = "";
 
 		try {
-			// LLMClientFactoryを使用してクライアントを作成
+			// Create client using LLMClientFactory
 			const llmClient = LLMClientFactory.createClient(storedApiKey, {
 				tools: AI_TOOLS,
 				systemPrompt: AI_AGENT_INSTRUCTIONS,
 				functionHandlers: functionHandlerMap,
 			});
 
-			// ユーザーのゴールとキャンバス配置指示をメッセージとして送信
+			// Send user goal and canvas placement instructions as message
 			const userMessage = `${args.user_goal}\n\nStart placing the first node near (X: ${300}, Y: ${200}) on the canvas.`;
 
-			// チャットを実行し、レスポンスを処理
+			// Execute chat and process response
 			await llmClient.chat({
 				message: userMessage,
 				onTextChunk: (textChunk) => {
-					// テキストチャンクを蓄積
+					// Accumulate text chunks
 					outputContent += textChunk;
 				},
 			});
 
-			// 成功レスポンスを返す
+			// Return success response
 			return {
 				success: true,
 				content: outputContent || "Workflow generation completed.",

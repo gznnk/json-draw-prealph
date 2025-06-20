@@ -45,7 +45,7 @@ export const useContextMenu = (canvasProps: SvgCanvasProps) => {
 		Undo: historyIndex > 0 ? "Enable" : "Disable",
 		Redo: historyIndex < history.length - 1 ? "Enable" : "Disable",
 		Copy: isItemSelected ? "Enable" : "Disable",
-		Paste: "Enable", // ペースト機能は常に有効
+		Paste: "Enable", // Paste function is always enabled
 		SelectAll: items.length > 0 ? "Enable" : "Disable",
 		Group: multiSelectGroup ? "Enable" : "Disable",
 		Ungroup: isGroupSelected ? "Enable" : "Disable",

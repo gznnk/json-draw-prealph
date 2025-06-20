@@ -26,10 +26,10 @@ export const createConnectPathOnDrag = (
 	endX: number,
 	endY: number,
 ) => {
-	// 図形と重ならないように線を引く
+	// Draw lines to avoid overlapping with shapes
 	const newPoints: Point[] = [];
 
-	// 開始方向が上下かどうか
+	// Check if start direction is up or down
 	const isDirectionUpDown = isUpDown(startDirection);
 
 	const marginBoxGeometry = addMarginToBoxGeometry(
@@ -70,11 +70,11 @@ export const createConnectPathOnDrag = (
 	// p4
 	const p4 = { x: endX, y: endY };
 
-	// p2-p3間の線の方向が逆向きになっているかチェック
+	// Check if the direction of the line between p2-p3 is in reverse
 	const isP2ReverseDirection =
 		getLineDirection(p2.x, p2.y, p3.x, p3.y) !== startDirection;
 	if (isP2ReverseDirection) {
-		// 逆向きになっている場合
+		// If it's in reverse direction
 		if (isDirectionUpDown) {
 			p3.x = p4.x;
 			p3.y = p2.y;
@@ -86,7 +86,7 @@ export const createConnectPathOnDrag = (
 	newPoints.push(p3);
 	newPoints.push(p4);
 
-	// p3-p4間の線が図形の辺と交差しているかチェック
+	// Check if the line between p3-p4 intersects with shape edges
 	let isAccrossCloserLine = false;
 	let isAccrossFartherLine = false;
 	if (startDirection === "up") {
@@ -147,13 +147,13 @@ export const createConnectPathOnDrag = (
 	}
 
 	if (isAccrossCloserLine) {
-		// 近い辺と交差している場合は、p3を近い辺に移動
+		// If intersecting with the closer edge, move p3 to the closer edge
 		if (isDirectionUpDown) {
 			p3.x = closer(endX, marginBoxGeometry.left, marginBoxGeometry.right);
 		} else {
 			p3.y = closer(endY, marginBoxGeometry.top, marginBoxGeometry.bottom);
 		}
-		// p4が図形の中に入らないよう位置を修正
+		// Adjust p4 position so it doesn't enter inside the shape
 		if (isDirectionUpDown) {
 			p4.x = p3.x;
 			p4.y = endY;
@@ -164,7 +164,7 @@ export const createConnectPathOnDrag = (
 	}
 
 	if (isAccrossFartherLine) {
-		// 遠い辺も交差している場合は、p5を追加して交差しないようにする
+		// If the farther edge is also intersecting, add p5 to avoid intersection
 		const p5 = { x: endX, y: endY };
 		newPoints.push(p5);
 	}

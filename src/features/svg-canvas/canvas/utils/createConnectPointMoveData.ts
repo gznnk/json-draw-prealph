@@ -13,7 +13,7 @@ export const createConnectPointMoveData = (
 	newItem: Diagram,
 ): ConnectPointMoveData[] => {
 	if (isConnectableData(newItem)) {
-		// 複数選択の選択元かどうかに関わらず、全ての接続可能な図形の接続ポイントを処理する
+		// Process connection points for all connectable shapes regardless of multi-selection source status
 		const calculator = DiagramRegistry.getConnectPointCalculator(newItem.type);
 		return calculator ? calculator(newItem) : [];
 	}

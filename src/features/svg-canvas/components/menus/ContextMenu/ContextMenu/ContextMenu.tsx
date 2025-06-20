@@ -38,36 +38,36 @@ const ContextMenuComponent: React.FC<ContextMenuProps> = ({
 	return (
 		<ContextMenuDiv x={x} y={y}>
 			<ContextMenuItem menuType="Undo" {...menuItemProps}>
-				元に戻す
+				Undo
 			</ContextMenuItem>
 			<ContextMenuItem menuType="Redo" {...menuItemProps}>
-				やり直し
+				Redo
 			</ContextMenuItem>
 			<ContextMenuDivider />
 			<ContextMenuItem menuType="Copy" {...menuItemProps}>
-				コピー
+				Copy
 			</ContextMenuItem>
 			<ContextMenuItem menuType="Paste" {...menuItemProps}>
-				ペースト
+				Paste
 			</ContextMenuItem>
 			<ContextMenuDivider />
 			<ContextMenuItem menuType="SelectAll" {...menuItemProps}>
-				すべて選択
+				Select All
 			</ContextMenuItem>
 			<ContextMenuDivider />
 			<ContextMenuItem menuType="Group" {...menuItemProps}>
-				グループ化
+				Group
 			</ContextMenuItem>
 			<ContextMenuItem menuType="Ungroup" {...menuItemProps}>
-				グループ解除
+				Ungroup
 			</ContextMenuItem>
 			<ContextMenuDivider />
 			<ContextMenuItem menuType="Export" {...menuItemProps}>
-				エクスポート
+				Export
 			</ContextMenuItem>
 			<ContextMenuDivider />
 			<ContextMenuItem menuType="Delete" {...menuItemProps}>
-				削除
+				Delete
 			</ContextMenuItem>
 		</ContextMenuDiv>
 	);

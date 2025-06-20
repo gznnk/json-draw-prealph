@@ -13,7 +13,7 @@ import type { PathPointData } from "../../../../types/data/shapes/PathPointData"
 // Import hooks
 import { useEventBus } from "../../../../context/EventBusContext";
 
-// SvgCanvas髢｢騾｣繧ｳ繝ｳ繝昴・繝阪Φ繝医ｒ繧､繝ｳ繝昴・繝・
+// Import components related to SvgCanvas
 import { DragPoint } from "../../../core/DragPoint";
 
 // Import utils.
@@ -29,7 +29,7 @@ import { getLineDirection } from "../../../../utils/shapes/connectPoint/getLineD
 import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
 
 /**
- * 謗･邯壹・繧､繝ｳ繝医さ繝ｳ繝昴・繝阪Φ繝・
+ * Connect point component
  */
 const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	id,
@@ -43,25 +43,24 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	// Get eventBus from context
 	const eventBus = useEventBus();
 
-	// 繝帙ヰ繝ｼ迥ｶ諷九・邂｡逅・
+	// Hover state management
 	const [isHovered, setIsHovered] = useState(false);
-	// 謗･邯夂ｷ壹・蠎ｧ讓・
+	// Connection line coordinates
 	const [pathPoints, setPathPoints] = useState<PathPointData[]>([]);
-	// 謗･邯壻ｸｭ縺ｮ繝昴う繝ｳ繝・
+	// Connecting point
 	const connectingPoint = useRef<ConnectingPoint | undefined>(undefined);
-	// 謗･邯壹・繧､繝ｳ繝医・謇譛芽・・螟匁磁遏ｩ蠖｢
+	// Bounding box geometry of the connect point's owner
 	const ownerBoundingBoxGeometry = calcRectangleBoundingBoxGeometry(ownerShape);
-	// 謗･邯壹・繧､繝ｳ繝医・譁ｹ蜷・
+	// Direction of the connect point
 	const direction = getLineDirection(ownerShape.x, ownerShape.y, x, y);
-
 	/**
-	 * 謗･邯夂ｷ壹・蠎ｧ讓吶ｒ譖ｴ譁ｰ
+	 * Update connection line coordinates
 	 */
 	const updatePathPoints = (dragX: number, dragY: number) => {
 		let newPoints: Point[] = [];
 
 		if (!connectingPoint.current) {
-			// 繝峨Λ繝・げ荳ｭ縺ｮ謗･邯夂ｷ・
+			// Connection line during dragging
 			newPoints = createConnectPathOnDrag(
 				x,
 				y,
@@ -71,21 +70,21 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 				dragY,
 			);
 		} else {
-			// 謗･邯壻ｸｭ縺ｮ繝昴う繝ｳ繝医′縺ゅｋ蝣ｴ蜷医・謗･邯夂ｷ・
+			// Connection line when there is a connecting point
 			newPoints = createBestConnectPath(
 				x,
 				y,
 				ownerShape,
-				connectingPoint.current.x, // 謗･邯壼・縺ｮX蠎ｧ讓・
-				connectingPoint.current.y, // 謗･邯壼・縺ｮY蠎ｧ讓・
-				connectingPoint.current.ownerShape, // 謗･邯壼・縺ｮ謇譛芽・・蠖｢迥ｶ
+				connectingPoint.current.x, // X coordinate of the connection destination
+				connectingPoint.current.y, // Y coordinate of the connection destination
+				connectingPoint.current.ownerShape, // Shape of the connection destination's owner
 			);
 		}
 
 		const newPathPoints = newPoints.map(
 			(p, i) =>
 				({
-					id: `${id}-${i}`, // 莉ｮ縺ｮID繧剃ｻ倅ｸ・
+					id: `${id}-${i}`, // Assign temporary ID
 					x: p.x,
 					y: p.y,
 				}) as PathPointData,
@@ -113,10 +112,9 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			items: newPathPoints,
 		});
 	};
-
-	// 繝上Φ繝峨Λ逕滓・縺ｮ鬆ｻ逋ｺ繧貞屓驕ｿ縺吶ｋ縺溘ａ縲∝盾辣ｧ縺吶ｋ蛟､繧置seRef縺ｧ菫晄戟縺吶ｋ
+	// To avoid frequent handler generation, hold referenced values in useRef
 	const refBusVal = {
-		// 繝励Ο繝代ユ繧｣
+		// Properties
 		id,
 		x,
 		y,
@@ -124,23 +122,22 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		ownerShape,
 		onConnect,
 		eventBus,
-		// 蜀・Κ螟画焚繝ｻ蜀・Κ髢｢謨ｰ
+		// Internal variables and functions
 		pathPoints,
 		updatePathPoints,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-
 	/**
-	 * 謗･邯壹・繧､繝ｳ繝医・繝峨Λ繝・げ繧､繝吶Φ繝医ワ繝ｳ繝峨Λ
+	 * Drag event handler for the connect point
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
 		if (connectingPoint.current) {
-			// 謗･邯壻ｸｭ縺ｮ繝昴う繝ｳ繝医′縺ゅｋ蝣ｴ蜷医・縲√◎縺ｮ繝昴う繝ｳ繝医ｒ邨らせ縺ｨ縺吶ｋ
+			// If there is a connecting point, use that point as the end point
 			return;
 		}
 
-		// 謗･邯夂ｷ壹・蠎ｧ讓吶ｒ蜀崎ｨ育ｮ・
+		// Recalculate connection line coordinates
 		refBus.current.updatePathPoints(e.endX, e.endY);
 
 		if (e.eventType === "End") {
@@ -150,9 +147,8 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			triggerNewConnectLine(refBus.current.eventBus);
 		}
 	}, []);
-
 	/**
-	 * 縺薙・謗･邯壹・繧､繝ｳ繝医・荳翫↓隕∫ｴ縺御ｹ励▲縺滓凾縺ｮ繧､繝吶Φ繝医ワ繝ｳ繝峨Λ
+	 * Event handler when an element is dragged over this connect point
 	 */
 	const handleDragOver = useCallback((e: DiagramDragDropEvent) => {
 		if (e.dropItem.type === "ConnectPoint") {
@@ -160,7 +156,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 
 			const { id, x, y, ownerId, ownerShape, eventBus } = refBus.current;
 
-			// 謗･邯壼・縺ｫ諠・ｱ繧帝∽ｿ｡
+			// Send notification to the connection destination
 			eventBus.dispatchEvent(
 				new CustomEvent(EVENT_NAME_CONNECTTION, {
 					detail: {
@@ -178,17 +174,16 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 				}),
 			);
 		}
-	}, []);
-	/**
-	 * 縺薙・謗･邯壹・繧､繝ｳ繝医・荳翫°繧芽ｦ∫ｴ縺悟､悶ｌ縺滓凾縺ｮ繧､繝吶Φ繝医ワ繝ｳ繝峨Λ
+	}, []); /**
+	 * Event handler when an element is dragged away from this connect point
 	 */
 	const handleDragLeave = useCallback((e: DiagramDragDropEvent) => {
 		setIsHovered(false);
-		// 謗･邯壹′蛻・ｌ縺滓凾縺ｮ蜃ｦ逅・
+		// Processing when connection is cancelled
 		if (e.dropItem.type === "ConnectPoint") {
 			const { id, x, y, ownerId, ownerShape, eventBus } = refBus.current;
 
-			// 謗･邯壼・縺ｫ諠・ｱ繧帝∽ｿ｡
+			// Send notification to the connection destination
 			eventBus.dispatchEvent(
 				new CustomEvent(EVENT_NAME_CONNECTTION, {
 					detail: {
@@ -206,16 +201,15 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 				}),
 			);
 		}
-	}, []);
-	/**
-	 * 縺薙・謗･邯壹・繧､繝ｳ繝医↓隕∫ｴ縺後ラ繝ｭ繝・・縺輔ｌ縺滓凾縺ｮ繧､繝吶Φ繝医ワ繝ｳ繝峨Λ
+	}, []); /**
+	 * Event handler when an element is dropped on this connect point
 	 */
 	const handleDrop = useCallback((e: DiagramDragDropEvent) => {
-		// 繝峨Ο繝・・縺輔ｌ縺溘→縺阪・蜃ｦ逅・
+		// Processing when dropped
 		if (e.dropItem.type === "ConnectPoint") {
 			const { id, x, y, ownerId, ownerShape, eventBus } = refBus.current;
 
-			// 謗･邯壼・縺ｫ諠・ｱ繧帝∽ｿ｡
+			// Send notification to the connection destination
 			eventBus.dispatchEvent(
 				new CustomEvent(EVENT_NAME_CONNECTTION, {
 					detail: {
@@ -235,28 +229,26 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		}
 		setIsHovered(false);
 	}, []);
-
 	/**
-	 * 繝帙ヰ繝ｼ迥ｶ諷句､画峩繧､繝吶Φ繝医ワ繝ｳ繝峨Λ
+	 * Hover state change event handler
 	 *
-	 * @param {DiagramHoverEvent} e 繝帙ヰ繝ｼ迥ｶ諷句､画峩繧､繝吶Φ繝・
+	 * @param {DiagramHoverEvent} e Hover state change event
 	 * @returns {void}
 	 */
 	const handleHover = useCallback((e: DiagramHoverEvent) => {
 		setIsHovered(e.isHovered);
 	}, []);
-
 	useEffect(() => {
 		const handleConnection = (e: Event) => {
-			// refBus繧剃ｻ九＠縺ｦ蜿ら・蛟､繧貞叙蠕・
+			// Get referenced values via refBus
 			const { id, pathPoints, ownerId, onConnect, updatePathPoints, eventBus } =
 				refBus.current;
 
 			const customEvent = e as CustomEvent<ConnectionEvent>;
 			if (customEvent.detail.startPointId === id) {
 				if (customEvent.detail.type === "connecting") {
-					// 謗･邯壹′蟋九∪縺｣縺滓凾縺ｮ蜃ｦ逅・
-					// 謗･邯壼・縺ｮ繝昴う繝ｳ繝医ｒ菫晄戟
+					// Processing when connection starts
+					// Hold the connection destination point
 					connectingPoint.current = {
 						id: customEvent.detail.endPointId,
 						x: customEvent.detail.endX,
@@ -265,19 +257,19 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 						ownerShape: customEvent.detail.endOwnerShape,
 					};
 
-					// 謗･邯壼・縺ｮ繝昴う繝ｳ繝医→邱壹′縺､縺ｪ縺後ｋ繧医≧縲√ヱ繧ｹ繝昴う繝ｳ繝医ｒ蜀崎ｨ育ｮ・
+					// Recalculate path points so that the line connects to the connection destination point
 					updatePathPoints(customEvent.detail.endX, customEvent.detail.endY);
 				}
 
 				if (customEvent.detail.type === "disconnect") {
-					// 蛻・妙譎ゅ・蜃ｦ逅・
-					// 謗･邯壻ｸｭ縺ｮ繝昴う繝ｳ繝医ｒ隗｣髯､
+					// Processing during disconnection
+					// Release the connecting point
 					connectingPoint.current = undefined;
 				}
 
 				if (customEvent.detail.type === "connect") {
-					// 謗･邯壼ｮ御ｺ・凾縺ｮ蜃ｦ逅・
-					// 謗･邯夂ｷ壹・繝・・繧ｿ繧堤函謌舌＠縺ｦ繧､繝吶Φ繝育匱轣ｫ
+					// Processing when connection is completed
+					// Generate connection line data and fire event
 
 					const points: PathPointData[] = [...pathPoints];
 					points[0].id = id;
@@ -324,7 +316,6 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			// Show when hovered, even if isTransparent is true.
 			// If you want to hide when hovered, do not render this component.
 			isTransparent={isTransparent && !isHovered}
-
 			onDrag={handleDrag}
 			onDragOver={handleDragOver}
 			onDragLeave={handleDragLeave}

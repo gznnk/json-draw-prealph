@@ -21,7 +21,7 @@ import { dispatchNewItemEvent } from "../addNewItem";
 import { CONNECT_NODES_EVENT_NAME } from "./connectNodesConstants";
 
 /**
- * ConnectNodes イベントを監視してノード接続を行う Hook。
+ * Hook that monitors ConnectNodes events and performs node connections.
  */
 export const useConnectNodes = (props: CanvasHooksProps) => {
 	// Create references bypass to avoid function creation in every render.

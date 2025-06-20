@@ -3,10 +3,10 @@ import { isItemableData } from "../../validation/isItemableData";
 import { isSelectableData } from "../../validation/isSelectableData";
 
 /**
- * 選択されたグループ内の図形を、配下のグループも含めて再帰的に取得する
+ * Recursively retrieves selected shapes within a group, including shapes in nested groups
  *
- * @param {Diagram[]} diagrams 図形リスト
- * @returns {string | undefined} 選択されたグループ内の図形
+ * @param {Diagram[]} diagrams - List of diagrams
+ * @returns {string | undefined} - Selected shape within the group
  */
 export const getSelectedChildDiagram = (
 	diagrams: Diagram[],

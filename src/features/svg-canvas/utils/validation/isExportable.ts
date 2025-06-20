@@ -1,4 +1,4 @@
-// TODO: 依存関係を整理する
+// TODO: Refactor dependency structure
 import { DiagramRegistry } from "../../registry";
 
 // Import types.

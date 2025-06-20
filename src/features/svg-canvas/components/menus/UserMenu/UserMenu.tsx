@@ -43,7 +43,7 @@ const UserMenu: React.FC = () => {
 
 	const handleSaveApiKey = () => {
 		OpenAiKeyManager.saveKey(apiKey);
-		alert("APIキーを保存しました！");
+		alert("API key saved!");
 	};
 
 	return (
@@ -94,7 +94,7 @@ const UserMenu: React.FC = () => {
 			{isMenuOpen && (
 				<MenuDetailDiv>
 					<label>
-						APIキー:
+						API Key:
 						<input
 							type="password"
 							placeholder="Enter your OpenAI API key"
@@ -104,10 +104,10 @@ const UserMenu: React.FC = () => {
 						/>
 					</label>
 					<button type="button" onClick={handleSaveApiKey}>
-						保存
+						Save
 					</button>
 					<button type="button" onClick={() => setMenuOpen(false)}>
-						閉じる
+						Close
 					</button>
 				</MenuDetailDiv>
 			)}

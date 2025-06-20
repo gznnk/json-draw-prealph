@@ -30,7 +30,7 @@ export const createBestConnectPath = (
 	endY: number,
 	endOwnerShape: Shape,
 ): Point[] => {
-	// 開始方向を計算
+	// Calculate start direction
 	const startDirection = getLineDirection(
 		startOwnerShape.x,
 		startOwnerShape.y,
@@ -75,17 +75,17 @@ export const createBestConnectPath = (
 		score: 1,
 	};
 
-	// 接続線の中心候補となるポイントのグリッドを作成
+	// Create grid of candidate center points for connection lines
 	const grid: Point[] = [];
 	addGridCrossPoint(grid, startP2);
 	addGridCrossPoint(grid, endP2);
 	addGridCrossPoint(grid, midPoint);
 
-	// そのぞれの中心候補のポイントを通過するルートを作成
+	// Create routes passing through each center candidate point
 	const pathList: Point[][] = [];
 	const intersectsPathList: Point[][] = [];
 	for (const p of grid) {
-		// 接続元から中心候補までのルート
+		// Route from connection source to center candidate
 		const startToCenter = createConnectPathOnDrag(
 			startX,
 			startY,
@@ -95,7 +95,7 @@ export const createBestConnectPath = (
 			p.y,
 		);
 
-		// 終了点の方向を計算
+		// Calculate end point direction
 		const endDirection = getLineDirection(
 			endOwnerShape.x,
 			endOwnerShape.y,
@@ -103,7 +103,7 @@ export const createBestConnectPath = (
 			endY,
 		);
 
-		// 接続先から中心候補までのルート
+		// Route from connection destination to center candidate
 		const endToCenter = createConnectPathOnDrag(
 			endX,
 			endY,
@@ -115,7 +115,7 @@ export const createBestConnectPath = (
 
 		const connectPath = [...startToCenter, ...endToCenter.reverse()];
 
-		// 図形と交差しているかチェック
+		// Check if intersecting with shapes
 		const isIntersecting = () => {
 			for (let i = 1; i < connectPath.length - 2; i++) {
 				const p1 = connectPath[i];
