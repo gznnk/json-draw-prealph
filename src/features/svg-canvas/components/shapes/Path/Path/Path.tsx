@@ -9,7 +9,6 @@ import type { PathData } from "../../../../types/data/shapes/PathData";
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
-import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointerEvent";
 import type { PathProps } from "../../../../types/props/shapes/PathProps";
 
 // Import components.
@@ -23,6 +22,7 @@ import { PathElement } from "./PathStyled";
 // Import hooks.
 import { useDrag } from "../../../../hooks/useDrag";
 import { useClick } from "../../../../hooks/useClick";
+import { useSelect } from "../../../../hooks/useSelect";
 
 // Import utils.
 import { calcPointsOuterShape } from "../../../../utils/math/geometry/calcPointsOuterShape";
@@ -105,18 +105,11 @@ const PathComponent: React.FC<PathProps> = ({
 		isVerticesMode,
 	};
 	const refBus = useRef(refBusVal);
-	refBus.current = refBusVal;
-	/**
+	refBus.current = refBusVal; /**
 	 * Polyline pointer down event handler
 	 */
-	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
-		const { id, isSelected, transformEnabled, onSelect } = refBus.current;
-
-		// Fire shape selection event
-		onSelect?.({
-			eventId: e.eventId,
-			id,
-		});
+	const handlePointerDown = useCallback(() => {
+		const { isSelected, transformEnabled } = refBus.current;
 
 		if (!transformEnabled) {
 			setIsVerticesMode(true);
@@ -241,7 +234,8 @@ const PathComponent: React.FC<PathProps> = ({
 	}, []);
 	/**
 	 * Change event handler for line segments and new vertices
-	 */ const handleDiagramChangeBySegumentAndNewVertex = useCallback(
+	 */
+	const handleDiagramChangeBySegumentAndNewVertex = useCallback(
 		(e: DiagramChangeEvent) => {
 			if (!isItemableData<DiagramBaseData>(e.endDiagram)) return; // Type guard with DiagramBaseData
 
@@ -290,9 +284,13 @@ const PathComponent: React.FC<PathProps> = ({
 		y,
 		ref: dragSvgRef,
 		onClick: handleClick,
+	}); // Generate properties for selection
+	const selectProps = useSelect({
+		id,
+		onSelect,
 	});
 	// Compose props for path element
-	const composedProps = mergeProps(dragProps, clickProps);
+	const composedProps = mergeProps(dragProps, clickProps, selectProps);
 
 	// Generate polyline d attribute value
 	const d = createDValue(items);

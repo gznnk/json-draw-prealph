@@ -4,7 +4,6 @@ import { memo, useCallback, useRef, useState } from "react";
 
 // Import types.
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
-import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEvent";
 import type { ImageProps } from "../../../types/props/shapes/ImageProps";
 
 // Import components.
@@ -16,6 +15,7 @@ import { ImageElement } from "./ImageStyled";
 // Import hooks.
 import { useDrag } from "../../../hooks/useDrag";
 import { useClick } from "../../../hooks/useClick";
+import { useSelect } from "../../../hooks/useSelect";
 
 // Import utils.
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
@@ -60,7 +60,6 @@ const ImageComponent: React.FC<ImageProps> = ({
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-
 	/**
 	 * Handler for drag events.
 	 */
@@ -78,18 +77,6 @@ const ImageComponent: React.FC<ImageProps> = ({
 		}
 	}, []);
 
-	/**
-	 * Handler for pointer down events.
-	 */
-	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
-		const { id, onSelect } = refBus.current;
-
-		// Trigger the select event when the pointer is down.
-		onSelect?.({
-			eventId: e.eventId,
-			id,
-		});
-	}, []);
 	// Prepare props for the drag element.
 	const dragProps = useDrag({
 		id,
@@ -98,7 +85,6 @@ const ImageComponent: React.FC<ImageProps> = ({
 		y,
 		syncWithSameId,
 		ref: svgRef,
-		onPointerDown: handlePointerDown,
 		onDrag: handleDrag,
 	});
 	// Generate properties for clicking
@@ -109,8 +95,13 @@ const ImageComponent: React.FC<ImageProps> = ({
 		ref: svgRef,
 		onClick,
 	});
+	// Generate properties for selection
+	const selectProps = useSelect({
+		id,
+		onSelect,
+	});
 	// Compose props for ImageElement
-	const composedProps = mergeProps(dragProps, clickProps);
+	const composedProps = mergeProps(dragProps, clickProps, selectProps);
 
 	// Create the transform attribute for the element.
 	const transform = createSvgTransform(

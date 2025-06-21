@@ -5,7 +5,6 @@ import { memo, useCallback, useMemo, useRef, useState } from "react";
 // Import types.
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
-import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEvent";
 import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
 import type { EllipseProps } from "../../../types/props/shapes/EllipseProps";
 
@@ -20,6 +19,7 @@ import { ConnectPoint } from "../ConnectPoint";
 import { useDrag } from "../../../hooks/useDrag";
 import { useClick } from "../../../hooks/useClick";
 import { useHover } from "../../../hooks/useHover";
+import { useSelect } from "../../../hooks/useSelect";
 
 // Import utils.
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
@@ -124,19 +124,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 			setIsTransforming(false);
 		}
 	}, []);
-
-	/**
-	 * Pointer down event handler
-	 */
-	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
-		const { id, onSelect } = refBus.current;
-		// Fire shape selection event
-		onSelect?.({
-			eventId: e.eventId,
-			id,
-		});
-	}, []);
-
 	/**
 	 * Hover state change event handler
 	 */
@@ -163,7 +150,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	 */
 	const handleDoubleClick = useCallback(() => {
 		const { id, isSelected, isTextEditEnabled, onTextEdit } = refBus.current;
-
 		if (!isTextEditEnabled) return;
 
 		if (!isSelected) return;
@@ -181,7 +167,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 		y,
 		syncWithSameId,
 		ref: svgRef,
-		onPointerDown: handlePointerDown,
 		onDrag: handleDrag,
 		onDragOver: handleDragOver,
 		onDragLeave: handleDragLeave,
@@ -194,13 +179,18 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 		ref: svgRef,
 		onClick,
 	});
+	// Generate properties for selection
+	const selectProps = useSelect({
+		id,
+		onSelect,
+	});
 	// Generate properties for hovering
 	const hoverProps = useHover({
 		id,
 		onHoverChange: handleHover,
 	});
 	// Compose props for EllipseElement
-	const composedProps = mergeProps(dragProps, clickProps, hoverProps);
+	const composedProps = mergeProps(dragProps, clickProps, selectProps, hoverProps);
 	// Suppress ConnectPoint re-rendering by memoization
 	// If separated by key and passed as individual props, each ConnectPoint side
 	// performs comparison processing for each key which is inefficient, so detect Shape differences collectively here
