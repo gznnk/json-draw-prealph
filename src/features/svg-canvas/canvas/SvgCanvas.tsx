@@ -12,6 +12,7 @@ import React, {
 // Import SvgCanvas related type definitions
 import { DiagramRegistry } from "../registry";
 import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
+import { newEventId } from "../utils/common/newEventId";
 
 // Import SvgCanvas related components
 import { TextEditor } from "../components/core/Textable";
@@ -91,9 +92,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onGrabStart,
 			onGrabMove,
 			onGrabEnd,
-			onStartAreaSelection,
-			onUpdateAreaSelection,
-			onEndAreaSelection,
+			onAreaSelection,
 			onCancelAreaSelection,
 		} = props;
 
@@ -178,7 +177,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		const handleBlur = useCallback(() => {
 			hasFocus.current = false;
 		}, []);
-
 		/**
 		 * Handle the pointer down event on the SVG canvas.
 		 */
@@ -195,8 +193,13 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					}
 
 					// Start area selection if not pressing Ctrl key
-					if (!e.ctrlKey) {
-						onStartAreaSelection?.(e.clientX, e.clientY);
+					if (!e.ctrlKey && onAreaSelection) {
+						onAreaSelection({
+							eventId: newEventId(),
+							eventType: "Start",
+							clientX: e.clientX,
+							clientY: e.clientY,
+						});
 					}
 
 					// Clear the selection when pointer is down on the canvas.
@@ -206,38 +209,46 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				// Close the context menu.
 				contextMenuFunctions.closeContextMenu();
 			},
-			[onStartAreaSelection],
-		);
-		/**
+			[onAreaSelection],
+		); /**
 		 * Handle the pointer move event for grab scrolling and area selection.
 		 */
 		const handlePointerMove = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
 				// Handle area selection if active
-				if (selectionState?.isSelecting) {
-					onUpdateAreaSelection?.(e.clientX, e.clientY);
+				if (selectionState?.isSelecting && onAreaSelection) {
+					onAreaSelection({
+						eventId: newEventId(),
+						eventType: "InProgress",
+						clientX: e.clientX,
+						clientY: e.clientY,
+					});
 					return;
 				}
 
 				refBus.current.onGrabMove?.(e);
 			},
-			[selectionState?.isSelecting, onUpdateAreaSelection],
+			[selectionState?.isSelecting, onAreaSelection],
 		);
-
 		/**
 		 * Handle the pointer up event to end grab scrolling and area selection.
 		 */
 		const handlePointerUp = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
 				// Handle area selection end
-				if (selectionState?.isSelecting) {
-					onEndAreaSelection?.();
+				if (selectionState?.isSelecting && onAreaSelection) {
+					onAreaSelection({
+						eventId: newEventId(),
+						eventType: "End",
+						clientX: e.clientX,
+						clientY: e.clientY,
+					});
 					return;
 				}
 
 				refBus.current.onGrabEnd?.(e);
 			},
-			[selectionState?.isSelecting, onEndAreaSelection],
+			[selectionState?.isSelecting, onAreaSelection],
 		);
 
 		/**

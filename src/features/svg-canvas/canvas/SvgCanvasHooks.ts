@@ -117,15 +117,9 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// Ctrl key state management
 	const { isCtrlPressed } = useCtrl();
-
 	// Handler for area selection
-	const {
-		selectionState,
-		onStartAreaSelection,
-		onUpdateAreaSelection,
-		onEndAreaSelection,
-		onCancelAreaSelection,
-	} = useAreaSelection(canvasHooksProps);
+	const { selectionState, onAreaSelection, onCancelAreaSelection } =
+		useAreaSelection(canvasHooksProps);
 
 	// Handler for the drag event.
 	const onDrag = useDrag(canvasHooksProps);
@@ -212,7 +206,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// Observer for the connect nodes event.
 	useConnectNodes(canvasHooksProps);
-
 	// Create the canvas props object that will be passed to the SvgCanvas component.
 	const canvasProps = {
 		...canvasState,
@@ -247,9 +240,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onGrabStart,
 		onGrabMove,
 		onGrabEnd,
-		onStartAreaSelection,
-		onUpdateAreaSelection,
-		onEndAreaSelection,
+		onAreaSelection,
 		onCancelAreaSelection,
 	};
 

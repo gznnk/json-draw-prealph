@@ -20,6 +20,7 @@ import type { NewDiagramEvent } from "../types/events/NewDiagramEvent";
 import type { StackOrderChangeEvent } from "../types/events/StackOrderChangeEvent";
 import type { SvgCanvasResizeEvent } from "../types/events/SvgCanvasResizeEvent";
 import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
+import type { AreaSelectionEvent } from "../types/events/AreaSelectionEvent";
 import type { EventBus } from "../../../shared/event-bus/EventBus";
 
 // Import area selection types.
@@ -116,8 +117,6 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onGrabStart?: (e: React.PointerEvent<SVGSVGElement>) => boolean;
 	onGrabMove?: (e: React.PointerEvent<SVGSVGElement>) => void;
 	onGrabEnd?: (e: React.PointerEvent<SVGSVGElement>) => void;
-	onStartAreaSelection?: (clientX: number, clientY: number) => void;
-	onUpdateAreaSelection?: (clientX: number, clientY: number) => void;
-	onEndAreaSelection?: () => void;
+	onAreaSelection?: (event: AreaSelectionEvent) => void;
 	onCancelAreaSelection?: () => void;
 };

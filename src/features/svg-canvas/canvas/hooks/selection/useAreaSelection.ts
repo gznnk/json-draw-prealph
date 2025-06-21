@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from "react";
 
 // Import types related to SvgCanvas.
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
+import type { AreaSelectionEvent } from "../../../types/events/AreaSelectionEvent";
 
 // Import functions related to SvgCanvas.
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
@@ -208,66 +209,80 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 		}));
 	}, []);
 
-	const onStartAreaSelection = useCallback(
-		(clientX: number, clientY: number) => {
-			const { x, y } = clientToCanvasCoords(clientX, clientY);
+	/**
+	 * Handle area selection events
+	 */
+	const onAreaSelection = useCallback(
+		(event: AreaSelectionEvent) => {
+			const { eventType, clientX, clientY } = event;
 
-			// Clear existing selections when starting area selection
-			onClearAllSelection();
+			switch (eventType) {
+				case "Start": {
+					const { x, y } = clientToCanvasCoords(clientX, clientY);
 
-			setSelectionState({
-				isSelecting: true,
-				startX: x,
-				startY: y,
-				endX: x,
-				endY: y,
-			});
+					// Clear existing selections when starting area selection
+					onClearAllSelection();
+
+					setSelectionState({
+						isSelecting: true,
+						startX: x,
+						startY: y,
+						endX: x,
+						endY: y,
+					});
+					break;
+				}
+
+				case "InProgress": {
+					const { selectionState } = refBus.current;
+					const { x, y } = clientToCanvasCoords(clientX, clientY);
+
+					const newSelectionState = {
+						isSelecting: true,
+						startX: selectionState.startX,
+						startY: selectionState.startY,
+						endX: x,
+						endY: y,
+					};
+
+					setSelectionState(newSelectionState);
+
+					// Update outline display for items within selection bounds
+					updateOutlineDisplay(newSelectionState);
+					break;
+				}
+
+				case "End": {
+					const { selectionState } = refBus.current;
+
+					if (!selectionState.isSelecting) return;
+
+					// Update items selection with current selection bounds
+					updateItemsSelection(selectionState);
+
+					// Clear outline display for all items
+					clearOutlineDisplay();
+
+					// Reset selection state
+					setSelectionState({
+						isSelecting: false,
+						startX: 0,
+						startY: 0,
+						endX: 0,
+						endY: 0,
+					});
+					break;
+				}
+			}
 		},
-		[clientToCanvasCoords, onClearAllSelection],
+		[
+			clientToCanvasCoords,
+			onClearAllSelection,
+			updateItemsSelection,
+			updateOutlineDisplay,
+			clearOutlineDisplay,
+		],
 	);
-
-	const onUpdateAreaSelection = useCallback(
-		(clientX: number, clientY: number) => {
-			const { selectionState } = refBus.current;
-
-			const { x, y } = clientToCanvasCoords(clientX, clientY);
-
-			const newSelectionState = {
-				isSelecting: true,
-				startX: selectionState.startX,
-				startY: selectionState.startY,
-				endX: x,
-				endY: y,
-			};
-
-			setSelectionState(newSelectionState);
-
-			// Update outline display for items within selection bounds
-			updateOutlineDisplay(newSelectionState);
-		},
-		[clientToCanvasCoords, updateOutlineDisplay],
-	);
-
-	const onEndAreaSelection = useCallback(() => {
-		const { selectionState } = refBus.current;
-
-		if (!selectionState.isSelecting) return;
-
-		// Update items selection with current selection bounds
-		updateItemsSelection(selectionState);
-
-		// Clear outline display for all items
-		clearOutlineDisplay();
-
-		// Reset selection state
-		setSelectionState({
-			isSelecting: false,
-			startX: 0,
-			startY: 0,
-			endX: 0,
-			endY: 0,
-		});
-	}, [updateItemsSelection, clearOutlineDisplay]);
 
 	const onCancelAreaSelection = useCallback(() => {
 		// Clear outline display for all items
@@ -281,12 +296,9 @@ export const useAreaSelection = (props: CanvasHooksProps) => {
 			endY: 0,
 		});
 	}, [clearOutlineDisplay]);
-
 	return {
 		selectionState,
-		onStartAreaSelection,
-		onUpdateAreaSelection,
-		onEndAreaSelection,
+		onAreaSelection,
 		onCancelAreaSelection,
 	};
 };

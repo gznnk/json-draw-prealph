@@ -6,9 +6,6 @@ import type { EventType } from "./EventType";
 export type AreaSelectionEvent = {
 	eventId: string;
 	eventType: EventType;
-	startX: number;
-	startY: number;
-	endX: number;
-	endY: number;
-	isActive: boolean;
+	clientX: number;
+	clientY: number;
 };
