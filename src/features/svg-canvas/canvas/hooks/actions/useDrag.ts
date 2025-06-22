@@ -23,6 +23,7 @@ import { isDiagramChangingEvent } from "../../utils/isDiagramChangingEvent";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
+import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
 
 /**
  * Custom hook to handle drag events on the canvas.
@@ -181,6 +182,9 @@ export const useDrag = (props: CanvasHooksProps) => {
 
 			// Update isDiagramChanging state based on the event type.
 			newState.isDiagramChanging = isDiagramChangingEvent(e.eventType);
+
+			// Refresh the connect lines for the dragged diagrams.
+			newState = refreshConnectLines(draggedDiagrams, newState);
 
 			if (isHistoryEvent(e.eventType)) {
 				// Add a new history entry.
