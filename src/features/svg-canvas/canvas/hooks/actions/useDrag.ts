@@ -2,25 +2,27 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
+import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { CanvasHooksProps, SvgCanvasState } from "../../SvgCanvasTypes";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
 
 // Import hooks related to SvgCanvas.
 import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
 
 // Import functions related to SvgCanvas.
+import { DiagramRegistry } from "../../../registry";
+import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
+import { isConnectableData } from "../../../utils/validation/isConnectableData";
+import { isItemableData } from "../../../utils/validation/isItemableData";
+import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { addHistory } from "../../utils/addHistory";
 import { applyRecursive } from "../../utils/applyRecursive";
+import { getAncestorItemsById } from "../../utils/getAncestorItemsById";
+import { getDiagramById } from "../../utils/getDiagramById";
 import { isDiagramChangingEvent } from "../../utils/isDiagramChangingEvent";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
-import { updateConnectPointsAndNotifyMove } from "../../utils/updateConnectPointsAndNotifyMove";
 import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { getAncestorItemsById } from "../../utils/getAncestorItemsById";
-import { getDiagramById } from "../../utils/getDiagramById";
 
 /**
  * Custom hook to handle drag events on the canvas.
@@ -40,6 +42,7 @@ export const useDrag = (props: CanvasHooksProps) => {
 	// The selected ancestor item data of the dragged item at the start of the drag event.
 	const selectedAncestorItem = useRef<Diagram | undefined>(undefined);
 
+	// Return a callback function to handle the drag event.
 	return useCallback((e: DiagramDragEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const {
@@ -58,7 +61,29 @@ export const useDrag = (props: CanvasHooksProps) => {
 				}
 			}
 
+			// Updated state to be returned.
 			let newState: SvgCanvasState;
+			// Dragged diagrams to be updated.
+			const draggedDiagrams: Diagram[] = [];
+
+			// TODO: Generailize function.
+			// Function to update connect points of the dragged item.
+			const updateConnectPoints = (item: Diagram) => {
+				if (isConnectableData(item)) {
+					const calculator = DiagramRegistry.getConnectPointCalculator(
+						item.type,
+					);
+					if (calculator) {
+						// TODO: Diractly create connect points data.
+						// Update the connect points of the item.
+						item.connectPoints = calculator(item).map((c) => ({
+							...c,
+							type: "ConnectPoint",
+						})) as ConnectPointData[];
+						draggedDiagrams.push(item);
+					}
+				}
+			};
 
 			if (
 				selectedAncestorItem.current &&
@@ -82,7 +107,7 @@ export const useDrag = (props: CanvasHooksProps) => {
 							item.id === selectedAncestorItem.current.id &&
 							isItemableData(item)
 						) {
-							return {
+							const newItem = {
 								...item,
 								x: selectedAncestorItem.current.x + dx,
 								y: selectedAncestorItem.current.y + dy,
@@ -96,13 +121,23 @@ export const useDrag = (props: CanvasHooksProps) => {
 										return childItem;
 									}
 									// Update the position of the child items.
-									return {
+									const newChildItem = {
 										...childItem,
 										x: startItem.x + dx,
 										y: startItem.y + dy,
 									};
+
+									// Update the connect points of the child item.
+									updateConnectPoints(newChildItem);
+
+									return newChildItem;
 								}),
 							};
+
+							// Update the connect points of the ancestor item.
+							updateConnectPoints(newItem);
+
+							return newItem;
 						}
 
 						// If the item is a group, recursively search its children.
@@ -134,14 +169,10 @@ export const useDrag = (props: CanvasHooksProps) => {
 								y: e.endY,
 							};
 
-							// TODO: Update state in this function.
-							// Update the connect points of the diagram.
-							// And notify the connect points move event to ConnectLine.
-							return updateConnectPointsAndNotifyMove(
-								e.eventId,
-								e.eventType,
-								newItem,
-							);
+							// Update the connect points of the dragged item.
+							updateConnectPoints(newItem);
+
+							return newItem;
 						}
 						return item;
 					}),
