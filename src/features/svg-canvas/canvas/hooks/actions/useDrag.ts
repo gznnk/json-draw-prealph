@@ -38,10 +38,13 @@ export const useDrag = (props: CanvasHooksProps) => {
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
+
 	// Reference to store ancestor items of the dragged item.
 	const ancestors = useRef<Diagram[]>([]);
 	// The selected ancestor item data of the dragged item at the start of the drag event.
 	const selectedAncestorItem = useRef<Diagram | undefined>(undefined);
+	// Reference to store the canvas state at the start of drag for connect line updates.
+	const startCanvasState = useRef<SvgCanvasState | undefined>(undefined);
 
 	// Return a callback function to handle the drag event.
 	return useCallback((e: DiagramDragEvent) => {
@@ -54,6 +57,9 @@ export const useDrag = (props: CanvasHooksProps) => {
 		setCanvasState((prevState) => {
 			// Remember the ancestor items of the dragged item on the drag start event.
 			if (e.eventType === "Start") {
+				// Store the current canvas state for connect line updates
+				startCanvasState.current = prevState;
+
 				ancestors.current = getAncestorItemsById(e.id, prevState);
 				if (ancestors.current.length > 0) {
 					selectedAncestorItem.current = ancestors.current.find(
@@ -184,7 +190,11 @@ export const useDrag = (props: CanvasHooksProps) => {
 			newState.isDiagramChanging = isDiagramChangingEvent(e.eventType);
 
 			// Refresh the connect lines for the dragged diagrams.
-			newState = refreshConnectLines(draggedDiagrams, newState);
+			newState = refreshConnectLines(
+				draggedDiagrams,
+				newState,
+				startCanvasState.current,
+			);
 
 			if (isHistoryEvent(e.eventType)) {
 				// Add a new history entry.
@@ -202,6 +212,7 @@ export const useDrag = (props: CanvasHooksProps) => {
 				// clean up the ancestor reference.
 				ancestors.current = [];
 				selectedAncestorItem.current = undefined;
+				startCanvasState.current = undefined;
 			}
 
 			return newState;
