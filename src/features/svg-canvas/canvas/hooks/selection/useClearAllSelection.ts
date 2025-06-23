@@ -26,7 +26,6 @@ export const useClearAllSelection = (props: CanvasHooksProps) => {
 			...prevState,
 			items: clearSelectedRecursive(prevState.items),
 			multiSelectGroup: undefined,
-			selectedItemId: undefined,
 		}));
 	}, []);
 };

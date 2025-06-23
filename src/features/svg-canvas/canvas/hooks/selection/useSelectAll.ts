@@ -92,7 +92,6 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 				...prevState,
 				items,
 				multiSelectGroup,
-				selectedItemId: undefined,
 			};
 		});
 	}, []);

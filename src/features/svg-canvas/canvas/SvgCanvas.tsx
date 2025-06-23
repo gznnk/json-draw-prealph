@@ -372,10 +372,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 								<Group
 									{...multiSelectGroup}
 									id={MULTI_SELECT_GROUP}
-									syncWithSameId
-									onSelect={onSelect}
 									onTransform={onTransform}
-									onDiagramChange={onDiagramChange}
 								/>
 							)}
 							{/* Render new connect line. */}

@@ -22,6 +22,7 @@ import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
 import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
+import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 
 /**
  * Custom hook to handle drag events on the canvas.
@@ -52,6 +53,8 @@ export const useDrag = (props: CanvasHooksProps) => {
 			props: { setCanvasState, onDataChange },
 			autoEdgeScroll,
 		} = refBus.current;
+
+		// Update the canvas state based on the drag event.
 		setCanvasState((prevState) => {
 			// Store the current canvas state for connect line updates on drag start
 			if (e.eventType === "Start") {
@@ -87,6 +90,7 @@ export const useDrag = (props: CanvasHooksProps) => {
 			// Collect all diagrams that will be moved (for connect point updates)
 			const movedDiagrams: Diagram[] = [];
 
+			// TODO: 関数化
 			// Function to update connect points of a moved item
 			const updateConnectPoints = (item: Diagram) => {
 				if (isConnectableData(item)) {
@@ -156,6 +160,14 @@ export const useDrag = (props: CanvasHooksProps) => {
 				items: newItems,
 				isDiagramChanging: isDiagramChangingEvent(e.eventType),
 			};
+
+			// If multiple items are selected, create a multi-select group
+			if (prevState.multiSelectGroup) {
+				newState.multiSelectGroup = createMultiSelectGroup(
+					movedDiagrams,
+					prevState.multiSelectGroup?.keepProportion,
+				);
+			}
 
 			// Refresh the connect lines for the moved diagrams
 			newState = refreshConnectLines(
