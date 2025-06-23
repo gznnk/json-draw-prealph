@@ -2,7 +2,6 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
 import { DiagramRegistry } from "../../../registry";
 import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEvent";
 import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";
@@ -16,12 +15,6 @@ import type { GroupProps } from "../../../types/props/shapes/GroupProps";
 import { PositionLabel } from "../../core/PositionLabel";
 import { Outline } from "../../core/Outline";
 import { Transformative } from "../../core/Transformative";
-
-// Import utils.
-import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
-import { rotatePoint } from "../../../utils/math/points/rotatePoint";
 
 // Imports related to this component.
 import { getSelectedChildDiagram } from "../../../utils/shapes/group/getSelectedChildDiagram";
@@ -66,12 +59,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 	// even if the shape are not the same.
 	// This is set to true only when the group is already selected and the pointer is pressed again on a shape inside the group.
 	const isSequentialSelection = useRef(false);
-
-	// List of child shapes at the start of a drag or transform.
-	const startItems = useRef<Diagram[]>(items);
-
-	// Group's oriented box at the start of a drag or transform.
-	const startBox = useRef({ x, y, width, height });
 	// To avoid frequent handler generation, hold referenced values in useRef
 	const refBusVal = {
 		// Properties
@@ -230,128 +217,21 @@ const GroupComponent: React.FC<GroupProps> = ({
 		// Propagate the text edit event for shapes within the group as is
 		onTextEdit?.(e);
 	}, []);
+
 	/**
 	 * Group transform event handler
 	 */
 	const handleTransform = useCallback((e: DiagramTransformEvent) => {
-		const { id, x, y, width, height, items, onDiagramChange } = refBus.current;
+		const { onTransform } = refBus.current;
 
 		// Processing at group transform start
 		if (e.eventType === "Start") {
-			// Record the group's shape at transform start
-			startBox.current = { x, y, width, height };
-			startItems.current = items;
-
-			// Nothing has been transformed yet, so only send start notification
-			onDiagramChange?.({
-				eventId: e.eventId,
-				eventType: "Start",
-				changeType: "Transform",
-				id,
-				startDiagram: {
-					...e.startShape,
-					items,
-				},
-				endDiagram: {
-					...e.endShape,
-					items,
-				},
-				cursorX: e.cursorX,
-				cursorY: e.cursorY,
-			});
-
 			setIsGroupTransforming(true);
-			return;
 		}
 
-		// Following processing for during group transform and transform end
-
-		// Calculate group scaling
-		const groupScaleX = e.endShape.width / e.startShape.width;
-		const groupScaleY = e.endShape.height / e.startShape.height;
-
-		// Recursively transform shapes within the group (including connection points)
-		const transformRecursive = (diagrams: Diagram[]) => {
-			const newItems: Diagram[] = [];
-			for (const item of diagrams) {
-				const inversedItemCenter = rotatePoint(
-					item.x,
-					item.y,
-					e.startShape.x,
-					e.startShape.y,
-					degreesToRadians(-e.startShape.rotation),
-				);
-				const dx =
-					(inversedItemCenter.x - e.startShape.x) *
-					e.startShape.scaleX *
-					e.endShape.scaleX;
-				const dy =
-					(inversedItemCenter.y - e.startShape.y) *
-					e.startShape.scaleY *
-					e.endShape.scaleY;
-
-				const newDx = dx * groupScaleX;
-				const newDy = dy * groupScaleY;
-
-				let newCenter = {
-					x: e.endShape.x + newDx,
-					y: e.endShape.y + newDy,
-				};
-				newCenter = rotatePoint(
-					newCenter.x,
-					newCenter.y,
-					e.endShape.x,
-					e.endShape.y,
-					degreesToRadians(e.endShape.rotation),
-				);
-
-				if (isTransformativeData(item)) {
-					const rotationDiff = e.endShape.rotation - e.startShape.rotation;
-					const newRotation = item.rotation + rotationDiff;
-
-					newItems.push({
-						...item,
-						x: newCenter.x,
-						y: newCenter.y,
-						width: item.width * groupScaleX,
-						height: item.height * groupScaleY,
-						rotation: newRotation,
-						scaleX: e.endShape.scaleX,
-						scaleY: e.endShape.scaleY,
-						items: isItemableData(item)
-							? transformRecursive(item.items ?? [])
-							: undefined,
-					} as Diagram);
-				} else {
-					newItems.push({
-						...item,
-						x: newCenter.x,
-						y: newCenter.y,
-					});
-				}
-			}
-
-			return newItems;
-		};
-
-		const event: DiagramChangeEvent = {
-			eventId: e.eventId,
-			eventType: e.eventType,
-			changeType: "Transform",
-			id,
-			startDiagram: {
-				...e.startShape,
-				items: startItems.current,
-			},
-			endDiagram: {
-				...e.endShape,
-				items: transformRecursive(startItems.current),
-			},
-			cursorX: e.cursorX,
-			cursorY: e.cursorY,
-		};
-		// Notify the transformation of all shapes in the group collectively
-		onDiagramChange?.(event);
+		// Propagate the transform event to canvas.
+		// The recursive transformation of child items is now handled by useTransform hook.
+		onTransform?.(e);
 
 		if (e.eventType === "End") {
 			setIsGroupTransforming(false);
