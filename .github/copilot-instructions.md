@@ -2,6 +2,7 @@
 
 - [After Copilot Task](./instructions/after-copilot-task.instructions.md)
 - [Biome Linting And Formatting Rules](./instructions/biome-linting-and-formatting-rules.instructions.md)
+- [Code Formatting Preservation](./instructions/code-formatting-preservation.instructions.md)
 - [Color Scheme](./instructions/color-scheme.instructions.md)
 - [Comment Style Guidelines](./instructions/comment-style-guidelines.instructions.md)
 - [Component Function Separation](./instructions/component-function-separation.instructions.md)
