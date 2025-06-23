@@ -158,11 +158,9 @@ const GroupComponent: React.FC<GroupProps> = ({
 		const { isSelected, onDrag } = refBus.current;
 
 		// Processing at drag start
-		if (e.eventType === "Start") {
-			if (isSelected) {
-				// If in group selection, enable dragging of the entire group
-				setIsGroupDragging(true);
-			}
+		if (e.eventType === "Start" && isSelected) {
+			// If in group selection, enable dragging of the entire group
+			setIsGroupDragging(true);
 		}
 
 		// Processing during drag
