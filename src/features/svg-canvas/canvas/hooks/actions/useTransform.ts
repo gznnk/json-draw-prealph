@@ -12,21 +12,22 @@ import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
 // Import functions related to SvgCanvas.
 import { DiagramRegistry } from "../../../registry";
 import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
+import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
 import { isConnectableData } from "../../../utils/validation/isConnectableData";
 import { addHistory } from "../../utils/addHistory";
-import { applyRecursive } from "../../utils/applyRecursive";
+import { createItemMap } from "../../utils/createItemMap";
 import { isDiagramChangingEvent } from "../../utils/isDiagramChangingEvent";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
-import { getDiagramById } from "../../../utils/common/getDiagramById";
-import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
 
 // Import utility functions for transformation.
+import type { GroupData } from "../../../types/data/shapes/GroupData";
+import { getSelectedItems } from "../../../utils/common/getSelectedItems";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { rotatePoint } from "../../../utils/math/points/rotatePoint";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
-import { rotatePoint } from "../../../utils/math/points/rotatePoint";
 
 /**
  * Updates connect points of a diagram item if it's connectable.
@@ -59,103 +60,159 @@ export const useTransform = (props: CanvasHooksProps) => {
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-	// Reference to store the initial state of child items at the start of transform.
-	const startItems = useRef<Diagram[]>([]);
+
 	// Reference to store the canvas state at the start of transform for connect line updates.
 	const startCanvasState = useRef<SvgCanvasState | undefined>(undefined);
-	/**
-	 * Recursively transform child diagrams based on parent transformation.
-	 */
-	const transformChildrenRecursively = useCallback(
+	// Reference to store selected item IDs at the start of transform for performance.
+	const multiSelectedItemIds = useRef<Set<string>>(new Set());
+	// Reference to store initial items at the start of transform.
+	const initialItemsMap = useRef<Map<string, Diagram>>(new Map());
+
+	const transformChild = useCallback(
 		(
-			startDiagrams: Diagram[],
+			item: Diagram,
 			e: DiagramTransformEvent,
 			transformedDiagrams: Diagram[],
-		): Diagram[] => {
-			// Calculate group scaling
+		): Diagram => {
+			const initialItem = initialItemsMap.current.get(item.id);
+			if (!initialItem) {
+				// If the item is not found in the initial items map, return the child item as is.
+				return item;
+			}
 			const groupScaleX = e.endShape.width / e.startShape.width;
 			const groupScaleY = e.endShape.height / e.startShape.height;
+			const inversedItemCenter = rotatePoint(
+				initialItem.x,
+				initialItem.y,
+				e.startShape.x,
+				e.startShape.y,
+				degreesToRadians(-e.startShape.rotation),
+			);
+			const dx =
+				(inversedItemCenter.x - e.startShape.x) *
+				e.startShape.scaleX *
+				e.endShape.scaleX;
+			const dy =
+				(inversedItemCenter.y - e.startShape.y) *
+				e.startShape.scaleY *
+				e.endShape.scaleY;
 
-			const newItems: Diagram[] = [];
-			for (const item of startDiagrams) {
-				const inversedItemCenter = rotatePoint(
-					item.x,
-					item.y,
-					e.startShape.x,
-					e.startShape.y,
-					degreesToRadians(-e.startShape.rotation),
-				);
-				const dx =
-					(inversedItemCenter.x - e.startShape.x) *
-					e.startShape.scaleX *
-					e.endShape.scaleX;
-				const dy =
-					(inversedItemCenter.y - e.startShape.y) *
-					e.startShape.scaleY *
-					e.endShape.scaleY;
+			const newDx = dx * groupScaleX;
+			const newDy = dy * groupScaleY;
 
-				const newDx = dx * groupScaleX;
-				const newDy = dy * groupScaleY;
+			let newCenter = {
+				x: e.endShape.x + newDx,
+				y: e.endShape.y + newDy,
+			};
+			newCenter = rotatePoint(
+				newCenter.x,
+				newCenter.y,
+				e.endShape.x,
+				e.endShape.y,
+				degreesToRadians(e.endShape.rotation),
+			);
 
-				let newCenter = {
-					x: e.endShape.x + newDx,
-					y: e.endShape.y + newDy,
+			let newItem: Diagram;
+			if (isTransformativeData(initialItem)) {
+				const rotationDiff = e.endShape.rotation - e.startShape.rotation;
+				const newRotation = initialItem.rotation + rotationDiff;
+				newItem = {
+					...item,
+					x: newCenter.x,
+					y: newCenter.y,
+					width: initialItem.width * groupScaleX,
+					height: initialItem.height * groupScaleY,
+					rotation: newRotation,
+					scaleX: e.endShape.scaleX,
+					scaleY: e.endShape.scaleY,
+					items: isItemableData(initialItem)
+						? transformRecursively(
+								initialItem.items ?? [],
+								e,
+								transformedDiagrams,
+								true,
+							)
+						: undefined,
+				} as Diagram;
+
+				// Update the connect points of the transformed item.
+				updateDiagramConnectPoints(newItem);
+				if (isConnectableData(newItem)) {
+					transformedDiagrams.push(newItem);
+				}
+			} else {
+				newItem = {
+					...item,
+					x: newCenter.x,
+					y: newCenter.y,
 				};
-				newCenter = rotatePoint(
-					newCenter.x,
-					newCenter.y,
-					e.endShape.x,
-					e.endShape.y,
-					degreesToRadians(e.endShape.rotation),
-				);
 
-				if (isTransformativeData(item)) {
-					const rotationDiff = e.endShape.rotation - e.startShape.rotation;
-					const newRotation = item.rotation + rotationDiff;
-					const newItem = {
-						...item,
-						x: newCenter.x,
-						y: newCenter.y,
-						width: item.width * groupScaleX,
-						height: item.height * groupScaleY,
-						rotation: newRotation,
-						scaleX: e.endShape.scaleX,
-						scaleY: e.endShape.scaleY,
-						items: isItemableData(item)
-							? transformChildrenRecursively(
-									item.items ?? [],
-									e,
-									transformedDiagrams,
-								)
-							: undefined,
-					} as Diagram;
-
-					// Update the connect points of the transformed item.
-					updateDiagramConnectPoints(newItem);
-					if (isConnectableData(newItem)) {
-						transformedDiagrams.push(newItem);
-					}
-					newItems.push(newItem);
-				} else {
-					const newItem = {
-						...item,
-						x: newCenter.x,
-						y: newCenter.y,
-					};
-
-					// Update the connect points of the transformed item.
-					updateDiagramConnectPoints(newItem);
-					if (isConnectableData(newItem)) {
-						transformedDiagrams.push(newItem);
-					}
-					newItems.push(newItem);
+				// Update the connect points of the transformed item.
+				updateDiagramConnectPoints(newItem);
+				if (isConnectableData(newItem)) {
+					transformedDiagrams.push(newItem);
 				}
 			}
 
-			return newItems;
+			return newItem;
 		},
 		[],
 	);
+
+	const transformRecursively = useCallback(
+		(
+			items: Diagram[],
+			e: DiagramTransformEvent,
+			transformedDiagrams: Diagram[],
+			isChild = false,
+		): Diagram[] => {
+			return items.map((item) => {
+				if (item.id === e.id) {
+					// Apply the new shape to the item.
+					const newItem = {
+						...item,
+						...e.endShape,
+					};
+
+					// Transform its children recursively.
+					if (isItemableData(newItem)) {
+						newItem.items = transformRecursively(
+							newItem.items ?? [],
+							e,
+							transformedDiagrams,
+							true,
+						);
+					}
+
+					// Update the connect points of the transformed item.
+					updateDiagramConnectPoints(newItem);
+					if (isConnectableData(newItem)) {
+						transformedDiagrams.push(newItem);
+					}
+
+					return newItem;
+				}
+				// If the item is multi-selected or a child of a transformed item, transform it.
+				if (isChild || multiSelectedItemIds.current.has(item.id)) {
+					return transformChild(item, e, transformedDiagrams);
+				}
+				// If the item has children, recursively transform them.
+				if (isItemableData(item)) {
+					return {
+						...item,
+						items: transformRecursively(
+							item.items ?? [],
+							e,
+							transformedDiagrams,
+						),
+					};
+				}
+				return item; // Return the child item unchanged if not selected.
+			});
+		},
+		[transformChild],
+	);
+
 	// Return a callback function to handle the transform event.
 	return useCallback(
 		(e: DiagramTransformEvent) => {
@@ -172,10 +229,16 @@ export const useTransform = (props: CanvasHooksProps) => {
 					// Store the current canvas state for connect line updates
 					startCanvasState.current = prevState;
 
-					const targetItem = getDiagramById(prevState.items, e.id);
-					if (targetItem && isItemableData(targetItem)) {
-						startItems.current = targetItem.items ?? [];
+					// Store selected item IDs for performance
+					const selectedItems = getSelectedItems(prevState.items);
+					if (selectedItems.length > 1) {
+						// If multiple items are selected, store their IDs for multi-selection.
+						multiSelectedItemIds.current = new Set(
+							selectedItems.map((item) => item.id),
+						);
 					}
+					// Store initial items
+					initialItemsMap.current = createItemMap(prevState.items);
 				}
 
 				// Transformed diagrams to be updated.
@@ -183,42 +246,16 @@ export const useTransform = (props: CanvasHooksProps) => {
 
 				let newState = {
 					...prevState,
-					items: applyRecursive(prevState.items, (item) => {
-						if (item.id === e.id) {
-							// Apply the new shape to the item.
-							let newItem = {
-								...item,
-								...e.endShape,
-							};
-
-							// Update the connect points of the transformed item.
-							updateDiagramConnectPoints(newItem);
-							if (isConnectableData(newItem)) {
-								transformedDiagrams.push(newItem);
-							}
-
-							// If the item has children, recursively transform them using the stored initial state.
-							if (
-								isItemableData(newItem) &&
-								startItems.current &&
-								startItems.current.length > 0
-							) {
-								newItem = {
-									...newItem,
-									items: transformChildrenRecursively(
-										startItems.current,
-										e,
-										transformedDiagrams,
-									),
-								};
-							}
-
-							return newItem;
-						}
-						return item;
-					}),
+					items: transformRecursively(prevState.items, e, transformedDiagrams),
 					isDiagramChanging: isDiagramChangingEvent(e.eventType),
-				};
+					multiSelectGroup: prevState.multiSelectGroup
+						? ({
+								...prevState.multiSelectGroup,
+								// Update the multi-select group with the new shape.
+								...e.endShape,
+							} as GroupData)
+						: undefined,
+				} as SvgCanvasState;
 
 				// Refresh the connect lines for the transformed diagrams.
 				newState = refreshConnectLines(
@@ -241,8 +278,9 @@ export const useTransform = (props: CanvasHooksProps) => {
 
 				// Clean up the stored items at the end of transform
 				if (e.eventType === "End") {
-					startItems.current = [];
 					startCanvasState.current = undefined;
+					initialItemsMap.current.clear();
+					multiSelectedItemIds.current.clear();
 				}
 
 				return newState;
@@ -253,6 +291,6 @@ export const useTransform = (props: CanvasHooksProps) => {
 				cursorY: e.cursorY ?? e.endShape.y,
 			});
 		},
-		[transformChildrenRecursively],
+		[transformRecursively],
 	);
 };
