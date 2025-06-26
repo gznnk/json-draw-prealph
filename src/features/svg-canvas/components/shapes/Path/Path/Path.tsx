@@ -58,7 +58,6 @@ const PathComponent: React.FC<PathProps> = ({
 	stroke = "black",
 	strokeWidth = "1px",
 	isSelected = false,
-	isMultiSelectSource = false,
 	showOutline = false,
 	items = [],
 	dragEnabled = true,
@@ -306,20 +305,17 @@ const PathComponent: React.FC<PathProps> = ({
 		isSelected &&
 		isVerticesMode &&
 		!isDragging &&
-		!isPathPointDragging &&
-		!isMultiSelectSource;
-
+		!isPathPointDragging;
 	// Display flag for new vertices
 	const showNewVertex =
 		newVertexEnabled &&
 		isSelected &&
 		isVerticesMode &&
 		!isDragging &&
-		!isPathPointDragging &&
-		!isMultiSelectSource;
+		!isPathPointDragging;
 
 	// Display flag for overall transform group
-	const showTransformGroup = isSelected && !isMultiSelectSource;
+	const showTransformGroup = isSelected;
 
 	// Flag to show the position label.
 	const showPositionLabel = isSelected && isDragging;
@@ -347,7 +343,7 @@ const PathComponent: React.FC<PathProps> = ({
 					fill="none"
 					stroke={stroke}
 					strokeWidth={strokeWidth}
-					isTransparent={isMultiSelectSource}
+					isTransparent={false}
 				/>
 			</g>
 			{/* Path for dragging */}
@@ -397,7 +393,6 @@ const PathComponent: React.FC<PathProps> = ({
 					scaleX={scaleX}
 					scaleY={scaleY}
 					isSelected={isSelected}
-					isMultiSelectSource={isMultiSelectSource}
 					showOutline={showOutline}
 				/>
 			)}
@@ -408,7 +403,6 @@ const PathComponent: React.FC<PathProps> = ({
 					x={x}
 					y={y}
 					isSelected={transformEnabled && !isVerticesMode}
-					isMultiSelectSource={isMultiSelectSource}
 					width={width}
 					height={height}
 					rotation={rotation}

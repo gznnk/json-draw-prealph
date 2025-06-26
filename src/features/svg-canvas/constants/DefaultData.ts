@@ -29,7 +29,6 @@ export const DEFAULT_DIAGRAM_BASE_DATA = {
  */
 export const DEFAULT_SELECTABLE_DATA = {
 	isSelected: false,
-	isMultiSelectSource: false,
 } as const satisfies SelectableData;
 
 /**

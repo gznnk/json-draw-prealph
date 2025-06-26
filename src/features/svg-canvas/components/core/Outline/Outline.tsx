@@ -18,7 +18,6 @@ type OutlineProps = {
 	scaleX: number;
 	scaleY: number;
 	isSelected: boolean;
-	isMultiSelectSource: boolean;
 	showOutline?: boolean;
 };
 
@@ -36,16 +35,10 @@ const OutlineComponent: React.FC<OutlineProps> = ({
 	scaleX,
 	scaleY,
 	isSelected,
-	isMultiSelectSource,
 	showOutline = false,
 }) => {
 	// Don't render if the component is not selected and not showing outline
 	if (!isSelected && !showOutline) {
-		return null;
-	}
-
-	// Hide the selection outline when the component is the source of a multi-selection
-	if (isMultiSelectSource) {
 		return null;
 	}
 

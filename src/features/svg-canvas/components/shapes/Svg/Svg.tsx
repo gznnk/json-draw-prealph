@@ -39,7 +39,6 @@ const SvgComponent: React.FC<SvgProps> = ({
 	scaleY,
 	keepProportion,
 	isSelected,
-	isMultiSelectSource,
 	initialWidth,
 	initialHeight,
 	svgText,
@@ -133,14 +132,14 @@ const SvgComponent: React.FC<SvgProps> = ({
 	}, [svgText, initialWidth, initialHeight]);
 
 	// Flag to show the transformative element.
-	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
+	const showTransformative = isSelected && !isDragging;
 
 	return (
 		<>
 			<g transform={transform}>
 				<SvgGroupElement
 					transform={`translate(${-width / 2}, ${-height / 2}) scale(${width / initialWidth}, ${height / initialHeight})`}
-					isTransparent={isMultiSelectSource}
+					isTransparent={false}
 					ref={groupRef}
 				/>
 				{/* Element for handle pointer events */}
@@ -153,7 +152,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 					tabIndex={0}
 					cursor="move"
 					fill="transparent"
-					isTransparent={isMultiSelectSource}
+					isTransparent={false}
 					ref={svgRef}
 					{...composedProps}
 				/>
@@ -167,7 +166,6 @@ const SvgComponent: React.FC<SvgProps> = ({
 				scaleX={scaleX}
 				scaleY={scaleY}
 				isSelected={isSelected}
-				isMultiSelectSource={isMultiSelectSource}
 				showOutline={showOutline}
 			/>
 			{showTransformative && (
@@ -183,7 +181,6 @@ const SvgComponent: React.FC<SvgProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					isSelected={isSelected}
-					isMultiSelectSource={isMultiSelectSource}
 					onTransform={onTransform}
 				/>
 			)}

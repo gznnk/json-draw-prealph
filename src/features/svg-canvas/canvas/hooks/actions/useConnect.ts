@@ -33,7 +33,6 @@ export const useConnect = (_props: CanvasHooksProps) => {
 				stroke: "#3A415C",
 				strokeWidth: "3px",
 				isSelected: false,
-				isMultiSelectSource: false,
 				keepProportion: false,
 				items: e.points.map((p: PathPointData) => ({
 					...p,

@@ -43,7 +43,7 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 
 		setCanvasState((prevState) => {
 			// Update the selected state of the items.
-			let items = applyRecursive(prevState.items, (item) => {
+			const items = applyRecursive(prevState.items, (item) => {
 				if (!isSelectableData(item)) {
 					// Skip if the item is not selectable.
 					return item;
@@ -74,7 +74,6 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 					...item,
 					// When single selection, clear the selection state of all diagrams except the selected one.
 					isSelected: false,
-					isMultiSelectSource: false,
 				};
 			});
 
@@ -89,22 +88,15 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 				if (selectedItems.some((item) => item.type === "ConnectLine")) {
 					// If the selected items include a connection line, keep their selection state unchanged to prevent grouping.
 					return prevState;
-				} // Create initial values for the multi-select group
+				}
+				// Create initial values for the multi-select group
 				multiSelectGroup = createMultiSelectGroup(
 					selectedItems,
 					prevState.multiSelectGroup?.keepProportion,
 				);
 			} else {
-				// When not in multi-select mode, set all shapes to not be multi-select sources
-				items = applyRecursive(items, (item) => {
-					if (isSelectableData(item)) {
-						return {
-							...item,
-							isMultiSelectSource: false,
-						};
-					}
-					return item;
-				});
+				// Multi-select source logic is no longer needed
+				// Items remain as-is without modification
 			}
 
 			return {

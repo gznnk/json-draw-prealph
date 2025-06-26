@@ -36,7 +36,6 @@ const ImageComponent: React.FC<ImageProps> = ({
 	scaleY,
 	keepProportion,
 	isSelected,
-	isMultiSelectSource,
 	base64Data,
 	showOutline = false,
 	onDrag,
@@ -111,7 +110,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 	);
 
 	// Flag to show the transformative element.
-	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
+	const showTransformative = isSelected && !isDragging;
 
 	return (
 		<>
@@ -125,7 +124,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 					tabIndex={0}
 					cursor="move"
 					href={`data:image/png;base64,${base64Data}`}
-					isTransparent={isMultiSelectSource}
+					isTransparent={false}
 					ref={svgRef}
 					{...composedProps}
 				/>
@@ -139,7 +138,6 @@ const ImageComponent: React.FC<ImageProps> = ({
 				scaleX={scaleX}
 				scaleY={scaleY}
 				isSelected={isSelected}
-				isMultiSelectSource={isMultiSelectSource}
 				showOutline={showOutline}
 			/>
 			{showTransformative && (
@@ -155,7 +153,6 @@ const ImageComponent: React.FC<ImageProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					isSelected={isSelected}
-					isMultiSelectSource={isMultiSelectSource}
 					onTransform={onTransform}
 				/>
 			)}

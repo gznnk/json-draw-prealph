@@ -60,7 +60,6 @@ const TransformativeComponent: React.FC<Props> = ({
 	scaleY,
 	keepProportion,
 	isSelected,
-	isMultiSelectSource,
 	onTransform,
 }) => {
 	const [isResizing, setIsResizing] = useState(false);
@@ -881,11 +880,6 @@ const TransformativeComponent: React.FC<Props> = ({
 
 	// Don't render if the component is not selected.
 	if (!isSelected) {
-		return null;
-	}
-
-	// Hide the transform outline when the component is the source of a multi-selection.
-	if (isMultiSelectSource) {
 		return null;
 	}
 

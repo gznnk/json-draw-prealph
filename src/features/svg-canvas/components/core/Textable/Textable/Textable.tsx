@@ -20,7 +20,6 @@ type TextableProps = TextableData & {
 	width: number;
 	height: number;
 	transform: string;
-	isMultiSelectSource?: boolean;
 };
 
 /**
@@ -41,7 +40,6 @@ const TextableComponent: React.FC<TextableProps> = ({
 	fontFamily,
 	fontWeight,
 	isTextEditing,
-	isMultiSelectSource,
 }) => {
 	const textRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +62,7 @@ const TextableComponent: React.FC<TextableProps> = ({
 			height={height}
 			transform={transform}
 			pointerEvents="none"
-			isTransparent={isMultiSelectSource}
+			isTransparent={false}
 		>
 			<TextWrapper verticalAlign={verticalAlign}>
 				{textType === "markdown" ? (

@@ -10,7 +10,6 @@ import { newId } from "../../../utils/shapes/common/newId";
 import { newEventId } from "../../../utils/common/newEventId";
 import { addHistory } from "../../utils/addHistory";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
-import { clearMultiSelectSourceRecursive } from "../../utils/clearMultiSelectSourceRecursive";
 import { getSelectedItems } from "../../../utils/common/getSelectedItems";
 import { removeGroupedRecursive } from "../../utils/removeGroupedRecursive";
 
@@ -51,18 +50,12 @@ export const useGroup = (props: CanvasHooksProps) => {
 				id: newId(),
 				type: "Group",
 				isSelected: true,
-				isMultiSelectSource: false,
-				items: selectedItems.map((item) => ({
-					...item,
-					isSelected: false,
-					isMultiSelectSource: false,
-				})),
-			}; // Remove grouped shapes from the shape array
+				items: selectedItems.map((item) => ({ ...item, isSelected: false })),
+			};
+			// Remove grouped shapes from the shape array
 			let items = removeGroupedRecursive(prevState.items);
 			// Add new group
 			items = [...items, group];
-			// Clear multi-selection source settings
-			items = clearMultiSelectSourceRecursive(items);
 
 			// Create new state
 			let newState = {

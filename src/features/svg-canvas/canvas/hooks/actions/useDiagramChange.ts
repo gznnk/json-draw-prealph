@@ -88,9 +88,8 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 					let newItem = { ...item };
 
 					if (isSelectableData(changedItem)) {
-						// Remove the properties that are not needed for the update.
-						const { isSelected, isMultiSelectSource, ...updateItem } =
-							changedItem;
+						// Remove the isSelected property that is not needed for the update.
+						const { isSelected, ...updateItem } = changedItem;
 
 						// Apply the updated properties to the original item.
 						newItem = {
@@ -129,12 +128,7 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 						multiSelectGroup.items,
 						(item) =>
 							item.id === e.id
-								? {
-										...item,
-										...e.endDiagram,
-										isSelected: false,
-										isMultiSelectSource: false,
-									}
+								? { ...item, ...e.endDiagram, isSelected: false }
 								: item,
 					);
 				}

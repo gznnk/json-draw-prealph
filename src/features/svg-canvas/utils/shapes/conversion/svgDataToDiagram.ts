@@ -57,8 +57,8 @@ export const svgDataToDiagram = (data: string): GroupData => {
 		rotation: 0,
 		scaleX: 1,
 		scaleY: 1,
+		keepProportion: false,
 		isSelected: false,
-		isMultiSelectSource: false,
 		items: newData,
 	} as GroupData;
 

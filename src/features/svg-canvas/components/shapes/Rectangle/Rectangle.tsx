@@ -50,7 +50,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	stroke,
 	strokeWidth,
 	isSelected,
-	isMultiSelectSource,
 	connectPoints,
 	showConnectPoints = true,
 	text,
@@ -225,15 +224,10 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		y,
 	);
 	// Flag whether to show transform component
-	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
-
+	const showTransformative = isSelected && !isDragging;
 	// Flag whether to show connect points
 	const doShowConnectPoints =
-		showConnectPoints &&
-		!isSelected &&
-		!isMultiSelectSource &&
-		!isDragging &&
-		!isTransformimg;
+		showConnectPoints && !isSelected && !isDragging && !isTransformimg;
 
 	return (
 		<>
@@ -251,7 +245,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					strokeWidth={strokeWidth}
 					tabIndex={0}
 					cursor="move"
-					isTransparent={isTransparent || isMultiSelectSource}
+					isTransparent={isTransparent}
 					transform={transform}
 					ref={svgRef}
 					onDoubleClick={handleDoubleClick}
@@ -285,7 +279,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 				scaleX={scaleX}
 				scaleY={scaleY}
 				isSelected={isSelected}
-				isMultiSelectSource={isMultiSelectSource}
 				showOutline={showOutline}
 			/>
 			{showTransformative && (
@@ -301,7 +294,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					isSelected={isSelected}
-					isMultiSelectSource={isMultiSelectSource}
 					onTransform={handleTransform}
 				/>
 			)}

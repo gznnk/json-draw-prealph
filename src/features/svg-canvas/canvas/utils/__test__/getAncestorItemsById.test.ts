@@ -38,7 +38,6 @@ const createMockGroup = (id: string, items: Diagram[]): GroupData => ({
 	scaleY: 1,
 	keepProportion: false,
 	isSelected: false,
-	isMultiSelectSource: false,
 	items,
 });
 

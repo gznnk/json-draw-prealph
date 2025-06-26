@@ -107,7 +107,6 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			strokeWidth: "3px",
 			keepProportion: false,
 			isSelected: false,
-			isMultiSelectSource: false,
 			endArrowHead: "Circle",
 			items: newPathPoints,
 		});

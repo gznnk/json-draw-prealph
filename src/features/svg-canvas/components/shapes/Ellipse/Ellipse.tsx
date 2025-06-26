@@ -46,7 +46,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	strokeWidth,
 	keepProportion,
 	isSelected,
-	isMultiSelectSource,
 	connectPoints,
 	showConnectPoints = true,
 	text,
@@ -219,15 +218,10 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	);
 
 	// Flag whether to show transform component
-	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
-
+	const showTransformative = isSelected && !isDragging;
 	// Flag whether to show connect points
-	const doShowConnectPoints =
-		showConnectPoints &&
-		!isSelected &&
-		!isMultiSelectSource &&
-		!isDragging &&
-		!isTransformimg;
+	const showConnectPointsFlag =
+		showConnectPoints && !isSelected && !isDragging && !isTransformimg;
 
 	return (
 		<>
@@ -243,7 +237,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 					strokeWidth={strokeWidth}
 					tabIndex={0}
 					cursor="move"
-					isTransparent={isTransparent || isMultiSelectSource}
+					isTransparent={isTransparent}
 					transform={transform}
 					ref={svgRef}
 					onDoubleClick={handleDoubleClick}
@@ -277,7 +271,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 				scaleX={scaleX}
 				scaleY={scaleY}
 				isSelected={isSelected}
-				isMultiSelectSource={isMultiSelectSource}
 				showOutline={showOutline}
 			/>
 			{showTransformative && (
@@ -293,11 +286,10 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					isSelected={isSelected}
-					isMultiSelectSource={isMultiSelectSource}
 					onTransform={handleTransform}
 				/>
 			)}
-			{doShowConnectPoints &&
+			{showConnectPointsFlag &&
 				connectPoints.map((cp) => (
 					<ConnectPoint
 						key={cp.id}

@@ -87,17 +87,14 @@ const setSelectionState = (
 				// Only set isSelected to true for top-level items
 				// This ensures only top-level groups are selected in multi-select mode
 				newItem.isSelected = true;
-				newItem.isMultiSelectSource = true;
 			} else {
 				// Child elements are not selected
 				newItem.isSelected = false;
-				newItem.isMultiSelectSource = true;
 			}
 		} else {
 			// For single selection mode
 			// Only set isSelected to true if it's a top-level item
 			newItem.isSelected = isTopLevel;
-			newItem.isMultiSelectSource = false;
 		}
 	}
 
@@ -317,7 +314,6 @@ export const usePaste = (props: CanvasHooksProps) => {
 								return {
 									...item,
 									isSelected: false,
-									isMultiSelectSource: false,
 								};
 							}
 							return item;
@@ -362,11 +358,9 @@ export const usePaste = (props: CanvasHooksProps) => {
 								keepProportion:
 									prevState.multiSelectGroup?.keepProportion ?? true,
 								isSelected: true,
-								isMultiSelectSource: false,
 								items: pastedNormalItems.map((item) => ({
 									...item,
 									isSelected: false, // Set to false within multi-select group
-									isMultiSelectSource: false, // Set to false within multi-select group
 								})),
 							} as GroupData;
 						}

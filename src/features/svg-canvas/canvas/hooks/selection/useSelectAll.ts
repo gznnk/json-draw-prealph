@@ -11,7 +11,6 @@ import { calcUnrotatedGroupBoundingBox } from "../../../utils/shapes/group/calcU
 
 // Import functions related to SvgCanvas.
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
-import { applyMultiSelectSourceRecursive } from "../../utils/applyMultiSelectSourceRecursive";
 import { applyRecursive } from "../../utils/applyRecursive";
 
 // Imports related to this component.
@@ -33,7 +32,7 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 		const { setCanvasState } = refBus.current.props;
 
 		setCanvasState((prevState) => {
-			let items = prevState.items.map((item) => {
+			const items = prevState.items.map((item) => {
 				if (!isSelectableData(item)) {
 					// Ignore non-selectable items.
 					return item;
@@ -50,9 +49,6 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 				};
 			});
 
-			// Set `isMultiSelectSource` to true to hide the transform outline of the original diagrams during multi-selection.
-			items = applyMultiSelectSourceRecursive(items);
-
 			// Create a multi-select group's items.
 			const multiSelectGroupItems = items.filter(
 				(item) => item.type !== "ConnectLine",
@@ -66,6 +62,7 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 
 			const multiSelectGroup = {
 				id: MULTI_SELECT_GROUP,
+				type: "Group" as const,
 				x: boundingBox.left + (boundingBox.right - boundingBox.left) / 2,
 				y: boundingBox.top + (boundingBox.bottom - boundingBox.top) / 2,
 				width: boundingBox.right - boundingBox.left,
@@ -75,7 +72,6 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 				scaleY: 1,
 				keepProportion: prevState.multiSelectGroup?.keepProportion ?? true,
 				isSelected: true, // Multi-select group is always in selected state
-				isMultiSelectSource: false, // Set as not being a multi-select source
 				items: applyRecursive(multiSelectGroupItems, (item) => {
 					if (!isSelectableData(item)) {
 						return item;
@@ -83,7 +79,6 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 					return {
 						...item,
 						isSelected: false, // Shapes in the multi-select group have their selection state cleared
-						isMultiSelectSource: false, // Set as not being a multi-select source
 					};
 				}),
 			} as GroupData;

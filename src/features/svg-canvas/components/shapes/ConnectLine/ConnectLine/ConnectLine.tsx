@@ -65,7 +65,6 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 			stroke={stroke}
 			strokeWidth={strokeWidth}
 			isSelected={isSelected}
-			isMultiSelectSource={false}
 			dragEnabled={false}
 			transformEnabled={false}
 			segmentDragEnabled={true}
