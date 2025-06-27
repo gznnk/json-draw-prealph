@@ -43,6 +43,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 	initialHeight,
 	svgText,
 	showOutline = false,
+	showTransformControls = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -132,7 +133,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 	}, [svgText, initialWidth, initialHeight]);
 
 	// Flag to show the transformative element.
-	const showTransformative = isSelected && !isDragging;
+	const showTransformative = showTransformControls && !isDragging;
 
 	return (
 		<>
@@ -180,7 +181,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 					scaleX={scaleX}
 					scaleY={scaleY}
 					keepProportion={keepProportion}
-					isSelected={isSelected}
+					showTransformControls={showTransformControls}
 					onTransform={onTransform}
 				/>
 			)}

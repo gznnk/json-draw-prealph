@@ -64,6 +64,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	isTextEditEnabled = true,
 	isTransparent,
 	showOutline = false,
+	showTransformControls = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -224,7 +225,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		y,
 	);
 	// Flag whether to show transform component
-	const showTransformative = isSelected && !isDragging;
+	const showTransformative = showTransformControls && !isDragging;
 	// Flag whether to show connect points
 	const doShowConnectPoints =
 		showConnectPoints && !isSelected && !isDragging && !isTransformimg;
@@ -293,7 +294,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					scaleX={scaleX}
 					scaleY={scaleY}
 					keepProportion={keepProportion}
-					isSelected={isSelected}
+					showTransformControls={showTransformControls}
 					onTransform={handleTransform}
 				/>
 			)}

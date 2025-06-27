@@ -35,6 +35,6 @@ export const createHubNodeData = ({
 		keepProportion: true,
 		connectPoints,
 		isSelected: false,
-		isMultiSelectSource: false,
+		showTransformControls: false,
 	} as HubNodeData;
 };

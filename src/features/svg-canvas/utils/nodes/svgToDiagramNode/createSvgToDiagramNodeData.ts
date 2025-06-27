@@ -42,6 +42,6 @@ export const createSvgToDiagramNodeData = ({
 		keepProportion: true,
 		connectPoints,
 		isSelected: false,
-		isMultiSelectSource: false,
+		showTransformControls: false,
 	} as SvgToDiagramNodeData;
 };

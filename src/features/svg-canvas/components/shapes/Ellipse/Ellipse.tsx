@@ -60,6 +60,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	isTextEditEnabled = true,
 	isTransparent,
 	showOutline = false,
+	showTransformControls = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -218,7 +219,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	);
 
 	// Flag whether to show transform component
-	const showTransformative = isSelected && !isDragging;
+	const showTransformative = showTransformControls && !isDragging;
 	// Flag whether to show connect points
 	const showConnectPointsFlag =
 		showConnectPoints && !isSelected && !isDragging && !isTransformimg;
@@ -285,7 +286,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 					scaleX={scaleX}
 					scaleY={scaleY}
 					keepProportion={keepProportion}
-					isSelected={isSelected}
+					showTransformControls={showTransformControls}
 					onTransform={handleTransform}
 				/>
 			)}

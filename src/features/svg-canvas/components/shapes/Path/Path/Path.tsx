@@ -59,6 +59,7 @@ const PathComponent: React.FC<PathProps> = ({
 	strokeWidth = "1px",
 	isSelected = false,
 	showOutline = false,
+	showTransformControls = false,
 	items = [],
 	dragEnabled = true,
 	transformEnabled = true,
@@ -315,7 +316,7 @@ const PathComponent: React.FC<PathProps> = ({
 		!isPathPointDragging;
 
 	// Display flag for overall transform group
-	const showTransformGroup = isSelected;
+	const showTransformGroup = showTransformControls;
 
 	// Flag to show the position label.
 	const showPositionLabel = isSelected && isDragging;
@@ -402,7 +403,8 @@ const PathComponent: React.FC<PathProps> = ({
 					id={id}
 					x={x}
 					y={y}
-					isSelected={transformEnabled && !isVerticesMode}
+					isSelected={showTransformControls && !isVerticesMode}
+					showTransformControls={showTransformControls}
 					width={width}
 					height={height}
 					rotation={rotation}

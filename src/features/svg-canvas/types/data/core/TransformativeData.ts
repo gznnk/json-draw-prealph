@@ -6,5 +6,6 @@ import type { Shape } from "../../base/Shape";
  * Extends the Shape interface with additional transformation properties.
  */
 export type TransformativeData = Shape & {
+	showTransformControls: boolean;
 	keepProportion: boolean;
 };

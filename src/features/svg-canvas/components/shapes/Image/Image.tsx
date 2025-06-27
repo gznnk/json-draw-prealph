@@ -38,6 +38,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 	isSelected,
 	base64Data,
 	showOutline = false,
+	showTransformControls = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -110,7 +111,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 	);
 
 	// Flag to show the transformative element.
-	const showTransformative = isSelected && !isDragging;
+	const showTransformative = showTransformControls && !isDragging;
 
 	return (
 		<>
@@ -152,7 +153,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 					scaleX={scaleX}
 					scaleY={scaleY}
 					keepProportion={keepProportion}
-					isSelected={isSelected}
+					showTransformControls={showTransformControls}
 					onTransform={onTransform}
 				/>
 			)}

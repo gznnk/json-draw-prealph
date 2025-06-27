@@ -32,6 +32,7 @@ export const createMultiSelectGroup = (
 		scaleY: 1,
 		keepProportion: previousKeepProportion,
 		isSelected: true,
+		showTransformControls: true,
 		items: [],
 	} as GroupData;
 };

@@ -7,7 +7,6 @@ import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramType } from "../../../types/base/DiagramType";
 import type { EventType } from "../../../types/events/EventType";
 import type { Point } from "../../../types/base/Point";
-import type { SelectableData } from "../../../types/data/core/SelectableData";
 import type { TransformativeData } from "../../../types/data/core/TransformativeData";
 import type { TransformativeProps } from "../../../types/props/core/TransformativeProps";
 
@@ -39,7 +38,6 @@ import { ROTATE_POINT_MARGIN } from "./TransformativeConstants";
  * Combines transformation data, selection state, and transformation event handlers.
  */
 type Props = TransformativeData &
-	SelectableData &
 	TransformativeProps & {
 		id: string;
 		type: DiagramType;
@@ -59,7 +57,7 @@ const TransformativeComponent: React.FC<Props> = ({
 	scaleX,
 	scaleY,
 	keepProportion,
-	isSelected,
+	showTransformControls,
 	onTransform,
 }) => {
 	const [isResizing, setIsResizing] = useState(false);
@@ -783,7 +781,7 @@ const TransformativeComponent: React.FC<Props> = ({
 	useEffect(() => {
 		let handleKeyDown: (e: KeyboardEvent) => void;
 		let handleKeyUp: (e: KeyboardEvent) => void;
-		if (isSelected) {
+		if (showTransformControls) {
 			handleKeyDown = (e: KeyboardEvent) => {
 				setShiftKeyDown(e.shiftKey);
 			};
@@ -799,12 +797,12 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		return () => {
 			// Cleanup
-			if (isSelected) {
+			if (showTransformControls) {
 				window.removeEventListener("keydown", handleKeyDown);
 				window.removeEventListener("keyup", handleKeyUp);
 			}
 		};
-	}, [isSelected]);
+	}, [showTransformControls]);
 
 	// Rotation
 	const rotationPoint = affineTransformation(
@@ -879,7 +877,7 @@ const TransformativeComponent: React.FC<Props> = ({
 	}, []);
 
 	// Don't render if the component is not selected.
-	if (!isSelected) {
+	if (!showTransformControls) {
 		return null;
 	}
 

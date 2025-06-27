@@ -55,6 +55,7 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 						return {
 							...item,
 							isSelected: !item.isSelected,
+							showTransformControls: !item.isSelected, // Toggle transform controls visibility.
 						};
 					}
 
@@ -62,6 +63,7 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 					return {
 						...item,
 						isSelected: true,
+						showTransformControls: true, // Show transform controls when selected.
 					};
 				}
 
@@ -74,6 +76,7 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 					...item,
 					// When single selection, clear the selection state of all diagrams except the selected one.
 					isSelected: false,
+					showTransformControls: false, // Hide transform controls when not selected.
 				};
 			});
 
@@ -94,9 +97,6 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 					selectedItems,
 					prevState.multiSelectGroup?.keepProportion,
 				);
-			} else {
-				// Multi-select source logic is no longer needed
-				// Items remain as-is without modification
 			}
 
 			return {

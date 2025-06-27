@@ -36,6 +36,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	items,
 	showConnectPoints = true,
 	showOutline = false,
+	showTransformControls = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -297,7 +298,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 					scaleX={scaleX}
 					scaleY={scaleY}
 					keepProportion={keepProportion}
-					isSelected={isSelected}
+					showTransformControls={showTransformControls}
 					onTransform={handleTransform}
 				/>
 			)}
