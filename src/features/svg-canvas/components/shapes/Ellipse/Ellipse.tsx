@@ -180,6 +180,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	// Generate properties for selection
 	const selectProps = useSelect({
 		id,
+		ref: svgRef,
 		onSelect,
 	});
 	// Generate properties for hovering

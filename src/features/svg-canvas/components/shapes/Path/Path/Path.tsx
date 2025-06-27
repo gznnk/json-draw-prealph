@@ -285,6 +285,7 @@ const PathComponent: React.FC<PathProps> = ({
 	}); // Generate properties for selection
 	const selectProps = useSelect({
 		id,
+		ref: dragSvgRef,
 		onSelect,
 	});
 	// Compose props for path element

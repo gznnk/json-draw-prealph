@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 // Import types.
 import type { DiagramType } from "../types/base/DiagramType";
@@ -8,6 +8,10 @@ import type { DiagramPointerEvent } from "../types/events/DiagramPointerEvent";
 
 // Import utils.
 import { newEventId } from "../utils/common/newEventId";
+import { getSvgPoint } from "../utils/math/points/getSvgPoint";
+
+// Import constants.
+import { DRAG_DEAD_ZONE } from "../constants/Constants";
 
 /**
  * Type definition for select props
@@ -15,7 +19,10 @@ import { newEventId } from "../utils/common/newEventId";
 export type SelectProps = {
 	id: string;
 	type?: DiagramType;
+	isSelected?: boolean;
+	ref: React.RefObject<SVGElement>;
 	onSelect?: (e: DiagramPointerEvent) => void;
+	onReselect?: (e: DiagramPointerEvent) => void;
 };
 
 /**
@@ -24,13 +31,20 @@ export type SelectProps = {
  * @param {SelectProps} props Select props
  * @param {string} props.id ID of the element to be selectable
  * @param {DiagramType} [props.type] Type of diagram
+ * @param {boolean} [props.isSelected] Whether the element is already selected
+ * @param {React.RefObject<SVGElement>} props.ref Reference to the element
  * @param {(e: DiagramPointerEvent) => void} [props.onSelect] Event handler for selection
+ * @param {(e: DiagramPointerEvent) => void} [props.onReselect] Event handler for reselection
  */
 export const useSelect = (props: SelectProps) => {
-	const { id, onSelect } = props;
-
+	const { id, isSelected, ref, onSelect, onReselect } = props;
 	// Flag whether pointer is pressed down in this select area
 	const isPointerDown = useRef(false);
+	// Flag whether dragging
+	const [isDragging, setIsDragging] = useState(false);
+	// Element coordinates at pointer down
+	const startX = useRef(0);
+	const startY = useRef(0);
 
 	/**
 	 * Pointer down event handler within the select area
@@ -46,6 +60,11 @@ export const useSelect = (props: SelectProps) => {
 			// Set the flag that the pointer is pressed
 			isPointerDown.current = true;
 
+			// Get current SVG coordinates and remember them
+			const svgPoint = getSvgPoint(e.clientX, e.clientY, ref.current);
+			startX.current = svgPoint.x;
+			startY.current = svgPoint.y;
+
 			// Fire select event
 			onSelect?.({
 				eventId: newEventId(),
@@ -53,16 +72,48 @@ export const useSelect = (props: SelectProps) => {
 			});
 		}
 	};
+
+	/**
+	 * Pointer move event handler within the select area
+	 */
+	const handlePointerMove = (e: React.PointerEvent<SVGElement>): void => {
+		if (!isPointerDown.current) {
+			// Do nothing if pointer is not pressed down in this select area
+			return;
+		}
+		// Get current SVG coordinates
+		const svgPoint = getSvgPoint(e.clientX, e.clientY, ref.current);
+
+		if (
+			!isDragging &&
+			(Math.abs(svgPoint.x - startX.current) > DRAG_DEAD_ZONE ||
+				Math.abs(svgPoint.y - startY.current) > DRAG_DEAD_ZONE)
+		) {
+			// Start dragging when not dragging and pointer movement exceeds a certain threshold
+			setIsDragging(true);
+		}
+	};
+
 	/**
 	 * Pointer up event handler within the select area
 	 */
 	const handlePointerUp = (): void => {
-		// Clear flag
+		if (isPointerDown.current && !isDragging && isSelected) {
+			// If pointer up after clicking (not dragging) and element is already selected, notify reselect event
+			onReselect?.({
+				eventId: newEventId(),
+				id,
+			});
+		}
+
+		// Clear flags
+		setIsDragging(false);
 		isPointerDown.current = false;
 	};
 
 	return {
 		onPointerDown: handlePointerDown,
+		onPointerMove: handlePointerMove,
 		onPointerUp: handlePointerUp,
 	};
 };
