@@ -16,7 +16,7 @@ import { getSelectedItems } from "../../../utils/common/getSelectedItems";
 import { isConnectableData } from "../../../utils/validation/isConnectableData";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { addHistory } from "../../utils/addHistory";
-import { applyRecursive } from "../../utils/applyRecursive";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { isDiagramChangingEvent } from "../../utils/isDiagramChangingEvent";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
@@ -119,23 +119,28 @@ export const useDrag = (props: CanvasHooksProps) => {
 
 						// If the item has children, move them recursively
 						if (isItemableData(newItem)) {
-							newItem.items = applyRecursive(newItem.items, (childItem) => {
-								// Move child items by the same delta
-								const childInitialPosition = initialPositions.get(childItem.id);
-								if (childInitialPosition) {
-									const newChildItem = {
-										...childItem,
-										x: childInitialPosition.x + dx,
-										y: childInitialPosition.y + dy,
-									};
+							newItem.items = applyFunctionRecursively(
+								newItem.items,
+								(childItem) => {
+									// Move child items by the same delta
+									const childInitialPosition = initialPositions.get(
+										childItem.id,
+									);
+									if (childInitialPosition) {
+										const newChildItem = {
+											...childItem,
+											x: childInitialPosition.x + dx,
+											y: childInitialPosition.y + dy,
+										};
 
-									// Update connect points
-									updateConnectPoints(newChildItem);
+										// Update connect points
+										updateConnectPoints(newChildItem);
 
-									return newChildItem;
-								}
-								return childItem; // If no initial position, return unchanged
-							});
+										return newChildItem;
+									}
+									return childItem; // If no initial position, return unchanged
+								},
+							);
 						}
 
 						return newItem;

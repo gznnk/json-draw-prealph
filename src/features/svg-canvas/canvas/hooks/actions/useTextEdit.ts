@@ -8,7 +8,7 @@ import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 import type { TextEditorState } from "../../../components/core/Textable/TextEditor/TextEditorTypes";
 
 // Import functions related to SvgCanvas.
-import { applyRecursive } from "../../utils/applyRecursive";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
 /**
  * Custom hook to handle text edit events on the canvas.
@@ -30,7 +30,7 @@ export const useTextEdit = (props: CanvasHooksProps) => {
 
 			const newState = {
 				...prevState,
-				items: applyRecursive(prevState.items, (item) => {
+				items: applyFunctionRecursively(prevState.items, (item) => {
 					if (item.id === e.id) {
 						targetItem = item;
 						return {

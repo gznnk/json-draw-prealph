@@ -9,7 +9,7 @@ import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEven
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 
 // Import functions related to SvgCanvas.
-import { applyRecursive } from "../../utils/applyRecursive";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { getSelectedItems } from "../../../utils/common/getSelectedItems";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
@@ -43,7 +43,7 @@ export const useSelect = (props: CanvasHooksProps, isCtrlPressed?: boolean) => {
 
 		setCanvasState((prevState) => {
 			// Update the selected state of the items.
-			const items = applyRecursive(prevState.items, (item) => {
+			const items = applyFunctionRecursively(prevState.items, (item) => {
 				if (!isSelectableData(item)) {
 					// Skip if the item is not selectable.
 					return item;

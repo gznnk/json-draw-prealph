@@ -1,6 +1,6 @@
 import type { Diagram } from "../../types/data/catalog/Diagram";
 import { isSelectableData } from "../../utils/validation/isSelectableData";
-import { applyRecursive } from "./applyRecursive";
+import { applyFunctionRecursively } from "./applyFunctionRecursively";
 
 /**
  * Recursively clear the selection state of all items.
@@ -9,7 +9,7 @@ import { applyRecursive } from "./applyRecursive";
  * @returns {Diagram[]} - The updated list of items with the selection state cleared.
  */
 export const clearSelectedRecursive = (items: Diagram[]) => {
-	return applyRecursive(items, (item) =>
+	return applyFunctionRecursively(items, (item) =>
 		isSelectableData(item)
 			? {
 					...item,

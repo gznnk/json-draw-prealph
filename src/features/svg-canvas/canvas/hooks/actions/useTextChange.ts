@@ -7,7 +7,7 @@ import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
 import { addHistory } from "../../utils/addHistory";
-import { applyRecursive } from "../../utils/applyRecursive";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 
 /**
@@ -31,7 +31,7 @@ export const useTextChange = (props: CanvasHooksProps) => {
 			// Create a new state with the updated text.
 			let newState = {
 				...prevState,
-				items: applyRecursive(prevState.items, (item) =>
+				items: applyFunctionRecursively(prevState.items, (item) =>
 					item.id === e.id ? { ...item, text: e.text, isTextEditing } : item,
 				),
 				textEditorState: {

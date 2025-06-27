@@ -11,7 +11,7 @@ import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { addHistory } from "../../utils/addHistory";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
-import { applyRecursive } from "../../utils/applyRecursive";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { getDiagramById } from "../../../utils/common/getDiagramById";
 
 /**
@@ -30,7 +30,7 @@ export const useDelete = (props: CanvasHooksProps) => {
 
 		setCanvasState((prevState) => {
 			// Remove selected items.
-			let items = applyRecursive(prevState.items, (item) => {
+			let items = applyFunctionRecursively(prevState.items, (item) => {
 				if (!isSelectableData(item)) {
 					return item;
 				}
