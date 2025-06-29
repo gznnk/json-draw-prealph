@@ -6,6 +6,7 @@
 	},
 	"files.exclude": {
 		// "**/__tests__": true
+		"**/*.drawio.png.bkp": true
 	},
 	"todo-tree.filtering.excludeGlobs": ["node_modules", "chrome_extensions"]
 }
