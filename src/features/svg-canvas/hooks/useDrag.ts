@@ -65,14 +65,17 @@ export type DragProps = {
  * Custom hook to create a draggable area
  *
  * @param {DragProps} props Drag area props
- * @param {string} props.id ID (set the same ID to the element to be draggable. Otherwise it will not work correctly) * @param {DiagramType} [props.type] Type of diagram
+ * @param {string} props.id ID (set the same ID to the element to be draggable. Otherwise it will not work correctly)
+ * @param {DiagramType} [props.type] Type of diagram
  * @param {number} props.x X coordinate
  * @param {number} props.y Y coordinate
- * @param {React.RefObject<SVGElement>} props.ref Reference to the element to be draggable * @param {(e: DiagramPointerEvent) => void} [props.onPointerDown] Event handler for pointer down
+ * @param {React.RefObject<SVGElement>} props.ref Reference to the element to be draggable
+ * @param {(e: DiagramPointerEvent) => void} [props.onPointerDown] Event handler for pointer down
  * @param {(e: DiagramPointerEvent) => void} [props.onPointerUp] Event handler for pointer up
  * @param {(e: DiagramDragEvent) => void} [props.onDrag] Event handler for dragging
  * @param {(e: DiagramDragDropEvent) => void} [props.onDragOver] Event handler for drag over
- * @param {(e: DiagramDragDropEvent) => void} [props.onDragLeave] Event handler for drag leave * @param {(e: DiagramDragDropEvent) => void} [props.onDrop] Event handler for drop
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDragLeave] Event handler for drag leave
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDrop] Event handler for drop
  * @param {(x: number, y: number) => Point} [props.dragPositioningFunction] Drag position transformation function
  */
 export const useDrag = (props: DragProps) => {
@@ -121,8 +124,9 @@ export const useDrag = (props: DragProps) => {
 		// Adjust the coordinates by the offset between the center and the pointer
 		newX -= offsetXBetweenCenterAndPointer.current;
 		newY -= offsetYBetweenCenterAndPointer.current;
+
+		// If a drag position transformation function is specified, apply that function
 		if (dragPositioningFunction) {
-			// If a drag position transformation function is specified, apply that function
 			const p = dragPositioningFunction(newX, newY);
 			newX = p.x;
 			newY = p.y;

@@ -25,7 +25,7 @@ import { useClick } from "../../../../hooks/useClick";
 import { useSelect } from "../../../../hooks/useSelect";
 
 // Import utils.
-import { calcPointsOuterShape } from "../../../../utils/math/geometry/calcPointsOuterShape";
+import { calcOrientedShapeFromPoints } from "../../../../utils/math/geometry/calcOrientedShapeFromPoints";
 import {
 	createEndPointArrowHead,
 	createStartPointArrowHead,
@@ -244,7 +244,7 @@ const PathComponent: React.FC<PathProps> = ({
 			const { rotation, scaleX, scaleY, onDiagramChange } = refBus.current;
 			if (e.eventType === "End") {
 				// Calculate new shape of Path's bounding box when new vertex and line segment dragging is completed
-				const newShape = calcPointsOuterShape(
+				const newShape = calcOrientedShapeFromPoints(
 					(e.endDiagram.items ?? []).map((p) => ({ x: p.x, y: p.y })),
 					rotation,
 					scaleX,

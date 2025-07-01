@@ -1,23 +1,19 @@
 // Import React.
 import { useCallback, useRef } from "react";
 
-// Import types related to SvgCanvas.
+// Import types.
 import type { GroupData } from "../../../types/data/shapes/GroupData";
 import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEvent";
-
-// Import components related to SvgCanvas.
-import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
-
-// Import functions related to SvgCanvas.
-import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
-// Import utility functions.
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
-import { getAncestorItemsById } from "../../utils/getAncestorItemsById";
-import { isItemableData } from "../../../utils/validation/isItemableData";
+// Import utils.
 import { getDiagramById } from "../../../utils/common/getDiagramById";
+import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { isItemableData } from "../../../utils/validation/isItemableData";
+import { isSelectableData } from "../../../utils/validation/isSelectableData";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
+import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
+import { getAncestorItemsById } from "../../utils/getAncestorItemsById";
 
 /**
  * Custom hook to handle select events on the canvas.

@@ -13,7 +13,7 @@ import type { Shape } from "../../../../types/base/Shape";
 // Import functions related to SvgCanvas.
 import { createBestConnectPath } from "../../../../utils/shapes/connectPoint/createBestConnectPath";
 import { newId } from "../../../../utils/shapes/common/newId";
-import { calcPointsOuterShape } from "../../../../utils/math/geometry/calcPointsOuterShape";
+import { calcOrientedShapeFromPoints } from "../../../../utils/math/geometry/calcOrientedShapeFromPoints";
 import { getDiagramById } from "../../../../utils/common/getDiagramById";
 import { dispatchNewItemEvent } from "../addNewItem";
 
@@ -70,7 +70,7 @@ export const useConnectNodes = (props: CanvasHooksProps) => {
 				targetNode as Shape,
 			);
 
-			const shape = calcPointsOuterShape(
+			const shape = calcOrientedShapeFromPoints(
 				points.map((p) => ({ x: p.x, y: p.y })),
 			);
 

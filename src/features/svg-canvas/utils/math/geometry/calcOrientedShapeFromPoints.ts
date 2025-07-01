@@ -9,15 +9,18 @@ import { affineTransformation } from "../transform/affineTransformation";
 import { inverseAffineTransformation } from "../transform/inverseAffineTransformation";
 
 /**
- * Calculates the bounding box for a set of points.
+ * Calculates the oriented bounding shape for a path defined by a set of points.
  *
- * @param points - Array of points
- * @param rotation - Rotation angle in degrees (default: 0)
- * @param scaleX - Scale factor in x-direction (default: 1)
- * @param scaleY - Scale factor in y-direction (default: 1)
- * @returns The bounding box shape
+ * This function derives a Shape object (including rotation and scale)
+ * that tightly bounds the given path based on its rotated and scaled coordinates.
+ *
+ * @param points - The array of points representing a path (already transformed by rotation and scale)
+ * @param rotation - The rotation angle of the path in degrees (default: 0)
+ * @param scaleX - The scale factor along the X-axis (default: 1)
+ * @param scaleY - The scale factor along the Y-axis (default: 1)
+ * @returns A Shape object representing the oriented bounding box of the path
  */
-export const calcPointsOuterShape = (
+export const calcOrientedShapeFromPoints = (
 	points: Point[],
 	rotation = 0,
 	scaleX = 1,

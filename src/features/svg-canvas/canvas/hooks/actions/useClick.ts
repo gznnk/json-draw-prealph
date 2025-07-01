@@ -1,9 +1,11 @@
 // Import React.
 import { useCallback } from "react";
 
-// Import types related to SvgCanvas.
-import type { CanvasHooksProps } from "../../SvgCanvasTypes";
+// Import types.
 import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent";
+import type { CanvasHooksProps } from "../../SvgCanvasTypes";
+
+// Import hooks.
 import { useSelect } from "../selection/useSelect";
 
 /**

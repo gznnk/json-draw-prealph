@@ -1,15 +1,17 @@
 // Import React.
 import { useCallback } from "react";
 
-// Import types related to SvgCanvas.
+// Import types.
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
 import type { PathPointData } from "../../../types/data/shapes/PathPointData";
 import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
-// Import functions related to SvgCanvas.
+// Import utils.
+import { calcOrientedShapeFromPoints } from "../../../utils/math/geometry/calcOrientedShapeFromPoints";
 import { newId } from "../../../utils/shapes/common/newId";
-import { calcPointsOuterShape } from "../../../utils/math/geometry/calcPointsOuterShape";
+
+// Import hooks.
 import { dispatchNewItemEvent } from "../listeners/addNewItem";
 
 /**
@@ -17,7 +19,7 @@ import { dispatchNewItemEvent } from "../listeners/addNewItem";
  */
 export const useConnect = (_props: CanvasHooksProps) => {
 	return useCallback((e: DiagramConnectEvent) => {
-		const shape = calcPointsOuterShape(
+		const shape = calcOrientedShapeFromPoints(
 			e.points.map((p: PathPointData) => ({ x: p.x, y: p.y })),
 		);
 
