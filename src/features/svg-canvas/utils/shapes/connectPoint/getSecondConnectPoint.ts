@@ -1,23 +1,24 @@
+import { CONNECT_LINE_MARGIN } from "../../../components/shapes/ConnectPoint/ConnectPoint/ConnectPointConstants";
+import type { BoxGeometry } from "../../../types/base/BoxGeometry";
 import type { Point } from "../../../types/base/Point";
 import type { Shape } from "../../../types/base/Shape";
-import { calcRectangleBoundingBoxGeometry } from "../../math/geometry/calcRectangleBoundingBoxGeometry";
 import { getLineDirection } from "./getLineDirection";
-import { CONNECT_LINE_MARGIN } from "../../../components/shapes/ConnectPoint/ConnectPoint/ConnectPointConstants";
 
 /**
  * Gets the second connect point for a shape based on direction.
  *
  * @param ownerShape - The shape that owns the connect point
+ * @param ownerBoundingBoxGeometry - The bounding box geometry of the owner shape
  * @param cx - Connect point x coordinate
  * @param cy - Connect point y coordinate
  * @returns The second connect point
  */
 export const getSecondConnectPoint = (
 	ownerShape: Shape,
+	ownerBoundingBoxGeometry: BoxGeometry,
 	cx: number,
 	cy: number,
 ): Point => {
-	const ownerBoundingBoxGeometry = calcRectangleBoundingBoxGeometry(ownerShape);
 	const direction = getLineDirection(ownerShape.x, ownerShape.y, cx, cy);
 
 	if (direction === "up") {

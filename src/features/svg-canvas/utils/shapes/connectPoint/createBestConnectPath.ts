@@ -1,15 +1,18 @@
+// Import types.
 import type { Point } from "../../../types/base/Point";
 import type { Shape } from "../../../types/base/Shape";
+
+// Import utils.
+import { closer } from "../../math/common/closer";
 import { calcRectangleBoundingBoxGeometry } from "../../math/geometry/calcRectangleBoundingBoxGeometry";
 import { isLineIntersectingBoxGeometry } from "../../math/geometry/isLineIntersectingBoxGeometry";
-import { closer } from "../../math/common/closer";
+import { addGridCrossPoint } from "./addGridCrossPoint";
+import { cleanPath } from "./cleanPath";
+import { createConnectPathOnDrag } from "./createConnectPathOnDrag";
+import { getBestPath } from "./getBestPath";
 import { getLineDirection } from "./getLineDirection";
 import { getSecondConnectPoint } from "./getSecondConnectPoint";
-import { addGridCrossPoint } from "./addGridCrossPoint";
-import { createConnectPathOnDrag } from "./createConnectPathOnDrag";
 import { removeDuplicatePoints } from "./removeDuplicatePoints";
-import { getBestPath } from "./getBestPath";
-import { cleanPath } from "./cleanPath";
 
 /**
  * Creates the best connection path between two points on shapes.
@@ -37,13 +40,30 @@ export const createBestConnectPath = (
 		startX,
 		startY,
 	);
+	// Calculate end point direction
+	const endDirection = getLineDirection(
+		endOwnerShape.x,
+		endOwnerShape.y,
+		endX,
+		endY,
+	);
 	const startBoundingBoxGeometry =
 		calcRectangleBoundingBoxGeometry(startOwnerShape);
 	const endBoundingBoxGeometry =
 		calcRectangleBoundingBoxGeometry(endOwnerShape);
 
-	const startP2 = getSecondConnectPoint(startOwnerShape, startX, startY);
-	const endP2 = getSecondConnectPoint(endOwnerShape, endX, endY);
+	const startP2 = getSecondConnectPoint(
+		startOwnerShape,
+		startBoundingBoxGeometry,
+		startX,
+		startY,
+	);
+	const endP2 = getSecondConnectPoint(
+		endOwnerShape,
+		endBoundingBoxGeometry,
+		endX,
+		endY,
+	);
 
 	const p2MidX = (startP2.x + endP2.x) / 2;
 	const p2MidY = (startP2.y + endP2.y) / 2;
@@ -95,20 +115,12 @@ export const createBestConnectPath = (
 			p.y,
 		);
 
-		// Calculate end point direction
-		const endDirection = getLineDirection(
-			endOwnerShape.x,
-			endOwnerShape.y,
-			endX,
-			endY,
-		);
-
 		// Route from connection destination to center candidate
 		const endToCenter = createConnectPathOnDrag(
 			endX,
 			endY,
 			endDirection,
-			calcRectangleBoundingBoxGeometry(endOwnerShape),
+			endBoundingBoxGeometry,
 			p.x,
 			p.y,
 		);
