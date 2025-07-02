@@ -7,7 +7,7 @@
  * @param y2 - Y-coordinate of the second point
  * @returns The distance between the two points
  */
-export const calcDistance = (
+export const calcEuclideanDistance = (
 	x1: number,
 	y1: number,
 	x2: number,

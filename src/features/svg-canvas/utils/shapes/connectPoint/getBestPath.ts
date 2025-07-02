@@ -1,12 +1,25 @@
 import type { Point } from "../../../types/base/Point";
 import type { GridPoint } from "../../../components/shapes/ConnectPoint/ConnectPoint/ConnectPointTypes";
-import { calcDistance } from "../../math/points/calcDistance";
+import { calcManhattanDistance } from "../../math/points/calcManhattanDistance";
 import { isStraight } from "./isStraight";
+
+/**
+ * Checks if a point matches the midPoint and returns its score.
+ *
+ * @param point - Point to check
+ * @param midPoint - Mid point that provides scoring benefits
+ * @returns Score value if point matches midPoint, 0 otherwise
+ */
+const getMidPointScore = (point: Point, midPoint: GridPoint): number => {
+	return point.x === midPoint.x && point.y === midPoint.y
+		? midPoint.score || 0
+		: 0;
+};
 
 /**
  * Selects the best path from a list of paths based on distance, turns, and score.
  *
- * @param list - List of paths to evaluate
+ * @param pathList - List of paths to evaluate
  * @param startPoint - Start point of the connection
  * @param endPoint - End point of the connection
  * @param midPoint - Mid point that provides scoring benefits
@@ -18,23 +31,46 @@ export const getBestPath = (
 	endPoint: Point,
 	midPoint: GridPoint,
 ): Point[] => {
-	const getMidPointScore = (point: Point): number => {
-		return point.x === midPoint.x && point.y === midPoint.y
-			? midPoint.score || 0
-			: 0;
-	};
-
 	return pathList.reduce((bestPath, currentPath) => {
+		// First, compare distances
 		const bestPathDistance = Math.round(
 			bestPath.reduce((totalDistance, point, index) => {
 				if (index === 0) return totalDistance;
 				const previousPoint = bestPath[index - 1];
 				return (
 					totalDistance +
-					calcDistance(previousPoint.x, previousPoint.y, point.x, point.y)
+					calcManhattanDistance(
+						previousPoint.x,
+						previousPoint.y,
+						point.x,
+						point.y,
+					)
 				);
 			}, 0),
 		);
+
+		const currentPathDistance = Math.round(
+			currentPath.reduce((totalDistance, point, index) => {
+				if (index === 0) return totalDistance;
+				const previousPoint = currentPath[index - 1];
+				return (
+					totalDistance +
+					calcManhattanDistance(
+						previousPoint.x,
+						previousPoint.y,
+						point.x,
+						point.y,
+					)
+				);
+			}, 0),
+		);
+
+		// If distances are different, return the shorter path
+		if (bestPathDistance !== currentPathDistance) {
+			return bestPathDistance < currentPathDistance ? bestPath : currentPath;
+		}
+
+		// If distances are equal, compare turns
 		const fullBestPath = [startPoint].concat(bestPath, endPoint);
 		const bestPathTurns = fullBestPath.reduce((totalTurns, point, index) => {
 			if (index < 2) return totalTurns;
@@ -45,21 +81,7 @@ export const getBestPath = (
 					: 1)
 			);
 		}, 0);
-		const bestPathScore = bestPath.reduce(
-			(totalScore, point) => totalScore + getMidPointScore(point),
-			0,
-		);
 
-		const currentPathDistance = Math.round(
-			currentPath.reduce((totalDistance, point, index) => {
-				if (index === 0) return totalDistance;
-				const previousPoint = currentPath[index - 1];
-				return (
-					totalDistance +
-					calcDistance(previousPoint.x, previousPoint.y, point.x, point.y)
-				);
-			}, 0),
-		);
 		const fullCurrentPath = [startPoint].concat(currentPath, endPoint);
 		const currentPathTurns = fullCurrentPath.reduce(
 			(totalTurns, point, index) => {
@@ -77,18 +99,24 @@ export const getBestPath = (
 			},
 			0,
 		);
-		const currentPathScore = currentPath.reduce(
-			(totalScore, point) => totalScore + getMidPointScore(point),
+
+		// If turns are different, return the path with fewer turns
+		if (bestPathTurns !== currentPathTurns) {
+			return bestPathTurns < currentPathTurns ? bestPath : currentPath;
+		}
+
+		// If both distance and turns are equal, compare scores
+		const bestPathScore = bestPath.reduce(
+			(totalScore, point) => totalScore + getMidPointScore(point, midPoint),
 			0,
 		);
 
-		return bestPathDistance < currentPathDistance ||
-			(bestPathDistance === currentPathDistance &&
-				bestPathTurns < currentPathTurns) ||
-			(bestPathDistance === currentPathDistance &&
-				bestPathTurns === currentPathTurns &&
-				bestPathScore > currentPathScore)
-			? bestPath
-			: currentPath;
+		const currentPathScore = currentPath.reduce(
+			(totalScore, point) => totalScore + getMidPointScore(point, midPoint),
+			0,
+		);
+
+		// Return the path with higher score
+		return bestPathScore > currentPathScore ? bestPath : currentPath;
 	});
 };

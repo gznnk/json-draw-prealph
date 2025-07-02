@@ -2,7 +2,7 @@
 import type { Point } from "../../../types/base/Point";
 
 // Import utils.
-import { calcDistance } from "./calcDistance";
+import { calcEuclideanDistance } from "./calcEuclideanDistance";
 
 /**
  * Returns the point (from two options) that is closer to a reference point.
@@ -23,8 +23,8 @@ export const closerPoint = (
 	bx: number,
 	by: number,
 ): Point => {
-	const distanceA = calcDistance(px, py, ax, ay);
-	const distanceB = calcDistance(px, py, bx, by);
+	const distanceA = calcEuclideanDistance(px, py, ax, ay);
+	const distanceB = calcEuclideanDistance(px, py, bx, by);
 
 	return distanceA < distanceB ? { x: ax, y: ay } : { x: bx, y: by };
 };
