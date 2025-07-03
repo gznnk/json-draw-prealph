@@ -2,7 +2,7 @@ import type { BoxGeometry } from "../../../types/base/BoxGeometry";
 import type { Point } from "../../../types/base/Point";
 import type { Direction } from "../../../components/shapes/ConnectPoint/ConnectPoint/ConnectPointTypes";
 import { closer } from "../../math/common/closer";
-import { lineIntersects } from "../../math/geometry/lineIntersects";
+import { segmentsIntersect } from "../../math/geometry/segmentsIntersect";
 import { getLineDirection } from "./getLineDirection";
 import { isUpDown } from "./isUpDown";
 import { addMarginToBoxGeometry } from "./addMarginToBoxGeometry";
@@ -90,13 +90,13 @@ export const createConnectPathOnDrag = (
 	let isAccrossCloserLine = false;
 	let isAccrossFartherLine = false;
 	if (startDirection === "up") {
-		isAccrossCloserLine = lineIntersects(
+		isAccrossCloserLine = segmentsIntersect(
 			marginBoxGeometry.topLeft,
 			marginBoxGeometry.topRight,
 			p3,
 			p4,
 		);
-		isAccrossFartherLine = lineIntersects(
+		isAccrossFartherLine = segmentsIntersect(
 			marginBoxGeometry.bottomLeft,
 			marginBoxGeometry.bottomRight,
 			p3,
@@ -104,13 +104,13 @@ export const createConnectPathOnDrag = (
 		);
 	}
 	if (startDirection === "down") {
-		isAccrossCloserLine = lineIntersects(
+		isAccrossCloserLine = segmentsIntersect(
 			marginBoxGeometry.bottomLeft,
 			marginBoxGeometry.bottomRight,
 			p3,
 			p4,
 		);
-		isAccrossFartherLine = lineIntersects(
+		isAccrossFartherLine = segmentsIntersect(
 			marginBoxGeometry.topLeft,
 			marginBoxGeometry.topRight,
 			p3,
@@ -118,13 +118,13 @@ export const createConnectPathOnDrag = (
 		);
 	}
 	if (startDirection === "left") {
-		isAccrossCloserLine = lineIntersects(
+		isAccrossCloserLine = segmentsIntersect(
 			marginBoxGeometry.topLeft,
 			marginBoxGeometry.bottomLeft,
 			p3,
 			p4,
 		);
-		isAccrossFartherLine = lineIntersects(
+		isAccrossFartherLine = segmentsIntersect(
 			marginBoxGeometry.topRight,
 			marginBoxGeometry.bottomRight,
 			p3,
@@ -132,13 +132,13 @@ export const createConnectPathOnDrag = (
 		);
 	}
 	if (startDirection === "right") {
-		isAccrossCloserLine = lineIntersects(
+		isAccrossCloserLine = segmentsIntersect(
 			marginBoxGeometry.topRight,
 			marginBoxGeometry.bottomRight,
 			p3,
 			p4,
 		);
-		isAccrossFartherLine = lineIntersects(
+		isAccrossFartherLine = segmentsIntersect(
 			marginBoxGeometry.topLeft,
 			marginBoxGeometry.bottomLeft,
 			p3,

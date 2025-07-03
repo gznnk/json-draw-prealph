@@ -26,7 +26,7 @@ const subtract = (p: Point, q: Point): Point => ({
  * @param inclusive - If true, includes intersection at endpoints. Default: true
  * @returns True if the line segments intersect, false otherwise
  */
-export const lineIntersects = (
+export const segmentsIntersect = (
 	p1: Point,
 	p2: Point,
 	q1: Point,

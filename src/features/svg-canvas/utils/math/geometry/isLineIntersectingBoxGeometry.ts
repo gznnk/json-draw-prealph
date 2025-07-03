@@ -3,7 +3,7 @@ import type { BoxGeometry } from "../../../types/base/BoxGeometry";
 import type { Point } from "../../../types/base/Point";
 
 // Import utils.
-import { lineIntersects } from "./lineIntersects";
+import { segmentsIntersect } from "./segmentsIntersect";
 
 /**
  * Determines if a line segment intersects with a box geometry.
@@ -37,5 +37,5 @@ export const isLineIntersectingBoxGeometry = (
 		], // Left edge
 	];
 
-	return boxEdges.some(([q1, q2]) => lineIntersects(p1, p2, q1, q2, false));
+	return boxEdges.some(([q1, q2]) => segmentsIntersect(p1, p2, q1, q2, false));
 };
