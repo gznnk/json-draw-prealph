@@ -23,7 +23,7 @@ import { newId } from "../../../../utils/shapes/common/newId";
 // Imports related to this component.
 import { triggerNewConnectLine } from "../NewConnectLine";
 import { EVENT_NAME_CONNECTTION } from "./ConnectPointConstants";
-import { createBestConnectPath } from "../../../../utils/shapes/connectPoint/createBestConnectPath";
+import { generateOptimalShapeToShapeConnection } from "../../../../utils/shapes/connectPoint/generateOptimalShapeToShapeConnection";
 import { generatePathFromShapeToPoint } from "../../../../utils/shapes/connectPoint/generatePathFromShapeToPoint";
 import { getLineDirection } from "../../../../utils/shapes/connectPoint/getLineDirection";
 import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
@@ -71,7 +71,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			);
 		} else {
 			// Connection line when there is a connecting point
-			newPoints = createBestConnectPath(
+			newPoints = generateOptimalShapeToShapeConnection(
 				x,
 				y,
 				ownerShape,

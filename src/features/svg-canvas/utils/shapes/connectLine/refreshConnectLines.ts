@@ -2,7 +2,7 @@ import type { SvgCanvasState } from "../../../canvas/SvgCanvasTypes";
 import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
 import type { Shape } from "../../../types/base/Shape";
-import { createBestConnectPath } from "../connectPoint/createBestConnectPath";
+import { generateOptimalShapeToShapeConnection } from "../connectPoint/generateOptimalShapeToShapeConnection";
 import { newId } from "../common/newId";
 import { getDiagramById } from "../../common/getDiagramById";
 import { isConnectableData } from "../../validation/isConnectableData";
@@ -90,7 +90,7 @@ export const refreshConnectLines = (
 
 		if (connectLine.autoRouting) {
 			// Auto-routing enabled: recalculate the optimal path
-			const newPath = createBestConnectPath(
+			const newPath = generateOptimalShapeToShapeConnection(
 				startConnectPoint.x,
 				startConnectPoint.y,
 				startOwnerShape,

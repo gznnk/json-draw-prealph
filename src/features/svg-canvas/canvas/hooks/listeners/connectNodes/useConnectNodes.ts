@@ -11,7 +11,7 @@ import type { CanvasHooksProps } from "../../../SvgCanvasTypes";
 import type { Shape } from "../../../../types/base/Shape";
 
 // Import functions related to SvgCanvas.
-import { createBestConnectPath } from "../../../../utils/shapes/connectPoint/createBestConnectPath";
+import { generateOptimalShapeToShapeConnection } from "../../../../utils/shapes/connectPoint/generateOptimalShapeToShapeConnection";
 import { newId } from "../../../../utils/shapes/common/newId";
 import { calcOrientedShapeFromPoints } from "../../../../utils/math/geometry/calcOrientedShapeFromPoints";
 import { getDiagramById } from "../../../../utils/common/getDiagramById";
@@ -61,7 +61,7 @@ export const useConnectNodes = (props: CanvasHooksProps) => {
 				return;
 			}
 
-			const points = createBestConnectPath(
+			const points = generateOptimalShapeToShapeConnection(
 				sourceConnectPoint.x,
 				sourceConnectPoint.y,
 				sourceNode as Shape,

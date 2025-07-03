@@ -50,17 +50,19 @@ const addCandidatePointWithIntersections = (
 };
 
 /**
- * Creates the best connection path between two points on shapes.
+ * Generates optimal connection path between two shapes with automatic routing.
+ * This function analyzes multiple routing options and selects the best path that
+ * avoids shape intersections and provides the shortest, cleanest connection.
  *
- * @param startX - Start point x coordinate
- * @param startY - Start point y coordinate
- * @param startOwnerShape - Shape that owns the start point
- * @param endX - End point x coordinate
- * @param endY - End point y coordinate
- * @param endOwnerShape - Shape that owns the end point
- * @returns Array of points representing the optimal connection path
+ * @param startX - Start point x coordinate on the first shape
+ * @param startY - Start point y coordinate on the first shape
+ * @param startOwnerShape - First shape in the connection
+ * @param endX - End point x coordinate on the second shape
+ * @param endY - End point y coordinate on the second shape
+ * @param endOwnerShape - Second shape in the connection
+ * @returns Array of points representing the optimal shape-to-shape connection path
  */
-export const createBestConnectPath = (
+export const generateOptimalShapeToShapeConnection = (
 	startX: number,
 	startY: number,
 	startOwnerShape: Shape,

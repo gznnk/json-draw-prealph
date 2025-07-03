@@ -1,4 +1,4 @@
 export { ConnectPoint } from "./ConnectPoint";
-export { createBestConnectPath } from "../../../../utils/shapes/connectPoint/createBestConnectPath";
+export { generateOptimalShapeToShapeConnection } from "../../../../utils/shapes/connectPoint/generateOptimalShapeToShapeConnection";
 export { getLineDirection } from "../../../../utils/shapes/connectPoint/getLineDirection";
 export type { Direction } from "./ConnectPointTypes";
