@@ -67,7 +67,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	onSelect,
 	onTransform,
 	onConnect,
-	onTextEdit,
+	onTextChange,
 }) => {
 	// Flag whether dragging
 	const [isDragging, setIsDragging] = useState(false);
@@ -87,7 +87,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 		onDrag,
 		onSelect,
 		onTransform,
-		onTextEdit,
+		onTextChange,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -149,14 +149,17 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	 * Double click event handler
 	 */
 	const handleDoubleClick = useCallback(() => {
-		const { id, isSelected, isTextEditEnabled, onTextEdit } = refBus.current;
+		const { id, isSelected, isTextEditEnabled, onTextChange } = refBus.current;
 		if (!isTextEditEnabled) return;
 
 		if (!isSelected) return;
 
-		// Fire text editing event
-		onTextEdit?.({
+		// Fire text editing event with Start eventType
+		onTextChange?.({
+			eventId: crypto.randomUUID(),
+			eventType: "Start",
 			id,
+			text: "",
 		});
 	}, []);
 	// Generate drag properties

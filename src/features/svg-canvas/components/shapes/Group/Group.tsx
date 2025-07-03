@@ -6,7 +6,7 @@ import { DiagramRegistry } from "../../../registry";
 import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEvent";
 import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
-import type { DiagramTextEditEvent } from "../../../types/events/DiagramTextEditEvent";
+import type { DiagramTextChangeEvent } from "../../../types/events/DiagramTextChangeEvent";
 import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
 import type { GroupProps } from "../../../types/props/shapes/GroupProps";
 
@@ -39,7 +39,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	onTransform,
 	onDiagramChange,
 	onConnect,
-	onTextEdit,
+	onTextChange,
 	onExecute,
 }) => {
 	// Flag indicating whether the entire group is being dragged.
@@ -61,7 +61,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 		onTransform,
 		onDiagramChange,
 		onConnect,
-		onTextEdit,
+		onTextChange,
 		// Internal variables and functions
 		isGroupDragging,
 	};
@@ -139,14 +139,17 @@ const GroupComponent: React.FC<GroupProps> = ({
 		onConnect?.(e);
 	}, []);
 	/**
-	 * Text edit event handler for shapes within the group
+	 * Text change event handler for shapes within the group
 	 */
-	const handleChildDiagramTextEdit = useCallback((e: DiagramTextEditEvent) => {
-		const { onTextEdit } = refBus.current;
+	const handleChildDiagramTextChange = useCallback(
+		(e: DiagramTextChangeEvent) => {
+			const { onTextChange } = refBus.current;
 
-		// Propagate the text edit event for shapes within the group as is
-		onTextEdit?.(e);
-	}, []);
+			// Propagate the text change event for shapes within the group as is
+			onTextChange?.(e);
+		},
+		[],
+	);
 
 	/**
 	 * Group transform event handler
@@ -197,7 +200,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			onTransform: handleChildDiagramTransfrom,
 			onDiagramChange: handleChildDiagramChange,
 			onConnect: handleChildDiagramConnect,
-			onTextEdit: handleChildDiagramTextEdit,
+			onTextChange: handleChildDiagramTextChange,
 			onExecute,
 		};
 

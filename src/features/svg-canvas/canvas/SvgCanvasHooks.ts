@@ -35,7 +35,6 @@ import { useNewDiagram } from "./hooks/actions/useNewDiagram";
 import { usePaste } from "./hooks/actions/usePaste";
 import { useStackOrderChange } from "./hooks/actions/useStackOrderChange";
 import { useTextChange } from "./hooks/actions/useTextChange";
-import { useTextEdit } from "./hooks/actions/useTextEdit";
 import { useTransform } from "./hooks/actions/useTransform";
 import { useUngroup } from "./hooks/actions/useUngroup";
 import { useRedo } from "./hooks/history/useRedo";
@@ -156,10 +155,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the diagram connect event.
 	const onConnect = useConnect(canvasHooksProps);
 
-	// Handler for the start of text editing.
-	const onTextEdit = useTextEdit(canvasHooksProps);
-
-	// Handler for the text change event.
+	// Handler for the text change event (includes text editing initiation).
 	const onTextChange = useTextChange(canvasHooksProps);
 
 	// Handler for the group event.
@@ -226,7 +222,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onDiagramChange,
 		onDiagramStyleChange,
 		onDiagramConstraintChange,
-		onTextEdit,
 		onTextChange,
 		onGroup,
 		onUngroup,

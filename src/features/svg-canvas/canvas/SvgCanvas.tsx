@@ -73,7 +73,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onNewDiagram,
 			onPaste,
 			onTextChange,
-			onTextEdit,
 			onTransform,
 			onRedo,
 			onUndo,
@@ -336,7 +335,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				onClick,
 				onSelect,
 				onConnect,
-				onTextEdit,
+				onTextChange,
 				onExecute,
 			};
 

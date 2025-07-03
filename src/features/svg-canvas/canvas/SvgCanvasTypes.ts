@@ -13,7 +13,6 @@ import type { DiagramDragEvent } from "../types/events/DiagramDragEvent";
 import type { DiagramSelectEvent } from "../types/events/DiagramSelectEvent";
 import type { DiagramStyleChangeEvent } from "../types/events/DiagramStyleChangeEvent";
 import type { DiagramTextChangeEvent } from "../types/events/DiagramTextChangeEvent";
-import type { DiagramTextEditEvent } from "../types/events/DiagramTextEditEvent";
 import type { DiagramTransformEvent } from "../types/events/DiagramTransformEvent";
 import type { ExecuteEvent } from "../types/events/ExecuteEvent";
 import type { NewDiagramEvent } from "../types/events/NewDiagramEvent";
@@ -105,7 +104,6 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onPaste?: () => void;
 	onStackOrderChange?: (e: StackOrderChangeEvent) => void;
 	onTextChange?: (e: DiagramTextChangeEvent) => void;
-	onTextEdit?: (e: DiagramTextEditEvent) => void;
 	onTransform?: (e: DiagramTransformEvent) => void;
 	onUngroup?: () => void;
 	// history

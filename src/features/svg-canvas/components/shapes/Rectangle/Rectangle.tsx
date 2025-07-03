@@ -71,7 +71,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	onSelect,
 	onTransform,
 	onConnect,
-	onTextEdit,
+	onTextChange,
 	onFileDrop,
 }) => {
 	// Flag whether dragging
@@ -91,7 +91,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		isTextEditEnabled,
 		onDrag,
 		onTransform,
-		onTextEdit,
+		onTextChange,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -153,14 +153,17 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	 * Double click event handler
 	 */
 	const handleDoubleClick = useCallback(() => {
-		const { id, isSelected, isTextEditEnabled, onTextEdit } = refBus.current;
+		const { id, isSelected, isTextEditEnabled, onTextChange } = refBus.current;
 		if (!isTextEditEnabled) return;
 
 		if (!isSelected) return;
 
-		// Fire text edit event
-		onTextEdit?.({
+		// Fire text edit event with Start eventType
+		onTextChange?.({
+			eventId: crypto.randomUUID(),
+			eventType: "Start",
 			id,
+			text: "",
 		});
 	}, []);
 	// Generate properties for dragging
