@@ -7,6 +7,7 @@ import { closer } from "../../math/common/closer";
 import { calcRectangleBoundingBoxGeometry } from "../../math/geometry/calcRectangleBoundingBoxGeometry";
 import { isLineIntersectingBoxGeometry } from "../../math/geometry/isLineIntersectingBoxGeometry";
 import { addGridCrossPoint } from "./addGridCrossPoint";
+import { addMarginToBoxGeometry } from "./addMarginToBoxGeometry";
 import { cleanPath } from "./cleanPath";
 import { createConnectPathOnDrag } from "./createConnectPathOnDrag";
 import { getBestPath } from "./getBestPath";
@@ -102,8 +103,14 @@ export const createBestConnectPath = (
 	addGridCrossPoint(grid, midPoint);
 
 	// Create routes passing through each center candidate point
-	const pathList: Point[][] = [];
-	const intersectsPathList: Point[][] = [];
+	const validPaths: Point[][] = [];
+	const intersectingPaths: Point[][] = [];
+	const marginedStartBoundingBoxGeometry = addMarginToBoxGeometry(
+		startBoundingBoxGeometry,
+	);
+	const marginedEndBoundingBoxGeometry = addMarginToBoxGeometry(
+		endBoundingBoxGeometry,
+	);
 	for (const p of grid) {
 		// Route from connection source to center candidate
 		const startToCenter = createConnectPathOnDrag(
@@ -133,8 +140,12 @@ export const createBestConnectPath = (
 				const p1 = connectPath[i];
 				const p2 = connectPath[i + 1];
 				if (
-					isLineIntersectingBoxGeometry(p1, p2, startBoundingBoxGeometry) ||
-					isLineIntersectingBoxGeometry(p1, p2, endBoundingBoxGeometry)
+					isLineIntersectingBoxGeometry(
+						p1,
+						p2,
+						marginedStartBoundingBoxGeometry,
+					) ||
+					isLineIntersectingBoxGeometry(p1, p2, marginedEndBoundingBoxGeometry)
 				) {
 					return true;
 				}
@@ -142,10 +153,11 @@ export const createBestConnectPath = (
 			return false;
 		};
 
+		const pathWithoutDuplicates = removeDuplicatePoints(connectPath);
 		if (!isIntersecting()) {
-			pathList.push(removeDuplicatePoints(connectPath));
+			validPaths.push(pathWithoutDuplicates);
 		} else {
-			intersectsPathList.push(removeDuplicatePoints(connectPath));
+			intersectingPaths.push(pathWithoutDuplicates);
 		}
 	}
 
@@ -153,9 +165,9 @@ export const createBestConnectPath = (
 	const endPoint = { x: endX, y: endY };
 
 	const bestPath =
-		pathList.length !== 0
-			? getBestPath(pathList, startPoint, endPoint, midPoint)
-			: getBestPath(intersectsPathList, startPoint, endPoint, midPoint);
+		validPaths.length !== 0
+			? getBestPath(validPaths, startPoint, endPoint, midPoint)
+			: getBestPath(intersectingPaths, startPoint, endPoint, midPoint);
 
 	return cleanPath(bestPath);
 };
