@@ -40,6 +40,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 	base64Data,
 	showOutline = false,
 	showTransformControls = false,
+	isTransforming = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -156,6 +157,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					showTransformControls={showTransformControls}
+					isTransforming={isTransforming}
 					onTransform={onTransform}
 				/>
 			)}

@@ -8,4 +8,5 @@ import type { Shape } from "../../base/Shape";
 export type TransformativeData = Shape & {
 	showTransformControls: boolean;
 	keepProportion: boolean;
+	isTransforming: boolean;
 };

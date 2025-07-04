@@ -5,7 +5,6 @@ import { memo, useCallback, useMemo, useRef, useState } from "react";
 // Import types.
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
-import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
 import type { EllipseProps } from "../../../types/props/shapes/EllipseProps";
 
 // SvgCanvas components.
@@ -63,6 +62,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	isTransparent,
 	showOutline = false,
 	showTransformControls = false,
+	isTransforming = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -72,8 +72,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 }) => {
 	// Flag whether dragging
 	const [isDragging, setIsDragging] = useState(false);
-	// Flag whether transforming
-	const [isTransformimg, setIsTransforming] = useState(false);
 	// Flag whether hovering
 	const [isHovered, setIsHovered] = useState(false);
 	// Reference to the SVG element to be transformed
@@ -87,7 +85,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 		isTextEditEnabled,
 		onDrag,
 		onSelect,
-		onTransform,
 		onTextChange,
 	};
 	const refBus = useRef(refBusVal);
@@ -109,22 +106,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 		}
 	}, []);
 
-	/**
-	 * Ellipse transform event handler
-	 */
-	const handleTransform = useCallback((e: DiagramTransformEvent) => {
-		const { onTransform } = refBus.current;
-
-		if (e.eventType === "Start") {
-			setIsTransforming(true);
-		}
-
-		onTransform?.(e);
-
-		if (e.eventType === "End") {
-			setIsTransforming(false);
-		}
-	}, []);
 	/**
 	 * Hover state change event handler
 	 */
@@ -219,7 +200,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	const showTransformative = showTransformControls && !isDragging;
 	// Flag whether to show connect points
 	const showConnectPointsFlag =
-		showConnectPoints && !isSelected && !isDragging && !isTransformimg;
+		showConnectPoints && !isSelected && !isDragging && !isTransforming;
 
 	return (
 		<>
@@ -283,7 +264,8 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					showTransformControls={showTransformControls}
-					onTransform={handleTransform}
+					isTransforming={isTransforming}
+					onTransform={onTransform}
 				/>
 			)}
 			{showConnectPointsFlag &&
@@ -296,7 +278,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 						y={cp.y}
 						ownerId={id}
 						ownerShape={ownerShape}
-						isTransparent={!isHovered || isDragging || isTransformimg}
+						isTransparent={!isHovered || isDragging || isTransforming}
 						onConnect={onConnect}
 					/>
 				))}

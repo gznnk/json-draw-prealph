@@ -7,7 +7,6 @@ import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEven
 import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramTextChangeEvent } from "../../../types/events/DiagramTextChangeEvent";
-import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
 import type { GroupProps } from "../../../types/props/shapes/GroupProps";
 
 // Import components related to SvgCanvas.
@@ -33,6 +32,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	showConnectPoints = true,
 	showOutline = false,
 	showTransformControls = false,
+	isTransforming = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -45,8 +45,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 	// Flag indicating whether the entire group is being dragged.
 	// Set to true only when this group is selected and currently being dragged.
 	const [isGroupDragging, setIsGroupDragging] = useState(false);
-	// Flag indicating whether the entire group is being transformed.
-	const [isGroupTransforming, setIsGroupTransforming] = useState(false);
 	// To avoid frequent handler generation, hold referenced values in useRef
 	const refBusVal = {
 		// Properties
@@ -58,7 +56,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 		isSelected,
 		items,
 		onDrag,
-		onTransform,
 		onDiagramChange,
 		onConnect,
 		onTextChange,
@@ -89,19 +86,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 		}
 	}, []);
 
-	/**
-	 * Transform event handler for shapes within the group
-	 */
-	const handleChildDiagramTransfrom = useCallback(
-		(e: DiagramTransformEvent) => {
-			const { onTransform } = refBus.current;
-
-			// Propagate the transform event as is
-			// Outline update is done on the Canvas side, so nothing is done here
-			onTransform?.(e);
-		},
-		[],
-	);
 	/**
 	 * Change event handler for shapes within the group
 	 */
@@ -151,31 +135,8 @@ const GroupComponent: React.FC<GroupProps> = ({
 		[],
 	);
 
-	/**
-	 * Group transform event handler
-	 */
-	const handleTransform = useCallback((e: DiagramTransformEvent) => {
-		const { onTransform } = refBus.current;
-
-		// Processing at group transform start
-		if (e.eventType === "Start") {
-			setIsGroupTransforming(true);
-		}
-
-		// Propagate the transform event to canvas.
-		// The recursive transformation of child items is now handled by useTransform hook.
-		onTransform?.(e);
-
-		if (e.eventType === "End") {
-			setIsGroupTransforming(false);
-		}
-	}, []);
-
 	const doShowConnectPoints =
-		showConnectPoints &&
-		!isSelected &&
-		!isGroupDragging &&
-		!isGroupTransforming;
+		showConnectPoints && !isSelected && !isGroupDragging && !isTransforming;
 	// Create shapes within the group
 	const children = items.map((item) => {
 		// Ensure that item.type is of DiagramType
@@ -195,7 +156,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			onClick,
 			onSelect,
 			onDrag: handleChildDiagramDrag,
-			onTransform: handleChildDiagramTransfrom,
+			onTransform,
 			onDiagramChange: handleChildDiagramChange,
 			onConnect: handleChildDiagramConnect,
 			onTextChange: handleChildDiagramTextChange,
@@ -230,7 +191,8 @@ const GroupComponent: React.FC<GroupProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					showTransformControls={showTransformControls}
-					onTransform={handleTransform}
+					isTransforming={isTransforming}
+					onTransform={onTransform}
 				/>
 			)}
 			{isSelected && isGroupDragging && (

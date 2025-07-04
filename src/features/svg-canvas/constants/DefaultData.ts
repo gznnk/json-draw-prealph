@@ -45,6 +45,7 @@ export const DEFAULT_TRANSFORMATIVE_DATA = {
 	scaleY: 1,
 	keepProportion: false,
 	showTransformControls: false,
+	isTransforming: false,
 } as const satisfies TransformativeData;
 
 /**

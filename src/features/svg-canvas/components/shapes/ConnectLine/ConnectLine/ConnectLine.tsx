@@ -67,6 +67,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 			isSelected={isSelected}
 			showTransformControls={false}
 			showOutline={false}
+			isTransforming={false}
 			dragEnabled={false}
 			transformEnabled={false}
 			segmentDragEnabled={true}

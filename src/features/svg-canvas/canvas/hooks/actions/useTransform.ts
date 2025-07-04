@@ -125,6 +125,8 @@ export const useTransform = (props: CanvasHooksProps) => {
 					rotation: newRotation,
 					scaleX: e.endShape.scaleX,
 					scaleY: e.endShape.scaleY,
+					isTransforming:
+						e.eventType === "Start" || e.eventType === "InProgress",
 					items: isItemableData(initialItem)
 						? transformRecursively(
 								initialItem.items ?? [],
@@ -173,6 +175,12 @@ export const useTransform = (props: CanvasHooksProps) => {
 						...item,
 						...e.endShape,
 					};
+
+					// Update isTransforming flag if it's transformative data
+					if (isTransformativeData(newItem)) {
+						newItem.isTransforming =
+							e.eventType === "Start" || e.eventType === "InProgress";
+					}
 
 					// Transform its children recursively.
 					if (isItemableData(newItem)) {

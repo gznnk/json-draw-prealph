@@ -45,6 +45,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 	svgText,
 	showOutline = false,
 	showTransformControls = false,
+	isTransforming = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -184,6 +185,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					showTransformControls={showTransformControls}
+					isTransforming={isTransforming}
 					onTransform={onTransform}
 				/>
 			)}

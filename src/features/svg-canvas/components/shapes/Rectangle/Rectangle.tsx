@@ -5,7 +5,6 @@ import { memo, useCallback, useMemo, useRef, useState } from "react";
 // Import types.
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
-import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
 import type { RectangleProps } from "../../../types/props/shapes/RectangleProps";
 
 // Import components.
@@ -65,6 +64,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	isTransparent,
 	showOutline = false,
 	showTransformControls = false,
+	isTransforming = false,
 	onDrag,
 	onClick,
 	onSelect,
@@ -75,8 +75,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 }) => {
 	// Flag whether dragging
 	const [isDragging, setIsDragging] = useState(false);
-	// Flag whether transforming
-	const [isTransformimg, setIsTransforming] = useState(false);
 	// Flag whether hovering
 	const [isHovered, setIsHovered] = useState(false);
 	// Reference to the SVG element to be transformed
@@ -89,7 +87,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		isSelected,
 		isTextEditEnabled,
 		onDrag,
-		onTransform,
 		onTextChange,
 	};
 	const refBus = useRef(refBusVal);
@@ -109,22 +106,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 
 		if (e.eventType === "End") {
 			setIsDragging(false);
-		}
-	}, []);
-	/**
-	 * Rectangle transform event handler
-	 */
-	const handleTransform = useCallback((e: DiagramTransformEvent) => {
-		const { onTransform } = refBus.current;
-
-		if (e.eventType === "Start") {
-			setIsTransforming(true);
-		}
-
-		onTransform?.(e);
-
-		if (e.eventType === "End") {
-			setIsTransforming(false);
 		}
 	}, []);
 	/**
@@ -224,7 +205,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	const showTransformative = showTransformControls && !isDragging;
 	// Flag whether to show connect points
 	const doShowConnectPoints =
-		showConnectPoints && !isSelected && !isDragging && !isTransformimg;
+		showConnectPoints && !isSelected && !isDragging && !isTransforming;
 
 	return (
 		<>
@@ -290,7 +271,8 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					showTransformControls={showTransformControls}
-					onTransform={handleTransform}
+					isTransforming={isTransforming}
+					onTransform={onTransform}
 				/>
 			)}
 			{doShowConnectPoints &&
@@ -303,7 +285,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 						y={cp.y}
 						ownerId={id}
 						ownerShape={ownerShape}
-						isTransparent={!isHovered || isDragging || isTransformimg}
+						isTransparent={!isHovered || isDragging || isTransforming}
 						onConnect={onConnect}
 					/>
 				))}
