@@ -1,17 +1,17 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-REM ステージングされた変更があるか確認
+REM Check if there are staged changes
 git diff --cached --quiet
 if %ERRORLEVEL% EQU 0 (
   echo No staged changes found, staging all changes...
   git add .
 )
 
-REM コミットメッセージを取得
+REM Get commit message
 set "COMMIT_MSG=%~1"
 
-REM コミットメッセージが必須
+REM Commit message is required
 if "!COMMIT_MSG!"=="" (
   echo Error: Commit message is required
   echo Usage: git-commit-push.bat "commit message"
@@ -20,10 +20,10 @@ if "!COMMIT_MSG!"=="" (
 
 echo Using commit message: !COMMIT_MSG!
 
-REM コミット実行
+REM Execute commit
 git commit -m "!COMMIT_MSG!"
 
-REM コミットが成功した場合のみプッシュ
+REM Push only if commit was successful
 if %ERRORLEVEL% EQU 0 (
   echo Commit successful, pushing changes...
   git push
