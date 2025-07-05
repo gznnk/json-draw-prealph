@@ -59,6 +59,7 @@ const PathComponent: React.FC<PathProps> = ({
 	strokeWidth = "1px",
 	isSelected = false,
 	isAncestorSelected = false,
+	isDragging = false,
 	showOutline = false,
 	showTransformControls = false,
 	isTransforming = false,
@@ -77,7 +78,6 @@ const PathComponent: React.FC<PathProps> = ({
 	onTransform,
 	onDiagramChange,
 }) => {
-	const [isDragging, setIsDragging] = useState(false);
 	const [isPathPointDragging, setIsPathPointDragging] = useState(false);
 	const [isSequentialSelection, setIsSequentialSelection] = useState(false);
 	const [isVerticesMode, setIsVerticesMode] = useState(!transformEnabled);
@@ -169,8 +169,6 @@ const PathComponent: React.FC<PathProps> = ({
 
 		// Processing at drag start
 		if (e.eventType === "Start") {
-			setIsDragging(true);
-
 			startItems.current = items;
 
 			const startDiagram = {
@@ -216,10 +214,6 @@ const PathComponent: React.FC<PathProps> = ({
 				items: newItems,
 			},
 		});
-
-		if (e.eventType === "End") {
-			setIsDragging(false);
-		}
 	}, []);
 	/**
 	 * Vertex drag event handler

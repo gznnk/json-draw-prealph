@@ -3,7 +3,6 @@ import type React from "react";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 
 // Import types.
-import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
 import type { EllipseProps } from "../../../types/props/shapes/EllipseProps";
 
@@ -59,6 +58,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	verticalAlign,
 	isTextEditing,
 	isTextEditEnabled = true,
+	isDragging = false,
 	isTransparent,
 	showOutline = false,
 	showTransformControls = false,
@@ -70,8 +70,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	onConnect,
 	onTextChange,
 }) => {
-	// Flag whether dragging
-	const [isDragging, setIsDragging] = useState(false);
 	// Flag whether hovering
 	const [isHovered, setIsHovered] = useState(false);
 	// Reference to the SVG element to be transformed
@@ -89,22 +87,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-	/**
-	 * Ellipse drag event handler
-	 */
-	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { onDrag } = refBus.current;
-
-		if (e.eventType === "Start") {
-			setIsDragging(true);
-		}
-
-		onDrag?.(e);
-
-		if (e.eventType === "End") {
-			setIsDragging(false);
-		}
-	}, []);
 
 	/**
 	 * Hover state change event handler
@@ -141,7 +123,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 		x,
 		y,
 		ref: svgRef,
-		onDrag: handleDrag,
+		onDrag,
 		onDragOver: handleDragOver,
 		onDragLeave: handleDragLeave,
 	});

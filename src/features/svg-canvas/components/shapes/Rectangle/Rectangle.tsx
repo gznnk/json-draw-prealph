@@ -3,7 +3,6 @@ import type React from "react";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 
 // Import types.
-import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
 import type { RectangleProps } from "../../../types/props/shapes/RectangleProps";
 
@@ -61,6 +60,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	verticalAlign,
 	isTextEditing,
 	isTextEditEnabled = true,
+	isDragging = false,
 	isTransparent,
 	showOutline = false,
 	showTransformControls = false,
@@ -73,8 +73,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	onTextChange,
 	onFileDrop,
 }) => {
-	// Flag whether dragging
-	const [isDragging, setIsDragging] = useState(false);
 	// Flag whether hovering
 	const [isHovered, setIsHovered] = useState(false);
 	// Reference to the SVG element to be transformed
@@ -92,22 +90,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	/**
-	 * Rectangle drag event handler
-	 */
-	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { onDrag } = refBus.current;
-
-		if (e.eventType === "Start") {
-			setIsDragging(true);
-		}
-
-		onDrag?.(e);
-
-		if (e.eventType === "End") {
-			setIsDragging(false);
-		}
-	}, []);
 	/**
 	 * Hover state change event handler
 	 */
@@ -143,7 +125,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		x,
 		y,
 		ref: svgRef,
-		onDrag: handleDrag,
+		onDrag,
 		onDragOver: handleDragOver,
 		onDragLeave: handleDragLeave,
 	});

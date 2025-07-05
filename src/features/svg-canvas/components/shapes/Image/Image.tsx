@@ -1,9 +1,8 @@
 // Import React.
 import type React from "react";
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useRef } from "react";
 
 // Import types.
-import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { ImageProps } from "../../../types/props/shapes/ImageProps";
 
 // Import components.
@@ -38,6 +37,7 @@ const ImageComponent: React.FC<ImageProps> = ({
 	isSelected,
 	isAncestorSelected = false,
 	base64Data,
+	isDragging = false,
 	showOutline = false,
 	showTransformControls = false,
 	isTransforming = false,
@@ -46,8 +46,6 @@ const ImageComponent: React.FC<ImageProps> = ({
 	onSelect,
 	onTransform,
 }) => {
-	// Is the element being dragged.
-	const [isDragging, setIsDragging] = useState(false);
 	// Reference to the element.
 	const svgRef = useRef<SVGImageElement>({} as SVGImageElement);
 
@@ -61,31 +59,15 @@ const ImageComponent: React.FC<ImageProps> = ({
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-	/**
-	 * Handler for drag events.
-	 */
-	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { onDrag } = refBus.current;
-
-		if (e.eventType === "Start") {
-			setIsDragging(true);
-		}
-
-		onDrag?.(e);
-
-		if (e.eventType === "End") {
-			setIsDragging(false);
-		}
-	}, []);
 
 	// Prepare props for the drag element.
 	const dragProps = useDrag({
 		id,
-		type: "Rectangle",
+		type: "Image",
 		x,
 		y,
 		ref: svgRef,
-		onDrag: handleDrag,
+		onDrag,
 	});
 	// Generate properties for clicking
 	const clickProps = useClick({

@@ -47,6 +47,14 @@ const updateDiagramConnectPoints = (item: Diagram): void => {
 };
 
 /**
+ * Determines if an item should be in transforming state based on event type.
+ * Pure function for consistent state management.
+ */
+const getIsTransformingState = (eventType: DiagramTransformEvent["eventType"]): boolean => {
+	return eventType === "Start" || eventType === "InProgress";
+};
+
+/**
  * Custom hook to handle transform events on the canvas.
  */
 export const useTransform = (props: CanvasHooksProps) => {
@@ -125,8 +133,7 @@ export const useTransform = (props: CanvasHooksProps) => {
 					rotation: newRotation,
 					scaleX: e.endShape.scaleX,
 					scaleY: e.endShape.scaleY,
-					isTransforming:
-						e.eventType === "Start" || e.eventType === "InProgress",
+					isTransforming: getIsTransformingState(e.eventType),
 					items: isItemableData(initialItem)
 						? transformRecursively(
 								initialItem.items ?? [],
@@ -178,8 +185,7 @@ export const useTransform = (props: CanvasHooksProps) => {
 
 					// Update isTransforming flag if it's transformative data
 					if (isTransformativeData(newItem)) {
-						newItem.isTransforming =
-							e.eventType === "Start" || e.eventType === "InProgress";
+						newItem.isTransforming = getIsTransformingState(e.eventType);
 					}
 
 					// Transform its children recursively.

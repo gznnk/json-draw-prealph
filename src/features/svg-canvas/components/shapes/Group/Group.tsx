@@ -1,5 +1,5 @@
 // Import React.
-import React, { memo, useCallback, useRef, useState } from "react";
+import React, { memo, useCallback, useRef } from "react";
 
 // Import types.
 import { DiagramRegistry } from "../../../registry";
@@ -30,6 +30,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	isSelected,
 	items,
 	showConnectPoints = true,
+	isDragging = false,
 	showOutline = false,
 	showTransformControls = false,
 	isTransforming = false,
@@ -42,9 +43,6 @@ const GroupComponent: React.FC<GroupProps> = ({
 	onTextChange,
 	onExecute,
 }) => {
-	// Flag indicating whether the entire group is being dragged.
-	// Set to true only when this group is selected and currently being dragged.
-	const [isGroupDragging, setIsGroupDragging] = useState(false);
 	// To avoid frequent handler generation, hold referenced values in useRef
 	const refBusVal = {
 		// Properties
@@ -59,39 +57,16 @@ const GroupComponent: React.FC<GroupProps> = ({
 		onDiagramChange,
 		onConnect,
 		onTextChange,
-		// Internal variables and functions
-		isGroupDragging,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-
-	/**
-	 * Drag event handler for shapes within the group
-	 */
-	const handleChildDiagramDrag = useCallback((e: DiagramDragEvent) => {
-		const { isSelected, onDrag } = refBus.current;
-
-		// Processing at drag start
-		if (e.eventType === "Start" && isSelected) {
-			// If in group selection, enable dragging of the entire group
-			setIsGroupDragging(true);
-		}
-
-		// Processing during drag
-		onDrag?.(e);
-
-		// Clear the dragging flag at drag end
-		if (e.eventType === "End") {
-			setIsGroupDragging(false);
-		}
-	}, []);
 
 	/**
 	 * Change event handler for shapes within the group
 	 */
 	const handleChildDiagramChange = useCallback(
 		(e: DiagramChangeEvent) => {
-			const { id, isSelected, onDiagramChange } = refBus.current;
+			const { id, isSelected, onDiagramChange, onDrag } = refBus.current;
 
 			if (isSelected) {
 				// TODO: Check if this logic is necessary
@@ -105,13 +80,13 @@ const GroupComponent: React.FC<GroupProps> = ({
 					endY: e.endDiagram.y,
 				} as DiagramDragEvent;
 
-				handleChildDiagramDrag(dragEvent);
+				onDrag?.(dragEvent);
 			} else {
 				// When group is not selected, there is no impact on the group other than outline, so propagate the change event as is
 				onDiagramChange?.(e);
 			}
 		},
-		[handleChildDiagramDrag],
+		[],
 	);
 	/**
 	 * Connection event handler for shapes within the group
@@ -136,7 +111,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	);
 
 	const doShowConnectPoints =
-		showConnectPoints && !isSelected && !isGroupDragging && !isTransforming;
+		showConnectPoints && !isSelected && !isDragging && !isTransforming;
 	// Create shapes within the group
 	const children = items.map((item) => {
 		// Ensure that item.type is of DiagramType
@@ -155,7 +130,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			showConnectPoints: doShowConnectPoints,
 			onClick,
 			onSelect,
-			onDrag: handleChildDiagramDrag,
+			onDrag,
 			onTransform,
 			onDiagramChange: handleChildDiagramChange,
 			onConnect: handleChildDiagramConnect,
@@ -178,7 +153,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 				scaleY={scaleY}
 				showOutline={showOutline}
 			/>
-			{!isGroupDragging && (
+			{!isDragging && (
 				<Transformative
 					id={id}
 					type="Group"
@@ -195,7 +170,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 					onTransform={onTransform}
 				/>
 			)}
-			{isSelected && isGroupDragging && (
+			{isSelected && isDragging && (
 				<PositionLabel
 					x={x}
 					y={y}

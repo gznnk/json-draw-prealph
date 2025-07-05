@@ -1,12 +1,11 @@
 // Import React.
 import type React from "react";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 
 // Import other libraries.
 import DOMPurify from "dompurify";
 
 // Import types.
-import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { SvgProps } from "../../../types/props/shapes/SvgProps";
 
 // Import components.
@@ -43,6 +42,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 	initialWidth,
 	initialHeight,
 	svgText,
+	isDragging = false,
 	showOutline = false,
 	showTransformControls = false,
 	isTransforming = false,
@@ -51,8 +51,6 @@ const SvgComponent: React.FC<SvgProps> = ({
 	onSelect,
 	onTransform,
 }) => {
-	// Is the element being dragged.
-	const [isDragging, setIsDragging] = useState(false);
 	// Reference to the element.
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 	const groupRef = useRef<SVGGElement>({} as SVGGElement);
@@ -67,22 +65,6 @@ const SvgComponent: React.FC<SvgProps> = ({
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-	/**
-	 * Handler for drag events.
-	 */
-	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { onDrag } = refBus.current;
-
-		if (e.eventType === "Start") {
-			setIsDragging(true);
-		}
-
-		onDrag?.(e);
-
-		if (e.eventType === "End") {
-			setIsDragging(false);
-		}
-	}, []);
 
 	// Prepare props for the drag element.
 	const dragProps = useDrag({
@@ -91,7 +73,7 @@ const SvgComponent: React.FC<SvgProps> = ({
 		x,
 		y,
 		ref: svgRef,
-		onDrag: handleDrag,
+		onDrag,
 	});
 	// Generate properties for clicking
 	const clickProps = useClick({

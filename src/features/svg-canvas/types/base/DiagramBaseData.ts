@@ -10,4 +10,5 @@ export type DiagramBaseData = {
 	type: DiagramType;
 	x: number;
 	y: number;
+	isDragging?: boolean;
 };
