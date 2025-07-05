@@ -11,23 +11,14 @@ if %ERRORLEVEL% EQU 0 (
 REM コミットメッセージを取得
 set "COMMIT_MSG=%~1"
 
-REM 引数でメッセージが提供されていない場合は自動生成
+REM コミットメッセージが必須
 if "!COMMIT_MSG!"=="" (
-  echo No commit message provided, generating commit message based on changes...
-  for /f "tokens=*" %%a in ('node "%~dp0generate-commit-message.cjs"') do (
-    set "COMMIT_MSG=%%a"
-  )
-  
-  REM 空のメッセージの場合はデフォルトを使用
-  if "!COMMIT_MSG!"=="" (
-    set "COMMIT_MSG=Update files"
-    echo Using default message: !COMMIT_MSG!
-  ) else (
-    echo Using auto-generated message: !COMMIT_MSG!
-  )
-) else (
-  echo Using provided message: !COMMIT_MSG!
+  echo Error: Commit message is required
+  echo Usage: git-commit-push.bat "commit message"
+  exit /b 1
 )
+
+echo Using commit message: !COMMIT_MSG!
 
 REM コミット実行
 git commit -m "!COMMIT_MSG!"
