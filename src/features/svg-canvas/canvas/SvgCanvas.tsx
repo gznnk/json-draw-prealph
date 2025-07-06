@@ -63,6 +63,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			isGrabScrollReady,
 			isGrabScrolling,
 			selectionState,
+			// actions
 			onClick,
 			onConnect,
 			onCopy,
@@ -77,19 +78,23 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onPaste,
 			onTextChange,
 			onTransform,
+			// history
 			onRedo,
 			onUndo,
+			// navigation
 			onGrabStart,
 			onGrabMove,
 			onGrabEnd,
 			onNavigate,
 			onScroll,
 			onZoom,
+			// selection
 			onAreaSelection,
 			onCancelAreaSelection,
 			onClearAllSelection,
 			onSelect,
 			onSelectAll,
+			// other
 			onDataChange,
 		} = props;
 
