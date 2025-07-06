@@ -8,28 +8,28 @@ import type { PathData } from "../../../../types/data/shapes/PathData";
 import { Path } from "../../Path";
 
 // Import constants.
-import { EVENT_NAME_NEW_CONNECT_LINE } from "../../../../constants/EventNames";
+import { EVENT_NAME_PREVIEW_CONNECT_LINE } from "../../../../constants/EventNames";
 
 // Import context.
 import { useEventBus } from "../../../../context/EventBusContext";
 
 // Import local module files.
-import type { NewConnectLineEvent } from "./NewConnectLineTypes";
+import type { PreviewConnectLineEvent } from "./PreviewConnectLineTypes";
 
 /**
- * Component for rendering a new connection line.
+ * Component for rendering a preview connection line.
  *
- * This component exists to ensure that the new connection line is rendered
+ * This component exists to ensure that the preview connection line is rendered
  * on top of all other shapes. It is positioned at the front of the render order
  * in SvgCanvas to achieve this visual layering effect.
  */
-const NewConnectLineComponent: React.FC = () => {
+const PreviewConnectLineComponent: React.FC = () => {
 	const eventBus = useEventBus();
 	const [connectLine, setConnectLine] = useState<PathData>();
 
 	useEffect(() => {
-		const handleNewConnectLine = (e: Event) => {
-			const customEvent = e as CustomEvent<NewConnectLineEvent>;
+		const handlePreviewConnectLine = (e: Event) => {
+			const customEvent = e as CustomEvent<PreviewConnectLineEvent>;
 			const event = customEvent.detail;
 			if (event) {
 				setConnectLine(event.data);
@@ -37,13 +37,13 @@ const NewConnectLineComponent: React.FC = () => {
 		};
 
 		eventBus.addEventListener(
-			EVENT_NAME_NEW_CONNECT_LINE,
-			handleNewConnectLine,
+			EVENT_NAME_PREVIEW_CONNECT_LINE,
+			handlePreviewConnectLine,
 		);
 		return () => {
 			eventBus.removeEventListener(
-				EVENT_NAME_NEW_CONNECT_LINE,
-				handleNewConnectLine,
+				EVENT_NAME_PREVIEW_CONNECT_LINE,
+				handlePreviewConnectLine,
 			);
 		};
 	}, [eventBus]);
@@ -55,4 +55,4 @@ const NewConnectLineComponent: React.FC = () => {
 	return <Path {...connectLine} />;
 };
 
-export const NewConnectLine = memo(NewConnectLineComponent);
+export const PreviewConnectLine = memo(PreviewConnectLineComponent);

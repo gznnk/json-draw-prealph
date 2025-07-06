@@ -2,8 +2,8 @@
 import type { PathData } from "../../../../types/data/shapes/PathData";
 
 /**
- * Type for the new connection line event.
+ * Type for the preview connection line event.
  */
-export type NewConnectLineEvent = {
+export type PreviewConnectLineEvent = {
 	data?: PathData;
 };

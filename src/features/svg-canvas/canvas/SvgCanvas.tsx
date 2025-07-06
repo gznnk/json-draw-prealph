@@ -20,7 +20,7 @@ import { CanvasMenu } from "../components/menus/CanvasMenu";
 import { ContextMenu, useContextMenu } from "../components/menus/ContextMenu";
 import { DiagramMenu, useDiagramMenu } from "../components/menus/DiagramMenu";
 import { FlashConnectLine } from "../components/shapes/ConnectLine";
-import { NewConnectLine } from "../components/shapes/ConnectPoint";
+import { PreviewConnectLine } from "../components/shapes/ConnectPoint";
 import { Group } from "../components/shapes/Group";
 import UserMenu from "../components/menus/UserMenu/UserMenu";
 import { MiniMap } from "../components/auxiliary/MiniMap";
@@ -388,8 +388,8 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 									onTransform={onTransform}
 								/>
 							)}
-							{/* Render new connect line. */}
-							<NewConnectLine />
+							{/* Render preview connect line. */}
+							<PreviewConnectLine />
 							{/* Render flash connect lines */} <FlashConnectLine />
 							{/* Render area selection rectangle */}
 							{selectionState && (
