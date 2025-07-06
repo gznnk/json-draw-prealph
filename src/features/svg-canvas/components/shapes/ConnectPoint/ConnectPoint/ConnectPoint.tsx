@@ -24,7 +24,6 @@ import { generatePathFromShapeToPoint } from "../../../../utils/shapes/connectPo
 import { getLineDirection } from "../../../../utils/shapes/connectPoint/getLineDirection";
 
 // Import local module files.
-import { dispatchPreviewConnectLineEvent } from "../PreviewConnectLine";
 import { EVENT_NAME_CONNECTTION } from "./ConnectPointConstants";
 import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
 
@@ -39,6 +38,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	ownerShape,
 	isTransparent,
 	onConnect,
+	onPreviewConnectLine,
 }) => {
 	// Get eventBus from context
 	const eventBus = useEventBus();
@@ -94,25 +94,27 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		setPathPoints(newPathPoints);
 
 		// Notify the path data for the new connection line rendering.
-		dispatchPreviewConnectLineEvent(eventBus, {
-			id: `${id}-connecting-path`,
-			type: "Path",
-			x: 0,
-			y: 0,
-			width: 0,
-			height: 0,
-			rotation: 0,
-			scaleX: 1,
-			scaleY: 1,
-			stroke: "#3A415C",
-			strokeWidth: "3px",
-			keepProportion: false,
-			isSelected: false,
-			showTransformControls: false,
-			showOutline: false,
-			isTransforming: false,
-			endArrowHead: "Circle",
-			items: newPathPoints,
+		onPreviewConnectLine?.({
+			pathData: {
+				id: `${id}-connecting-path`,
+				type: "Path",
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0,
+				rotation: 0,
+				scaleX: 1,
+				scaleY: 1,
+				stroke: "#3A415C",
+				strokeWidth: "3px",
+				keepProportion: false,
+				isSelected: false,
+				showTransformControls: false,
+				showOutline: false,
+				isTransforming: false,
+				endArrowHead: "Circle",
+				items: newPathPoints,
+			},
 		});
 	};
 
@@ -125,6 +127,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		ownerId,
 		ownerShape,
 		onConnect,
+		onPreviewConnectLine,
 		eventBus,
 		// Internal variables and functions
 		pathPoints,
@@ -149,7 +152,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			setPathPoints([]);
 
 			// Clear the path data for the new connection line rendering.
-			dispatchPreviewConnectLineEvent(refBus.current.eventBus);
+			refBus.current.onPreviewConnectLine?.({ pathData: undefined });
 		}
 	}, []);
 
@@ -253,7 +256,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	useEffect(() => {
 		const handleConnection = (e: Event) => {
 			// Get referenced values via refBus
-			const { id, pathPoints, ownerId, onConnect, updatePathPoints, eventBus } =
+			const { id, pathPoints, ownerId, onConnect, updatePathPoints } =
 				refBus.current;
 
 			const customEvent = e as CustomEvent<ConnectionEvent>;
@@ -300,7 +303,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 					setPathPoints([]);
 
 					// Clear the path data for the new connection line rendering.
-					dispatchPreviewConnectLineEvent(eventBus);
+					refBus.current.onPreviewConnectLine?.({ pathData: undefined });
 				}
 			}
 		};

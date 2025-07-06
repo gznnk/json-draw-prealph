@@ -60,6 +60,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			zoom,
 			multiSelectGroup,
 			textEditorState,
+			previewConnectLineState,
 			isGrabScrollReady,
 			isGrabScrolling,
 			selectionState,
@@ -76,6 +77,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onHoverChange,
 			onNewDiagram,
 			onPaste,
+			onPreviewConnectLine,
 			onTextChange,
 			onTransform,
 			// history
@@ -160,18 +162,21 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		};
 		const refBus = useRef(refBusVal);
 		refBus.current = refBusVal;
+
 		/**
 		 * Focus event handler for SVG element
 		 */
 		const handleFocus = useCallback(() => {
 			hasFocus.current = true;
 		}, []);
+
 		/**
 		 * Blur event handler for SVG element
 		 */
 		const handleBlur = useCallback(() => {
 			hasFocus.current = false;
 		}, []);
+
 		/**
 		 * Handle the pointer down event on the SVG canvas.
 		 */
@@ -205,7 +210,9 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				contextMenuFunctions.closeContextMenu();
 			},
 			[onAreaSelection],
-		); /**
+		);
+
+		/**
 		 * Handle the pointer move event for grab scrolling and area selection.
 		 */
 		const handlePointerMove = useCallback(
@@ -260,6 +267,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				clientY: e.clientY + e.deltaY,
 			});
 		}, []);
+
 		/**
 		 * SvgCanvas key down event handler
 		 */
@@ -348,6 +356,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				onClick,
 				onSelect,
 				onConnect,
+				onPreviewConnectLine,
 				onTextChange,
 				onExecute,
 				onHoverChange,
@@ -389,8 +398,9 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 								/>
 							)}
 							{/* Render preview connect line. */}
-							<PreviewConnectLine />
-							{/* Render flash connect lines */} <FlashConnectLine />
+							<PreviewConnectLine pathData={previewConnectLineState} />
+							{/* Render flash connect lines */}
+							<FlashConnectLine />
 							{/* Render area selection rectangle */}
 							{selectionState && (
 								<SelectionRect

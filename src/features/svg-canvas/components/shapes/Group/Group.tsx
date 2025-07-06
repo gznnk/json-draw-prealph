@@ -41,6 +41,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 	onHoverChange,
 	onDiagramChange,
 	onConnect,
+	onPreviewConnectLine,
 	onTextChange,
 	onExecute,
 }) => {
@@ -57,6 +58,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 		onDrag,
 		onDiagramChange,
 		onConnect,
+		onPreviewConnectLine,
 		onTextChange,
 	};
 	const refBus = useRef(refBusVal);
@@ -115,6 +117,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			onHoverChange,
 			onDiagramChange: handleChildDiagramChange,
 			onConnect,
+			onPreviewConnectLine,
 			onTextChange,
 			onExecute,
 		};

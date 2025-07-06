@@ -36,6 +36,7 @@ import { useGroup } from "./hooks/actions/useGroup";
 import { useHoverChange } from "./hooks/actions/useHoverChange";
 import { useNewDiagram } from "./hooks/actions/useNewDiagram";
 import { usePaste } from "./hooks/actions/usePaste";
+import { usePreviewConnectLine } from "./hooks/actions/usePreviewConnectLine";
 import { useStackOrderChange } from "./hooks/actions/useStackOrderChange";
 import { useTextChange } from "./hooks/actions/useTextChange";
 import { useTransform } from "./hooks/actions/useTransform";
@@ -174,6 +175,9 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the paste event.
 	const onPaste = usePaste(canvasHooksProps);
 
+	// Handler for the preview connect line event.
+	const onPreviewConnectLine = usePreviewConnectLine(canvasHooksProps);
+
 	// Handler for the stack order change event.
 	const onStackOrderChange = useStackOrderChange(canvasHooksProps);
 
@@ -245,6 +249,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onHoverChange,
 		onNewDiagram,
 		onPaste,
+		onPreviewConnectLine,
 		onStackOrderChange,
 		onTextChange,
 		onTransform,

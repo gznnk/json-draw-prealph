@@ -4,6 +4,7 @@ import type { RefObject } from "react";
 // Import types.
 import type { Diagram } from "../types/data/catalog/Diagram";
 import type { GroupData } from "../types/data/shapes/GroupData";
+import type { PathData } from "../types/data/shapes/PathData";
 import type { AreaSelectionEvent } from "../types/events/AreaSelectionEvent";
 import type { DiagramChangeEvent } from "../types/events/DiagramChangeEvent";
 import type { DiagramClickEvent } from "../types/events/DiagramClickEvent";
@@ -18,6 +19,7 @@ import type { DiagramTextChangeEvent } from "../types/events/DiagramTextChangeEv
 import type { DiagramTransformEvent } from "../types/events/DiagramTransformEvent";
 import type { ExecuteEvent } from "../types/events/ExecuteEvent";
 import type { NewDiagramEvent } from "../types/events/NewDiagramEvent";
+import type { PreviewConnectLineEvent } from "../types/events/PreviewConnectLineEvent";
 import type { StackOrderChangeEvent } from "../types/events/StackOrderChangeEvent";
 import type { SvgCanvasResizeEvent } from "../types/events/SvgCanvasResizeEvent";
 import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
@@ -52,6 +54,7 @@ export type SvgCanvasState = {
 	historyIndex: number;
 	lastHistoryEventId: string;
 	textEditorState: TextEditorState;
+	previewConnectLineState?: PathData;
 	isGrabScrollReady?: boolean;
 	isGrabScrolling?: boolean;
 } & SvgCanvasData;
@@ -107,6 +110,7 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onHoverChange?: (e: DiagramHoverChangeEvent) => void;
 	onNewDiagram?: (e: NewDiagramEvent) => void;
 	onPaste?: () => void;
+	onPreviewConnectLine?: (e: PreviewConnectLineEvent) => void;
 	onStackOrderChange?: (e: StackOrderChangeEvent) => void;
 	onTextChange?: (e: DiagramTextChangeEvent) => void;
 	onTransform?: (e: DiagramTransformEvent) => void;
