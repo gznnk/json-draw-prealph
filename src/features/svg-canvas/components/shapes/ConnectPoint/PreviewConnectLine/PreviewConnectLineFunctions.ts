@@ -6,12 +6,12 @@ import type { EventBus } from "../../../../../../shared/event-bus/EventBus";
 import { EVENT_NAME_PREVIEW_CONNECT_LINE } from "../../../../constants/EventNames";
 
 /**
- * Function to trigger a preview connection line event.
+ * Function to dispatch a preview connection line event.
  *
  * @param eventBus - The event bus instance to dispatch the event.
  * @param pathData - The data for the preview connection line.
  */
-export const triggerPreviewConnectLine = (
+export const dispatchPreviewConnectLineEvent = (
 	eventBus: EventBus,
 	pathData?: PathData,
 ) => {

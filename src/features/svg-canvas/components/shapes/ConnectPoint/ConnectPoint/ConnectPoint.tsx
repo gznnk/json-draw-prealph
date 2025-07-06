@@ -24,7 +24,7 @@ import { generatePathFromShapeToPoint } from "../../../../utils/shapes/connectPo
 import { getLineDirection } from "../../../../utils/shapes/connectPoint/getLineDirection";
 
 // Import local module files.
-import { triggerPreviewConnectLine } from "../PreviewConnectLine";
+import { dispatchPreviewConnectLineEvent } from "../PreviewConnectLine";
 import { EVENT_NAME_CONNECTTION } from "./ConnectPointConstants";
 import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
 
@@ -94,7 +94,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		setPathPoints(newPathPoints);
 
 		// Notify the path data for the new connection line rendering.
-		triggerPreviewConnectLine(eventBus, {
+		dispatchPreviewConnectLineEvent(eventBus, {
 			id: `${id}-connecting-path`,
 			type: "Path",
 			x: 0,
@@ -149,7 +149,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			setPathPoints([]);
 
 			// Clear the path data for the new connection line rendering.
-			triggerPreviewConnectLine(refBus.current.eventBus);
+			dispatchPreviewConnectLineEvent(refBus.current.eventBus);
 		}
 	}, []);
 
@@ -300,7 +300,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 					setPathPoints([]);
 
 					// Clear the path data for the new connection line rendering.
-					triggerPreviewConnectLine(eventBus);
+					dispatchPreviewConnectLineEvent(eventBus);
 				}
 			}
 		};
