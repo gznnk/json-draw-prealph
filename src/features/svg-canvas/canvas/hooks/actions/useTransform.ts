@@ -20,7 +20,7 @@ import { createItemMap } from "../../utils/createItemMap";
 import { isDiagramChangingEvent } from "../../utils/isDiagramChangingEvent";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
-import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
+import { updateOutlineOfGroup } from "../../utils/updateOutlineOfGroup";
 
 // Import utility functions for transformation.
 import type { GroupData } from "../../../types/data/shapes/GroupData";
@@ -174,7 +174,7 @@ export const useTransform = (props: CanvasHooksProps) => {
 			items: Diagram[],
 			e: DiagramTransformEvent,
 			transformedDiagrams: Diagram[],
-			isChild = false,
+			isTransformedChild: boolean,
 		): Diagram[] => {
 			return items.map((item) => {
 				if (item.id === e.id) {
@@ -208,7 +208,7 @@ export const useTransform = (props: CanvasHooksProps) => {
 					return newItem;
 				}
 				// If the item is multi-selected or a child of a transformed item, transform it.
-				if (isChild || multiSelectedItemIds.current.has(item.id)) {
+				if (isTransformedChild || multiSelectedItemIds.current.has(item.id)) {
 					return transformChild(item, e, transformedDiagrams);
 				}
 				// If the item has children, recursively transform them.
@@ -219,6 +219,7 @@ export const useTransform = (props: CanvasHooksProps) => {
 							item.items ?? [],
 							e,
 							transformedDiagrams,
+							false,
 						),
 					};
 				}
@@ -261,7 +262,12 @@ export const useTransform = (props: CanvasHooksProps) => {
 
 				let newState = {
 					...prevState,
-					items: transformRecursively(prevState.items, e, transformedDiagrams),
+					items: transformRecursively(
+						prevState.items,
+						e,
+						transformedDiagrams,
+						false,
+					),
 					isDiagramChanging: isDiagramChangingEvent(e.eventType),
 					multiSelectGroup: prevState.multiSelectGroup
 						? ({
@@ -279,8 +285,14 @@ export const useTransform = (props: CanvasHooksProps) => {
 					startCanvasState.current,
 				);
 
-				// Update outline of all groups.
-				newState.items = updateOutlineOfAllGroups(newState.items);
+				// Update outline of groups that were transformed
+				const transformedIdSet = new Set(transformedDiagrams.map((d) => d.id));
+				newState.items = newState.items.map((item) => {
+					if (item.type === "Group" && transformedIdSet.has(item.id)) {
+						return updateOutlineOfGroup(item);
+					}
+					return item;
+				});
 
 				if (isHistoryEvent(e.eventType)) {
 					// Add a new history entry.
