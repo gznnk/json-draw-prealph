@@ -5,6 +5,9 @@ import { useCallback, useRef } from "react";
 import type { PreviewConnectLineEvent } from "../../../types/events/PreviewConnectLineEvent";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
+// Import functions related to SvgCanvas.
+import { clearSelectedRecursive } from "../../utils/clearSelectedRecursive";
+
 /**
  * Custom hook to handle preview connect line events on the canvas.
  * Updates the canvas state to show or hide the preview connection line.
@@ -22,11 +25,18 @@ export const usePreviewConnectLine = (props: CanvasHooksProps) => {
 		const { setCanvasState } = refBus.current.props;
 
 		setCanvasState((prevState) => {
-			// Update the preview connect line state
-			return {
+			const newState = {
 				...prevState,
 				previewConnectLineState: e.pathData,
 			};
+
+			// Clear all selections when connection preview starts
+			if (e.eventType === "Start") {
+				newState.items = clearSelectedRecursive(prevState.items);
+				newState.multiSelectGroup = undefined;
+			}
+
+			return newState;
 		});
 	}, []);
 };

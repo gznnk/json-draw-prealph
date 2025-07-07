@@ -26,6 +26,7 @@ import { getLineDirection } from "../../../../utils/shapes/connectPoint/getLineD
 // Import local module files.
 import { EVENT_NAME_CONNECTTION } from "./ConnectPointConstants";
 import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
+import type { EventType } from "../../../../types/events/EventType";
 
 /**
  * Connect point component
@@ -57,7 +58,11 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	/**
 	 * Update connection line coordinates
 	 */
-	const updatePathPoints = (dragX: number, dragY: number) => {
+	const updatePathPoints = (
+		dragX: number,
+		dragY: number,
+		eventType: EventType,
+	) => {
 		let newPoints: Point[] = [];
 
 		if (!connectingPoint.current) {
@@ -95,6 +100,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 
 		// Notify the path data for the new connection line rendering.
 		onPreviewConnectLine?.({
+			eventType,
 			pathData: {
 				id: `${id}-connecting-path`,
 				type: "Path",
@@ -145,14 +151,16 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			return;
 		}
 
-		// Recalculate connection line coordinates
-		refBus.current.updatePathPoints(e.endX, e.endY);
-
-		if (e.eventType === "End") {
+		if (e.eventType !== "End") {
+			refBus.current.updatePathPoints(e.endX, e.endY, e.eventType);
+		} else {
 			setPathPoints([]);
 
 			// Clear the path data for the new connection line rendering.
-			refBus.current.onPreviewConnectLine?.({ pathData: undefined });
+			refBus.current.onPreviewConnectLine?.({
+				eventType: e.eventType,
+				pathData: undefined,
+			});
 		}
 	}, []);
 
@@ -273,7 +281,11 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 					};
 
 					// Recalculate path points so that the line connects to the connection destination point
-					updatePathPoints(customEvent.detail.endX, customEvent.detail.endY);
+					updatePathPoints(
+						customEvent.detail.endX,
+						customEvent.detail.endY,
+						"InProgress",
+					);
 				}
 
 				if (customEvent.detail.type === "disconnect") {
@@ -303,7 +315,10 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 					setPathPoints([]);
 
 					// Clear the path data for the new connection line rendering.
-					refBus.current.onPreviewConnectLine?.({ pathData: undefined });
+					refBus.current.onPreviewConnectLine?.({
+						pathData: undefined,
+						eventType: "End",
+					});
 				}
 			}
 		};
