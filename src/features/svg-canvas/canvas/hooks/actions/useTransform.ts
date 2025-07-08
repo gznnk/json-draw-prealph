@@ -82,6 +82,8 @@ export const useTransform = (props: CanvasHooksProps) => {
 			item: Diagram,
 			e: DiagramTransformEvent,
 			transformedDiagrams: Diagram[],
+			ancestors: string[] = [],
+			topLevelGroupIds: Set<string> = new Set(),
 		): Diagram => {
 			const initialItem = initialItemsMap.current.get(item.id);
 			if (!initialItem) {
@@ -141,6 +143,8 @@ export const useTransform = (props: CanvasHooksProps) => {
 								e,
 								transformedDiagrams,
 								true,
+								[...ancestors, item.id],
+								topLevelGroupIds,
 							)
 						: undefined,
 				} as Diagram;
@@ -175,6 +179,8 @@ export const useTransform = (props: CanvasHooksProps) => {
 			e: DiagramTransformEvent,
 			transformedDiagrams: Diagram[],
 			isTransformedChild: boolean,
+			ancestors: string[] = [],
+			topLevelGroupIds: Set<string> = new Set(),
 		): Diagram[] => {
 			return items.map((item) => {
 				if (item.id === e.id) {
@@ -196,6 +202,8 @@ export const useTransform = (props: CanvasHooksProps) => {
 							e,
 							transformedDiagrams,
 							true,
+							[...ancestors, item.id],
+							topLevelGroupIds,
 						);
 					}
 
@@ -205,11 +213,29 @@ export const useTransform = (props: CanvasHooksProps) => {
 						transformedDiagrams.push(newItem);
 					}
 
+					// Add top-level group to the set if this is a transformed item and we have ancestors
+					if (ancestors.length > 0 && ancestors[0]) {
+						topLevelGroupIds.add(ancestors[0]);
+					}
+
 					return newItem;
 				}
 				// If the item is multi-selected or a child of a transformed item, transform it.
 				if (isTransformedChild || multiSelectedItemIds.current.has(item.id)) {
-					return transformChild(item, e, transformedDiagrams);
+					const transformedChild = transformChild(
+						item,
+						e,
+						transformedDiagrams,
+						ancestors,
+						topLevelGroupIds,
+					);
+
+					// Add top-level group to the set if this is a transformed item and we have ancestors
+					if (ancestors.length > 0 && ancestors[0]) {
+						topLevelGroupIds.add(ancestors[0]);
+					}
+
+					return transformedChild;
 				}
 				// If the item has children, recursively transform them.
 				if (isItemableData(item)) {
@@ -220,6 +246,8 @@ export const useTransform = (props: CanvasHooksProps) => {
 							e,
 							transformedDiagrams,
 							false,
+							[...ancestors, item.id],
+							topLevelGroupIds,
 						),
 					};
 				}
@@ -259,6 +287,7 @@ export const useTransform = (props: CanvasHooksProps) => {
 
 				// Transformed diagrams to be updated.
 				const transformedDiagrams: Diagram[] = [];
+				const topLevelGroupIds = new Set<string>();
 
 				let newState = {
 					...prevState,
@@ -267,6 +296,8 @@ export const useTransform = (props: CanvasHooksProps) => {
 						e,
 						transformedDiagrams,
 						false,
+						[],
+						topLevelGroupIds,
 					),
 					isDiagramChanging: isDiagramChangingEvent(e.eventType),
 					multiSelectGroup: prevState.multiSelectGroup
@@ -285,10 +316,9 @@ export const useTransform = (props: CanvasHooksProps) => {
 					startCanvasState.current,
 				);
 
-				// Update outline of groups that were transformed
-				const transformedIdSet = new Set(transformedDiagrams.map((d) => d.id));
+				// Update outline of top-level groups that contain transformed diagrams
 				newState.items = newState.items.map((item) => {
-					if (item.type === "Group" && transformedIdSet.has(item.id)) {
+					if (item.type === "Group" && topLevelGroupIds.has(item.id)) {
 						return updateOutlineOfGroup(item);
 					}
 					return item;
