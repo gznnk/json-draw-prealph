@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef } from "react";
 
 // Import types.
 import type { DiagramDragDropEvent } from "../../../types/events/DiagramDragDropEvent";
@@ -48,7 +48,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	isSelected,
 	isAncestorSelected = false,
 	connectPoints,
-	showConnectPoints = true,
+	showConnectPoints = false,
 	text,
 	textType,
 	fontColor,
@@ -75,8 +75,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	onTextChange,
 	onHoverChange,
 }) => {
-	// Flag whether hovering
-	const [isHovered, setIsHovered] = useState(false);
 	// Reference to the SVG element to be transformed
 	const svgRef = useRef<SVGEllipseElement>({} as SVGEllipseElement);
 
@@ -98,7 +96,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	 */
 	const handleHover = useCallback(
 		(e: DiagramHoverChangeEvent) => {
-			setIsHovered(e.isHovered);
 			// Propagate hover change event to canvas
 			if (onHoverChange) {
 				onHoverChange(e);
@@ -112,7 +109,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	 */
 	const handleDragOver = useCallback(
 		(e: DiagramDragDropEvent) => {
-			setIsHovered(true);
 			// Propagate drag enter event to canvas
 			if (onDragEnter) {
 				onDragEnter(e);
@@ -126,7 +122,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	 */
 	const handleDragLeave = useCallback(
 		(e: DiagramDragDropEvent) => {
-			setIsHovered(false);
 			// Propagate drag leave event to canvas
 			if (onDragLeave) {
 				onDragLeave(e);
@@ -211,10 +206,6 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 		y,
 	);
 
-	// Flag whether to show connect points
-	const showConnectPointsFlag =
-		showConnectPoints && !isSelected && !isDragging && !isTransforming;
-
 	return (
 		<>
 			<g transform="translate(0.5,0.5)">
@@ -285,8 +276,8 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 				ownerId={id}
 				ownerShape={ownerShape}
 				connectPoints={connectPoints}
-				isVisible={showConnectPointsFlag}
-				isActive={!isHovered || isDragging || isTransforming}
+				showConnectPoints={showConnectPoints}
+				shouldRender={!isDragging && !isTransforming && !isSelected}
 				onConnect={onConnect}
 				onPreviewConnectLine={onPreviewConnectLine}
 			/>

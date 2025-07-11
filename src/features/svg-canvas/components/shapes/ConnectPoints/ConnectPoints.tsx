@@ -15,13 +15,13 @@ const ConnectPointsComponent: React.FC<ConnectPointsProps> = ({
 	ownerId,
 	ownerShape,
 	connectPoints,
-	isVisible,
-	isActive,
+	showConnectPoints,
+	shouldRender,
 	onConnect,
 	onPreviewConnectLine,
 }) => {
 	// Don't render if connect points should not be shown
-	if (!isVisible) {
+	if (!shouldRender) {
 		return null;
 	}
 
@@ -36,7 +36,7 @@ const ConnectPointsComponent: React.FC<ConnectPointsProps> = ({
 					y={cp.y}
 					ownerId={ownerId}
 					ownerShape={ownerShape}
-					isTransparent={isActive}
+					alwaysVisible={showConnectPoints}
 					onConnect={onConnect}
 					onPreviewConnectLine={onPreviewConnectLine}
 				/>

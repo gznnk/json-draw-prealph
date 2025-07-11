@@ -37,7 +37,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	y,
 	ownerId,
 	ownerShape,
-	isTransparent,
+	alwaysVisible,
 	onConnect,
 	onPreviewConnectLine,
 }) => {
@@ -343,9 +343,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			fill="rgba(255, 204, 0, 0.8)"
 			cursor="pointer"
 			outline="none"
-			// Show when hovered, even if isTransparent is true.
-			// If you want to hide when hovered, do not render this component.
-			isTransparent={isTransparent && !isHovered}
+			isTransparent={!alwaysVisible && !isHovered}
 			onDrag={handleDrag}
 			onDragOver={handleDragOver}
 			onDragLeave={handleDragLeave}

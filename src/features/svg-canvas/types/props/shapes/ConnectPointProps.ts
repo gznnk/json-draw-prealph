@@ -1,18 +1,16 @@
 // Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../core/CreateDiagramProps";
 import type { ConnectPointData } from "../../data/shapes/ConnectPointData";
 import type { DiagramConnectEvent } from "../../events/DiagramConnectEvent";
 import type { Shape } from "../../base/Shape";
+import type { PreviewConnectLineEvent } from "../../events/PreviewConnectLineEvent";
 
 /**
  * Connect point properties
  */
-export type ConnectPointProps = CreateDiagramProps<
-	ConnectPointData,
-	{ connectable: true }
-> & {
+export type ConnectPointProps = Omit<ConnectPointData, "type"> & {
 	ownerId: string;
 	ownerShape: Shape; // Should be passed as memoized
-	isTransparent: boolean;
+	alwaysVisible: boolean; // Whether to always show the connect point, even when not hovered.
 	onConnect?: (e: DiagramConnectEvent) => void;
+	onPreviewConnectLine?: (e: PreviewConnectLineEvent) => void;
 };

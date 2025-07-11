@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef } from "react";
 
 // Import types.
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
@@ -50,7 +50,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	isSelected,
 	isAncestorSelected = false,
 	connectPoints,
-	showConnectPoints = true,
+	showConnectPoints = false,
 	text,
 	textType,
 	fontColor,
@@ -78,8 +78,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	onFileDrop,
 	onHoverChange,
 }) => {
-	// Flag whether hovering
-	const [isHovered, setIsHovered] = useState(false);
 	// Reference to the SVG element to be transformed
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
@@ -100,7 +98,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	 */
 	const handleHover = useCallback(
 		(e: DiagramHoverChangeEvent) => {
-			setIsHovered(e.isHovered);
 			// Propagate hover change event to canvas
 			if (onHoverChange) {
 				onHoverChange(e);
@@ -114,7 +111,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	 */
 	const handleDragOver = useCallback(
 		(e: DiagramDragDropEvent) => {
-			setIsHovered(true);
 			// Propagate drag enter event to canvas
 			if (onDragEnter) {
 				onDragEnter(e);
@@ -128,7 +124,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	 */
 	const handleDragLeave = useCallback(
 		(e: DiagramDragDropEvent) => {
-			setIsHovered(false);
 			// Propagate drag leave event to canvas
 			if (onDragLeave) {
 				onDragLeave(e);
@@ -217,10 +212,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		y,
 	);
 
-	// Flag whether to show connect points
-	const doShowConnectPoints =
-		showConnectPoints && !isSelected && !isDragging && !isTransforming;
-
 	return (
 		<>
 			<g transform="translate(0.5,0.5)">
@@ -293,8 +284,8 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 				ownerId={id}
 				ownerShape={ownerShape}
 				connectPoints={connectPoints}
-				isVisible={doShowConnectPoints}
-				isActive={!isHovered || isDragging || isTransforming}
+				showConnectPoints={showConnectPoints}
+				shouldRender={!isDragging && !isTransforming && !isSelected}
 				onConnect={onConnect}
 				onPreviewConnectLine={onPreviewConnectLine}
 			/>
