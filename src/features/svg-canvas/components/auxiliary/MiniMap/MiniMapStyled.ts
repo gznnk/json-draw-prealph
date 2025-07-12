@@ -9,7 +9,7 @@ export const MiniMapContainer = styled.div<{ width: number; height: number }>`
 	right: 16px;
 	width: ${(props) => props.width}px;
 	height: ${(props) => props.height}px;
-	background-color: #1A1F33;
+	background-color: #DDDDDD;
 	border: 1px solid #2A2F4C;
 	border-radius: 4px;
 	cursor: pointer;
@@ -27,13 +27,20 @@ export const MiniMapSvg = styled.svg`
 	height: 100%;
 	display: block;
 	pointer-events: auto;
+	cursor: pointer;
+	
+	/* Override cursor for all child elements to prevent diagram-specific cursors */
+	* {
+		cursor: pointer !important;
+		pointer-events: none !important;
+	}
 `;
 
 /**
  * Background rectangle for the minimap
  */
 export const MiniMapBackground = styled.rect`
-	fill: #0C0F1C;
+	fill: #EEEEEE;
 `;
 
 /**
@@ -44,16 +51,17 @@ export const ViewportIndicator = styled.rect`
 	stroke: #4EA1FF;
 	stroke-width: 1;
 	opacity: 0.8;
-	cursor: grab;
-	pointer-events: all;
+	cursor: grab !important;
+	pointer-events: all !important;
 	
 	&:hover {
 		stroke-width: 2;
 		opacity: 1;
+		cursor: grab !important;
 	}
 	
 	&:active {
-		cursor: grabbing;
+		cursor: grabbing !important;
 		stroke-width: 2;
 		opacity: 1;
 	}

@@ -1,22 +1,21 @@
 // Import React.
-import { memo, useCallback, useMemo, useState } from "react";
-import type React from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
+
+// Import DiagramRegistry to render actual canvas content
+import { DiagramRegistry } from "../../../registry";
+
+// Import EventBus for diagram components
+import { EventBus } from "../../../../../shared/event-bus/EventBus";
+import { EventBusProvider } from "../../../context/EventBusContext";
 
 // Imports related to this component.
 import {
 	calculateCombinedCanvasBounds,
-	calculateDragNavigationPosition,
-	calculateDragOffsetRatio,
-	calculateMiniMapScale,
-	calculateNavigationPosition,
 	calculateCanvasViewportBounds,
-	calculateMiniMapViewportIndicatorBounds,
-	generateMiniMapItems,
 } from "./MiniMapFunctions";
 import {
 	MiniMapBackground,
 	MiniMapContainer,
-	MiniMapItem,
 	MiniMapSvg,
 	ViewportIndicator,
 } from "./MiniMapStyled";
@@ -37,8 +36,10 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 	height = 150,
 	onNavigate,
 }) => {
+	// Create a dummy EventBus for MiniMap diagram components
+	const dummyEventBus = useMemo(() => new EventBus(), []);
 	// Calculate all minimap properties in a single memoized computation for efficiency
-	const { canvasBounds, scale, viewportRect } = useMemo(() => {
+	const { canvasBounds, viewportRect } = useMemo(() => {
 		const viewportBounds = calculateCanvasViewportBounds(
 			minX,
 			minY,
@@ -48,61 +49,46 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 		);
 
 		const bounds = calculateCombinedCanvasBounds(items, viewportBounds);
-		const computedScale = calculateMiniMapScale(bounds, width, height);
-		const rect = calculateMiniMapViewportIndicatorBounds(
-			minX,
-			minY,
-			containerWidth,
-			containerHeight,
-			zoom,
-			bounds,
-			computedScale,
-			width,
-			height,
-		);
+
+		// For the new coordinate system, viewport rect is just the viewport bounds in canvas coordinates
+		const rect = {
+			x: viewportBounds.x,
+			y: viewportBounds.y,
+			width: viewportBounds.width,
+			height: viewportBounds.height,
+		};
 
 		return {
 			canvasBounds: bounds,
-			scale: computedScale,
 			viewportRect: rect,
 		};
-	}, [items, minX, minY, containerWidth, containerHeight, zoom, width, height]);
-
-	// Create navigation parameters object to reduce dependency array size
-	const navigationParams = useMemo(
-		() => ({
-			canvasBounds,
-			scale,
-			width,
-			height,
-			containerWidth,
-			containerHeight,
-			zoom,
-		}),
-		[canvasBounds, scale, width, height, containerWidth, containerHeight, zoom],
-	);
+	}, [items, minX, minY, containerWidth, containerHeight, zoom]);
 
 	// Handle navigation based on click coordinates
 	const handleNavigate = useCallback(
 		(clientX: number, clientY: number, svgElement: SVGSVGElement) => {
 			if (!onNavigate) return;
 
-			const { minX: newMinX, minY: newMinY } = calculateNavigationPosition(
-				clientX,
-				clientY,
-				svgElement,
-				navigationParams.canvasBounds,
-				navigationParams.scale,
-				navigationParams.width,
-				navigationParams.height,
-				navigationParams.containerWidth,
-				navigationParams.containerHeight,
-				navigationParams.zoom,
-			);
+			// Get the bounding rectangle of the SVG element
+			const rect = svgElement.getBoundingClientRect();
+
+			// Convert client coordinates to SVG coordinates using the viewBox
+			const svgX =
+				((clientX - rect.left) / rect.width) * canvasBounds.width +
+				canvasBounds.x;
+			const svgY =
+				((clientY - rect.top) / rect.height) * canvasBounds.height +
+				canvasBounds.y;
+
+			// Calculate new viewport center position
+			const viewportWidth = containerWidth / zoom;
+			const viewportHeight = containerHeight / zoom;
+			const newMinX = (svgX - viewportWidth / 2) * zoom;
+			const newMinY = (svgY - viewportHeight / 2) * zoom;
 
 			onNavigate(newMinX, newMinY);
 		},
-		[onNavigate, navigationParams],
+		[onNavigate, canvasBounds, containerWidth, containerHeight, zoom],
 	);
 
 	// State management for drag operations
@@ -124,19 +110,29 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 			setIsViewportInteraction(true);
 			e.currentTarget.setPointerCapture(e.pointerId);
 
-			// Calculate relative position within viewport using pure function
+			// Calculate relative position within viewport
 			const svgElement = e.currentTarget.ownerSVGElement;
 			if (!svgElement) return;
 
-			const offsetRatio = calculateDragOffsetRatio(
-				e.clientX,
-				e.clientY,
-				svgElement,
-				viewportRect,
-			);
+			// Get the bounding rectangle of the SVG element
+			const rect = svgElement.getBoundingClientRect();
+
+			// Convert client coordinates to SVG coordinates using the viewBox
+			const svgX =
+				((e.clientX - rect.left) / rect.width) * canvasBounds.width +
+				canvasBounds.x;
+			const svgY =
+				((e.clientY - rect.top) / rect.height) * canvasBounds.height +
+				canvasBounds.y;
+
+			// Calculate offset ratio within the viewport indicator
+			const offsetRatio = {
+				x: (svgX - viewportRect.x) / viewportRect.width,
+				y: (svgY - viewportRect.y) / viewportRect.height,
+			};
 			setDragOffsetRatio(offsetRatio);
 		},
-		[viewportRect],
+		[viewportRect, canvasBounds],
 	);
 
 	// Handle pointer move event to update viewport position
@@ -147,21 +143,24 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 			const svgElement = e.currentTarget.ownerSVGElement;
 			if (!svgElement) return;
 
-			// Calculate new navigation position using pure function
-			const { minX: newMinX, minY: newMinY } = calculateDragNavigationPosition(
-				e.clientX,
-				e.clientY,
-				svgElement,
-				dragOffsetRatio,
-				viewportRect,
-				navigationParams.canvasBounds,
-				navigationParams.scale,
-				navigationParams.width,
-				navigationParams.height,
-				navigationParams.containerWidth,
-				navigationParams.containerHeight,
-				navigationParams.zoom,
-			);
+			// Get the bounding rectangle of the SVG element
+			const rect = svgElement.getBoundingClientRect();
+
+			// Convert client coordinates to SVG coordinates using the viewBox
+			const svgX =
+				((e.clientX - rect.left) / rect.width) * canvasBounds.width +
+				canvasBounds.x;
+			const svgY =
+				((e.clientY - rect.top) / rect.height) * canvasBounds.height +
+				canvasBounds.y;
+
+			// Apply drag offset
+			const adjustedX = svgX - dragOffsetRatio.x * viewportRect.width;
+			const adjustedY = svgY - dragOffsetRatio.y * viewportRect.height;
+
+			// Convert to viewport coordinates
+			const newMinX = adjustedX * zoom;
+			const newMinY = adjustedY * zoom;
 
 			if (onNavigate) {
 				onNavigate(newMinX, newMinY);
@@ -171,7 +170,8 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 			isViewportInteraction,
 			dragOffsetRatio,
 			viewportRect,
-			navigationParams,
+			canvasBounds,
+			zoom,
 			onNavigate,
 		],
 	);
@@ -197,39 +197,60 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 		[],
 	);
 
-	// Generate minimap items for rendering
+	// Generate minimap items by rendering actual diagram components scaled down
 	const miniMapItems = useMemo(() => {
-		const itemData = generateMiniMapItems(
-			items,
-			canvasBounds,
-			scale,
-			width,
-			height,
-		);
+		return (
+			<EventBusProvider eventBus={dummyEventBus}>
+				{items.map((item) => {
+					const component = DiagramRegistry.getComponent(item.type);
+					if (!component) {
+						console.warn(`Component not found for type: ${item.type}`);
+						return null;
+					}
 
-		return itemData.map((item) => (
-			<MiniMapItem
-				key={item.id}
-				x={item.x}
-				y={item.y}
-				width={item.width}
-				height={item.height}
-			/>
-		));
-	}, [items, canvasBounds, scale, width, height]);
+					// Create props for the diagram component
+					// We pass minimal props to avoid any interactive behavior in minimap
+					const props = {
+						...item,
+						key: item.id,
+						// Pass no-op functions to prevent interactions in minimap
+						onTransform: () => {},
+						onDiagramChange: () => {},
+						onDrag: () => {},
+						onDragEnter: () => {},
+						onDragLeave: () => {},
+						onClick: () => {},
+						onSelect: () => {},
+						onConnect: () => {},
+						onPreviewConnectLine: () => {},
+						onTextChange: () => {},
+						onExecute: () => {},
+						onHoverChange: () => {},
+					};
+
+					return React.createElement(component(), props);
+				})}
+			</EventBusProvider>
+		);
+	}, [items, dummyEventBus]);
 
 	return (
 		<MiniMapContainer width={width} height={height}>
 			<MiniMapSvg
 				width={width}
 				height={height}
-				viewBox={`0 0 ${width} ${height}`}
+				viewBox={`${canvasBounds.x} ${canvasBounds.y} ${canvasBounds.width} ${canvasBounds.height}`}
 				onClick={handleClick}
 			>
 				{/* Background */}
-				<MiniMapBackground x={0} y={0} width={width} height={height} />
+				<MiniMapBackground
+					x={canvasBounds.x}
+					y={canvasBounds.y}
+					width={canvasBounds.width}
+					height={canvasBounds.height}
+				/>
 
-				{/* Render items */}
+				{/* Render actual diagram items */}
 				{miniMapItems}
 
 				{/* Viewport indicator */}
