@@ -117,7 +117,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			onExecute,
 		};
 
-		return React.createElement(component(), props);
+		return React.createElement(component, props);
 	});
 	return (
 		<>

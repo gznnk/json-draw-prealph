@@ -362,7 +362,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				onHoverChange,
 			};
 
-			return React.createElement(component(), props);
+			return React.createElement(component, props);
 		});
 
 		return (

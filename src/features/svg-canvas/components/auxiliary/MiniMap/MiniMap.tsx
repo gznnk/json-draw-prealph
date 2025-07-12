@@ -38,6 +38,7 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 }) => {
 	// Create a dummy EventBus for MiniMap diagram components
 	const dummyEventBus = useMemo(() => new EventBus(), []);
+
 	// Calculate all minimap properties in a single memoized computation for efficiency
 	const { canvasBounds, viewportRect } = useMemo(() => {
 		const viewportBounds = calculateCanvasViewportBounds(
@@ -198,41 +199,24 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 	);
 
 	// Generate minimap items by rendering actual diagram components scaled down
-	const miniMapItems = useMemo(() => {
-		return (
-			<EventBusProvider eventBus={dummyEventBus}>
-				{items.map((item) => {
-					const component = DiagramRegistry.getComponent(item.type);
-					if (!component) {
-						console.warn(`Component not found for type: ${item.type}`);
-						return null;
-					}
+	const diagramElements = useMemo(() => {
+		return items.map((item) => {
+			const component = DiagramRegistry.getComponent(item.type);
+			if (!component) {
+				console.warn(`Component not found for type: ${item.type}`);
+				return null;
+			}
 
-					// Create props for the diagram component
-					// We pass minimal props to avoid any interactive behavior in minimap
-					const props = {
-						...item,
-						key: item.id,
-						// Pass no-op functions to prevent interactions in minimap
-						onTransform: () => {},
-						onDiagramChange: () => {},
-						onDrag: () => {},
-						onDragEnter: () => {},
-						onDragLeave: () => {},
-						onClick: () => {},
-						onSelect: () => {},
-						onConnect: () => {},
-						onPreviewConnectLine: () => {},
-						onTextChange: () => {},
-						onExecute: () => {},
-						onHoverChange: () => {},
-					};
+			// Create props for the diagram component
+			// We pass minimal props to avoid any interactive behavior in minimap
+			const props = {
+				...item,
+				key: item.id,
+			};
 
-					return React.createElement(component(), props);
-				})}
-			</EventBusProvider>
-		);
-	}, [items, dummyEventBus]);
+			return React.createElement(component, props);
+		});
+	}, [items]);
 
 	return (
 		<MiniMapContainer width={width} height={height}>
@@ -251,7 +235,9 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 				/>
 
 				{/* Render actual diagram items */}
-				{miniMapItems}
+				<EventBusProvider eventBus={dummyEventBus}>
+					{diagramElements}
+				</EventBusProvider>
 
 				{/* Viewport indicator */}
 				<ViewportIndicator

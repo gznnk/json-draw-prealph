@@ -12,7 +12,7 @@ export type DiagramDefinition = {
 
 	/** React component factory for rendering the diagram */
 	// biome-ignore lint/suspicious/noExplicitAny: Different shapes have different prop types
-	component: () => React.FC<any>;
+	component: React.FC<any>;
 
 	/** Function to calculate connect point positions for the diagram */
 	connectPointCalculator: (diagram: Diagram) => ConnectPointMoveData[];

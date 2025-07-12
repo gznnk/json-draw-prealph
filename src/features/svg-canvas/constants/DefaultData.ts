@@ -59,6 +59,7 @@ export const DEFAULT_ITEMABLE_DATA = {
  * Default connectable data.
  */
 export const DEFAULT_CONNECTABLE_DATA = {
+	showConnectPoints: false,
 	connectPoints: [] as ConnectPointData[],
 } as const satisfies ConnectableData;
 

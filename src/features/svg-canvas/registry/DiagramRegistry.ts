@@ -30,13 +30,13 @@ class DiagramRegistryClass {
 	}
 
 	/**
-	 * Get the component factory for a diagram type.
+	 * Get the component for a diagram type.
 	 *
 	 * @param type - The diagram type
-	 * @returns The component factory or undefined if not found
+	 * @returns The component or undefined if not found
 	 */
 	// biome-ignore lint/suspicious/noExplicitAny: Different shapes have different prop types
-	getComponent(type: DiagramType): (() => React.FC<any>) | undefined {
+	getComponent(type: DiagramType): React.FC<any> | undefined {
 		return this.definitions.get(type)?.component;
 	}
 

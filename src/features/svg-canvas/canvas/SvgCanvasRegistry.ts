@@ -2,15 +2,14 @@
 import { DiagramRegistry } from "../registry";
 
 // Import shape components and their functions
-import { Rectangle } from "../components/shapes/Rectangle";
-import { Ellipse } from "../components/shapes/Ellipse";
-import { Image } from "../components/shapes/Image";
-import { Path } from "../components/shapes/Path";
-import { PathPoint } from "../components/shapes/Path";
-import { Svg } from "../components/shapes/Svg";
 import { ConnectLine } from "../components/shapes/ConnectLine";
 import { ConnectPoint } from "../components/shapes/ConnectPoint";
+import { Ellipse } from "../components/shapes/Ellipse";
 import { Group } from "../components/shapes/Group";
+import { Image } from "../components/shapes/Image";
+import { Path, PathPoint } from "../components/shapes/Path";
+import { Rectangle } from "../components/shapes/Rectangle";
+import { Svg } from "../components/shapes/Svg";
 
 // Import node components and their functions
 import { AgentNode } from "../components/nodes/AgentNode";
@@ -27,10 +26,6 @@ import { calcEllipseConnectPointPosition } from "../utils/shapes/ellipse/calcEll
 import { calcRectangleConnectPointPosition } from "../utils/shapes/rectangle/calcRectangleConnectPointPosition";
 
 // Import create functions
-import { createEllipseData } from "../utils/shapes/ellipse/createEllipseData";
-import { createImageData } from "../utils/shapes/image/createImageData";
-import { createPathData } from "../utils/shapes/path/createPathData";
-import { createRectangleData } from "../utils/shapes/rectangle/createRectangleData";
 import { createAgentNodeData } from "../components/nodes/AgentNode/AgentNodeFunctions";
 import { createHubNodeData } from "../components/nodes/HubNode/HubNodeFunctions";
 import { createImageGenNodeData } from "../utils/nodes/imageGenNode/createImageGenNodeData";
@@ -39,6 +34,10 @@ import { createSvgToDiagramNodeData } from "../utils/nodes/svgToDiagramNode/crea
 import { createTextAreaNodeData } from "../utils/nodes/textAreaNode/createTextAreaNodeData";
 import { createVectorStoreNodeData } from "../utils/nodes/vectorStoreNode/createVectorStoreNodeData";
 import { createWebSearchNodeData } from "../utils/nodes/webSearchNode/createWebSearchNodeData";
+import { createEllipseData } from "../utils/shapes/ellipse/createEllipseData";
+import { createImageData } from "../utils/shapes/image/createImageData";
+import { createPathData } from "../utils/shapes/path/createPathData";
+import { createRectangleData } from "../utils/shapes/rectangle/createRectangleData";
 
 // Import export functions
 import { imageToBlob } from "../utils/shapes/image/imageToBlob";
@@ -55,41 +54,39 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	// Register shape diagrams
 	DiagramRegistry.register({
 		type: "Rectangle",
-		component: () => Rectangle,
-		connectPointCalculator: (diagram) =>
-			calcRectangleConnectPointPosition(diagram),
-		createFunction: (props) => createRectangleData(props),
+		component: Rectangle,
+		connectPointCalculator: calcRectangleConnectPointPosition,
+		createFunction: createRectangleData,
 		exportFunction: undefined,
 	});
 
 	DiagramRegistry.register({
 		type: "Ellipse",
-		component: () => Ellipse,
-		connectPointCalculator: (diagram) =>
-			calcEllipseConnectPointPosition(diagram),
-		createFunction: (props) => createEllipseData(props),
+		component: Ellipse,
+		connectPointCalculator: calcEllipseConnectPointPosition,
+		createFunction: createEllipseData,
 		exportFunction: undefined,
 	});
 
 	DiagramRegistry.register({
 		type: "Image",
-		component: () => Image,
+		component: Image,
 		connectPointCalculator: () => [],
-		createFunction: (props) => createImageData(props),
+		createFunction: createImageData,
 		exportFunction: imageToBlob,
 	});
 
 	DiagramRegistry.register({
 		type: "Path",
-		component: () => Path,
+		component: Path,
 		connectPointCalculator: () => [],
-		createFunction: (props) => createPathData(props),
+		createFunction: createPathData,
 		exportFunction: undefined,
 	});
 
 	DiagramRegistry.register({
 		type: "PathPoint",
-		component: () => PathPoint,
+		component: PathPoint,
 		connectPointCalculator: () => [],
 		createFunction: () => undefined,
 		exportFunction: undefined,
@@ -97,7 +94,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 
 	DiagramRegistry.register({
 		type: "Svg",
-		component: () => Svg,
+		component: Svg,
 		connectPointCalculator: () => [],
 		createFunction: () => undefined,
 		exportFunction: svgToBlob,
@@ -105,7 +102,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 
 	DiagramRegistry.register({
 		type: "ConnectLine",
-		component: () => ConnectLine,
+		component: ConnectLine,
 		connectPointCalculator: () => [],
 		createFunction: () => undefined,
 		exportFunction: undefined,
@@ -113,7 +110,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 
 	DiagramRegistry.register({
 		type: "ConnectPoint",
-		component: () => ConnectPoint,
+		component: ConnectPoint,
 		connectPointCalculator: () => [],
 		createFunction: () => undefined,
 		exportFunction: undefined,
@@ -121,7 +118,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 
 	DiagramRegistry.register({
 		type: "Group",
-		component: () => Group,
+		component: Group,
 		connectPointCalculator: () => [],
 		createFunction: () => undefined,
 		exportFunction: undefined,
@@ -130,73 +127,65 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	// Register node diagrams
 	DiagramRegistry.register({
 		type: "AgentNode",
-		component: () => AgentNode,
-		connectPointCalculator: (diagram) =>
-			calcRectangleConnectPointPosition(diagram),
-		createFunction: (props) => createAgentNodeData(props),
+		component: AgentNode,
+		connectPointCalculator: calcRectangleConnectPointPosition,
+		createFunction: createAgentNodeData,
 		exportFunction: undefined,
 	});
 
 	DiagramRegistry.register({
 		type: "HubNode",
-		component: () => HubNode,
-		connectPointCalculator: (diagram) =>
-			calcEllipseConnectPointPosition(diagram),
-		createFunction: (props) => createHubNodeData(props),
+		component: HubNode,
+		connectPointCalculator: calcEllipseConnectPointPosition,
+		createFunction: createHubNodeData,
 		exportFunction: undefined,
 	});
 
 	DiagramRegistry.register({
 		type: "ImageGenNode",
-		component: () => ImageGenNode,
-		connectPointCalculator: (diagram) =>
-			calcRectangleConnectPointPosition(diagram),
-		createFunction: (props) => createImageGenNodeData(props),
+		component: ImageGenNode,
+		connectPointCalculator: calcRectangleConnectPointPosition,
+		createFunction: createImageGenNodeData,
 		exportFunction: undefined,
 	});
 
 	DiagramRegistry.register({
 		type: "LLMNode",
-		component: () => LLMNode,
-		connectPointCalculator: (diagram) =>
-			calcRectangleConnectPointPosition(diagram),
-		createFunction: (props) => createLLMNodeData(props),
+		component: LLMNode,
+		connectPointCalculator: calcRectangleConnectPointPosition,
+		createFunction: createLLMNodeData,
 		exportFunction: undefined,
 	});
 
 	DiagramRegistry.register({
 		type: "SvgToDiagramNode",
-		component: () => SvgToDiagramNode,
-		connectPointCalculator: (diagram) =>
-			calcRectangleConnectPointPosition(diagram),
-		createFunction: (props) => createSvgToDiagramNodeData(props),
+		component: SvgToDiagramNode,
+		connectPointCalculator: calcRectangleConnectPointPosition,
+		createFunction: createSvgToDiagramNodeData,
 		exportFunction: undefined,
 	});
 
 	DiagramRegistry.register({
 		type: "TextAreaNode",
-		component: () => TextAreaNode,
-		connectPointCalculator: (diagram) =>
-			calcRectangleConnectPointPosition(diagram),
-		createFunction: (props) => createTextAreaNodeData(props),
+		component: TextAreaNode,
+		connectPointCalculator: calcRectangleConnectPointPosition,
+		createFunction: createTextAreaNodeData,
 		exportFunction: undefined,
 	});
 
 	DiagramRegistry.register({
 		type: "VectorStoreNode",
-		component: () => VectorStoreNode,
-		connectPointCalculator: (diagram) =>
-			calcRectangleConnectPointPosition(diagram),
-		createFunction: (props) => createVectorStoreNodeData(props),
+		component: VectorStoreNode,
+		connectPointCalculator: calcRectangleConnectPointPosition,
+		createFunction: createVectorStoreNodeData,
 		exportFunction: undefined,
 	});
 
 	DiagramRegistry.register({
 		type: "WebSearchNode",
-		component: () => WebSearchNode,
-		connectPointCalculator: (diagram) =>
-			calcRectangleConnectPointPosition(diagram),
-		createFunction: (props) => createWebSearchNodeData(props),
+		component: WebSearchNode,
+		connectPointCalculator: calcRectangleConnectPointPosition,
+		createFunction: createWebSearchNodeData,
 		exportFunction: undefined,
 	});
 };
