@@ -12,6 +12,8 @@ export const isSelectableData = (obj: unknown): obj is SelectableData => {
 		obj !== null &&
 		typeof obj === "object" &&
 		"isSelected" in obj &&
-		typeof (obj as SelectableData).isSelected === "boolean"
+		typeof (obj as SelectableData).isSelected === "boolean" &&
+		"showOutline" in obj &&
+		typeof (obj as SelectableData).showOutline === "boolean"
 	);
 };
