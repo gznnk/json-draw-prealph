@@ -125,6 +125,8 @@ const TransformativeComponent: React.FC<Props> = ({
 		eventId: string,
 		cursorX: number,
 		cursorY: number,
+		minX?: number,
+		minY?: number,
 	) => {
 		startShape.current = {
 			x,
@@ -146,6 +148,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			endShape: startShape.current,
 			cursorX,
 			cursorY,
+			minX,
+			minY,
 		});
 	};
 
@@ -157,6 +161,8 @@ const TransformativeComponent: React.FC<Props> = ({
 		eventType: EventType,
 		cursorX: number,
 		cursorY: number,
+		minX?: number,
+		minY?: number,
 	) => {
 		const event = {
 			eventId,
@@ -176,6 +182,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			},
 			cursorX,
 			cursorY,
+			minX,
+			minY,
 		};
 
 		onTransform?.(event);
@@ -267,7 +275,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -303,6 +317,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
 		);
 	}, []);
 
@@ -331,7 +347,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -366,6 +388,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
 		);
 	}, []);
 
@@ -394,7 +418,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -429,6 +459,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
 		);
 	}, []);
 
@@ -457,7 +489,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -492,6 +530,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
 		);
 	}, []);
 
@@ -520,7 +560,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -555,6 +601,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
 		);
 	}, []);
 
@@ -588,7 +636,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -623,6 +677,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
 		);
 	}, []);
 
@@ -656,7 +712,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -691,6 +753,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
 		);
 	}, []);
 
@@ -724,7 +788,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -759,6 +829,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
 		);
 	}, []);
 
@@ -832,7 +904,13 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		if (e.eventType === "Start") {
 			setIsRotating(true);
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const radian = calcRadians(x, y, e.endX, e.endY);

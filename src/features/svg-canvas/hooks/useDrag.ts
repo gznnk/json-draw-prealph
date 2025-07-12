@@ -564,6 +564,8 @@ export const useDrag = (props: DragProps) => {
 					endY: dragPoint.y,
 					cursorX: svgCursorPoint.x,
 					cursorY: svgCursorPoint.y,
+					minX: customEvent.detail.minX,
+					minY: customEvent.detail.minY,
 				});
 			};
 			eventBus.addEventListener(

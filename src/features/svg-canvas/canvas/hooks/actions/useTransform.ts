@@ -314,6 +314,12 @@ export const useTransform = (props: CanvasHooksProps) => {
 						: undefined,
 				} as SvgCanvasState;
 
+				// If the event has minX and minY, update the canvas state
+				if (e.minX !== undefined && e.minY !== undefined) {
+					newState.minX = e.minX;
+					newState.minY = e.minY;
+				}
+
 				// Refresh the connect lines for the transformed diagrams.
 				newState = refreshConnectLines(
 					transformedDiagrams,

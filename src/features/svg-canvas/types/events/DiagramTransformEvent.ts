@@ -13,4 +13,6 @@ export type DiagramTransformEvent = {
 	endShape: Shape;
 	cursorX: number;
 	cursorY: number;
+	minX?: number;
+	minY?: number;
 };

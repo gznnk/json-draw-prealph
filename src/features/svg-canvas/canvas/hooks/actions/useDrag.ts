@@ -179,6 +179,12 @@ export const useDrag = (props: CanvasHooksProps) => {
 						: InteractionState.Normal,
 			};
 
+			// If the event has minX and minY, update the canvas state
+			if (e.minX !== undefined && e.minY !== undefined) {
+				newState.minX = e.minX;
+				newState.minY = e.minY;
+			}
+
 			// If multiple items are selected, create a multi-select group
 			if (prevState.multiSelectGroup) {
 				newState.multiSelectGroup = createMultiSelectGroup(

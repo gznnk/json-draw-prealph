@@ -263,8 +263,8 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onScroll?.({
 				minX: minX + e.deltaX,
 				minY: minY + e.deltaY,
-				clientX: e.clientX + e.deltaX,
-				clientY: e.clientY + e.deltaY,
+				clientX: e.clientX + e.deltaX, // TODO: ここで加算するのはわかりにくい
+				clientY: e.clientY + e.deltaY, // TODO: ここで加算するのはわかりにくい
 			});
 		}, []);
 
