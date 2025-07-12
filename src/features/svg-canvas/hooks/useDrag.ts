@@ -3,8 +3,8 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 
 // Import types.
-import type { DiagramType } from "../types/base/DiagramType";
-import type { Point } from "../types/base/Point";
+import type { DiagramType } from "../types/core/DiagramType";
+import type { Point } from "../types/core/Point";
 import type { DiagramDragDropEvent } from "../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../types/events/DiagramPointerEvent";

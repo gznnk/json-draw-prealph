@@ -1,4 +1,4 @@
-import type { Point } from "../../../types/base/Point";
+import type { Point } from "../../../types/core/Point";
 import { calcManhattanDistance } from "../../math/points/calcManhattanDistance";
 import { isStraight } from "./isStraight";
 

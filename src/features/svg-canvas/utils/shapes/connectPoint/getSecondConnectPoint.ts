@@ -1,7 +1,7 @@
 import { CONNECT_LINE_MARGIN } from "../../../constants/Constants";
-import type { BoxGeometry } from "../../../types/base/BoxGeometry";
-import type { Point } from "../../../types/base/Point";
-import type { Shape } from "../../../types/base/Shape";
+import type { BoxGeometry } from "../../../types/core/BoxGeometry";
+import type { Point } from "../../../types/core/Point";
+import type { Shape } from "../../../types/core/Shape";
 import { getLineDirection } from "./getLineDirection";
 
 /**

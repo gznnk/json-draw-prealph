@@ -1,4 +1,4 @@
-import type { Point } from "../../../types/base/Point";
+import type { Point } from "../../../types/core/Point";
 import { isStraight } from "./isStraight";
 
 /**

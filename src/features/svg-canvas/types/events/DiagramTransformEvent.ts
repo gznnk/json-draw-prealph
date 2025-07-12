@@ -1,5 +1,5 @@
 import type { EventType } from "./EventType";
-import type { Shape } from "../base/Shape";
+import type { Shape } from "../core/Shape";
 
 /**
  * Event fired during diagram transformation operations such as resizing or rotating.

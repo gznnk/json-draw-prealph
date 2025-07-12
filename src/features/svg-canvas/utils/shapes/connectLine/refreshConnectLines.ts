@@ -1,7 +1,7 @@
 import type { SvgCanvasState } from "../../../canvas/SvgCanvasTypes";
 import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
-import type { Shape } from "../../../types/base/Shape";
+import type { Shape } from "../../../types/core/Shape";
 import { generateOptimalShapeToShapeConnection } from "../connectPoint/generateOptimalShapeToShapeConnection";
 import { newId } from "../common/newId";
 import { getDiagramById } from "../../common/getDiagramById";

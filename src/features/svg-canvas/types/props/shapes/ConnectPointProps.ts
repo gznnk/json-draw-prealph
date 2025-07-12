@@ -1,7 +1,7 @@
 // Import types related to SvgCanvas.
 import type { ConnectPointData } from "../../data/shapes/ConnectPointData";
 import type { DiagramConnectEvent } from "../../events/DiagramConnectEvent";
-import type { Shape } from "../../base/Shape";
+import type { Shape } from "../../core/Shape";
 import type { PreviewConnectLineEvent } from "../../events/PreviewConnectLineEvent";
 
 /**

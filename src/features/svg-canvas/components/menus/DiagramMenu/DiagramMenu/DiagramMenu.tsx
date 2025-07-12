@@ -23,7 +23,7 @@ import { VerticalAlignMiddle } from "../../../icons/VerticalAlignMiddle";
 import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
 
 // Import types related to SvgCanvas.
-import type { RectangleVertices } from "../../../../types/base/RectangleVertices";
+import type { RectangleVertices } from "../../../../types/core/RectangleVertices";
 
 // Import functions related to SvgCanvas.
 import { calcRectangleVertices } from "../../../../utils/math/geometry/calcRectangleVertices";

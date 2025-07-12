@@ -1,8 +1,8 @@
 // Import types.
 import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { ConnectPointMoveData } from "../../../types/events/ConnectPointMoveData";
-import type { EllipseVertices } from "../../../types/base/EllipseVertices";
-import type { Shape } from "../../../types/base/Shape";
+import type { EllipseVertices } from "../../../types/core/EllipseVertices";
+import type { Shape } from "../../../types/core/Shape";
 
 // Import utils.
 import { calcEllipseVertices } from "../../math/geometry/calcEllipseVertices";

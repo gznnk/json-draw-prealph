@@ -3,7 +3,7 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
-import type { Point } from "../../../types/base/Point";
+import type { Point } from "../../../types/core/Point";
 import type { PathPointData } from "../../../types/data/shapes/PathPointData";
 import type { DiagramDragDropEvent } from "../../../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";

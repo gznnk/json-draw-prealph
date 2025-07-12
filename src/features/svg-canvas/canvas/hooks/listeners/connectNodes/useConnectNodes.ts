@@ -8,7 +8,7 @@ import type { Diagram } from "../../../../types/data/catalog/Diagram";
 import type { ConnectableData } from "../../../../types/data/shapes/ConnectableData";
 import type { ConnectNodesEvent } from "../../../../types/events/ConnectNodesEvent";
 import type { CanvasHooksProps } from "../../../SvgCanvasTypes";
-import type { Shape } from "../../../../types/base/Shape";
+import type { Shape } from "../../../../types/core/Shape";
 
 // Import functions related to SvgCanvas.
 import { generateOptimalShapeToShapeConnection } from "../../../../utils/shapes/connectPoint/generateOptimalShapeToShapeConnection";

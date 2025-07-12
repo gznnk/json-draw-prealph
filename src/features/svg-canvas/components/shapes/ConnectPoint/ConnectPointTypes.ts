@@ -1,5 +1,5 @@
 // Import types related to SvgCanvas.
-import type { Shape } from "../../../types/base/Shape";
+import type { Shape } from "../../../types/core/Shape";
 
 export type ConnectionEvent = {
 	eventId: string;

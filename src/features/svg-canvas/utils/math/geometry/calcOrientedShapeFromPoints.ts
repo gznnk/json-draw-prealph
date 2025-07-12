@@ -1,6 +1,6 @@
 // Import types.
-import type { Point } from "../../../types/base/Point";
-import type { Shape } from "../../../types/base/Shape";
+import type { Point } from "../../../types/core/Point";
+import type { Shape } from "../../../types/core/Shape";
 
 // Import utils.
 import { degreesToRadians } from "../common/degreesToRadians";

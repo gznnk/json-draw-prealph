@@ -1,5 +1,5 @@
 // Import types.
-import type { Box } from "../../../types/base/Box";
+import type { Box } from "../../../types/core/Box";
 import type { Diagram } from "../../../types/data/catalog/Diagram";
 
 // Import utils.

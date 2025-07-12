@@ -1,5 +1,5 @@
 // Import base types.
-import type { Shape } from "../../base/Shape";
+import type { Shape } from "../../core/Shape";
 
 /**
  * Interface for diagram elements that can be resized, rotated, and repositioned.

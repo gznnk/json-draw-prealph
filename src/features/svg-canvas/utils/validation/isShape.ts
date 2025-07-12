@@ -1,5 +1,5 @@
 // Import types.
-import type { Shape } from "../../types/base/Shape";
+import type { Shape } from "../../types/core/Shape";
 
 /**
  * Check if an object is a Shape.

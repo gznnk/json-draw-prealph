@@ -1,7 +1,7 @@
 // Import types.
-import type { TextAlign } from "../../../types/base/TextAlign";
-import type { TextableType } from "../../../types/base/TextableType";
-import type { VerticalAlign } from "../../../types/base/VerticalAlign";
+import type { TextAlign } from "../../../types/core/TextAlign";
+import type { TextableType } from "../../../types/core/TextableType";
+import type { VerticalAlign } from "../../../types/core/VerticalAlign";
 import type { RectangleData } from "../../../types/data/shapes/RectangleData";
 
 // Import utils.

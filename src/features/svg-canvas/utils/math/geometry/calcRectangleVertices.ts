@@ -1,6 +1,6 @@
 // Import types.
-import type { RectangleVertices } from "../../../types/base/RectangleVertices";
-import type { Shape } from "../../../types/base/Shape";
+import type { RectangleVertices } from "../../../types/core/RectangleVertices";
+import type { Shape } from "../../../types/core/Shape";
 
 // Import utils.
 import { degreesToRadians } from "../common/degreesToRadians";

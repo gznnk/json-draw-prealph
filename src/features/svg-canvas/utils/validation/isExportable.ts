@@ -2,7 +2,7 @@
 import { DiagramRegistry } from "../../registry";
 
 // Import types.
-import type { DiagramType } from "../../types/base/DiagramType";
+import type { DiagramType } from "../../types/core/DiagramType";
 
 /**
  * Check if an object is exportable.

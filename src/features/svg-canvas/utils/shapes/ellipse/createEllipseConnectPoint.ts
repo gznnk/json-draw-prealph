@@ -1,6 +1,6 @@
 // Import types.
 import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
-import type { EllipseVertices } from "../../../types/base/EllipseVertices";
+import type { EllipseVertices } from "../../../types/core/EllipseVertices";
 
 // Import utils.
 import { calcEllipseVertices } from "../../math/geometry/calcEllipseVertices";

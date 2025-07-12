@@ -1,4 +1,4 @@
-import type { BoxGeometry } from "../../../types/base/BoxGeometry";
+import type { BoxGeometry } from "../../../types/core/BoxGeometry";
 import { CONNECT_LINE_MARGIN } from "../../../constants/Constants";
 
 /**

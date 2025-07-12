@@ -4,9 +4,9 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
-import type { DiagramType } from "../../../types/base/DiagramType";
+import type { DiagramType } from "../../../types/core/DiagramType";
 import type { EventType } from "../../../types/events/EventType";
-import type { Point } from "../../../types/base/Point";
+import type { Point } from "../../../types/core/Point";
 import type { TransformativeData } from "../../../types/data/core/TransformativeData";
 import type { TransformativeProps } from "../../../types/props/core/TransformativeProps";
 

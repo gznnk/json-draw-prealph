@@ -1,7 +1,7 @@
 // Import types.
 import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { RectangleVertices } from "../../../types/base/RectangleVertices";
-import type { Shape } from "../../../types/base/Shape";
+import type { RectangleVertices } from "../../../types/core/RectangleVertices";
+import type { Shape } from "../../../types/core/Shape";
 import type { ConnectPointMoveData } from "../../../types/events/ConnectPointMoveData";
 
 // Import utils.

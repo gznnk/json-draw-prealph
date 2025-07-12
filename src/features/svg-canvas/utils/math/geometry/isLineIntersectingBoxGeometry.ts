@@ -1,6 +1,6 @@
 // Import types.
-import type { BoxGeometry } from "../../../types/base/BoxGeometry";
-import type { Point } from "../../../types/base/Point";
+import type { BoxGeometry } from "../../../types/core/BoxGeometry";
+import type { Point } from "../../../types/core/Point";
 
 // Import utils.
 import { segmentsIntersect } from "./segmentsIntersect";

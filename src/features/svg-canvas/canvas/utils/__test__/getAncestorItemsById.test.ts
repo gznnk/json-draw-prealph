@@ -3,7 +3,7 @@ import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { SvgCanvasState } from "../../SvgCanvasTypes";
 import { InteractionState } from "../../SvgCanvasTypes";
 import type { GroupData } from "../../../types/data/shapes/GroupData";
-import type { DiagramType } from "../../../types/base/DiagramType";
+import type { DiagramType } from "../../../types/core/DiagramType";
 
 /**
  * Create a mock diagram item for testing

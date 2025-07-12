@@ -6,7 +6,7 @@ import { memo, useCallback, useRef } from "react";
 import { DragLine } from "../../../core/DragLine";
 
 // Import types related to SvgCanvas.
-import type { Point } from "../../../../types/base/Point";
+import type { Point } from "../../../../types/core/Point";
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointerEvent";

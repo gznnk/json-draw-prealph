@@ -1,5 +1,5 @@
 // Import types.
-import type { Point } from "../../../types/base/Point";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Calculates the cross product of two 2D vectors.
