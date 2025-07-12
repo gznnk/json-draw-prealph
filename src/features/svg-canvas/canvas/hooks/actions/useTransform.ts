@@ -273,10 +273,10 @@ export const useTransform = (props: CanvasHooksProps) => {
 			// ignore diagram transformation processing but continue auto edge scroll detection
 			if (isAutoScrolling && !e.isFromAutoEdgeScroll) {
 				// Auto scroll if the cursor is near the edges.
-				autoEdgeScroll({
-					cursorX: e.cursorX,
-					cursorY: e.cursorY,
-				});
+					autoEdgeScroll({
+						cursorX: e.cursorX,
+						cursorY: e.cursorY,
+					});
 				return;
 			}
 
@@ -366,11 +366,14 @@ export const useTransform = (props: CanvasHooksProps) => {
 
 				return newState;
 			});
-			// Auto scroll if the cursor is near the edges.
-			autoEdgeScroll({
-				cursorX: e.cursorX ?? e.endShape.x,
-				cursorY: e.cursorY ?? e.endShape.y,
-			});
+
+			// Auto scroll if the cursor is near the edges, but skip for rotation operations
+			if (e.transformationType !== "Rotation") {
+				autoEdgeScroll({
+					cursorX: e.cursorX ?? e.endShape.x,
+					cursorY: e.cursorY ?? e.endShape.y,
+				});
+			}
 		},
 		[transformRecursively],
 	);

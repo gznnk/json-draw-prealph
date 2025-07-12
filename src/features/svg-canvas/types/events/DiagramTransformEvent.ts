@@ -1,5 +1,6 @@
 import type { EventType } from "./EventType";
 import type { Shape } from "../core/Shape";
+import type { TransformationType } from "../core/TransformationType";
 
 /**
  * Event fired during diagram transformation operations such as resizing or rotating.
@@ -9,6 +10,7 @@ export type DiagramTransformEvent = {
 	eventId: string;
 	id: string;
 	eventType: EventType;
+	transformationType: TransformationType;
 	startShape: Shape;
 	endShape: Shape;
 	cursorX: number;

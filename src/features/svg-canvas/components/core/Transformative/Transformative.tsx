@@ -7,6 +7,7 @@ import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramType } from "../../../types/core/DiagramType";
 import type { EventType } from "../../../types/events/EventType";
 import type { Point } from "../../../types/core/Point";
+import type { TransformationType } from "../../../types/core/TransformationType";
 import type { TransformativeData } from "../../../types/data/core/TransformativeData";
 import type { TransformativeProps } from "../../../types/props/core/TransformativeProps";
 
@@ -143,6 +144,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		onTransform?.({
 			eventId,
 			eventType: "Start",
+			transformationType: "Resize",
 			id,
 			startShape: startShape.current,
 			endShape: startShape.current,
@@ -168,6 +170,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		const event = {
 			eventId,
 			eventType,
+			transformationType: "Resize" as TransformationType,
 			id,
 			startShape: {
 				...startShape.current,
@@ -909,18 +912,39 @@ const TransformativeComponent: React.FC<Props> = ({
 			scaleX,
 			scaleY,
 			onTransform,
-			triggerTransformStart,
+			rotation,
+			vertices,
 		} = refBus.current;
 
 		if (e.eventType === "Start") {
 			setIsRotating(true);
-			return triggerTransformStart(
-				e.eventId,
-				e.cursorX,
-				e.cursorY,
-				e.minX,
-				e.minY,
-			);
+
+			startShape.current = {
+				x,
+				y,
+				width,
+				height,
+				rotation,
+				scaleX,
+				scaleY,
+				aspectRatio: width / height,
+				...vertices,
+			};
+
+			onTransform?.({
+				eventId: e.eventId,
+				eventType: "Start",
+				transformationType: "Rotation",
+				id,
+				startShape: startShape.current,
+				endShape: startShape.current,
+				cursorX: e.cursorX,
+				cursorY: e.cursorY,
+				minX: e.minX,
+				minY: e.minY,
+			});
+
+			return;
 		}
 
 		const radian = calcRadians(x, y, e.endX, e.endY);
@@ -930,6 +954,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		const event = {
 			eventId: e.eventId,
 			eventType: e.eventType,
+			transformationType: "Rotation" as TransformationType,
 			id,
 			startShape: {
 				...startShape.current,
