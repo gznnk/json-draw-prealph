@@ -1,5 +1,5 @@
 // Import types.
-import type { Bounds } from "../../../types/base/Bounds";
+import type { Bounds } from "../../../types/core/Bounds";
 import type { Diagram } from "../../../types/data/catalog/Diagram";
 
 // Import utils.

@@ -1,7 +1,7 @@
 // Import types.
-import type { TextableType } from "../../../types/base/TextableType";
-import type { TextAlign } from "../../../types/base/TextAlign";
-import type { VerticalAlign } from "../../../types/base/VerticalAlign";
+import type { TextableType } from "../../../types/core/TextableType";
+import type { TextAlign } from "../../../types/core/TextAlign";
+import type { VerticalAlign } from "../../../types/core/VerticalAlign";
 import type { EllipseData } from "../../../types/data/shapes/EllipseData";
 
 // Import utils.
@@ -60,7 +60,7 @@ export const createEllipseData = ({
 	fontFamily?: string;
 	fontWeight?: string;
 }): EllipseData => {
-	// 接続ポイントを生成
+	// Generate connection points
 	const connectPoints = createEllipseConnectPoint({
 		x,
 		y,

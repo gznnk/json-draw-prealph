@@ -17,15 +17,13 @@ type OutlineProps = {
 	rotation: number;
 	scaleX: number;
 	scaleY: number;
-	isSelected: boolean;
-	isMultiSelectSource: boolean;
-	showOutline?: boolean;
+	showOutline: boolean;
 };
 
 /**
  * Component that displays a selection outline around diagram elements.
- * Shows a dashed border when an element is selected but not the multi-select source.
- * Can also show outline for various states like area selection or when parent group is selected.
+ * Shows a dashed border when showOutline is true.
+ * Can show outline for various states like area selection or when parent group is selected.
  */
 const OutlineComponent: React.FC<OutlineProps> = ({
 	x,
@@ -35,17 +33,10 @@ const OutlineComponent: React.FC<OutlineProps> = ({
 	rotation,
 	scaleX,
 	scaleY,
-	isSelected,
-	isMultiSelectSource,
-	showOutline = false,
+	showOutline,
 }) => {
-	// Don't render if the component is not selected and not showing outline
-	if (!isSelected && !showOutline) {
-		return null;
-	}
-
-	// Hide the selection outline when the component is the source of a multi-selection
-	if (isMultiSelectSource) {
+	// Don't render if not showing outline
+	if (!showOutline) {
 		return null;
 	}
 

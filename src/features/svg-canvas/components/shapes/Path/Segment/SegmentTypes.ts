@@ -1,5 +1,5 @@
 /**
- * 線分データ
+ * Segment data
  */
 export type SegmentData = {
 	id: string;

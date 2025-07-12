@@ -1,6 +1,6 @@
 // Import types.
-import type { BoxGeometry } from "../../../types/base/BoxGeometry";
-import type { Shape } from "../../../types/base/Shape";
+import type { BoxGeometry } from "../../../types/core/BoxGeometry";
+import type { Shape } from "../../../types/core/Shape";
 
 // Import utils.
 import { calcRectangleVertices } from "./calcRectangleVertices";

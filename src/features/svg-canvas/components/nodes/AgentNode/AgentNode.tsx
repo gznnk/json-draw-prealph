@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { memo, useContext, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 // Import other libraries.
 import { OpenAI } from "openai";
@@ -32,18 +32,12 @@ import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 import { AI_AGENT_INSTRUCTIONS, AI_AGENT_TOOLS } from "./AgentConstants";
 import type { AgentNodeProps } from "../../../types/props/nodes/AgentNodeProps";
 
-// Import SvgCanvas context.
-import { SvgCanvasContext } from "../../../canvas/SvgCanvasContext";
-
 /**
  * AgentNode component.
  */
 const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 	const [apiKey, setApiKey] = useState<string>("");
 	const [processIdList, setProcessIdList] = useState<string[]>([]);
-
-	// SvgCanvas state provider.
-	const canvasStateProvider = useContext(SvgCanvasContext);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
@@ -69,10 +63,9 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 
 			const processId = newEventId();
 			setProcessIdList((prev) => [...prev, processId]);
-
 			const openai = new OpenAI({
 				apiKey: apiKey,
-				dangerouslyAllowBrowser: true, // ブラウザで直接使用する場合に必要
+				dangerouslyAllowBrowser: true, // Required for direct browser usage
 			});
 
 			// Initialize the input for the OpenAI API.
@@ -84,16 +77,16 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 			] as OpenAI.Responses.ResponseInput;
 
 			// Add the input to the first node position.
-			const canvasState = canvasStateProvider?.state();
-			if (canvasState) {
-				const startX = canvasState.minX + 300;
-				const startY = canvasState.minY + window.innerHeight / 2;
+			// const canvasState = canvasStateProvider?.state();
+			// if (canvasState) {
+			// 	const startX = canvasState.minX + 300;
+			// 	const startY = canvasState.minY + window.innerHeight / 2;
 
-				input.push({
-					role: "user",
-					content: `Start placing the first node near (X: ${startX}, Y: ${startY}) on the canvas.`,
-				});
-			}
+			// 	input.push({
+			// 		role: "user",
+			// 		content: `Start placing the first node near (X: ${startX}, Y: ${startY}) on the canvas.`,
+			// 	});
+			// }
 
 			try {
 				input.push({
@@ -119,7 +112,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 					const stream = await openai.responses.create({
 						model: "gpt-4o",
 						input,
-						stream: true, // 必須！
+						stream: true, // Required!
 						tools: AI_AGENT_TOOLS,
 					});
 
@@ -278,7 +271,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 				}
 			} catch (error) {
 				console.error("Error fetching data from OpenAI API:", error);
-				alert("APIリクエスト中にエラーが発生しました。");
+				alert("An error occurred during the API request.");
 			}
 
 			setProcessIdList((prev) => prev.filter((id) => id !== processId));

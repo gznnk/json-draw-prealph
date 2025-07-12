@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { RectangleVertices } from "../../../types/base/RectangleVertices";
+import type { RectangleVertices } from "../../../types/core/RectangleVertices";
 
 // Import components.
 import { calcBottomLabelPosition } from "../BottomLabel";

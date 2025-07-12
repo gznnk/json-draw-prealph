@@ -107,7 +107,7 @@ const WebSearchNodeComponent: React.FC<WebSearchNodeProps> = (props) => {
 				}
 			} catch (error) {
 				console.error("Error fetching data from OpenAI API:", error);
-				alert("APIリクエスト中にエラーが発生しました。");
+				alert("An error occurred during API request.");
 			}
 
 			setProcessIdList((prev) => prev.filter((id) => id !== processId));

@@ -9,7 +9,6 @@ import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeE
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointerEvent";
-import type { EventBus } from "../../../../../../shared/event-bus/EventBus";
 
 // Import functions related to SvgCanvas.
 import { newId } from "../../../../utils/shapes/common/newId";
@@ -18,28 +17,26 @@ import { newId } from "../../../../utils/shapes/common/newId";
 import { Segment, type SegmentData } from "../Segment";
 
 /**
- * 線分リストプロパティ
+ * Segment list properties
  */
 type SegmentListProps = {
 	id: string;
 	rightAngleSegmentDrag: boolean;
 	fixBothEnds: boolean;
 	items: Diagram[];
-	eventBus: EventBus;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onClick?: (e: DiagramClickEvent) => void;
 	onDiagramChange?: (e: DiagramChangeEvent) => void;
 };
 
 /**
- * 線分リストコンポーネント
+ * Segment list component
  */
 const SegmentListComponent: React.FC<SegmentListProps> = ({
 	id,
 	rightAngleSegmentDrag,
 	fixBothEnds,
 	items,
-	eventBus,
 	onPointerDown,
 	onClick,
 	onDiagramChange,
@@ -213,7 +210,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 				},
 				endDiagram: {
 					items: items.map((item) => {
-						// ドラッグが完了したら、線分用のIDから新しいIDに変更
+						// When dragging is complete, change from temporary ID to new ID
 						if (item.id === draggingSegment.startPointId) {
 							return { ...item, x: newStartX, y: newStartY };
 						}
@@ -233,7 +230,6 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 			key={item.id}
 			{...item}
 			rightAngleSegmentDrag={rightAngleSegmentDrag}
-			eventBus={eventBus}
 			onPointerDown={onPointerDown}
 			onClick={onClick}
 			onDrag={handleSegmentDrag}

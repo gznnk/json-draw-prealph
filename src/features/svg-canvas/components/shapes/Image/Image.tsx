@@ -1,10 +1,8 @@
 // Import React.
 import type React from "react";
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useRef } from "react";
 
 // Import types.
-import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
-import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEvent";
 import type { ImageProps } from "../../../types/props/shapes/ImageProps";
 
 // Import components.
@@ -15,10 +13,13 @@ import { ImageElement } from "./ImageStyled";
 
 // Import hooks.
 import { useDrag } from "../../../hooks/useDrag";
+import { useClick } from "../../../hooks/useClick";
+import { useSelect } from "../../../hooks/useSelect";
 
 // Import utils.
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
+import { mergeProps } from "../../../utils/common/mergeProps";
 
 /**
  * Image component.
@@ -34,18 +35,17 @@ const ImageComponent: React.FC<ImageProps> = ({
 	scaleY,
 	keepProportion,
 	isSelected,
-	isMultiSelectSource,
-	syncWithSameId = false,
+	isAncestorSelected = false,
 	base64Data,
+	isDragging = false,
 	showOutline = false,
-	eventBus,
+	showTransformControls = false,
+	isTransforming = false,
 	onDrag,
 	onClick,
 	onSelect,
 	onTransform,
 }) => {
-	// Is the element being dragged.
-	const [isDragging, setIsDragging] = useState(false);
 	// Reference to the element.
 	const svgRef = useRef<SVGImageElement>({} as SVGImageElement);
 
@@ -60,49 +60,32 @@ const ImageComponent: React.FC<ImageProps> = ({
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	/**
-	 * Handler for drag events.
-	 */
-	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { onDrag } = refBus.current;
-
-		if (e.eventType === "Start") {
-			setIsDragging(true);
-		}
-
-		onDrag?.(e);
-
-		if (e.eventType === "End") {
-			setIsDragging(false);
-		}
-	}, []);
-
-	/**
-	 * Handler for pointer down events.
-	 */
-	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
-		const { id, onSelect } = refBus.current;
-
-		// Trigger the select event when the pointer is down.
-		onSelect?.({
-			eventId: e.eventId,
-			id,
-		});
-	}, []);
-
 	// Prepare props for the drag element.
 	const dragProps = useDrag({
 		id,
-		type: "Rectangle",
+		type: "Image",
 		x,
 		y,
-		syncWithSameId,
 		ref: svgRef,
-		eventBus,
-		onPointerDown: handlePointerDown,
-		onClick: onClick,
-		onDrag: handleDrag,
+		onDrag,
 	});
+	// Generate properties for clicking
+	const clickProps = useClick({
+		id,
+		x,
+		y,
+		isSelected,
+		isAncestorSelected,
+		ref: svgRef,
+		onClick,
+	});
+	// Generate properties for selection
+	const selectProps = useSelect({
+		id,
+		onSelect,
+	});
+	// Compose props for ImageElement
+	const composedProps = mergeProps(dragProps, clickProps, selectProps);
 
 	// Create the transform attribute for the element.
 	const transform = createSvgTransform(
@@ -112,9 +95,6 @@ const ImageComponent: React.FC<ImageProps> = ({
 		x,
 		y,
 	);
-
-	// Flag to show the transformative element.
-	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
 
 	return (
 		<>
@@ -128,9 +108,9 @@ const ImageComponent: React.FC<ImageProps> = ({
 					tabIndex={0}
 					cursor="move"
 					href={`data:image/png;base64,${base64Data}`}
-					isTransparent={isMultiSelectSource}
+					isTransparent={false}
 					ref={svgRef}
-					{...dragProps}
+					{...composedProps}
 				/>
 			</g>
 			<Outline
@@ -141,11 +121,9 @@ const ImageComponent: React.FC<ImageProps> = ({
 				rotation={rotation}
 				scaleX={scaleX}
 				scaleY={scaleY}
-				isSelected={isSelected}
-				isMultiSelectSource={isMultiSelectSource}
 				showOutline={showOutline}
 			/>
-			{showTransformative && (
+			{showTransformControls && (
 				<Transformative
 					id={id}
 					type="Rectangle"
@@ -157,9 +135,8 @@ const ImageComponent: React.FC<ImageProps> = ({
 					scaleX={scaleX}
 					scaleY={scaleY}
 					keepProportion={keepProportion}
-					isSelected={isSelected}
-					isMultiSelectSource={isMultiSelectSource}
-					eventBus={eventBus}
+					showTransformControls={showTransformControls}
+					isTransforming={isTransforming}
 					onTransform={onTransform}
 				/>
 			)}

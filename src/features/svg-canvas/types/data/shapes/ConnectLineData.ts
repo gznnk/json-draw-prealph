@@ -1,4 +1,4 @@
-import type { ArrowHeadType } from "../../base/ArrowHeadType";
+import type { ArrowHeadType } from "../../core/ArrowHeadType";
 import type { CreateDataType } from "./CreateDataType";
 
 /**

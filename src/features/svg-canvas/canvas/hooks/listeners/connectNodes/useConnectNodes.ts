@@ -8,20 +8,20 @@ import type { Diagram } from "../../../../types/data/catalog/Diagram";
 import type { ConnectableData } from "../../../../types/data/shapes/ConnectableData";
 import type { ConnectNodesEvent } from "../../../../types/events/ConnectNodesEvent";
 import type { CanvasHooksProps } from "../../../SvgCanvasTypes";
-import type { Shape } from "../../../../types/base/Shape";
+import type { Shape } from "../../../../types/core/Shape";
 
 // Import functions related to SvgCanvas.
-import { createBestConnectPath } from "../../../../utils/shapes/connectPoint/createBestConnectPath";
+import { generateOptimalShapeToShapeConnection } from "../../../../utils/shapes/connectPoint/generateOptimalShapeToShapeConnection";
 import { newId } from "../../../../utils/shapes/common/newId";
-import { calcPointsOuterShape } from "../../../../utils/math/geometry/calcPointsOuterShape";
-import { getDiagramById } from "../../../utils/getDiagramById";
+import { calcOrientedShapeFromPoints } from "../../../../utils/math/geometry/calcOrientedShapeFromPoints";
+import { getDiagramById } from "../../../../utils/common/getDiagramById";
 import { dispatchNewItemEvent } from "../addNewItem";
 
 // Import related to this component.
 import { CONNECT_NODES_EVENT_NAME } from "./connectNodesConstants";
 
 /**
- * ConnectNodes イベントを監視してノード接続を行う Hook。
+ * Hook that monitors ConnectNodes events and performs node connections.
  */
 export const useConnectNodes = (props: CanvasHooksProps) => {
 	// Create references bypass to avoid function creation in every render.
@@ -61,7 +61,7 @@ export const useConnectNodes = (props: CanvasHooksProps) => {
 				return;
 			}
 
-			const points = createBestConnectPath(
+			const points = generateOptimalShapeToShapeConnection(
 				sourceConnectPoint.x,
 				sourceConnectPoint.y,
 				sourceNode as Shape,
@@ -70,7 +70,7 @@ export const useConnectNodes = (props: CanvasHooksProps) => {
 				targetNode as Shape,
 			);
 
-			const shape = calcPointsOuterShape(
+			const shape = calcOrientedShapeFromPoints(
 				points.map((p) => ({ x: p.x, y: p.y })),
 			);
 

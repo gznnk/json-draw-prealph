@@ -6,11 +6,10 @@ import { memo, useCallback, useRef } from "react";
 import { DragLine } from "../../../core/DragLine";
 
 // Import types related to SvgCanvas.
-import type { Point } from "../../../../types/base/Point";
+import type { Point } from "../../../../types/core/Point";
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointerEvent";
-import type { EventBus } from "../../../../../../shared/event-bus/EventBus";
 
 // Import functions related to SvgCanvas.
 import { getCursorFromAngle } from "../../../../utils/shapes/common/getCursorFromAngle";
@@ -24,11 +23,10 @@ import { rotatePoint } from "../../../../utils/math/points/rotatePoint";
 import type { SegmentData } from "./SegmentTypes";
 
 /**
- * 線分プロパティ
+ * Line segment properties
  */
 type SegmentProps = SegmentData & {
 	rightAngleSegmentDrag: boolean;
-	eventBus: EventBus;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onClick?: (e: DiagramClickEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
@@ -36,7 +34,7 @@ type SegmentProps = SegmentData & {
 };
 
 /**
- * 線分コンポーネント
+ * Line segment component
  */
 const SegmentComponent: React.FC<SegmentProps> = ({
 	id,
@@ -45,7 +43,6 @@ const SegmentComponent: React.FC<SegmentProps> = ({
 	endX,
 	endY,
 	rightAngleSegmentDrag,
-	eventBus,
 	onPointerDown,
 	onClick,
 	onDrag,
@@ -65,10 +62,9 @@ const SegmentComponent: React.FC<SegmentProps> = ({
 	const cursor = rightAngleSegmentDrag
 		? getCursorFromAngle(radiansToDegrees(radian))
 		: "move";
-
-	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	// Use ref to hold referenced values to avoid frequent handler generation
 	const refBusVal = {
-		// 内部変数・内部関数
+		// State variables and functions
 		radian,
 		rotateStartPoint,
 		rotateEndPoint,
@@ -96,7 +92,6 @@ const SegmentComponent: React.FC<SegmentProps> = ({
 			endX={endX}
 			endY={endY}
 			cursor={cursor}
-			eventBus={eventBus}
 			onPointerDown={onPointerDown}
 			onClick={onClick}
 			onDrag={onDrag}

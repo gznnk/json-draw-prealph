@@ -1,7 +1,7 @@
 // Import types.
-import type { TextableType } from "../../../../types/base/TextableType";
-import type { TextAlign } from "../../../../types/base/TextAlign";
-import type { VerticalAlign } from "../../../../types/base/VerticalAlign";
+import type { TextableType } from "../../../../types/core/TextableType";
+import type { TextAlign } from "../../../../types/core/TextAlign";
+import type { VerticalAlign } from "../../../../types/core/VerticalAlign";
 import type { DiagramTextChangeEvent } from "../../../../types/events/DiagramTextChangeEvent";
 
 /**

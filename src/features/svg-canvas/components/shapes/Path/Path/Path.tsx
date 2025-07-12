@@ -4,12 +4,11 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
 import type { Diagram } from "../../../../types/data/catalog/Diagram";
-import type { DiagramBaseData } from "../../../../types/base/DiagramBaseData";
+import type { DiagramBaseData } from "../../../../types/data/core/DiagramBaseData";
 import type { PathData } from "../../../../types/data/shapes/PathData";
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
-import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointerEvent";
 import type { PathProps } from "../../../../types/props/shapes/PathProps";
 
 // Import components.
@@ -22,26 +21,29 @@ import { PathElement } from "./PathStyled";
 
 // Import hooks.
 import { useDrag } from "../../../../hooks/useDrag";
+import { useClick } from "../../../../hooks/useClick";
+import { useSelect } from "../../../../hooks/useSelect";
 
 // Import utils.
-import { calcPointsOuterShape } from "../../../../utils/math/geometry/calcPointsOuterShape";
+import { calcOrientedShapeFromPoints } from "../../../../utils/math/geometry/calcOrientedShapeFromPoints";
 import {
 	createEndPointArrowHead,
 	createStartPointArrowHead,
 } from "../../../../utils/shapes/path/createArrowHeads";
 import { createDValue } from "../../../../utils/shapes/path/createDValue";
 import { isItemableData } from "../../../../utils/validation/isItemableData";
+import { mergeProps } from "../../../../utils/common/mergeProps";
 
-// TODO: 枠線と重なっていると頂点編集モードにできない
+// TODO: Cannot enter vertex editing mode when overlapping with border
 /**
- * 折れ線コンポーネント.
- * できること：
- * - 折れ線の描画
- * - 折れ線の全体ドラッグ
- * - 折れ線の選択
- * - 折れ線の変形
- * - 折れ線の線分のドラッグ
- * - 折れ線の新規頂点の追加
+ * Polyline component
+ * Features:
+ * - Polyline drawing
+ * - Entire polyline dragging
+ * - Polyline selection
+ * - Polyline transformation
+ * - Line segment dragging
+ * - Adding new vertices to polyline
  */
 const PathComponent: React.FC<PathProps> = ({
 	id,
@@ -56,10 +58,12 @@ const PathComponent: React.FC<PathProps> = ({
 	stroke = "black",
 	strokeWidth = "1px",
 	isSelected = false,
-	isMultiSelectSource = false,
+	isAncestorSelected = false,
+	isDragging = false,
 	showOutline = false,
+	showTransformControls = false,
+	isTransforming = false,
 	items = [],
-	syncWithSameId = false,
 	dragEnabled = true,
 	transformEnabled = true,
 	segmentDragEnabled = true,
@@ -68,24 +72,21 @@ const PathComponent: React.FC<PathProps> = ({
 	fixBothEnds = false,
 	startArrowHead = "None",
 	endArrowHead = "None",
-	eventBus,
 	onClick,
 	onDrag,
 	onSelect,
 	onTransform,
 	onDiagramChange,
 }) => {
-	const [isDragging, setIsDragging] = useState(false);
 	const [isPathPointDragging, setIsPathPointDragging] = useState(false);
 	const [isSequentialSelection, setIsSequentialSelection] = useState(false);
 	const [isVerticesMode, setIsVerticesMode] = useState(!transformEnabled);
 
 	const startItems = useRef<Diagram[]>(items);
 	const dragSvgRef = useRef<SVGPathElement>({} as SVGPathElement);
-
-	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	// To avoid frequent handler generation, hold referenced values in useRef
 	const refBusVal = {
-		// プロパティ
+		// Properties
 		id,
 		x,
 		y,
@@ -100,24 +101,16 @@ const PathComponent: React.FC<PathProps> = ({
 		onSelect,
 		onClick,
 		onDiagramChange,
-		// 内部変数・内部関数
+		// Internal variables and functions
 		isSequentialSelection,
 		isVerticesMode,
 	};
 	const refBus = useRef(refBusVal);
-	refBus.current = refBusVal;
-
-	/**
-	 * 折れ線のポインターダウンイベントハンドラ
+	refBus.current = refBusVal; /**
+	 * Polyline pointer down event handler
 	 */
-	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
-		const { id, isSelected, transformEnabled, onSelect } = refBus.current;
-
-		// 図形選択イベントを発火
-		onSelect?.({
-			eventId: e.eventId,
-			id,
-		});
+	const handlePointerDown = useCallback(() => {
+		const { isSelected, transformEnabled } = refBus.current;
 
 		if (!transformEnabled) {
 			setIsVerticesMode(true);
@@ -127,9 +120,8 @@ const PathComponent: React.FC<PathProps> = ({
 			setIsSequentialSelection(true);
 		}
 	}, []);
-
 	/**
-	 * 折れ線のクリックイベントハンドラ
+	 * Polyline click event handler
 	 */
 	const handleClick = useCallback((e: DiagramClickEvent) => {
 		const {
@@ -146,39 +138,37 @@ const PathComponent: React.FC<PathProps> = ({
 		onClick?.({
 			eventId: e.eventId,
 			id,
+			isSelectedOnPointerDown: e.isSelectedOnPointerDown,
+			isAncestorSelectedOnPointerDown: e.isAncestorSelectedOnPointerDown,
 		});
 	}, []);
-
-	// 折れ線の選択状態制御
+	// Polyline selection state control
 	useEffect(() => {
-		// グループから選択が外れたら連続選択フラグも解除
+		// Clear sequential selection flag when selection is removed from group
 		if (!isSelected) {
 			setIsSequentialSelection(false);
 			setIsVerticesMode(false);
 		}
 	}, [isSelected]);
-
 	/**
-	 * 折れ線のドラッグイベントハンドラ
+	 * Polyline drag event handler
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
 		const { id, dragEnabled, items, onDiagramChange, isVerticesMode } =
 			refBus.current;
 
-		// ドラッグが無効な場合はイベントを潰してドラッグを無効化
+		// Disable dragging by suppressing event when drag is disabled
 		if (!dragEnabled) {
 			return;
 		}
 
-		// 頂点モードの場合はイベントを潰してドラッグを無効化
+		// Disable dragging by suppressing event when in vertices mode
 		if (isVerticesMode) {
 			return;
 		}
 
-		// ドラッグ開始時の処理
+		// Processing at drag start
 		if (e.eventType === "Start") {
-			setIsDragging(true);
-
 			startItems.current = items;
 
 			const startDiagram = {
@@ -224,14 +214,9 @@ const PathComponent: React.FC<PathProps> = ({
 				items: newItems,
 			},
 		});
-
-		if (e.eventType === "End") {
-			setIsDragging(false);
-		}
 	}, []);
-
 	/**
-	 * 頂点のドラッグ中イベントハンドラ
+	 * Vertex drag event handler
 	 */
 	const handlePathPointDrag = useCallback((e: DiagramDragEvent) => {
 		if (e.eventType === "Start") {
@@ -244,18 +229,17 @@ const PathComponent: React.FC<PathProps> = ({
 			setIsPathPointDragging(false);
 		}
 	}, []);
-
 	/**
-	 * 線分および新規頂点の変更イベントハンドラ
-	 */ const handleDiagramChangeBySegumentAndNewVertex = useCallback(
+	 * Change event handler for line segments and new vertices
+	 */
+	const handleDiagramChangeBySegumentAndNewVertex = useCallback(
 		(e: DiagramChangeEvent) => {
 			if (!isItemableData<DiagramBaseData>(e.endDiagram)) return; // Type guard with DiagramBaseData
 
 			const { rotation, scaleX, scaleY, onDiagramChange } = refBus.current;
-
 			if (e.eventType === "End") {
-				// 新規頂点および線分のドラッグ完了に伴うパスの外枠の形状計算
-				const newShape = calcPointsOuterShape(
+				// Calculate new shape of Path's bounding box when new vertex and line segment dragging is completed
+				const newShape = calcOrientedShapeFromPoints(
 					(e.endDiagram.items ?? []).map((p) => ({ x: p.x, y: p.y })),
 					rotation,
 					scaleX,
@@ -279,51 +263,60 @@ const PathComponent: React.FC<PathProps> = ({
 		},
 		[],
 	);
-
-	// 折れ線のドラッグ用要素のプロパティ生成
+	// Generate properties for polyline drag element
 	const dragProps = useDrag({
 		id,
 		type: "Path",
 		x,
 		y,
-		syncWithSameId,
 		ref: dragSvgRef,
 		onPointerDown: handlePointerDown,
-		onClick: handleClick,
 		onDrag: handleDrag,
-		eventBus,
 	});
+	// Generate properties for clicking
+	const clickProps = useClick({
+		id,
+		x,
+		y,
+		isSelected,
+		isAncestorSelected,
+		ref: dragSvgRef,
+		onClick: handleClick,
+	}); // Generate properties for selection
+	const selectProps = useSelect({
+		id,
+		onSelect,
+	});
+	// Compose props for path element
+	const composedProps = mergeProps(dragProps, clickProps, selectProps);
 
-	// 折れ線のd属性値を生成
+	// Generate polyline d attribute value
 	const d = createDValue(items);
 
-	// 頂点情報を生成
+	// Generate vertex information
 	const isBothEnds = (idx: number) => idx === 0 || idx === items.length - 1;
 	const linePoints = items.map((item, idx) => ({
 		...item,
 		hidden: !isVerticesMode || isDragging || (fixBothEnds && isBothEnds(idx)),
 	}));
 
-	// ドラッグ線分の表示フラグ
+	// Display flag for dragging line segments
 	const showSegmentList =
 		segmentDragEnabled &&
 		isSelected &&
 		isVerticesMode &&
 		!isDragging &&
-		!isPathPointDragging &&
-		!isMultiSelectSource;
-
-	// 新規頂点の表示フラグ
+		!isPathPointDragging;
+	// Display flag for new vertices
 	const showNewVertex =
 		newVertexEnabled &&
 		isSelected &&
 		isVerticesMode &&
 		!isDragging &&
-		!isPathPointDragging &&
-		!isMultiSelectSource;
+		!isPathPointDragging;
 
-	// 全体変形用グループの表示フラグ
-	const showTransformGroup = isSelected && !isMultiSelectSource;
+	// Display flag for overall transform group
+	const showTransformGroup = showTransformControls;
 
 	// Flag to show the position label.
 	const showPositionLabel = isSelected && isDragging;
@@ -344,17 +337,17 @@ const PathComponent: React.FC<PathProps> = ({
 
 	return (
 		<>
-			{/* 描画用のパス */}
+			{/* Path for drawing */}
 			<g transform="translate(0.5,0.5)">
 				<PathElement
 					d={d}
 					fill="none"
 					stroke={stroke}
 					strokeWidth={strokeWidth}
-					isTransparent={isMultiSelectSource}
+					isTransparent={false}
 				/>
 			</g>
-			{/* ドラッグ用のパス */}
+			{/* Path for dragging */}
 			<path
 				id={id}
 				d={d}
@@ -364,35 +357,33 @@ const PathComponent: React.FC<PathProps> = ({
 				cursor={dragEnabled ? "move" : "pointer"}
 				tabIndex={0}
 				ref={dragSvgRef}
-				{...dragProps}
+				{...composedProps}
 			/>
 			{/* Start point arrow head. */}
 			{startArrowHeadComp}
 			{/* End point arrow head. */}
 			{endArrowHeadComp}
-			{/* 線分ドラッグ */}
+			{/* Line segment dragging */}
 			{showSegmentList && (
 				<SegmentList
 					id={id}
 					rightAngleSegmentDrag={rightAngleSegmentDrag}
 					fixBothEnds={fixBothEnds}
 					items={items}
-					eventBus={eventBus}
 					onPointerDown={handlePointerDown}
 					onClick={handleClick}
 					onDiagramChange={handleDiagramChangeBySegumentAndNewVertex}
 				/>
 			)}
-			{/* 新規頂点 */}
+			{/* New vertices */}
 			{showNewVertex && (
 				<NewVertexList
 					id={id}
 					items={items}
-					eventBus={eventBus}
 					onDiagramChange={handleDiagramChangeBySegumentAndNewVertex}
 				/>
 			)}
-			{/* アウトライン（複数選択用） */}
+			{/* Outline for selection only */}
 			{!showTransformGroup && (
 				<Outline
 					x={x}
@@ -402,19 +393,18 @@ const PathComponent: React.FC<PathProps> = ({
 					rotation={rotation}
 					scaleX={scaleX}
 					scaleY={scaleY}
-					isSelected={isSelected}
-					isMultiSelectSource={isMultiSelectSource}
 					showOutline={showOutline}
 				/>
 			)}
-			{/* 全体変形用グループ */}
+			{/* Overall transform group */}
 			{showTransformGroup && (
 				<Group
 					id={id}
 					x={x}
 					y={y}
-					isSelected={transformEnabled && !isVerticesMode}
-					isMultiSelectSource={isMultiSelectSource}
+					isSelected={showTransformControls && !isVerticesMode}
+					showTransformControls={showTransformControls}
+					showOutline={showOutline}
 					width={width}
 					height={height}
 					rotation={rotation}
@@ -422,7 +412,7 @@ const PathComponent: React.FC<PathProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					items={linePoints}
-					eventBus={eventBus}
+					isTransforming={isTransforming}
 					onDrag={handlePathPointDrag}
 					onTransform={onTransform}
 					onDiagramChange={onDiagramChange}

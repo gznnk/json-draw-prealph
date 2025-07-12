@@ -1,5 +1,5 @@
-import type { TextAlign } from "../base/TextAlign";
-import type { VerticalAlign } from "../base/VerticalAlign";
+import type { TextAlign } from "../core/TextAlign";
+import type { VerticalAlign } from "../core/VerticalAlign";
 
 export type DiagramStyleChangeEvent = {
 	eventId: string;

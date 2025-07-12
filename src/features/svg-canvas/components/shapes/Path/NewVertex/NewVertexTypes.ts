@@ -1,5 +1,5 @@
 /**
- * 新規頂点データ
+ * New vertex data
  */
 export type NewVertexData = {
 	id: string;

@@ -2,8 +2,8 @@
 import styled from "@emotion/styled";
 
 // Import types.
-import type { TextAlign } from "../../../../types/base/TextAlign";
-import type { VerticalAlign } from "../../../../types/base/VerticalAlign";
+import type { TextAlign } from "../../../../types/core/TextAlign";
+import type { VerticalAlign } from "../../../../types/core/VerticalAlign";
 
 // Import local module files.
 import { TextAlignMap, VerticalAlignMap } from "./TextableConstants";

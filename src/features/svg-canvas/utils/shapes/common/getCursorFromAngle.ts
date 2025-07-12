@@ -6,7 +6,7 @@
  * @returns The CSS cursor style name
  */
 export const getCursorFromAngle = (angle: number): string => {
-	// angleに360度を加算して0度以上にする
+	// Add 360 degrees to angle to make it 0 degrees or more
 	const _angle = (angle + 360) % 360;
 
 	if (-22.5 <= _angle && _angle < 22.5) {

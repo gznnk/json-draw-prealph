@@ -1,5 +1,5 @@
-import type { BoxGeometry } from "../../../types/base/BoxGeometry";
-import { CONNECT_LINE_MARGIN } from "../../../components/shapes/ConnectPoint/ConnectPoint/ConnectPointConstants";
+import type { BoxGeometry } from "../../../types/core/BoxGeometry";
+import { CONNECT_LINE_MARGIN } from "../../../constants/Constants";
 
 /**
  * Adds margin to a box geometry and returns a new box geometry with expanded boundaries.

@@ -1,4 +1,4 @@
-import type { Point } from "../../../types/base/Point";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Removes duplicate points from a list of points.

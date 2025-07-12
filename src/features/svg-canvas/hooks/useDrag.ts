@@ -3,21 +3,23 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 
 // Import types.
-import type { DiagramType } from "../types/base/DiagramType";
-import type { Point } from "../types/base/Point";
-import type { DiagramClickEvent } from "../types/events/DiagramClickEvent";
+import type { DiagramType } from "../types/core/DiagramType";
+import type { Point } from "../types/core/Point";
 import type { DiagramDragDropEvent } from "../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../types/events/DiagramDragEvent";
-import type { DiagramHoverEvent } from "../types/events/DiagramHoverEvent";
 import type { DiagramPointerEvent } from "../types/events/DiagramPointerEvent";
 import type { EventType } from "../types/events/EventType";
 import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
 
 // Import utils.
 import { newEventId } from "../utils/common/newEventId";
+import { getSvgPoint } from "../utils/math/points/getSvgPoint";
+
+// Import constants.
+import { DRAG_DEAD_ZONE } from "../constants/Constants";
 
 // Import EventBus.
-import type { EventBus } from "../../../shared/event-bus/EventBus";
+import { useEventBus } from "../context/EventBusContext";
 
 // Import event names
 import {
@@ -25,11 +27,8 @@ import {
 	EVENT_NAME_SVG_CANVAS_SCROLL,
 } from "../constants/EventNames";
 
-/** ドラッグのあそび */
-const DRAG_DEAD_ZONE = 5;
-
 /**
- * 全体通知用ドラッグイベントの型定義
+ * Type definition for broadcast drag event
  */
 type BroadcastDragEvent = {
 	eventId: string;
@@ -45,78 +44,66 @@ type BroadcastDragEvent = {
 };
 
 /**
- * ドラッグ領域のPropsの型定義
+ * Type definition for drag area props
  */
 export type DragProps = {
 	id: string;
 	type?: DiagramType;
 	x: number;
 	y: number;
-	syncWithSameId?: boolean;
 	ref: React.RefObject<SVGElement>;
-	eventBus: EventBus;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onPointerUp?: (e: DiagramPointerEvent) => void;
-	onClick?: (e: DiagramClickEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragOver?: (e: DiagramDragDropEvent) => void;
 	onDragLeave?: (e: DiagramDragDropEvent) => void;
 	onDrop?: (e: DiagramDragDropEvent) => void;
-	onHover?: (e: DiagramHoverEvent) => void;
 	dragPositioningFunction?: (x: number, y: number) => Point;
 };
 
 /**
- * ドラッグ可能な領域を作成するカスタムフック
+ * Custom hook to create a draggable area
  *
- * @param {DragProps} props ドラッグ領域のProps
- * @param {string} props.id ID（ドラッグ可能にする要素にも同じIDを設定すること。しない場合は正しく動作しなくなる）
- * @param {DiagramType} [props.type] 図形の種類
- * @param {number} props.x X座標
- * @param {number} props.y Y座標
- * @param {boolean} [props.syncWithSameId] 同じIDの図形とドラッグを同期させるかどうかのフラグ
- * @param {React.RefObject<SVGElement>} props.ref ドラッグ可能にする要素の参照
- * @param {(e: DiagramPointerEvent) => void} [props.onPointerDown] ポインター押下時のイベントハンドラ
- * @param {(e: DiagramPointerEvent) => void} [props.onPointerUp] ポインター離上時のイベントハンドラ
- * @param {(e: DiagramClickEvent) => void} [props.onClick] クリック時のイベントハンドラ
- * @param {(e: DiagramDragEvent) => void} [props.onDragStart] ドラッグ開始時のイベントハンドラ
- * @param {(e: DiagramDragEvent) => void} [props.onDrag] ドラッグ中のイベントハンドラ
- * @param {(e: DiagramDragEvent) => void} [props.onDragEnd] ドラッグ終了時のイベントハンドラ
- * @param {(e: DiagramDragDropEvent) => void} [props.onDragOver] ドラッグオーバー時のイベントハンドラ
- * @param {(e: DiagramDragDropEvent) => void} [props.onDragLeave] ドラッグリーブ時のイベントハンドラ
- * @param {(e: DiagramDragDropEvent) => void} [props.onDrop] ドロップ時のイベントハンドラ
- * @param {(e: DiagramHoverEvent) => void} [props.onHover] ホバー変更時のイベントハンドラ
- * @param {(x: number, y: number) => Point} [props.dragPositioningFunction] ドラッグ位置変換関数
+ * @param {DragProps} props Drag area props
+ * @param {string} props.id ID (set the same ID to the element to be draggable. Otherwise it will not work correctly)
+ * @param {DiagramType} [props.type] Type of diagram
+ * @param {number} props.x X coordinate
+ * @param {number} props.y Y coordinate
+ * @param {React.RefObject<SVGElement>} props.ref Reference to the element to be draggable
+ * @param {(e: DiagramPointerEvent) => void} [props.onPointerDown] Event handler for pointer down
+ * @param {(e: DiagramPointerEvent) => void} [props.onPointerUp] Event handler for pointer up
+ * @param {(e: DiagramDragEvent) => void} [props.onDrag] Event handler for dragging
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDragOver] Event handler for drag over
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDragLeave] Event handler for drag leave
+ * @param {(e: DiagramDragDropEvent) => void} [props.onDrop] Event handler for drop
+ * @param {(x: number, y: number) => Point} [props.dragPositioningFunction] Drag position transformation function
  */
 export const useDrag = (props: DragProps) => {
+	const eventBus = useEventBus();
 	const {
 		id,
 		x,
 		y,
 		type,
-		syncWithSameId = false,
 		ref,
-		eventBus,
 		onPointerDown,
 		onPointerUp,
-		onClick,
 		onDrag,
 		onDragOver,
 		onDragLeave,
 		onDrop,
-		onHover,
 		dragPositioningFunction,
 	} = props;
 
-	// ドラッグ中かのフラグ
+	// Flag whether dragging
 	const [isDragging, setIsDragging] = useState(false);
-	// このドラッグ領域でポインターが押されたかどうかのフラグ
+	// Flag whether pointer is pressed down in this drag area
 	const isPointerDown = useRef(false);
-	// 矢印キーによるドラッグ中かのフラグ
+	// Flag whether dragging with arrow keys
 	const isArrowDragging = useRef(false);
-	// ドラッグエンターしたかのフラグ
+	// Flag whether drag entered
 	const dragEntered = useRef(false);
-	// ドラッグ開始時のドラッグ領域の座標
+	// Drag area coordinates at drag start
 	const startX = useRef(0);
 	const startY = useRef(0);
 	// The offset between the center and the pointer.
@@ -124,32 +111,14 @@ export const useDrag = (props: DragProps) => {
 	const offsetYBetweenCenterAndPointer = useRef(0);
 
 	/**
-	 * Get the SVG point from the client coordinates.
+	 * Get the drag area coordinates from the pointer position during dragging
 	 *
-	 * @param clientX - The X position of the cursor relative to the viewport (not the whole page).
-	 * @param clientY - The Y position of the cursor relative to the viewport (not the whole page).
-	 * @returns The SVG point
-	 */
-	const getSvgPoint = (clientX: number, clientY: number): Point => {
-		const ownerSVGElement = ref.current?.ownerSVGElement;
-		if (ownerSVGElement === null) throw new Error("ownerSVGElement is null."); // Unreachable — added to prevent type errors in the following code.
-
-		const point = ownerSVGElement.createSVGPoint();
-		point.x = clientX;
-		point.y = clientY;
-
-		return point.matrixTransform(ownerSVGElement.getScreenCTM()?.inverse());
-	};
-
-	/**
-	 * ドラッグ中のポインターの位置からドラッグ領域の座標を取得する
-	 *
-	 * @param {number} clientX ブラウザウィンドウ上のポインタのX座標
-	 * @param {number} clientY ブラウザウィンドウ上のポインタのY座標
-	 * @returns {Point} ドラッグ領域の座標
+	 * @param {number} clientX X coordinate of the pointer on the browser window
+	 * @param {number} clientY Y coordinate of the pointer on the browser window
+	 * @returns {Point} Drag area coordinates
 	 */
 	const getPointOnDrag = (clientX: number, clientY: number): Point => {
-		const svgPoint = getSvgPoint(clientX, clientY);
+		const svgPoint = getSvgPoint(clientX, clientY, ref.current);
 
 		let newX = svgPoint.x;
 		let newY = svgPoint.y;
@@ -158,8 +127,8 @@ export const useDrag = (props: DragProps) => {
 		newX -= offsetXBetweenCenterAndPointer.current;
 		newY -= offsetYBetweenCenterAndPointer.current;
 
+		// If a drag position transformation function is specified, apply that function
 		if (dragPositioningFunction) {
-			// ドラッグ位置変換関数が指定されている場合は、その関数を適用
 			const p = dragPositioningFunction(newX, newY);
 			newX = p.x;
 			newY = p.y;
@@ -172,32 +141,31 @@ export const useDrag = (props: DragProps) => {
 	};
 
 	/**
-	 * ドラッグ領域内でのポインターの押下イベントハンドラ
+	 * Pointer down event handler within the drag area
 	 */
 	const handlePointerDown = (e: React.PointerEvent<SVGElement>): void => {
 		if (e.button !== 0) {
-			// 左クリック以外の場合は何もしない
+			// Do nothing for non-left clicks
 			return;
 		}
 
-		// ポインターイベントが発生した要素のIDがこのドラッグ領域のIDと一致する場合のみイベントを処理する
+		// Process the event only if the ID of the element where the pointer event occurred matches the ID of this drag area
 		if ((e.target as HTMLElement).id === id) {
-			// ポインターキャプチャーを設定
+			// Set pointer capture
 			e.currentTarget.setPointerCapture(e.pointerId);
 
-			// ポインターが押されたフラグを立てる
+			// Set the flag that the pointer is pressed
 			isPointerDown.current = true;
 
-			// ドラッグ開始時のドラッグ領域の座標を記憶
+			// Remember the drag area coordinates at drag start
 			startX.current = x;
 			startY.current = y;
-
 			// Store the offset between the center and the pointer
-			const svgPoint = getSvgPoint(e.clientX, e.clientY);
+			const svgPoint = getSvgPoint(e.clientX, e.clientY, ref.current);
 			offsetXBetweenCenterAndPointer.current = svgPoint.x - x;
 			offsetYBetweenCenterAndPointer.current = svgPoint.y - y;
 
-			// ポインター押下イベント発火
+			// Fire pointer down event
 			onPointerDown?.({
 				eventId: newEventId(),
 				id,
@@ -206,24 +174,22 @@ export const useDrag = (props: DragProps) => {
 	};
 
 	/**
-	 * ドラッグ領域内でのポインターの移動イベントハンドラ
+	 * Pointer move event handler within the drag area
 	 */
 	const handlePointerMove = (e: React.PointerEvent<SVGElement>): void => {
 		if (!isPointerDown.current) {
-			// このドラッグ領域内でポインターが押されていない場合は何もしない
+			// Do nothing if pointer is not pressed down in this drag area
 			return;
 		}
 
-		// ドラッグ座標を取得
+		// Get drag coordinates
 		const dragPoint = getPointOnDrag(e.clientX, e.clientY);
-
-		// SVG座標系でのカーソル位置を取得
-		const svgCursorPoint = getSvgPoint(e.clientX, e.clientY);
-
-		// イベントIDを生成
+		// Get cursor position in SVG coordinate system
+		const svgCursorPoint = getSvgPoint(e.clientX, e.clientY, ref.current);
+		// Generate event ID
 		const eventId = newEventId();
 
-		// ドラッグ中のイベント情報を作成
+		// Create event information during dragging
 		const dragEvent = {
 			eventId,
 			eventType: "InProgress",
@@ -236,7 +202,7 @@ export const useDrag = (props: DragProps) => {
 			cursorY: svgCursorPoint.y,
 		} as DiagramDragEvent;
 
-		// 全体通知用ドラッグイベント情報を作成
+		// Create broadcast drag event information
 		const broadcastDragEvent = {
 			eventId,
 			eventType: "InProgress",
@@ -249,19 +215,18 @@ export const useDrag = (props: DragProps) => {
 			clientX: e.clientX,
 			clientY: e.clientY,
 		};
-
 		if (
 			!isDragging &&
 			(Math.abs(dragPoint.x - startX.current) > DRAG_DEAD_ZONE ||
 				Math.abs(dragPoint.y - startY.current) > DRAG_DEAD_ZONE)
 		) {
-			// ドラッグ中でない場合、かつポインターの移動量が一定以上の場合はドラッグ開始とする
+			// Start dragging when not dragging and pointer movement exceeds a certain threshold
 			onDrag?.({
 				...dragEvent,
 				eventType: "Start",
 			});
 
-			// 親子関係にない図形でハンドリングする用のドラッグ中イベント発火
+			// Fire dragging event for handling by shapes without parent-child relationship
 			eventBus.dispatchEvent(
 				new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
 					detail: {
@@ -276,14 +241,14 @@ export const useDrag = (props: DragProps) => {
 		}
 
 		if (!isDragging) {
-			// ドラッグ中でない場合は何もしない
+			// Do nothing when not dragging
 			return;
 		}
 
-		// ドラッグ中イベント発火
+		// Fire dragging event
 		onDrag?.(dragEvent);
 
-		// 親子関係にない図形でハンドリングする用のドラッグ中イベント発火
+		// Fire dragging event for handling by shapes without parent-child relationship
 		eventBus.dispatchEvent(
 			new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
 				detail: broadcastDragEvent,
@@ -292,23 +257,20 @@ export const useDrag = (props: DragProps) => {
 	};
 
 	/**
-	 * ドラッグ領域内でのポインターの離上イベントハンドラ
+	 * Pointer up event handler within the drag area
 	 */
 	const handlePointerUp = (e: React.PointerEvent<SVGElement>): void => {
-		// ポインターキャプチャーを解放
+		// Release pointer capture
 		e.currentTarget.releasePointerCapture(e.pointerId);
-
-		// イベントIDを生成
+		// Generate event ID
 		const eventId = newEventId();
 
 		if (isDragging) {
-			// ドラッグ座標を取得
-			const dragPoint = getPointOnDrag(e.clientX, e.clientY);
+			// Get drag coordinates
+			const dragPoint = getPointOnDrag(e.clientX, e.clientY); // Get cursor position in SVG coordinate system
+			const svgCursorPoint = getSvgPoint(e.clientX, e.clientY, ref.current);
 
-			// SVG座標系でのカーソル位置を取得
-			const svgCursorPoint = getSvgPoint(e.clientX, e.clientY);
-
-			// ドラッグ中だった場合はドラッグ終了イベントを発火
+			// Fire drag end event if dragging was in progress
 			onDrag?.({
 				eventId,
 				eventType: "End",
@@ -319,7 +281,8 @@ export const useDrag = (props: DragProps) => {
 				endY: dragPoint.y,
 				cursorX: svgCursorPoint.x,
 				cursorY: svgCursorPoint.y,
-			}); // 親子関係にない図形でハンドリングする用のドラッグ終了イベント発火
+			});
+			// Fire drag end event for handling by shapes without parent-child relationship
 			eventBus.dispatchEvent(
 				new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
 					detail: {
@@ -338,42 +301,34 @@ export const useDrag = (props: DragProps) => {
 			);
 		}
 
-		if (isPointerDown.current && !isDragging) {
-			// ドラッグ後のポインターアップでなければ、クリックイベントを親側に通知する
-			onClick?.({
-				eventId,
-				id,
-			});
-		}
-
-		// ポインターの離上イベント発火
+		// Fire pointer up event
 		onPointerUp?.({
 			eventId,
 			id,
 		});
 
-		// フラグのクリア
+		// Clear flags
 		setIsDragging(false);
 		isPointerDown.current = false;
 	};
 
 	/**
-	 * キー押下イベントハンドラ
+	 * Key press event handler
 	 */
 	const handleKeyDown = (e: React.KeyboardEvent<SVGGElement>) => {
-		// ポインターダウン中は何もしない
+		// Do nothing while pointer is down
 		if (isPointerDown.current) {
 			return;
 		}
 
-		// イベントIDを生成
+		// Generate event ID
 		const eventId = newEventId();
 
 		/**
-		 * 矢印キーによる移動処理
+		 * Move point by arrow keys
 		 *
-		 * @param dx x座標の移動量
-		 * @param dy y座標の移動量
+		 * @param dx x coordinate offset
+		 * @param dy y coordinate offset
 		 */
 		const movePoint = (dx: number, dy: number) => {
 			let newPoint = {
@@ -385,7 +340,7 @@ export const useDrag = (props: DragProps) => {
 				newPoint = dragPositioningFunction(newPoint.x, newPoint.y);
 			}
 
-			// キーボード操作時は、図形の中心をカーソル位置として扱う
+			// For keyboard operations, treat the shape's center as the cursor position
 			const dragEvent = {
 				eventId,
 				eventType: "InProgress",
@@ -394,8 +349,8 @@ export const useDrag = (props: DragProps) => {
 				startY: startY.current,
 				endX: newPoint.x,
 				endY: newPoint.y,
-				cursorX: newPoint.x, // 図形中心をカーソル位置として使用
-				cursorY: newPoint.y, // 図形中心をカーソル位置として使用
+				cursorX: newPoint.x, // Use shape center as cursor position
+				cursorY: newPoint.y, // Use shape center as cursor position
 			} as DiagramDragEvent;
 
 			if (!isArrowDragging.current) {
@@ -430,8 +385,8 @@ export const useDrag = (props: DragProps) => {
 				break;
 			case "Shift":
 				if (isArrowDragging.current) {
-					// 矢印キーによるドラッグ中にシフトキーが押された場合はドラッグを終了させる。
-					// ドラッグ終了イベントを発火させSvgCanvas側に座標の更新を通知し、座標を更新する。
+					// When shift key is pressed during arrow key dragging, end the drag
+					// Fire drag end event to notify SvgCanvas side of coordinate update and update coordinates
 					onDrag?.({
 						eventId,
 						eventType: "End",
@@ -440,11 +395,11 @@ export const useDrag = (props: DragProps) => {
 						startY: y,
 						endX: x,
 						endY: y,
-						cursorX: x, // 図形中心をカーソル位置として使用
-						cursorY: y, // 図形中心をカーソル位置として使用
+						cursorX: x, // Use shape center as cursor position
+						cursorY: y, // Use shape center as cursor position
 					});
 
-					// 矢印キーによるドラッグ終了とマーク
+					// Mark arrow key drag as ended
 					isArrowDragging.current = false;
 				}
 				break;
@@ -454,15 +409,15 @@ export const useDrag = (props: DragProps) => {
 	};
 
 	/**
-	 * キー離上イベントハンドラ
+	 * Key up event handler
 	 */
 	const handleKeyUp = (e: React.KeyboardEvent<SVGGElement>) => {
-		// ポインターダウン中は何もしない
+		// Do nothing while pointer is down
 		if (isPointerDown.current) {
 			return;
 		}
 
-		// 矢印キー移動完了時のイベント情報を作成
+		// Create event information for arrow key movement completion
 		const dragEvent = {
 			eventId: newEventId(),
 			eventType: "End",
@@ -471,14 +426,14 @@ export const useDrag = (props: DragProps) => {
 			startY: startY.current,
 			endX: x,
 			endY: y,
-			cursorX: x, // 図形中心をカーソル位置として使用
-			cursorY: y, // 図形中心をカーソル位置として使用
+			cursorX: x, // Use shape center as cursor position
+			cursorY: y, // Use shape center as cursor position
 		} as DiagramDragEvent;
 
 		if (isArrowDragging.current) {
 			if (e.key === "Shift") {
-				// 矢印キーによるドラッグ中にシフトキーが離された場合はドラッグ終了イベントを発火させ
-				// SvgCanvas側に座標の更新を通知し、一度座標を更新する
+				// When shift key is released during arrow key dragging, fire drag end event
+				// and notify SvgCanvas side to update coordinates once
 				onDrag?.(dragEvent);
 				onDrag?.({
 					...dragEvent,
@@ -491,56 +446,27 @@ export const useDrag = (props: DragProps) => {
 				e.key === "ArrowUp" ||
 				e.key === "ArrowDown"
 			) {
-				// 矢印キーが離されたらドラッグ終了イベントを発火させSvgCanvas側に座標の更新を通知し、座標を更新する
-				onDrag?.(dragEvent);
-
-				// 矢印キーによるドラッグ終了とマーク
+				// When arrow key is released, fire drag end event to notify SvgCanvas side of coordinate update and update coordinates
+				onDrag?.(dragEvent); // Mark arrow key drag as ended
 				isArrowDragging.current = false;
 			}
 		}
 	};
 
-	/**
-	 * ポインターエンター時のイベントハンドラ
-	 */
-	const handlePointerEnter = () => {
-		// ホバー時のイベント発火
-		onHover?.({
-			eventId: newEventId(),
-			id,
-			isHovered: true,
-		});
-	};
-
-	/**
-	 * ポインターリーブ時のイベントハンドラ
-	 */
-	const handlePointerLeave = () => {
-		// ホバー解除時のイベント発火
-		onHover?.({
-			eventId: newEventId(),
-			id,
-			isHovered: false,
-		});
-	};
-
-	// 全体周知用ドラッグイベントリスナー登録
-	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	// Register global broadcast drag event listener
+	// Use ref to hold referenced values to avoid frequent handler generation
 	const refBusVal = {
-		// プロパティ
+		// Properties
 		id,
 		x,
 		y,
 		type,
 		ref,
-		syncWithSameId,
-		eventBus,
 		onDrag,
 		onDragOver,
 		onDragLeave,
 		onDrop,
-		// 内部変数・内部関数
-		getSvgPoint,
+		// Internal variables and functions
 		getPointOnDrag,
 	};
 	const refBus = useRef(refBusVal);
@@ -548,18 +474,15 @@ export const useDrag = (props: DragProps) => {
 
 	useEffect(() => {
 		let handleBroadcastDrag: (e: CustomEvent) => void;
-		let handleBroadcastDragForSync: (e: CustomEvent) => void;
-
-		const { ref, eventBus, onDrag, onDragOver, onDrop, syncWithSameId } =
-			refBus.current;
+		const { onDragOver, onDrop } = refBus.current;
 
 		if (onDragOver || onDrop) {
 			handleBroadcastDrag = (e: CustomEvent) => {
-				// refBusを介して参照値を取得
+				// Get reference values via refBus
 				const { id, x, y, type, ref, onDragOver, onDragLeave } = refBus.current;
 				const customEvent = e as CustomEvent<BroadcastDragEvent>;
 
-				// ドラッグ＆ドロップのイベント情報を作成
+				// Create drag & drop event information
 				const dragDropEvent = {
 					eventId: customEvent.detail.eventId,
 					dropItem: {
@@ -599,41 +522,6 @@ export const useDrag = (props: DragProps) => {
 			eventBus.addEventListener(EVENT_NAME_BROADCAST_DRAG, handleBroadcastDrag);
 		}
 
-		if (syncWithSameId && onDrag) {
-			handleBroadcastDragForSync = (e: CustomEvent) => {
-				// refBusを介して参照値を取得
-				const { id, onDrag, getSvgPoint } = refBus.current;
-				const customEvent = e as CustomEvent<BroadcastDragEvent>;
-
-				// 同じIDでかつ自身以外の図形のドラッグイベントの場合、同期のためのドラッグイベントを発火する
-				if (customEvent.detail.id === id && e.target !== ref.current) {
-					// SVG座標系でのカーソル位置を取得
-					const svgCursorPoint = getSvgPoint(
-						customEvent.detail.clientX,
-						customEvent.detail.clientY,
-					);
-
-					const dragEvent = {
-						eventId: customEvent.detail.eventId,
-						eventType: customEvent.detail.eventType,
-						id,
-						startX: customEvent.detail.startX,
-						startY: customEvent.detail.startY,
-						endX: customEvent.detail.endX,
-						endY: customEvent.detail.endY,
-						cursorX: svgCursorPoint.x, // カーソル位置も同期させる
-						cursorY: svgCursorPoint.y, // カーソル位置も同期させる
-					};
-
-					onDrag?.(dragEvent);
-				}
-			};
-			eventBus.addEventListener(
-				EVENT_NAME_BROADCAST_DRAG,
-				handleBroadcastDragForSync,
-			);
-		}
-
 		return () => {
 			if (handleBroadcastDrag) {
 				eventBus.removeEventListener(
@@ -641,24 +529,17 @@ export const useDrag = (props: DragProps) => {
 					handleBroadcastDrag,
 				);
 			}
-
-			if (handleBroadcastDragForSync) {
-				eventBus.removeEventListener(
-					EVENT_NAME_BROADCAST_DRAG,
-					handleBroadcastDragForSync,
-				);
-			}
 		};
-	}, []);
+	}, [eventBus]);
 
 	/**
 	 * Handle SvgCanvas scroll event.
 	 */
 	useEffect(() => {
-		let handleSvgCanvasScroll: (e: Event) => void;
+		let handleSvgCanvasScroll: (e: CustomEvent) => void;
 		if (isDragging) {
-			handleSvgCanvasScroll = (e: Event) => {
-				const { id, getPointOnDrag, onDrag, getSvgPoint } = refBus.current;
+			handleSvgCanvasScroll = (e: CustomEvent) => {
+				const { id, getPointOnDrag, onDrag } = refBus.current;
 
 				const customEvent = e as CustomEvent<SvgCanvasScrollEvent>;
 
@@ -666,11 +547,11 @@ export const useDrag = (props: DragProps) => {
 					customEvent.detail.clientX,
 					customEvent.detail.clientY,
 				);
-
-				// SVG座標系でのカーソル位置を取得
+				// Get cursor position in SVG coordinate system
 				const svgCursorPoint = getSvgPoint(
 					customEvent.detail.clientX,
 					customEvent.detail.clientY,
+					ref.current,
 				);
 
 				onDrag?.({
@@ -683,24 +564,25 @@ export const useDrag = (props: DragProps) => {
 					endY: dragPoint.y,
 					cursorX: svgCursorPoint.x,
 					cursorY: svgCursorPoint.y,
+					minX: customEvent.detail.minX,
+					minY: customEvent.detail.minY,
+					isFromAutoEdgeScroll: customEvent.detail.isFromAutoEdgeScroll,
 				});
 			};
-			document.addEventListener(
+			eventBus.addEventListener(
 				EVENT_NAME_SVG_CANVAS_SCROLL,
 				handleSvgCanvasScroll,
-				true,
 			);
 		}
 		return () => {
 			if (handleSvgCanvasScroll) {
-				document.removeEventListener(
+				eventBus.removeEventListener(
 					EVENT_NAME_SVG_CANVAS_SCROLL,
 					handleSvgCanvasScroll,
-					true,
 				);
 			}
 		};
-	}, [isDragging]);
+	}, [isDragging, eventBus, ref]);
 
 	return {
 		onPointerDown: handlePointerDown,
@@ -708,19 +590,17 @@ export const useDrag = (props: DragProps) => {
 		onPointerUp: handlePointerUp,
 		onKeyDown: handleKeyDown,
 		onKeyUp: handleKeyUp,
-		onPointerEnter: handlePointerEnter,
-		onPointerLeave: handlePointerLeave,
 	};
 };
 
 /**
- * ポインターがこのドラッグ領域上にあるかどうかを判定する
- * ポインターキャプチャー時は他の要素でポインター関連のイベントが発火しないため、自力で判定する必要がある
+ * Determine whether the pointer is over this drag area
+ * When pointer is captured, pointer-related events do not fire on other elements, so we need to check manually
  *
- * @param {React.RefObject<SVGElement>} ref ドラッグ領域の参照
- * @param {number} clientX ポインターのX座標
- * @param {number} clientY ポインターのY座標
- * @returns {boolean} ポインターがこのドラッグ領域上にあるかどうか
+ * @param {React.RefObject<SVGElement>} ref Reference to the drag area
+ * @param {number} clientX Pointer X coordinate
+ * @param {number} clientY Pointer Y coordinate
+ * @returns {boolean} Whether the pointer is over this drag area
  */
 const isPointerOver = (
 	ref: React.RefObject<SVGElement>,

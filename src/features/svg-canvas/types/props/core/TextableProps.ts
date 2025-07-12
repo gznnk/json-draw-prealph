@@ -1,5 +1,5 @@
 import type { DiagramChangeEvent } from "../../events/DiagramChangeEvent";
-import type { DiagramTextEditEvent } from "../../events/DiagramTextEditEvent";
+import type { DiagramTextChangeEvent } from "../../events/DiagramTextChangeEvent";
 
 /**
  * Props for components that can display and edit text.
@@ -7,6 +7,6 @@ import type { DiagramTextEditEvent } from "../../events/DiagramTextEditEvent";
  */
 export type TextableProps = {
 	isTextEditEnabled?: boolean;
-	onTextEdit?: (e: DiagramTextEditEvent) => void;
+	onTextChange?: (e: DiagramTextChangeEvent) => void;
 	onDiagramChange?: (e: DiagramChangeEvent) => void;
 };

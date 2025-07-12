@@ -5,6 +5,13 @@ import { memo, useRef } from "react";
 // Import hooks.
 import type { DragProps } from "../../../hooks/useDrag";
 import { useDrag } from "../../../hooks/useDrag";
+import { useClick } from "../../../hooks/useClick";
+
+// Import types.
+import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent";
+
+// Import utils.
+import { mergeProps } from "../../../utils/common/mergeProps";
 
 /**
  * Props for the DragLine component.
@@ -15,6 +22,7 @@ type DragLineProps = Omit<DragProps, "ref"> & {
 	endX: number;
 	endY: number;
 	cursor: string;
+	onClick?: (e: DiagramClickEvent) => void;
 };
 
 /**
@@ -29,7 +37,6 @@ const DragLineComponent: React.FC<DragLineProps> = ({
 	endX,
 	endY,
 	cursor,
-	eventBus,
 	onPointerDown,
 	onClick,
 	onDrag,
@@ -42,12 +49,20 @@ const DragLineComponent: React.FC<DragLineProps> = ({
 		x,
 		y,
 		ref: svgRef,
-		eventBus,
 		onPointerDown,
-		onClick,
 		onDrag,
 		dragPositioningFunction,
 	});
+	const clickProps = useClick({
+		id,
+		x,
+		y,
+		ref: svgRef,
+		onClick,
+	});
+
+	// Compose props for line element
+	const composedProps = mergeProps(dragProps, clickProps);
 
 	return (
 		<line
@@ -60,7 +75,7 @@ const DragLineComponent: React.FC<DragLineProps> = ({
 			strokeWidth={5}
 			cursor={cursor}
 			ref={svgRef}
-			{...dragProps}
+			{...composedProps}
 		/>
 	);
 };

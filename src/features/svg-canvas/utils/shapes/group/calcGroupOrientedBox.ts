@@ -1,5 +1,5 @@
 // Import types.
-import type { Bounds } from "../../../types/base/Bounds";
+import type { Bounds } from "../../../types/core/Bounds";
 import type { GroupData } from "../../../types/data/shapes/GroupData";
 
 // Import utils.

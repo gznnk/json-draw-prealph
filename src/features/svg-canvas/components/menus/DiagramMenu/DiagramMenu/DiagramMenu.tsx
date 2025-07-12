@@ -23,7 +23,7 @@ import { VerticalAlignMiddle } from "../../../icons/VerticalAlignMiddle";
 import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
 
 // Import types related to SvgCanvas.
-import type { RectangleVertices } from "../../../../types/base/RectangleVertices";
+import type { RectangleVertices } from "../../../../types/core/RectangleVertices";
 
 // Import functions related to SvgCanvas.
 import { calcRectangleVertices } from "../../../../utils/math/geometry/calcRectangleVertices";
@@ -118,7 +118,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					menuStateMap={menuStateMap}
 					onMenuClick={onMenuClick}
 				>
-					<BgColor title="背景色" />
+					<BgColor title="Background Color" />
 				</DiagramMenuItem>
 				{menuStateMap.BgColor === "Active" && (
 					<ColorPicker color={bgColor} onColorChange={onBgColorChange} />
@@ -132,7 +132,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					menuStateMap={menuStateMap}
 					onMenuClick={onMenuClick}
 				>
-					<Edit title="枠線の色" />
+					<Edit title="Border Color" />
 				</DiagramMenuItem>
 				{menuStateMap.BorderColor === "Active" && (
 					<ColorPicker
@@ -149,15 +149,15 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					menuStateMap={menuStateMap}
 					onMenuClick={onMenuClick}
 				>
-					<BorderRadius title="角丸" />
+					<BorderRadius title="Border Radius" />
 				</DiagramMenuItem>
 				{menuStateMap.BorderRadius === "Active" && (
 					<NumberStepper
 						value={borderRadius}
 						min={MIN_BORDER_RADIUS}
 						max={MAX_BORDER_RADIUS}
-						minusTooltip="角丸を縮小"
-						plusTooltip="角丸を拡大"
+						minusTooltip="Decrease border radius"
+						plusTooltip="Increase border radius"
 						onChange={onBorderRadiusChange}
 					/>
 				)}
@@ -182,15 +182,15 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					menuStateMap={menuStateMap}
 					onMenuClick={onMenuClick}
 				>
-					<FontSize title="フォントサイズ" />
+					<FontSize title="Font Size" />
 				</DiagramMenuItem>
 				{menuStateMap.FontSize === "Active" && (
 					<NumberStepper
 						value={fontSize}
 						min={MIN_FONT_SIZE}
 						max={MAX_FONT_SIZE}
-						minusTooltip="フォントサイズを縮小"
-						plusTooltip="フォントサイズを拡大"
+						minusTooltip="Decrease font size"
+						plusTooltip="Increase font size"
 						onChange={onFontSizeChange}
 					/>
 				)}
@@ -203,7 +203,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					menuStateMap={menuStateMap}
 					onMenuClick={onMenuClick}
 				>
-					<FontColor title="フォントの色" />
+					<FontColor title="Font Color" />
 				</DiagramMenuItem>
 				{menuStateMap.FontColor === "Active" && (
 					<ColorPicker color={fontColor} onColorChange={onFontColorChange} />
@@ -217,7 +217,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<Bold title="太字" />
+				<Bold title="Bold" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -239,7 +239,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<AlignLeft title="左揃え" />
+				<AlignLeft title="Align Left" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -249,7 +249,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<AlignCenter title="中央揃え" />
+				<AlignCenter title="Align Center" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -259,7 +259,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<AlignRight title="右揃え" />
+				<AlignRight title="Align Right" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -281,7 +281,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<VerticalAlignTop title="上揃え" />
+				<VerticalAlignTop title="Align Top" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -291,7 +291,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<VerticalAlignMiddle title="中央揃え" />
+				<VerticalAlignMiddle title="Align Middle" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -301,7 +301,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<VerticalAlignBottom title="下揃え" />
+				<VerticalAlignBottom title="Align Bottom" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -324,7 +324,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<BringToFront title="最前面に移動" />
+				<BringToFront title="Bring to Front" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -334,7 +334,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<BringForward title="前面に移動" />
+				<BringForward title="Bring Forward" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -344,7 +344,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<SendBackward title="背面に移動" />
+				<SendBackward title="Send Backward" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -354,7 +354,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<SendToBack title="最背面に移動" />
+				<SendToBack title="Send to Back" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -372,7 +372,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<AspectRatio width={22} height={22} title="アスペクト比維持" />
+				<AspectRatio width={22} height={22} title="Keep Aspect Ratio" />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(
@@ -390,11 +390,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap={menuStateMap}
 				onMenuClick={onMenuClick}
 			>
-				<Group
-					title={
-						menuStateMap.Group === "Active" ? "グループ解除" : "グループ化"
-					}
-				/>
+				<Group title={menuStateMap.Group === "Active" ? "Ungroup" : "Group"} />
 			</DiagramMenuItem>,
 		);
 		menuItemComponents.push(<DiagramMenuDivider key="GroupSectionDivider" />);

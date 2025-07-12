@@ -1,4 +1,4 @@
-import type { DiagramType } from "../base/DiagramType";
+import type { DiagramType } from "../core/DiagramType";
 
 /**
  * Event type for new diagram creation.

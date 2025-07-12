@@ -50,9 +50,8 @@ const VectorStoreNodeComponent: React.FC<VectorStoreNodeProps> = (props) => {
 			setApiKey(storedApiKey);
 		}
 	}, []);
-
 	/**
-	 * ファイルをベクトルストアにアップロードする処理
+	 * Process to upload file to vector store
 	 */
 	const uploadFileToVectorStore = useCallback(async (file: File) => {
 		const processId = newEventId();
@@ -76,9 +75,8 @@ const VectorStoreNodeComponent: React.FC<VectorStoreNodeProps> = (props) => {
 			setProcessIdList((prev) => prev.filter((id) => id !== processId));
 		}
 	}, []);
-
 	/**
-	 * ファイルドロップのハンドラ
+	 * File drop handler
 	 */
 	const handleFileDrop = useCallback(
 		(e: FileDropEvent) => {
@@ -91,7 +89,7 @@ const VectorStoreNodeComponent: React.FC<VectorStoreNodeProps> = (props) => {
 
 			for (let i = 0; i < files.length; i++) {
 				const file = files[i];
-				// .txtまたは.mdファイルのみ処理
+				// Process only .txt or .md files
 				const extension = file.name.split(".").pop()?.toLowerCase();
 				if (extension === "txt" || extension === "md") {
 					uploadFileToVectorStore(file);
@@ -113,7 +111,7 @@ const VectorStoreNodeComponent: React.FC<VectorStoreNodeProps> = (props) => {
 
 			const openai = new OpenAI({
 				apiKey: apiKey,
-				dangerouslyAllowBrowser: true, // ブラウザで直接使用する場合に必要
+				dangerouslyAllowBrowser: true, // Required for direct browser usage
 			});
 
 			const fileContent = new Blob([e.data.text], { type: "text/plain" });

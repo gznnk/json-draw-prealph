@@ -84,11 +84,11 @@ const ImageGenNodeComponent: React.FC<ImageGenNodeProps> = (props) => {
 						}),
 					});
 				} else {
-					alert("APIからの応答が空です。");
+					alert("API response is empty.");
 				}
 			} catch (error) {
 				console.error("Error fetching data from OpenAI API:", error);
-				alert("APIリクエスト中にエラーが発生しました。");
+				alert("An error occurred during API request.");
 			}
 
 			setProcessIdList((prev) => prev.filter((id) => id !== processId));

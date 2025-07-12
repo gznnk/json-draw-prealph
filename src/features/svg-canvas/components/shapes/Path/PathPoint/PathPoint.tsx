@@ -9,19 +9,10 @@ import { DragPoint } from "../../../core/DragPoint";
 import type { PathPointProps } from "../../../../types/props/shapes/PathPointProps";
 
 /**
- * 折れ線の頂点コンポーネント
+ * Polyline vertex component
  */
 export const PathPoint: React.FC<PathPointProps> = memo(
-	({ id, x, y, hidden, eventBus, onDrag }) => {
-		return (
-			<DragPoint
-				id={id}
-				x={x}
-				y={y}
-				hidden={hidden}
-				eventBus={eventBus}
-				onDrag={onDrag}
-			/>
-		);
+	({ id, x, y, hidden, onDrag }) => {
+		return <DragPoint id={id} x={x} y={y} hidden={hidden} onDrag={onDrag} />;
 	},
 );

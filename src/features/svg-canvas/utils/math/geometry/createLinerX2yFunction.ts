@@ -1,5 +1,5 @@
 // Import types.
-import type { Point } from "../../../types/base/Point";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Creates a function that calculates Y coordinate from X using a line equation defined by two points.

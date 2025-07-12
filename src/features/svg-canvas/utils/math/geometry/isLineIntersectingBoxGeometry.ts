@@ -1,9 +1,9 @@
 // Import types.
-import type { BoxGeometry } from "../../../types/base/BoxGeometry";
-import type { Point } from "../../../types/base/Point";
+import type { BoxGeometry } from "../../../types/core/BoxGeometry";
+import type { Point } from "../../../types/core/Point";
 
 // Import utils.
-import { lineIntersects } from "./lineIntersects";
+import { segmentsIntersect } from "./segmentsIntersect";
 
 /**
  * Determines if a line segment intersects with a box geometry.
@@ -22,20 +22,20 @@ export const isLineIntersectingBoxGeometry = (
 		[
 			{ x: boxGeometry.left, y: boxGeometry.top },
 			{ x: boxGeometry.right, y: boxGeometry.top },
-		], // 上辺
+		], // Top edge
 		[
 			{ x: boxGeometry.right, y: boxGeometry.top },
 			{ x: boxGeometry.right, y: boxGeometry.bottom },
-		], // 右辺
+		], // Right edge
 		[
 			{ x: boxGeometry.right, y: boxGeometry.bottom },
 			{ x: boxGeometry.left, y: boxGeometry.bottom },
-		], // 下辺
+		], // Bottom edge
 		[
 			{ x: boxGeometry.left, y: boxGeometry.bottom },
 			{ x: boxGeometry.left, y: boxGeometry.top },
-		], // 左辺
+		], // Left edge
 	];
 
-	return boxEdges.some(([q1, q2]) => lineIntersects(p1, p2, q1, q2));
+	return boxEdges.some(([q1, q2]) => segmentsIntersect(p1, p2, q1, q2, false));
 };

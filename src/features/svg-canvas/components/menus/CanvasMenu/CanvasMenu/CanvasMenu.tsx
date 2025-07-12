@@ -29,7 +29,7 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({ onNewDiagram }) => {
 				}
 			>
 				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>四角形を追加</title>
+					<title>Add Rectangle</title>
 					<rect
 						x="2"
 						y="2"
@@ -50,7 +50,7 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({ onNewDiagram }) => {
 				}
 			>
 				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>円を追加</title>
+					<title>Add Circle</title>
 					<ellipse
 						cx="12"
 						cy="12"
@@ -71,7 +71,7 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({ onNewDiagram }) => {
 				}
 			>
 				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>線を追加</title>
+					<title>Add Line</title>
 					<path
 						d="M22 22 L2 2 Z"
 						fill="none"
@@ -89,7 +89,7 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({ onNewDiagram }) => {
 					})
 				}
 			>
-				あ
+				T
 			</CanvasMenuItem>
 			<CanvasMenuItem
 				onClick={() =>
@@ -111,7 +111,7 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({ onNewDiagram }) => {
 					})
 				}
 			>
-				図
+				SVG
 			</CanvasMenuItem>
 			<CanvasMenuItem
 				onClick={() =>
@@ -133,7 +133,7 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({ onNewDiagram }) => {
 					})
 				}
 			>
-				画
+				IMG
 			</CanvasMenuItem>
 			<CanvasMenuItem
 				onClick={() =>

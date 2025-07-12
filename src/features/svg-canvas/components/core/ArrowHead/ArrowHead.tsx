@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { ArrowHeadType } from "../../../types/base/ArrowHeadType";
+import type { ArrowHeadType } from "../../../types/core/ArrowHeadType";
 
 // Import utils.
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";

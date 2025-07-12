@@ -1,12 +1,10 @@
 // Import React.
 import type React from "react";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef } from "react";
 
 // Import types.
-import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
-import type { DiagramHoverEvent } from "../../../types/events/DiagramHoverEvent";
-import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEvent";
-import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
+import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
+import type { DiagramDragDropEvent } from "../../../types/events/DiagramDragDropEvent";
 import type { RectangleProps } from "../../../types/props/shapes/RectangleProps";
 
 // Import components.
@@ -14,13 +12,18 @@ import { Outline } from "../../core/Outline";
 import { PositionLabel } from "../../core/PositionLabel";
 import { Textable } from "../../core/Textable";
 import { Transformative } from "../../core/Transformative";
-import { ConnectPoint } from "../ConnectPoint";
+import { ConnectPoints } from "../ConnectPoints";
 
 // Import hooks.
+import { useClick } from "../../../hooks/useClick";
 import { useDrag } from "../../../hooks/useDrag";
 import { useFileDrop } from "../../../hooks/useFileDrop";
+import { useHover } from "../../../hooks/useHover";
+import { useSelect } from "../../../hooks/useSelect";
+import { useText } from "../../../hooks/useText";
 
 // Import utils.
+import { mergeProps } from "../../../utils/common/mergeProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 
@@ -28,7 +31,7 @@ import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransf
 import { RectangleElement } from "./RectangleStyled";
 
 /**
- * 四角形コンポーネント
+ * Rectangle component
  */
 const RectangleComponent: React.FC<RectangleProps> = ({
 	id,
@@ -45,10 +48,9 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	stroke,
 	strokeWidth,
 	isSelected,
-	isMultiSelectSource,
+	isAncestorSelected = false,
 	connectPoints,
-	showConnectPoints = true,
-	syncWithSameId = false,
+	showConnectPoints = false,
 	text,
 	textType,
 	fontColor,
@@ -59,147 +61,135 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	verticalAlign,
 	isTextEditing,
 	isTextEditEnabled = true,
+	isDragging = false,
 	isTransparent,
 	showOutline = false,
-	eventBus,
+	showTransformControls = false,
+	isTransforming = false,
 	onDrag,
+	onDragEnter,
+	onDragLeave,
 	onClick,
 	onSelect,
 	onTransform,
 	onConnect,
-	onTextEdit,
+	onPreviewConnectLine,
+	onTextChange,
 	onFileDrop,
+	onHoverChange,
 }) => {
-	// ドラッグ中かのフラグ
-	const [isDragging, setIsDragging] = useState(false);
-	// 変形中かのフラグ
-	const [isTransformimg, setIsTransforming] = useState(false);
-	// ホバー中かのフラグ
-	const [isHovered, setIsHovered] = useState(false);
-	// 変形対象のSVG要素への参照
+	// Reference to the SVG element to be transformed
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
-	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	// To avoid frequent handler generation, hold referenced values in useRef
 	const refBusVal = {
-		// プロパティ
+		// Properties
 		id,
 		isSelected,
 		isTextEditEnabled,
 		onDrag,
-		onSelect,
-		onTransform,
-		onTextEdit,
+		onTextChange,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	/**
-	 * 四角形のドラッグイベントハンドラ
+	 * Hover state change event handler
 	 */
-	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { onDrag } = refBus.current;
-
-		if (e.eventType === "Start") {
-			setIsDragging(true);
-		}
-
-		onDrag?.(e);
-
-		if (e.eventType === "End") {
-			setIsDragging(false);
-		}
-	}, []);
+	const handleHover = useCallback(
+		(e: DiagramHoverChangeEvent) => {
+			// Propagate hover change event to canvas
+			if (onHoverChange) {
+				onHoverChange(e);
+			}
+		},
+		[onHoverChange],
+	);
 
 	/**
-	 * 四角形の変形イベントハンドラ
+	 * Drag over event handler
 	 */
-	const handleTransform = useCallback((e: DiagramTransformEvent) => {
-		const { onTransform } = refBus.current;
-
-		if (e.eventType === "Start") {
-			setIsTransforming(true);
-		}
-
-		onTransform?.(e);
-
-		if (e.eventType === "End") {
-			setIsTransforming(false);
-		}
-	}, []);
+	const handleDragOver = useCallback(
+		(e: DiagramDragDropEvent) => {
+			// Propagate drag enter event to canvas
+			if (onDragEnter) {
+				onDragEnter(e);
+			}
+		},
+		[onDragEnter],
+	);
 
 	/**
-	 * ポインターダウンイベントハンドラ
+	 * Drag leave event handler
 	 */
-	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
-		const { id, onSelect } = refBus.current;
+	const handleDragLeave = useCallback(
+		(e: DiagramDragDropEvent) => {
+			// Propagate drag leave event to canvas
+			if (onDragLeave) {
+				onDragLeave(e);
+			}
+		},
+		[onDragLeave],
+	);
 
-		// 図形選択イベントを発火
-		onSelect?.({
-			eventId: e.eventId,
-			id,
-		});
-	}, []);
+	// Generate properties for text editing
+	const { onDoubleClick } = useText({
+		id,
+		isSelected,
+		isTextEditEnabled,
+		onTextChange,
+	});
 
-	/**
-	 * ホバー状態変更イベントハンドラ
-	 */
-	const handleHover = useCallback((e: DiagramHoverEvent) => {
-		setIsHovered(e.isHovered);
-	}, []);
-
-	/**
-	 * ドラッグオーバーイベントハンドラ
-	 */
-	const handleDragOver = useCallback(() => {
-		setIsHovered(true);
-	}, []);
-
-	/**
-	 * ドラッグリーブイベントハンドラ
-	 */
-	const handleDragLeave = useCallback(() => {
-		setIsHovered(false);
-	}, []);
-
-	/**
-	 * ダブルクリックイベントハンドラ
-	 */
-	const handleDoubleClick = useCallback(() => {
-		const { id, isSelected, isTextEditEnabled, onTextEdit } = refBus.current;
-
-		if (!isTextEditEnabled) return;
-
-		if (!isSelected) return;
-
-		// テキスト編集イベントを発火
-		onTextEdit?.({
-			id,
-		});
-	}, []);
-
-	// ドラッグ用のプロパティを生成
+	// Generate properties for dragging
 	const dragProps = useDrag({
 		id,
 		type: "Rectangle",
 		x,
 		y,
-		syncWithSameId,
 		ref: svgRef,
-		eventBus,
-		onPointerDown: handlePointerDown,
-		onClick: onClick,
-		onDrag: handleDrag,
-		onHover: handleHover,
+		onDrag,
 		onDragOver: handleDragOver,
 		onDragLeave: handleDragLeave,
 	});
 
-	// ファイルドロップ用のプロパティを生成
+	// Generate properties for clicking
+	const clickProps = useClick({
+		id,
+		x,
+		y,
+		isSelected,
+		isAncestorSelected,
+		ref: svgRef,
+		onClick,
+	});
+
+	// Generate properties for selection
+	const selectProps = useSelect({
+		id,
+		onSelect,
+	});
+
+	// Generate properties for hovering
+	const hoverProps = useHover({
+		id,
+		onHoverChange: handleHover,
+	});
+
+	// Generate properties for file drop
 	const fileDropProps = useFileDrop({ id, onFileDrop });
 
-	// memo化によりConnectPointの再描画を抑制
-	// keyで分解してばらばらにpropsで渡すと、各ConnectPoint側それぞれで各keyに対して
-	// 比較処理が走り非効率なので、ここでまとめてShapeの差異を検知する
+	// Compose props for RectangleElement
+	const composedProps = mergeProps(
+		dragProps,
+		clickProps,
+		selectProps,
+		hoverProps,
+		fileDropProps,
+	);
+
+	// Suppress ConnectPoint re-rendering by memoization
+	// If separated by key and passed as individual props, each ConnectPoint side
+	// performs comparison processing for each key which is inefficient, so detect Shape differences collectively here
 	const ownerShape = useMemo(
 		() => ({
 			x,
@@ -213,7 +203,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		[x, y, width, height, rotation, scaleX, scaleY],
 	);
 
-	// rectのtransform属性を生成
+	// Generate rect transform attribute
 	const transform = createSvgTransform(
 		scaleX,
 		scaleY,
@@ -221,17 +211,6 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 		x,
 		y,
 	);
-
-	// 変形コンポーネントを表示するかのフラグ
-	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
-
-	// 接続ポイントを表示するかのフラグ
-	const doShowConnectPoints =
-		showConnectPoints &&
-		!isSelected &&
-		!isMultiSelectSource &&
-		!isDragging &&
-		!isTransformimg;
 
 	return (
 		<>
@@ -249,12 +228,11 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					strokeWidth={strokeWidth}
 					tabIndex={0}
 					cursor="move"
-					isTransparent={isTransparent || isMultiSelectSource}
+					isTransparent={isTransparent}
 					transform={transform}
 					ref={svgRef}
-					onDoubleClick={handleDoubleClick}
-					{...dragProps}
-					{...fileDropProps}
+					onDoubleClick={onDoubleClick}
+					{...composedProps}
 				/>
 			</g>
 			{isTextEditEnabled && (
@@ -283,11 +261,9 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 				rotation={rotation}
 				scaleX={scaleX}
 				scaleY={scaleY}
-				isSelected={isSelected}
-				isMultiSelectSource={isMultiSelectSource}
 				showOutline={showOutline}
 			/>
-			{showTransformative && (
+			{showTransformControls && (
 				<Transformative
 					id={id}
 					type="Rectangle"
@@ -299,27 +275,20 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 					scaleX={scaleX}
 					scaleY={scaleY}
 					keepProportion={keepProportion}
-					isSelected={isSelected}
-					isMultiSelectSource={isMultiSelectSource}
-					eventBus={eventBus}
-					onTransform={handleTransform}
+					showTransformControls={showTransformControls}
+					isTransforming={isTransforming}
+					onTransform={onTransform}
 				/>
 			)}
-			{doShowConnectPoints &&
-				connectPoints.map((cp) => (
-					<ConnectPoint
-						key={cp.id}
-						id={cp.id}
-						name={cp.name}
-						x={cp.x}
-						y={cp.y}
-						ownerId={id}
-						ownerShape={ownerShape}
-						isTransparent={!isHovered || isDragging || isTransformimg}
-						eventBus={eventBus}
-						onConnect={onConnect}
-					/>
-				))}
+			<ConnectPoints
+				ownerId={id}
+				ownerShape={ownerShape}
+				connectPoints={connectPoints}
+				showConnectPoints={showConnectPoints}
+				shouldRender={!isDragging && !isTransforming && !isSelected}
+				onConnect={onConnect}
+				onPreviewConnectLine={onPreviewConnectLine}
+			/>
 			{isSelected && isDragging && (
 				<PositionLabel
 					x={x}

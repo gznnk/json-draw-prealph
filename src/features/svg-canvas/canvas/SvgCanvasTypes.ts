@@ -1,29 +1,50 @@
 // Import React.
 import type { RefObject } from "react";
 
-// Import types related to SvgCanvas.
+// Import types.
 import type { Diagram } from "../types/data/catalog/Diagram";
-import type { TextEditorState } from "../components/core/Textable";
 import type { GroupData } from "../types/data/shapes/GroupData";
+import type { PathData } from "../types/data/shapes/PathData";
+import type { AreaSelectionEvent } from "../types/events/AreaSelectionEvent";
 import type { DiagramChangeEvent } from "../types/events/DiagramChangeEvent";
+import type { DiagramClickEvent } from "../types/events/DiagramClickEvent";
 import type { DiagramConnectEvent } from "../types/events/DiagramConnectEvent";
 import type { DiagramConstraintChangeEvent } from "../types/events/DiagramConstraintChangeEvent";
-import type { DiagramDragDropEvent } from "../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../types/events/DiagramDragEvent";
+import type { DiagramDragDropEvent } from "../types/events/DiagramDragDropEvent";
+import type { DiagramHoverChangeEvent } from "../types/events/DiagramHoverChangeEvent";
 import type { DiagramSelectEvent } from "../types/events/DiagramSelectEvent";
 import type { DiagramStyleChangeEvent } from "../types/events/DiagramStyleChangeEvent";
 import type { DiagramTextChangeEvent } from "../types/events/DiagramTextChangeEvent";
-import type { DiagramTextEditEvent } from "../types/events/DiagramTextEditEvent";
 import type { DiagramTransformEvent } from "../types/events/DiagramTransformEvent";
 import type { ExecuteEvent } from "../types/events/ExecuteEvent";
 import type { NewDiagramEvent } from "../types/events/NewDiagramEvent";
+import type { PreviewConnectLineEvent } from "../types/events/PreviewConnectLineEvent";
 import type { StackOrderChangeEvent } from "../types/events/StackOrderChangeEvent";
 import type { SvgCanvasResizeEvent } from "../types/events/SvgCanvasResizeEvent";
 import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
-import type { EventBus } from "../../../shared/event-bus/EventBus";
+
+// Import components.
+import type { TextEditorState } from "../components/core/Textable";
 
 // Import area selection types.
 import type { AreaSelectionState } from "./hooks/selection/useAreaSelection";
+
+// Import shared.
+import type { EventBus } from "../../../shared/event-bus/EventBus";
+
+/**
+ * Enum for the interaction state of the SvgCanvas.
+ * Represents whether the canvas is in normal state, dragging, or transforming.
+ */
+export enum InteractionState {
+	/** Normal state - no special interaction */
+	Normal = "normal",
+	/** Dragging state - user is dragging elements */
+	Dragging = "dragging",
+	/** Transforming state - user is transforming elements (resize, rotate, etc.) */
+	Transforming = "transforming",
+}
 
 /**
  * Type for the data of the SvgCanvas.
@@ -46,8 +67,10 @@ export type SvgCanvasState = {
 	historyIndex: number;
 	lastHistoryEventId: string;
 	textEditorState: TextEditorState;
+	previewConnectLineState?: PathData;
 	isGrabScrollReady?: boolean;
 	isGrabScrolling?: boolean;
+	interactionState: InteractionState;
 } & SvgCanvasData;
 
 /**
@@ -84,40 +107,45 @@ export type SvgCanvasProps = SvgCanvasState & {
 	eventBus: EventBus;
 	title?: string;
 	selectionState?: AreaSelectionState;
-	onTransform?: (e: DiagramTransformEvent) => void;
-	onDiagramChange?: (e: DiagramChangeEvent) => void;
-	onDiagramStyleChange?: (e: DiagramStyleChangeEvent) => void;
-	onDiagramConstraintChange?: (e: DiagramConstraintChangeEvent) => void;
-	onDrag?: (e: DiagramDragEvent) => void;
-	onDragEnd?: (e: DiagramDragEvent) => void;
-	onDrop?: (e: DiagramDragDropEvent) => void;
-	onSelect?: (e: DiagramSelectEvent) => void;
-	onSelectAll?: () => void;
-	onClearAllSelection?: () => void;
-	onDelete?: () => void;
+	// actions
+	onClick?: (e: DiagramClickEvent) => void;
 	onConnect?: (e: DiagramConnectEvent) => void;
-	onTextEdit?: (e: DiagramTextEditEvent) => void;
-	onTextChange?: (e: DiagramTextChangeEvent) => void;
-	onGroup?: () => void;
-	onUngroup?: () => void;
-	onUndo?: () => void;
-	onRedo?: () => void;
-	onDataChange?: (data: SvgCanvasData) => void;
-	onCanvasResize?: (e: SvgCanvasResizeEvent) => void;
-	onNewDiagram?: (e: NewDiagramEvent) => void;
-	onStackOrderChange?: (e: StackOrderChangeEvent) => void;
+	onCopy?: () => void;
+	onDelete?: () => void;
+	onDiagramChange?: (e: DiagramChangeEvent) => void;
+	onDiagramConstraintChange?: (e: DiagramConstraintChangeEvent) => void;
+	onDiagramStyleChange?: (e: DiagramStyleChangeEvent) => void;
+	onDrag?: (e: DiagramDragEvent) => void;
+	onDragEnter?: (e: DiagramDragDropEvent) => void;
+	onDragLeave?: (e: DiagramDragDropEvent) => void;
 	onExecute?: (e: ExecuteEvent) => void;
 	onExport?: () => void;
-	onScroll?: (e: SvgCanvasScrollEvent) => void;
-	onCopy?: () => void;
+	onGroup?: () => void;
+	onHoverChange?: (e: DiagramHoverChangeEvent) => void;
+	onNewDiagram?: (e: NewDiagramEvent) => void;
 	onPaste?: () => void;
-	onZoom?: (zoom: number) => void;
-	onNavigate?: (minX: number, minY: number) => void;
+	onPreviewConnectLine?: (e: PreviewConnectLineEvent) => void;
+	onStackOrderChange?: (e: StackOrderChangeEvent) => void;
+	onTextChange?: (e: DiagramTextChangeEvent) => void;
+	onTransform?: (e: DiagramTransformEvent) => void;
+	onUngroup?: () => void;
+	// history
+	onRedo?: () => void;
+	onUndo?: () => void;
+	// navigation
 	onGrabStart?: (e: React.PointerEvent<SVGSVGElement>) => boolean;
 	onGrabMove?: (e: React.PointerEvent<SVGSVGElement>) => void;
 	onGrabEnd?: (e: React.PointerEvent<SVGSVGElement>) => void;
-	onStartAreaSelection?: (clientX: number, clientY: number) => void;
-	onUpdateAreaSelection?: (clientX: number, clientY: number) => void;
-	onEndAreaSelection?: () => void;
+	onNavigate?: (minX: number, minY: number) => void;
+	onScroll?: (e: SvgCanvasScrollEvent) => void;
+	onZoom?: (zoom: number) => void;
+	// selection
+	onAreaSelection?: (event: AreaSelectionEvent) => void;
 	onCancelAreaSelection?: () => void;
+	onClearAllSelection?: () => void;
+	onSelect?: (e: DiagramSelectEvent) => void;
+	onSelectAll?: () => void;
+	// other
+	onDataChange?: (data: SvgCanvasData) => void;
+	onCanvasResize?: (e: SvgCanvasResizeEvent) => void;
 };

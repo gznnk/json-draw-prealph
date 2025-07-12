@@ -1,5 +1,5 @@
 // Import types.
-import type { Point } from "../../types/base/Point";
+import type { Point } from "../../types/core/Point";
 
 /**
  * Draws a rectangle for debugging purposes.

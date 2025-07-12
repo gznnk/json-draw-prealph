@@ -6,7 +6,6 @@ import { memo, useCallback, useRef, useState } from "react";
 import type { Diagram } from "../../../../types/data/catalog/Diagram";
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
-import type { EventBus } from "../../../../../../shared/event-bus/EventBus";
 
 // Import functions related to SvgCanvas.
 import { newId } from "../../../../utils/shapes/common/newId";
@@ -15,22 +14,20 @@ import { newId } from "../../../../utils/shapes/common/newId";
 import { NewVertex, type NewVertexData } from "../NewVertex";
 
 /**
- * 新規頂点リストプロパティ
+ * New vertex list properties
  */
 type NewVertexListProps = {
 	id: string;
 	items: Diagram[];
-	eventBus: EventBus;
 	onDiagramChange?: (e: DiagramChangeEvent) => void;
 };
 
 /**
- * 新規頂点リストコンポーネント
+ * New vertex list component
  */
 const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 	id,
 	items,
-	eventBus,
 	onDiagramChange,
 }) => {
 	// Dragging NewVertex component data.
@@ -44,10 +41,10 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 	// NewVertex data list for rendering.
 	const newVertexList: NewVertexData[] = [];
 	if (draggingNewVertex) {
-		// ドラッグ中の場合はその新規頂点のみ描画
+		// During dragging, render only that new vertex
 		newVertexList.push(draggingNewVertex);
 	} else {
-		// ドラッグ中でなければ、各頂点の中点に新規頂点を描画
+		// When not dragging, render new vertices at the midpoint of each vertex pair
 		for (let i = 0; i < items.length - 1; i++) {
 			const item = items[i];
 			const nextItem = items[i + 1];
@@ -56,39 +53,39 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 			const y = (item.y + nextItem.y) / 2;
 
 			newVertexList.push({
-				id: `${item.id}-${nextItem.id}`, // 前後の頂点からIDを生成
+				id: `${item.id}-${nextItem.id}`, // Generate ID from adjacent vertices
 				x,
 				y,
 			});
 		}
 	}
 
-	// ハンドラ生成の頻発を回避するため、参照する値をuseRefで保持する
+	// Use ref to hold referenced values to avoid frequent handler generation
 	const refBusVal = {
-		// プロパティ
+		// Properties
 		id,
 		items,
 		onDiagramChange,
-		// 内部変数・内部関数
+		// State variables and functions
 		newVertexList,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	/**
-	 * 新規頂点のドラッグイベントハンドラ
+	 * New vertex drag event handler
 	 */
 	const handleNewVertexDrag = useCallback((e: DiagramDragEvent) => {
 		const { id, items, onDiagramChange, newVertexList } = refBus.current;
-		// ドラッグ開始時の処理
+		// Processing at drag start
 		if (e.eventType === "Start") {
 			// Store the items of owner Path component at the start of the new vertex drag.
 			startItems.current = items;
 
-			// ドラッグ中の新規頂点を設定
+			// Set the new vertex being dragged
 			setDraggingNewVertex({ id: e.id, x: e.startX, y: e.startY });
 
-			// 新規頂点と同じ位置に頂点を追加し、パスを更新する
+			// Add a vertex at the same position as the new vertex and update the path
 			const idx = newVertexList.findIndex((v) => v.id === e.id);
 			const newItems = [...items];
 			const newItem = {
@@ -99,7 +96,7 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 			} as Diagram;
 			newItems.splice(idx + 1, 0, newItem);
 
-			// パスの変更を通知
+			// Notify path change
 			onDiagramChange?.({
 				eventId: e.eventId,
 				eventType: e.eventType,
@@ -114,12 +111,12 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 			});
 		}
 
-		// ドラッグ中の処理
+		// Processing during drag
 		if (e.eventType === "InProgress") {
-			// ドラッグ中の新規頂点の位置を更新
+			// Update the position of the new vertex being dragged
 			setDraggingNewVertex({ id: e.id, x: e.endX, y: e.endY });
 
-			// 新規頂点のドラッグに伴うパスの頂点の位置変更を通知
+			// Notify path vertex position change due to new vertex drag
 			onDiagramChange?.({
 				eventId: e.eventId,
 				eventType: e.eventType,
@@ -135,13 +132,12 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 				},
 			});
 		}
-
-		// ドラッグ完了時の処理
+		// Processing at drag completion
 		if (e.eventType === "End") {
-			// ドラッグ中の新規頂点を解除
+			// Clear the new vertex being dragged
 			setDraggingNewVertex(undefined);
 
-			// 新規頂点のドラッグ完了に伴うパスのデータ変更を通知
+			// Notify path data change due to new vertex drag completion
 			onDiagramChange?.({
 				eventId: e.eventId,
 				eventType: e.eventType,
@@ -155,7 +151,7 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 						item.id === e.id
 							? {
 									...item,
-									id: newId(), // ドラッグが完了したら、新規頂点用のIDから新しいIDに変更
+									id: newId(), // When drag is completed, change from new vertex ID to new ID
 									x: e.endX,
 									y: e.endY,
 								}
@@ -169,12 +165,7 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 	return (
 		<>
 			{newVertexList.map((item) => (
-				<NewVertex
-					key={item.id}
-					{...item}
-					eventBus={eventBus}
-					onDrag={handleNewVertexDrag}
-				/>
+				<NewVertex key={item.id} {...item} onDrag={handleNewVertexDrag} />
 			))}
 		</>
 	);

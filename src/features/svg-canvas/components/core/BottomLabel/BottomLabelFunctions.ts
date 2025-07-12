@@ -1,5 +1,5 @@
 // Import types.
-import type { RectangleVertices } from "../../../types/base/RectangleVertices";
+import type { RectangleVertices } from "../../../types/core/RectangleVertices";
 
 /**
  * Calculate the position of the bottom label.

@@ -1,7 +1,7 @@
 import type { ConnectPointData } from "../types/data/shapes/ConnectPointData";
 import type { ConnectableData } from "../types/data/shapes/ConnectableData";
 import type { Diagram } from "../types/data/catalog/Diagram";
-import type { DiagramBaseData } from "../types/base/DiagramBaseData";
+import type { DiagramBaseData } from "../types/data/core/DiagramBaseData";
 import type { FillableData } from "../types/data/core/FillableData";
 import type { StrokableData } from "../types/data/core/StrokableData";
 import type { ItemableData } from "../types/data/core/ItemableData";
@@ -22,7 +22,6 @@ export const DEFAULT_DIAGRAM_BASE_DATA = {
 	type: "Rectangle",
 	x: 0,
 	y: 0,
-	syncWithSameId: false,
 } as const satisfies DiagramBaseData;
 
 /**
@@ -30,7 +29,7 @@ export const DEFAULT_DIAGRAM_BASE_DATA = {
  */
 export const DEFAULT_SELECTABLE_DATA = {
 	isSelected: false,
-	isMultiSelectSource: false,
+	showOutline: false,
 } as const satisfies SelectableData;
 
 /**
@@ -45,6 +44,8 @@ export const DEFAULT_TRANSFORMATIVE_DATA = {
 	scaleX: 1,
 	scaleY: 1,
 	keepProportion: false,
+	showTransformControls: false,
+	isTransforming: false,
 } as const satisfies TransformativeData;
 
 /**

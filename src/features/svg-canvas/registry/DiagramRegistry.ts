@@ -1,5 +1,5 @@
 import type { DiagramDefinition } from "./DiagramDefinition";
-import type { DiagramType } from "../types/base/DiagramType";
+import type { DiagramType } from "../types/core/DiagramType";
 import type { ConnectPointMoveData } from "../types/events/ConnectPointMoveData";
 import type { Diagram } from "../types/data/catalog/Diagram";
 

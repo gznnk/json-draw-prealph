@@ -5,7 +5,7 @@ import type { ConnectNodesEvent } from "../../../../types/events/ConnectNodesEve
 import { CONNECT_NODES_EVENT_NAME } from "./connectNodesConstants";
 
 /**
- * 指定された ConnectNodesEvent を window に dispatch する。
+ * Dispatch the specified ConnectNodesEvent to the window.
  */
 export const dispatchConnectNodesEvent = (e: ConnectNodesEvent) => {
 	const event = new CustomEvent(CONNECT_NODES_EVENT_NAME, {

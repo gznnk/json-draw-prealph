@@ -7,7 +7,7 @@ import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
 // Import functions related to SvgCanvas.
 import { addHistory } from "../../utils/addHistory";
-import { applyRecursive } from "../../utils/applyRecursive";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 
 /**
@@ -29,7 +29,7 @@ export const useDiagramConstraintChange = (props: CanvasHooksProps) => {
 
 		setCanvasState((prevState) => {
 			// Update items with constraint changes.
-			const items = applyRecursive(prevState.items, (item) => {
+			const items = applyFunctionRecursively(prevState.items, (item) => {
 				// If the id does not match, return the original item.
 				if (item.id !== e.id) return item;
 

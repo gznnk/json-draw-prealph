@@ -1,13 +1,11 @@
 // Import React.
 import type React from "react";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 
 // Import other libraries.
 import DOMPurify from "dompurify";
 
 // Import types.
-import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
-import type { DiagramPointerEvent } from "../../../types/events/DiagramPointerEvent";
 import type { SvgProps } from "../../../types/props/shapes/SvgProps";
 
 // Import components.
@@ -18,10 +16,13 @@ import { SvgGroupElement, SvgRectElement } from "./SvgStyled";
 
 // Import hooks.
 import { useDrag } from "../../../hooks/useDrag";
+import { useClick } from "../../../hooks/useClick";
+import { useSelect } from "../../../hooks/useSelect";
 
 // Import utils.
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { mergeProps } from "../../../utils/common/mergeProps";
 
 /**
  * Svg component.
@@ -37,20 +38,19 @@ const SvgComponent: React.FC<SvgProps> = ({
 	scaleY,
 	keepProportion,
 	isSelected,
-	isMultiSelectSource,
-	syncWithSameId = false,
+	isAncestorSelected = false,
 	initialWidth,
 	initialHeight,
 	svgText,
+	isDragging = false,
 	showOutline = false,
-	eventBus,
+	showTransformControls = false,
+	isTransforming = false,
 	onDrag,
 	onClick,
 	onSelect,
 	onTransform,
 }) => {
-	// Is the element being dragged.
-	const [isDragging, setIsDragging] = useState(false);
 	// Reference to the element.
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 	const groupRef = useRef<SVGGElement>({} as SVGGElement);
@@ -66,49 +66,35 @@ const SvgComponent: React.FC<SvgProps> = ({
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	/**
-	 * Handler for drag events.
-	 */
-	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { onDrag } = refBus.current;
-
-		if (e.eventType === "Start") {
-			setIsDragging(true);
-		}
-
-		onDrag?.(e);
-
-		if (e.eventType === "End") {
-			setIsDragging(false);
-		}
-	}, []);
-
-	/**
-	 * Handler for pointer down events.
-	 */
-	const handlePointerDown = useCallback((e: DiagramPointerEvent) => {
-		const { id, onSelect } = refBus.current;
-
-		// Trigger the select event when the pointer is down.
-		onSelect?.({
-			eventId: e.eventId,
-			id,
-		});
-	}, []);
-
 	// Prepare props for the drag element.
 	const dragProps = useDrag({
 		id,
 		type: "Rectangle",
 		x,
 		y,
-		syncWithSameId,
 		ref: svgRef,
-		eventBus,
-		onPointerDown: handlePointerDown,
-		onClick: onClick,
-		onDrag: handleDrag,
+		onDrag,
 	});
+
+	// Generate properties for clicking
+	const clickProps = useClick({
+		id,
+		x,
+		y,
+		isSelected,
+		isAncestorSelected,
+		ref: svgRef,
+		onClick,
+	});
+
+	// Generate properties for selection
+	const selectProps = useSelect({
+		id,
+		onSelect,
+	});
+
+	// Compose props for SvgRectElement
+	const composedProps = mergeProps(dragProps, clickProps, selectProps);
 
 	// Create the transform attribute for the element.
 	const transform = createSvgTransform(
@@ -135,15 +121,12 @@ const SvgComponent: React.FC<SvgProps> = ({
 		groupRef.current.appendChild(svgElement); // Append the new SVG element
 	}, [svgText, initialWidth, initialHeight]);
 
-	// Flag to show the transformative element.
-	const showTransformative = isSelected && !isMultiSelectSource && !isDragging;
-
 	return (
 		<>
 			<g transform={transform}>
 				<SvgGroupElement
 					transform={`translate(${-width / 2}, ${-height / 2}) scale(${width / initialWidth}, ${height / initialHeight})`}
-					isTransparent={isMultiSelectSource}
+					isTransparent={false}
 					ref={groupRef}
 				/>
 				{/* Element for handle pointer events */}
@@ -156,9 +139,9 @@ const SvgComponent: React.FC<SvgProps> = ({
 					tabIndex={0}
 					cursor="move"
 					fill="transparent"
-					isTransparent={isMultiSelectSource}
+					isTransparent={false}
 					ref={svgRef}
-					{...dragProps}
+					{...composedProps}
 				/>
 			</g>
 			<Outline
@@ -169,11 +152,9 @@ const SvgComponent: React.FC<SvgProps> = ({
 				rotation={rotation}
 				scaleX={scaleX}
 				scaleY={scaleY}
-				isSelected={isSelected}
-				isMultiSelectSource={isMultiSelectSource}
 				showOutline={showOutline}
 			/>
-			{showTransformative && (
+			{showTransformControls && (
 				<Transformative
 					id={id}
 					type="Rectangle"
@@ -185,9 +166,8 @@ const SvgComponent: React.FC<SvgProps> = ({
 					scaleX={scaleX}
 					scaleY={scaleY}
 					keepProportion={keepProportion}
-					isSelected={isSelected}
-					isMultiSelectSource={isMultiSelectSource}
-					eventBus={eventBus}
+					showTransformControls={showTransformControls}
+					isTransforming={isTransforming}
 					onTransform={onTransform}
 				/>
 			)}

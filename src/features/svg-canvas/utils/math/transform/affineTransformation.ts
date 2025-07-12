@@ -1,5 +1,5 @@
 // Import types.
-import type { Point } from "../../../types/base/Point";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Applies an affine transformation to a point.
@@ -22,19 +22,19 @@ export const affineTransformation = (
 	tx: number,
 	ty: number,
 ): Point => {
-	// 拡縮と回転の行列
+	// Scale and rotation matrix
 	const transformationMatrix = [
 		[sx * Math.cos(theta), -sy * Math.sin(theta)],
 		[sx * Math.sin(theta), sy * Math.cos(theta)],
 	];
 
-	// 平行移動のベクトル
+	// Translation vector
 	const translationVector = [tx, ty];
 
-	// 変換前の座標ベクトル
+	// Original coordinate vector
 	const originalVector = [px, py];
 
-	// アフィン変換を適用
+	// Apply affine transformation
 	const transformedVector = [
 		transformationMatrix[0][0] * originalVector[0] +
 			transformationMatrix[0][1] * originalVector[1] +

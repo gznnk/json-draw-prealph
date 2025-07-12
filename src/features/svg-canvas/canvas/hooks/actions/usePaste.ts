@@ -1,22 +1,21 @@
 // Import React.
 import { useCallback, useRef } from "react";
 
-// Import types related to SvgCanvas.
+// Import types.
+import type { Shape } from "../../../types/core/Shape";
+import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
 import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
 import type { GroupData } from "../../../types/data/shapes/GroupData";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { Shape } from "../../../types/base/Shape";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
-// Import functions related to SvgCanvas.
-import { calcUnrotatedGroupBoundingBox } from "../../../utils/shapes/group/calcUnrotatedGroupBoundingBox";
+// Import utils.
+import { getDiagramById } from "../../../utils/common/getDiagramById";
 import { newId } from "../../../utils/shapes/common/newId";
 import { isConnectableData } from "../../../utils/validation/isConnectableData";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
-import { MULTI_SELECT_GROUP } from "../../SvgCanvasConstants";
-import { getDiagramById } from "../../utils/getDiagramById";
+import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 
 /**
  * Offset amount when pasting shapes
@@ -87,17 +86,17 @@ const setSelectionState = (
 				// Only set isSelected to true for top-level items
 				// This ensures only top-level groups are selected in multi-select mode
 				newItem.isSelected = true;
-				newItem.isMultiSelectSource = true;
+				newItem.showTransformControls = true;
 			} else {
 				// Child elements are not selected
 				newItem.isSelected = false;
-				newItem.isMultiSelectSource = true;
+				newItem.showTransformControls = false;
 			}
 		} else {
 			// For single selection mode
 			// Only set isSelected to true if it's a top-level item
 			newItem.isSelected = isTopLevel;
-			newItem.isMultiSelectSource = false;
+			newItem.showTransformControls = isTopLevel;
 		}
 	}
 
@@ -223,6 +222,8 @@ const processConnectLineForPaste = (
 		startOwnerId: newStartOwnerId,
 		endOwnerId: newEndOwnerId,
 		isSelected: false, // Pasted connection lines are not selected
+		showTransformControls: false, // Hide transform controls for pasted connection lines
+		showOutline: false, // Hide outline for pasted connection lines
 		// Update path points (simply apply offset)
 		items: connectLine.items.map((point, index) => {
 			// Assign new IDs
@@ -317,7 +318,8 @@ export const usePaste = (props: CanvasHooksProps) => {
 								return {
 									...item,
 									isSelected: false,
-									isMultiSelectSource: false,
+									showTransformControls: false,
+									showOutline: false,
 								};
 							}
 							return item;
@@ -345,30 +347,23 @@ export const usePaste = (props: CanvasHooksProps) => {
 						// Set multiSelectGroup for multi-select mode
 						let multiSelectGroup: GroupData | undefined = undefined;
 						if (isMultiSelect) {
-							// Create multi-select group
-							const boundingBox =
-								calcUnrotatedGroupBoundingBox(pastedNormalItems);
-							multiSelectGroup = {
-								id: MULTI_SELECT_GROUP,
-								type: "Group",
-								x:
-									boundingBox.left + (boundingBox.right - boundingBox.left) / 2,
-								y: boundingBox.top + (boundingBox.bottom - boundingBox.top) / 2,
-								width: boundingBox.right - boundingBox.left,
-								height: boundingBox.bottom - boundingBox.top,
-								rotation: 0,
-								scaleX: 1,
-								scaleY: 1,
-								keepProportion:
-									prevState.multiSelectGroup?.keepProportion ?? true,
-								isSelected: true,
-								isMultiSelectSource: false,
-								items: pastedNormalItems.map((item) => ({
-									...item,
-									isSelected: false, // Set to false within multi-select group
-									isMultiSelectSource: false, // Set to false within multi-select group
-								})),
-							} as GroupData;
+							// Create multi-select group using the utility function
+							multiSelectGroup = createMultiSelectGroup(
+								pastedNormalItems,
+								prevState.multiSelectGroup?.keepProportion,
+							);
+
+							// Hide transform controls for all items in multi-select mode
+							allItems = allItems.map((item) => {
+								if (isSelectableData(item) && item.isSelected) {
+									return {
+										...item,
+										showTransformControls: false,
+										showOutline: true,
+									};
+								}
+								return item;
+							});
 						}
 
 						// Add the pasted items to the canvas

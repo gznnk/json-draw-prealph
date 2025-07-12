@@ -1,4 +1,4 @@
-import type { Point } from "../../../types/base/Point";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Checks if three points are in a straight line.

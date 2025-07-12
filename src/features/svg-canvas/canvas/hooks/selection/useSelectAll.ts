@@ -2,20 +2,16 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type { GroupData } from "../../../types/data/shapes/GroupData";
 import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
-// Import components related to SvgCanvas.
-import { calcUnrotatedGroupBoundingBox } from "../../../utils/shapes/group/calcUnrotatedGroupBoundingBox";
-
 // Import functions related to SvgCanvas.
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
-import { applyMultiSelectSourceRecursive } from "../../utils/applyMultiSelectSourceRecursive";
-import { applyRecursive } from "../../utils/applyRecursive";
 
 // Imports related to this component.
-import { MULTI_SELECT_GROUP } from "../../SvgCanvasConstants";
+import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
+import { isItemableData } from "../../../utils/validation/isItemableData";
 
 /**
  * Custom hook to handle select all events on the canvas.
@@ -33,7 +29,7 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 		const { setCanvasState } = refBus.current.props;
 
 		setCanvasState((prevState) => {
-			let items = prevState.items.map((item) => {
+			const items = prevState.items.map((item) => {
 				if (!isSelectableData(item)) {
 					// Ignore non-selectable items.
 					return item;
@@ -44,14 +40,32 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 						isSelected: false, // Deselect ConnectLine items.
 					};
 				}
+
+				if (isItemableData(item)) {
+					return {
+						...item,
+						items: applyFunctionRecursively(item.items, (childItem) => {
+							if (!isSelectableData(childItem)) {
+								// Ignore non-selectable child items.
+								return childItem;
+							}
+							return {
+								...childItem,
+								isAncestorSelected: true,
+								showOutline: true,
+							};
+						}),
+						isSelected: true,
+						showOutline: true,
+					};
+				}
+
 				return {
 					...item,
 					isSelected: true,
+					showOutline: true,
 				};
 			});
-
-			// Set `isMultiSelectSource` to true to hide the transform outline of the original diagrams during multi-selection.
-			items = applyMultiSelectSourceRecursive(items);
 
 			// Create a multi-select group's items.
 			const multiSelectGroupItems = items.filter(
@@ -62,37 +76,13 @@ export const useSelectAll = (props: CanvasHooksProps) => {
 				return prevState;
 			}
 
-			const boundingBox = calcUnrotatedGroupBoundingBox(multiSelectGroupItems);
-
-			const multiSelectGroup = {
-				id: MULTI_SELECT_GROUP,
-				x: boundingBox.left + (boundingBox.right - boundingBox.left) / 2,
-				y: boundingBox.top + (boundingBox.bottom - boundingBox.top) / 2,
-				width: boundingBox.right - boundingBox.left,
-				height: boundingBox.bottom - boundingBox.top,
-				rotation: 0,
-				scaleX: 1,
-				scaleY: 1,
-				keepProportion: prevState.multiSelectGroup?.keepProportion ?? true,
-				isSelected: true, // Multi-select group is always in selected state
-				isMultiSelectSource: false, // Set as not being a multi-select source
-				items: applyRecursive(multiSelectGroupItems, (item) => {
-					if (!isSelectableData(item)) {
-						return item;
-					}
-					return {
-						...item,
-						isSelected: false, // Shapes in the multi-select group have their selection state cleared
-						isMultiSelectSource: false, // Set as not being a multi-select source
-					};
-				}),
-			} as GroupData;
-
 			return {
 				...prevState,
 				items,
-				multiSelectGroup,
-				selectedItemId: undefined,
+				multiSelectGroup: createMultiSelectGroup(
+					multiSelectGroupItems,
+					prevState.multiSelectGroup?.keepProportion ?? true,
+				),
 			};
 		});
 	}, []);

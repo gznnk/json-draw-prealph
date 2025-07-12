@@ -4,10 +4,9 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
-import type { DiagramType } from "../../../types/base/DiagramType";
+import type { DiagramType } from "../../../types/core/DiagramType";
 import type { EventType } from "../../../types/events/EventType";
-import type { Point } from "../../../types/base/Point";
-import type { SelectableData } from "../../../types/data/core/SelectableData";
+import type { Point } from "../../../types/core/Point";
 import type { TransformativeData } from "../../../types/data/core/TransformativeData";
 import type { TransformativeProps } from "../../../types/props/core/TransformativeProps";
 
@@ -39,7 +38,6 @@ import { ROTATE_POINT_MARGIN } from "./TransformativeConstants";
  * Combines transformation data, selection state, and transformation event handlers.
  */
 type Props = TransformativeData &
-	SelectableData &
 	TransformativeProps & {
 		id: string;
 		type: DiagramType;
@@ -59,9 +57,7 @@ const TransformativeComponent: React.FC<Props> = ({
 	scaleX,
 	scaleY,
 	keepProportion,
-	isSelected,
-	isMultiSelectSource,
-	eventBus,
+	showTransformControls,
 	onTransform,
 }) => {
 	const [isResizing, setIsResizing] = useState(false);
@@ -129,6 +125,8 @@ const TransformativeComponent: React.FC<Props> = ({
 		eventId: string,
 		cursorX: number,
 		cursorY: number,
+		minX?: number,
+		minY?: number,
 	) => {
 		startShape.current = {
 			x,
@@ -150,6 +148,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			endShape: startShape.current,
 			cursorX,
 			cursorY,
+			minX,
+			minY,
 		});
 	};
 
@@ -161,6 +161,9 @@ const TransformativeComponent: React.FC<Props> = ({
 		eventType: EventType,
 		cursorX: number,
 		cursorY: number,
+		minX?: number,
+		minY?: number,
+		isFromAutoEdgeScroll?: boolean,
 	) => {
 		const event = {
 			eventId,
@@ -180,6 +183,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			},
 			cursorX,
 			cursorY,
+			minX,
+			minY,
+			isFromAutoEdgeScroll,
 		};
 
 		onTransform?.(event);
@@ -271,7 +277,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -298,7 +310,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		// カーソル位置を渡して自動スクロールを有効にする
+		// Pass cursor position to enable auto-scrolling
 		triggerTransform(
 			e.eventId,
 			center,
@@ -307,6 +319,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
+			e.isFromAutoEdgeScroll,
 		);
 	}, []);
 
@@ -335,7 +350,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -370,6 +391,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
+			e.isFromAutoEdgeScroll,
 		);
 	}, []);
 
@@ -398,7 +422,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -433,6 +463,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
+			e.isFromAutoEdgeScroll,
 		);
 	}, []);
 
@@ -461,7 +494,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -496,6 +535,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
+			e.isFromAutoEdgeScroll,
 		);
 	}, []);
 
@@ -524,7 +566,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -559,6 +607,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
+			e.isFromAutoEdgeScroll,
 		);
 	}, []);
 
@@ -592,7 +643,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -627,6 +684,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
+			e.isFromAutoEdgeScroll,
 		);
 	}, []);
 
@@ -660,7 +720,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -695,6 +761,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
+			e.isFromAutoEdgeScroll,
 		);
 	}, []);
 
@@ -728,7 +797,13 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -763,6 +838,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			e.eventType,
 			e.cursorX,
 			e.cursorY,
+			e.minX,
+			e.minY,
+			e.isFromAutoEdgeScroll,
 		);
 	}, []);
 
@@ -781,11 +859,11 @@ const TransformativeComponent: React.FC<Props> = ({
 	);
 	// --- BottomCenter End --- //
 
-	// シフトキーの状態を監視
+	// Monitor shift key state
 	useEffect(() => {
 		let handleKeyDown: (e: KeyboardEvent) => void;
 		let handleKeyUp: (e: KeyboardEvent) => void;
-		if (isSelected) {
+		if (showTransformControls) {
 			handleKeyDown = (e: KeyboardEvent) => {
 				setShiftKeyDown(e.shiftKey);
 			};
@@ -800,15 +878,15 @@ const TransformativeComponent: React.FC<Props> = ({
 		}
 
 		return () => {
-			// クリーンアップ
-			if (isSelected) {
+			// Cleanup
+			if (showTransformControls) {
 				window.removeEventListener("keydown", handleKeyDown);
 				window.removeEventListener("keyup", handleKeyUp);
 			}
 		};
-	}, [isSelected]);
+	}, [showTransformControls]);
 
-	// 回転
+	// Rotation
 	const rotationPoint = affineTransformation(
 		width / 2 + ROTATE_POINT_MARGIN,
 		-(height / 2 + ROTATE_POINT_MARGIN),
@@ -818,9 +896,8 @@ const TransformativeComponent: React.FC<Props> = ({
 		x,
 		y,
 	);
-
 	/**
-	 * 回転ポイントのドラッグハンドラ
+	 * Rotation point drag handler
 	 */
 	const handleDragRotationPoint = useCallback((e: DiagramDragEvent) => {
 		const {
@@ -837,7 +914,13 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		if (e.eventType === "Start") {
 			setIsRotating(true);
-			return triggerTransformStart(e.eventId, e.cursorX, e.cursorY);
+			return triggerTransformStart(
+				e.eventId,
+				e.cursorX,
+				e.cursorY,
+				e.minX,
+				e.minY,
+			);
 		}
 
 		const radian = calcRadians(x, y, e.endX, e.endY);
@@ -882,12 +965,7 @@ const TransformativeComponent: React.FC<Props> = ({
 	}, []);
 
 	// Don't render if the component is not selected.
-	if (!isSelected) {
-		return null;
-	}
-
-	// Hide the transform outline when the component is the source of a multi-selection.
-	if (isMultiSelectSource) {
+	if (!showTransformControls) {
 		return null;
 	}
 
@@ -917,7 +995,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						endX={vertices.topRightPoint.x}
 						endY={vertices.topRightPoint.y}
 						cursor={cursors.topCenter}
-						eventBus={eventBus}
 						onDrag={handleDragTopCenter}
 						dragPositioningFunction={linerDragFunctionTopCenter}
 					/>
@@ -931,7 +1008,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						endX={vertices.bottomLeftPoint.x}
 						endY={vertices.bottomLeftPoint.y}
 						cursor={cursors.leftCenter}
-						eventBus={eventBus}
 						onDrag={handleDragLeftCenter}
 						dragPositioningFunction={linerDragFunctionLeftCenter}
 					/>
@@ -945,7 +1021,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						endX={vertices.bottomRightPoint.x}
 						endY={vertices.bottomRightPoint.y}
 						cursor={cursors.rightCenter}
-						eventBus={eventBus}
 						onDrag={handleDragRightCenter}
 						dragPositioningFunction={linerDragFunctionRightCenter}
 					/>
@@ -959,7 +1034,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						endX={vertices.bottomRightPoint.x}
 						endY={vertices.bottomRightPoint.y}
 						cursor={cursors.bottomCenter}
-						eventBus={eventBus}
 						onDrag={handleDragBottomCenter}
 						dragPositioningFunction={linerDragFunctionBottomCenter}
 					/>
@@ -969,7 +1043,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						x={vertices.topLeftPoint.x}
 						y={vertices.topLeftPoint.y}
 						cursor={cursors.leftTop}
-						eventBus={eventBus}
 						onDrag={handleDragLeftTop}
 						dragPositioningFunction={
 							doKeepProportion ? linerDragFunctionLeftTop : undefined
@@ -981,7 +1054,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						x={vertices.bottomLeftPoint.x}
 						y={vertices.bottomLeftPoint.y}
 						cursor={cursors.leftBottom}
-						eventBus={eventBus}
 						onDrag={handleDragLeftBottom}
 						dragPositioningFunction={
 							doKeepProportion ? linerDragFunctionLeftBottom : undefined
@@ -993,7 +1065,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						x={vertices.topRightPoint.x}
 						y={vertices.topRightPoint.y}
 						cursor={cursors.rightTop}
-						eventBus={eventBus}
 						onDrag={handleDragRightTop}
 						dragPositioningFunction={
 							doKeepProportion ? linerDragFunctionRightTop : undefined
@@ -1005,7 +1076,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						x={vertices.bottomRightPoint.x}
 						y={vertices.bottomRightPoint.y}
 						cursor={cursors.rightBottom}
-						eventBus={eventBus}
 						onDrag={handleDragRightBottom}
 						dragPositioningFunction={
 							doKeepProportion ? linerDragFunctionRightBottom : undefined
@@ -1017,7 +1087,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						x={vertices.topCenterPoint.x}
 						y={vertices.topCenterPoint.y}
 						cursor={cursors.topCenter}
-						eventBus={eventBus}
 						onDrag={handleDragTopCenter}
 						dragPositioningFunction={linerDragFunctionTopCenter}
 					/>
@@ -1027,7 +1096,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						x={vertices.leftCenterPoint.x}
 						y={vertices.leftCenterPoint.y}
 						cursor={cursors.leftCenter}
-						eventBus={eventBus}
 						onDrag={handleDragLeftCenter}
 						dragPositioningFunction={linerDragFunctionLeftCenter}
 					/>
@@ -1037,7 +1105,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						x={vertices.rightCenterPoint.x}
 						y={vertices.rightCenterPoint.y}
 						cursor={cursors.rightCenter}
-						eventBus={eventBus}
 						onDrag={handleDragRightCenter}
 						dragPositioningFunction={linerDragFunctionRightCenter}
 					/>
@@ -1047,7 +1114,6 @@ const TransformativeComponent: React.FC<Props> = ({
 						x={vertices.bottomCenterPoint.x}
 						y={vertices.bottomCenterPoint.y}
 						cursor={cursors.bottomCenter}
-						eventBus={eventBus}
 						onDrag={handleDragBottomCenter}
 						dragPositioningFunction={linerDragFunctionBottomCenter}
 					/>
@@ -1060,7 +1126,6 @@ const TransformativeComponent: React.FC<Props> = ({
 					x={rotationPoint.x}
 					y={rotationPoint.y}
 					rotation={rotation}
-					eventBus={eventBus}
 					onDrag={handleDragRotationPoint}
 					dragPositioningFunction={dragFunctionRotationPoint}
 				/>

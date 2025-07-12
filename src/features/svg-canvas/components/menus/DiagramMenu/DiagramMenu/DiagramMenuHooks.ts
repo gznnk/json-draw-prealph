@@ -267,12 +267,10 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				if (key in newItem) {
 					(newItem[key] as (typeof data)[keyof Diagram]) = data[key];
 				}
-			}
-
-			// Trigger the change event.
+			} // Trigger the change event.
 			canvasProps.onDiagramChange?.({
 				eventId,
-				eventType: "Instant", // TODO: 履歴に保存されない
+				eventType: "Instant", // TODO: Not saved to history
 				changeType: "Appearance",
 				id: item.id,
 				startDiagram: item,

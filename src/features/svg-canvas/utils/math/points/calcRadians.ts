@@ -15,12 +15,12 @@ export const calcRadians = (
 	py: number,
 ): number => {
 	const dx = px - ox;
-	const dy = oy - py; // y軸の正方向を上向きにするため反転
+	const dy = oy - py; // Invert to make y-axis positive direction upward
 
-	let angle = Math.atan2(dx, dy); // atan2(y, x)ではなく(x, y)とすることで12時基準に
+	let angle = Math.atan2(dx, dy); // Use (x, y) instead of atan2(y, x) to base on 12 o'clock
 
 	if (angle < 0) {
-		angle += 2 * Math.PI; // 0 〜 2π の範囲に変換
+		angle += 2 * Math.PI; // Convert to range 0 ~ 2π
 	}
 
 	return angle;

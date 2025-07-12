@@ -1,8 +1,7 @@
 import type { DiagramDragEvent } from "../../events/DiagramDragEvent";
 import type { DiagramDragDropEvent } from "../../events/DiagramDragDropEvent";
 import type { DiagramClickEvent } from "../../events/DiagramClickEvent";
-import type { DiagramHoverEvent } from "../../events/DiagramHoverEvent";
-import type { EventBus } from "../../../../../shared/event-bus/EventBus";
+import type { DiagramHoverChangeEvent } from "../../events/DiagramHoverChangeEvent";
 
 /**
  * Base properties for diagram components.
@@ -10,9 +9,10 @@ import type { EventBus } from "../../../../../shared/event-bus/EventBus";
  */
 export type DiagramBaseProps = {
 	isTransparent?: boolean;
-	eventBus: EventBus;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDrop?: (e: DiagramDragDropEvent) => void;
+	onDragEnter?: (e: DiagramDragDropEvent) => void;
+	onDragLeave?: (e: DiagramDragDropEvent) => void;
 	onClick?: (e: DiagramClickEvent) => void;
-	onHover?: (e: DiagramHoverEvent) => void;
+	onHoverChange?: (e: DiagramHoverChangeEvent) => void;
 };

@@ -29,7 +29,6 @@ const RotatePointComponent: React.FC<RotatePointProps> = ({
 	type,
 	x,
 	y,
-	eventBus,
 	onDrag,
 	dragPositioningFunction,
 	rotation = 0,
@@ -56,13 +55,13 @@ const RotatePointComponent: React.FC<RotatePointProps> = ({
 		refBus.current.onDrag?.(e);
 	}, []);
 
+	// Create drag properties using the useDrag hook.
 	const dragProps = useDrag({
 		id,
 		type,
 		x,
 		y,
 		ref: svgRef,
-		eventBus,
 		onDrag: handleDrag,
 		dragPositioningFunction,
 	});

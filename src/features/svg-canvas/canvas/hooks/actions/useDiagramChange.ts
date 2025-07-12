@@ -18,7 +18,7 @@ import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { addHistory } from "../../utils/addHistory";
-import { applyRecursive } from "../../utils/applyRecursive";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { isDiagramChangingEvent } from "../../utils/isDiagramChangingEvent";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
@@ -34,7 +34,7 @@ import type { SvgCanvasState } from "../../SvgCanvasTypes";
  */
 export const useDiagramChange = (props: CanvasHooksProps) => {
 	// Get the auto edge scroll function to handle canvas auto scrolling.
-	const autoEdgeScroll = useAutoEdgeScroll(props);
+	const { autoEdgeScroll } = useAutoEdgeScroll(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
@@ -73,7 +73,7 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 						connectPointMoveDataList,
 					);
 				} // Propagate the multi-select group changes to the original diagrams.
-				items = applyRecursive(prevState.items, (item) => {
+				items = applyFunctionRecursively(prevState.items, (item) => {
 					if (!isItemableData<Diagram>(e.endDiagram)) return item; // Type guard with Diagram type
 
 					// Find the corresponding change data in the multi-select group.
@@ -88,9 +88,8 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 					let newItem = { ...item };
 
 					if (isSelectableData(changedItem)) {
-						// Remove the properties that are not needed for the update.
-						const { isSelected, isMultiSelectSource, ...updateItem } =
-							changedItem;
+						// Remove the isSelected property that is not needed for the update.
+						const { isSelected, ...updateItem } = changedItem;
 
 						// Apply the updated properties to the original item.
 						newItem = {
@@ -103,7 +102,7 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 				});
 			} else {
 				// The case of single diagram change.
-				items = applyRecursive(prevState.items, (item) => {
+				items = applyFunctionRecursively(prevState.items, (item) => {
 					// If the id does not match, return the original item.
 					if (item.id !== e.id) return item;
 
@@ -125,16 +124,11 @@ export const useDiagramChange = (props: CanvasHooksProps) => {
 				if (multiSelectGroup) {
 					// When a multi-select group is present, propagate the original diagram changes to its items.
 					// In this case, the changes are appearance only, so we don't need to update the connect points.
-					multiSelectGroup.items = applyRecursive(
+					multiSelectGroup.items = applyFunctionRecursively(
 						multiSelectGroup.items,
 						(item) =>
 							item.id === e.id
-								? {
-										...item,
-										...e.endDiagram,
-										isSelected: false,
-										isMultiSelectSource: false,
-									}
+								? { ...item, ...e.endDiagram, isSelected: false }
 								: item,
 					);
 				}

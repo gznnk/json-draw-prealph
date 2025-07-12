@@ -1,5 +1,5 @@
 // Import types.
-import type { Point } from "../../../types/base/Point";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Applies an inverse affine transformation to a point.
@@ -23,25 +23,25 @@ export const inverseAffineTransformation = (
 	tx: number,
 	ty: number,
 ): Point => {
-	// 拡縮と回転の逆行列を計算
+	// Calculate inverse matrix for scaling and rotation
 	const inverseTransformationMatrix = [
 		[Math.cos(theta) / sx, Math.sin(theta) / sx],
 		[-Math.sin(theta) / sy, Math.cos(theta) / sy],
 	];
 
-	// 平行移動の逆ベクトル
+	// Inverse vector for translation
 	const inverseTranslationVector = [-tx, -ty];
 
-	// 変換後の座標ベクトル
+	// Coordinate vector after transformation
 	const transformedVector = [px, py];
 
-	// 平行移動の逆変換を適用
+	// Apply inverse transformation for translation
 	const translatedVector = [
 		transformedVector[0] + inverseTranslationVector[0],
 		transformedVector[1] + inverseTranslationVector[1],
 	];
 
-	// アフィン変換の逆変換を適用
+	// Apply inverse affine transformation
 	const originalVector = [
 		inverseTransformationMatrix[0][0] * translatedVector[0] +
 			inverseTransformationMatrix[0][1] * translatedVector[1],
