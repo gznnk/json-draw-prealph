@@ -22,8 +22,8 @@ import { affineTransformation } from "../../../utils/math/transform/affineTransf
 import { calcNearestCircleIntersectionPoint } from "../../../utils/math/points/calcNearestCircleIntersectionPoint";
 import { calcRadians } from "../../../utils/math/points/calcRadians";
 import { calcRectangleVertices } from "../../../utils/math/geometry/calcRectangleVertices";
-import { createLinearX2yFunction } from "../../../utils/math/geometry/createLinearX2yFunction";
-import { createLinearY2xFunction } from "../../../utils/math/geometry/createLinearY2xFunction";
+import { createLinerX2yFunction } from "../../../utils/math/geometry/createLinerX2yFunction";
+import { createLinerY2xFunction } from "../../../utils/math/geometry/createLinerY2xFunction";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { getCursorFromAngle } from "../../../utils/shapes/common/getCursorFromAngle";
 import { inverseAffineTransformation } from "../../../utils/math/transform/inverseAffineTransformation";
@@ -310,9 +310,9 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 	}, []);
 
-	const linearDragFunctionLeftTop = useCallback(
+	const linerDragFunctionLeftTop = useCallback(
 		(x: number, y: number) =>
-			createLinearY2xFunction(
+			createLinerY2xFunction(
 				startShape.current.topLeftPoint,
 				startShape.current.bottomRightPoint,
 			)(x, y),
@@ -373,9 +373,9 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 	}, []);
 
-	const linearDragFunctionLeftBottom = useCallback(
+	const linerDragFunctionLeftBottom = useCallback(
 		(x: number, y: number) =>
-			createLinearY2xFunction(
+			createLinerY2xFunction(
 				startShape.current.topRightPoint,
 				startShape.current.bottomLeftPoint,
 			)(x, y),
@@ -436,9 +436,9 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 	}, []);
 
-	const linearDragFunctionRightTop = useCallback(
+	const linerDragFunctionRightTop = useCallback(
 		(x: number, y: number) =>
-			createLinearY2xFunction(
+			createLinerY2xFunction(
 				startShape.current.topRightPoint,
 				startShape.current.bottomLeftPoint,
 			)(x, y),
@@ -499,9 +499,9 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 	}, []);
 
-	const linearDragFunctionRightBottom = useCallback(
+	const linerDragFunctionRightBottom = useCallback(
 		(x: number, y: number) =>
-			createLinearY2xFunction(
+			createLinerY2xFunction(
 				startShape.current.bottomRightPoint,
 				startShape.current.topLeftPoint,
 			)(x, y),
@@ -562,14 +562,14 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 	}, []);
 
-	const linearDragFunctionTopCenter = useCallback(
+	const linerDragFunctionTopCenter = useCallback(
 		(x: number, y: number) =>
 			!refBus.current.isSwapped
-				? createLinearY2xFunction(
+				? createLinerY2xFunction(
 						startShape.current.bottomCenterPoint,
 						startShape.current.topCenterPoint,
 					)(x, y)
-				: createLinearX2yFunction(
+				: createLinerX2yFunction(
 						startShape.current.bottomCenterPoint,
 						startShape.current.topCenterPoint,
 					)(x, y),
@@ -630,14 +630,14 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 	}, []);
 
-	const linearDragFunctionLeftCenter = useCallback(
+	const linerDragFunctionLeftCenter = useCallback(
 		(x: number, y: number) =>
 			!refBus.current.isSwapped
-				? createLinearX2yFunction(
+				? createLinerX2yFunction(
 						startShape.current.leftCenterPoint,
 						startShape.current.rightCenterPoint,
 					)(x, y)
-				: createLinearY2xFunction(
+				: createLinerY2xFunction(
 						startShape.current.leftCenterPoint,
 						startShape.current.rightCenterPoint,
 					)(x, y),
@@ -698,14 +698,14 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 	}, []);
 
-	const linearDragFunctionRightCenter = useCallback(
+	const linerDragFunctionRightCenter = useCallback(
 		(x: number, y: number) =>
 			!refBus.current.isSwapped
-				? createLinearX2yFunction(
+				? createLinerX2yFunction(
 						startShape.current.leftCenterPoint,
 						startShape.current.rightCenterPoint,
 					)(x, y)
-				: createLinearY2xFunction(
+				: createLinerY2xFunction(
 						startShape.current.leftCenterPoint,
 						startShape.current.rightCenterPoint,
 					)(x, y),
@@ -766,14 +766,14 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 	}, []);
 
-	const linearDragFunctionBottomCenter = useCallback(
+	const linerDragFunctionBottomCenter = useCallback(
 		(x: number, y: number) =>
 			!refBus.current.isSwapped
-				? createLinearY2xFunction(
+				? createLinerY2xFunction(
 						startShape.current.bottomCenterPoint,
 						startShape.current.topCenterPoint,
 					)(x, y)
-				: createLinearX2yFunction(
+				: createLinerX2yFunction(
 						startShape.current.bottomCenterPoint,
 						startShape.current.topCenterPoint,
 					)(x, y),
@@ -919,7 +919,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						cursor={cursors.topCenter}
 						eventBus={eventBus}
 						onDrag={handleDragTopCenter}
-						dragPositioningFunction={linearDragFunctionTopCenter}
+						dragPositioningFunction={linerDragFunctionTopCenter}
 					/>
 					{/* Left DragLine */}
 					<DragLine
@@ -933,7 +933,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						cursor={cursors.leftCenter}
 						eventBus={eventBus}
 						onDrag={handleDragLeftCenter}
-						dragPositioningFunction={linearDragFunctionLeftCenter}
+						dragPositioningFunction={linerDragFunctionLeftCenter}
 					/>
 					{/* Right DragLine */}
 					<DragLine
@@ -947,7 +947,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						cursor={cursors.rightCenter}
 						eventBus={eventBus}
 						onDrag={handleDragRightCenter}
-						dragPositioningFunction={linearDragFunctionRightCenter}
+						dragPositioningFunction={linerDragFunctionRightCenter}
 					/>
 					{/* Bottom DragLine */}
 					<DragLine
@@ -961,7 +961,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						cursor={cursors.bottomCenter}
 						eventBus={eventBus}
 						onDrag={handleDragBottomCenter}
-						dragPositioningFunction={linearDragFunctionBottomCenter}
+						dragPositioningFunction={linerDragFunctionBottomCenter}
 					/>
 					{/* Top left DragPoint */}
 					<DragPoint
@@ -972,7 +972,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						eventBus={eventBus}
 						onDrag={handleDragLeftTop}
 						dragPositioningFunction={
-							doKeepProportion ? linearDragFunctionLeftTop : undefined
+							doKeepProportion ? linerDragFunctionLeftTop : undefined
 						}
 					/>
 					{/* Bottom left DragPoint */}
@@ -984,7 +984,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						eventBus={eventBus}
 						onDrag={handleDragLeftBottom}
 						dragPositioningFunction={
-							doKeepProportion ? linearDragFunctionLeftBottom : undefined
+							doKeepProportion ? linerDragFunctionLeftBottom : undefined
 						}
 					/>
 					{/* Top right DragPoint */}
@@ -996,7 +996,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						eventBus={eventBus}
 						onDrag={handleDragRightTop}
 						dragPositioningFunction={
-							doKeepProportion ? linearDragFunctionRightTop : undefined
+							doKeepProportion ? linerDragFunctionRightTop : undefined
 						}
 					/>
 					{/* Bottom right DragPoint */}
@@ -1008,7 +1008,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						eventBus={eventBus}
 						onDrag={handleDragRightBottom}
 						dragPositioningFunction={
-							doKeepProportion ? linearDragFunctionRightBottom : undefined
+							doKeepProportion ? linerDragFunctionRightBottom : undefined
 						}
 					/>
 					{/* Top center DragPoint */}
@@ -1019,7 +1019,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						cursor={cursors.topCenter}
 						eventBus={eventBus}
 						onDrag={handleDragTopCenter}
-						dragPositioningFunction={linearDragFunctionTopCenter}
+						dragPositioningFunction={linerDragFunctionTopCenter}
 					/>
 					{/* Left center DragPoint */}
 					<DragPoint
@@ -1029,7 +1029,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						cursor={cursors.leftCenter}
 						eventBus={eventBus}
 						onDrag={handleDragLeftCenter}
-						dragPositioningFunction={linearDragFunctionLeftCenter}
+						dragPositioningFunction={linerDragFunctionLeftCenter}
 					/>
 					{/* Right center DragPoint */}
 					<DragPoint
@@ -1039,7 +1039,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						cursor={cursors.rightCenter}
 						eventBus={eventBus}
 						onDrag={handleDragRightCenter}
-						dragPositioningFunction={linearDragFunctionRightCenter}
+						dragPositioningFunction={linerDragFunctionRightCenter}
 					/>
 					{/* Bottom center DragPoint */}
 					<DragPoint
@@ -1049,7 +1049,7 @@ const TransformativeComponent: React.FC<Props> = ({
 						cursor={cursors.bottomCenter}
 						eventBus={eventBus}
 						onDrag={handleDragBottomCenter}
-						dragPositioningFunction={linearDragFunctionBottomCenter}
+						dragPositioningFunction={linerDragFunctionBottomCenter}
 					/>
 				</>
 			)}
