@@ -68,7 +68,7 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 	// Function to perform a single scroll action with known base client coordinates
 	const performScroll = useCallback(
 		(direction: ScrollDirection, baseClientX: number, baseClientY: number) => {
-			const { canvasState, setCanvasState } = refBus.current.props;
+			const { canvasState } = refBus.current.props;
 			const { minX, minY } = canvasState;
 
 			let newMinX = minX;
@@ -80,34 +80,18 @@ export const useAutoEdgeScroll = (props: CanvasHooksProps) => {
 				case "left":
 					scrollDeltaX = -AUTO_SCROLL_STEP_SIZE;
 					newMinX = minX + scrollDeltaX;
-					setCanvasState((prevState) => ({
-						...prevState,
-						minX: newMinX,
-					}));
 					break;
 				case "top":
 					scrollDeltaY = -AUTO_SCROLL_STEP_SIZE;
 					newMinY = minY + scrollDeltaY;
-					setCanvasState((prevState) => ({
-						...prevState,
-						minY: newMinY,
-					}));
 					break;
 				case "right":
 					scrollDeltaX = AUTO_SCROLL_STEP_SIZE;
 					newMinX = minX + scrollDeltaX;
-					setCanvasState((prevState) => ({
-						...prevState,
-						minX: newMinX,
-					}));
 					break;
 				case "bottom":
 					scrollDeltaY = AUTO_SCROLL_STEP_SIZE;
 					newMinY = minY + scrollDeltaY;
-					setCanvasState((prevState) => ({
-						...prevState,
-						minY: newMinY,
-					}));
 					break;
 			}
 
