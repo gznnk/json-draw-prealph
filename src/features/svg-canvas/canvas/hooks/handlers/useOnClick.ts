@@ -6,16 +6,16 @@ import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent"
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import hooks.
-import { useSelect } from "../selection/useSelect";
+import { useOnSelect } from "./useOnSelect";
 
 /**
  * Custom hook to handle click events on the canvas.
  */
-export const useClick = (
+export const useOnClick = (
 	props: SvgCanvasSubHooksProps,
 	isCtrlPressed?: boolean,
 ) => {
-	const onSelect = useSelect(props, isCtrlPressed);
+	const onSelect = useOnSelect(props, isCtrlPressed);
 
 	return useCallback(
 		(e: DiagramClickEvent) => {

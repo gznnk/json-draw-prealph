@@ -12,7 +12,7 @@ import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundi
 import { newEventId } from "../../../utils/common/newEventId";
 
 // Import selection hooks
-import { useSelect } from "./useSelect";
+import { useOnSelect } from "../handlers/useOnSelect";
 import { useClearAllSelection } from "./useClearAllSelection";
 
 /**
@@ -28,7 +28,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	});
 
 	// Get the select function from useSelect hook with Ctrl key pressed (for multi-select)
-	const onSelect = useSelect(props, true);
+	const onSelect = useOnSelect(props, true);
 
 	// Get the clear all selection function
 	const onClearAllSelection = useClearAllSelection(props);
