@@ -2,6 +2,7 @@
 import type { GroupData } from "../../types/data/shapes/GroupData";
 import type { PathData } from "../../types/data/shapes/PathData";
 import type { TextEditorState } from "../../components/core/Textable";
+import type { GrabScrollState } from "./GrabScrollState";
 import type { InteractionState } from "./InteractionState";
 import type { SvgCanvasData } from "./SvgCanvasData";
 import type { SvgCanvasHistory } from "./SvgCanvasHistory";
@@ -18,9 +19,6 @@ export type SvgCanvasState = {
 	lastHistoryEventId: string;
 	textEditorState: TextEditorState;
 	previewConnectLineState?: PathData;
-	grabScrollState?: {
-		isGrabScrolling: boolean;
-		grabScrollOccurred: boolean;
-	}; // TODO: どこかで型化
+	grabScrollState?: GrabScrollState;
 	interactionState: InteractionState;
 } & SvgCanvasData;
