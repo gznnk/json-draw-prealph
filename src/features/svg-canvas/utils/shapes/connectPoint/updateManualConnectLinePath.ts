@@ -1,7 +1,5 @@
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
 import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { Shape } from "../../../types/core/Shape";
-import type { ConnectableData } from "../../../types/data/shapes/ConnectableData";
 import { calcRadians } from "../../math/points/calcRadians";
 import { radiansToDegrees } from "../../math/common/radiansToDegrees";
 import { isConnectableData } from "../../validation/isConnectableData";
@@ -22,14 +20,22 @@ import { isConnectableData } from "../../validation/isConnectableData";
  */
 export const updateManualConnectLinePath = (
 	connectLine: ConnectLineData,
-	startOwnerShape: Shape & ConnectableData,
-	endOwnerShape: Shape & ConnectableData,
+	startOwnerShape: Diagram,
+	endOwnerShape: Diagram,
 	originalConnectLine: ConnectLineData,
-	originalStartOwner: Shape & ConnectableData,
-	originalEndOwner: Shape & ConnectableData,
+	originalStartOwner: Diagram,
+	originalEndOwner: Diagram,
 	startPointId: string,
 	endPointId: string,
 ): ConnectLineData | null => {
+	// Check if current owner shapes have connect points
+	if (
+		!isConnectableData(startOwnerShape) ||
+		!isConnectableData(endOwnerShape)
+	) {
+		return null;
+	}
+
 	// Find current connect points
 	const startConnectPoint = startOwnerShape.connectPoints.find(
 		(cp) => cp.id === startPointId,
@@ -42,7 +48,7 @@ export const updateManualConnectLinePath = (
 		return null;
 	}
 
-	// Skip if original owner shapes don't have connect points
+	// Check if original owner shapes have connect points
 	if (
 		!isConnectableData(originalStartOwner) ||
 		!isConnectableData(originalEndOwner)

@@ -1,8 +1,6 @@
 import type { SvgCanvasState } from "../../../canvas/types/SvgCanvasState";
 import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
-import type { Shape } from "../../../types/core/Shape";
-import type { ConnectableData } from "../../../types/data/shapes/ConnectableData";
 import { generateOptimalShapeToShapeConnection } from "../connectPoint/generateOptimalShapeToShapeConnection";
 import { updateManualConnectLinePath } from "../connectPoint/updateManualConnectLinePath";
 import { newId } from "../common/newId";
@@ -47,11 +45,11 @@ export const refreshConnectLines = (
 		const startOwnerShape = getDiagramById(
 			updatingCanvasState.items,
 			connectLine.startOwnerId,
-		) as Shape;
+		) as Diagram;
 		const endOwnerShape = getDiagramById(
 			updatingCanvasState.items,
 			connectLine.endOwnerId,
-		) as Shape;
+		) as Diagram;
 
 		// Skip if either owner shape is not found
 		if (!startOwnerShape || !endOwnerShape) {
@@ -139,32 +137,24 @@ export const refreshConnectLines = (
 		const originalStartOwner = getDiagramById(
 			startCanvasState.items,
 			connectLine.startOwnerId,
-		) as Shape;
+		) as Diagram;
 		const originalEndOwner = getDiagramById(
 			startCanvasState.items,
 			connectLine.endOwnerId,
-		) as Shape;
+		) as Diagram;
 
 		if (!originalStartOwner || !originalEndOwner) {
-			return item;
-		}
-
-		// Skip if original owner shapes don't have connect points
-		if (
-			!isConnectableData(originalStartOwner) ||
-			!isConnectableData(originalEndOwner)
-		) {
 			return item;
 		}
 
 		// Update the manual connect line path using the extracted function
 		const updatedConnectLine = updateManualConnectLinePath(
 			connectLine,
-			startOwnerShape as Shape & ConnectableData,
-			endOwnerShape as Shape & ConnectableData,
+			startOwnerShape,
+			endOwnerShape,
 			originalConnectLine,
-			originalStartOwner as Shape & ConnectableData,
-			originalEndOwner as Shape & ConnectableData,
+			originalStartOwner,
+			originalEndOwner,
 			startPointId,
 			endPointId,
 		);
