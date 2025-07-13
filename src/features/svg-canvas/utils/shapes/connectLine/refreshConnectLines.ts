@@ -2,12 +2,12 @@ import type { SvgCanvasState } from "../../../canvas/types/SvgCanvasState";
 import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
 import type { Shape } from "../../../types/core/Shape";
+import type { ConnectableData } from "../../../types/data/shapes/ConnectableData";
 import { generateOptimalShapeToShapeConnection } from "../connectPoint/generateOptimalShapeToShapeConnection";
+import { updateManualConnectLinePath } from "../connectPoint/updateManualConnectLinePath";
 import { newId } from "../common/newId";
 import { getDiagramById } from "../../common/getDiagramById";
 import { isConnectableData } from "../../validation/isConnectableData";
-import { calcRadians } from "../../math/points/calcRadians";
-import { radiansToDegrees } from "../../math/common/radiansToDegrees";
 
 /**
  * Updates connection lines that are connected to the given updated diagrams.
@@ -157,134 +157,19 @@ export const refreshConnectLines = (
 			return item;
 		}
 
-		// Find original connect points
-		const originalStartConnectPoint = originalStartOwner.connectPoints.find(
-			(cp) => cp.id === startPointId,
+		// Update the manual connect line path using the extracted function
+		const updatedConnectLine = updateManualConnectLinePath(
+			connectLine,
+			startOwnerShape as Shape & ConnectableData,
+			endOwnerShape as Shape & ConnectableData,
+			originalConnectLine,
+			originalStartOwner as Shape & ConnectableData,
+			originalEndOwner as Shape & ConnectableData,
+			startPointId,
+			endPointId,
 		);
-		const originalEndConnectPoint = originalEndOwner.connectPoints.find(
-			(cp) => cp.id === endPointId,
-		);
 
-		if (!originalStartConnectPoint || !originalEndConnectPoint) {
-			return item;
-		}
-
-		// Create movement data for endpoints (matches ConnectLine component logic)
-		const startMovedData = {
-			id: startPointId,
-			x: startConnectPoint.x,
-			y: startConnectPoint.y,
-			moved:
-				startConnectPoint.x !== originalStartConnectPoint.x ||
-				startConnectPoint.y !== originalStartConnectPoint.y,
-		};
-
-		const endMovedData = {
-			id: endPointId,
-			x: endConnectPoint.x,
-			y: endConnectPoint.y,
-			moved:
-				endConnectPoint.x !== originalEndConnectPoint.x ||
-				endConnectPoint.y !== originalEndConnectPoint.y,
-		};
-
-		// If neither endpoint moved, skip
-		if (!startMovedData.moved && !endMovedData.moved) {
-			return item;
-		}
-
-		// Use original items for calculations (matches ConnectLine component behavior)
-		const originalItems = originalConnectLine.items;
-
-		// Check if all lines are vertical and horizontal only
-		const isVerticalHorizontalLines = originalItems.every((item, idx) => {
-			if (idx === 0) return true;
-
-			const prev = originalItems[idx - 1];
-			const radians = calcRadians(prev.x, prev.y, item.x, item.y);
-			const degrees = radiansToDegrees(radians);
-			return degrees % 90 === 0;
-		});
-
-		// Function to create new point (exact copy of ConnectLine component logic)
-		const createNewPoint = (
-			movedPoint: typeof startMovedData,
-			oldPoint: Diagram,
-			idx: number,
-		) => {
-			// Move end points along with connection point movement
-			if (oldPoint.id === movedPoint.id) {
-				return {
-					...oldPoint,
-					x: movedPoint.x,
-					y: movedPoint.y,
-				};
-			}
-
-			// Check if it's a point adjacent to the moved point
-			const movedPointIdx = originalItems.findIndex(
-				(item) => item.id === movedPoint.id,
-			);
-			const isNextPoint =
-				(movedPointIdx === 0 && idx === 1) ||
-				(movedPointIdx === originalItems.length - 1 &&
-					idx === originalItems.length - 2);
-
-			if (isNextPoint) {
-				// If connection lines are not only vertical and horizontal, keep the second point as is
-				if (!isVerticalHorizontalLines) {
-					return oldPoint;
-				}
-
-				// For connection lines with only vertical and horizontal lines, move the second point to maintain this constraint
-
-				// Calculate movement amount
-				const movedPointOldData = originalItems[movedPointIdx];
-				const dx = movedPoint.x - movedPointOldData.x;
-				const dy = movedPoint.y - movedPointOldData.y;
-
-				// Calculate angle between two points
-				const direction = calcRadians(
-					movedPointOldData.x,
-					movedPointOldData.y,
-					oldPoint.x,
-					oldPoint.y,
-				);
-				const degrees = radiansToDegrees(direction);
-				const isVertical = (degrees + 405) % 180 > 90;
-
-				// If the line between two points is horizontal, move only x coordinate; if vertical, move only y coordinate
-				return {
-					...oldPoint,
-					x: !isVertical ? oldPoint.x + dx : oldPoint.x,
-					y: isVertical ? oldPoint.y + dy : oldPoint.y,
-				};
-			}
-
-			return oldPoint;
-		};
-
-		// Create new items using the same logic as ConnectLine component
-		const newItems = originalItems.map((item, idx) => {
-			let newPoint = item;
-
-			// Apply start point changes
-			if (startMovedData.moved) {
-				newPoint = createNewPoint(startMovedData, newPoint, idx);
-			}
-
-			// Apply end point changes (if different from start point)
-			if (endMovedData.moved && newPoint === item) {
-				newPoint = createNewPoint(endMovedData, newPoint, idx);
-			}
-			return newPoint;
-		}) as Diagram[];
-
-		// Return updated connect line with moved points
-		return {
-			...connectLine,
-			items: newItems,
-		} as ConnectLineData;
+		return updatedConnectLine || item;
 	});
 
 	// Return the updated canvas state with refreshed connect lines
