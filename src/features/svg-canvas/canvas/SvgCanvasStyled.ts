@@ -24,7 +24,6 @@ export const Container = styled.div`
  * Props for the SVG element for grab scroll functionality.
  */
 type SvgProps = {
-	isGrabScrollReady?: boolean;
 	isGrabScrolling?: boolean;
 };
 
@@ -38,7 +37,6 @@ export const Svg = styled.svg<SvgProps>`
     outline: none;
     cursor: ${(props) => {
 			if (props.isGrabScrolling) return "grabbing";
-			if (props.isGrabScrollReady) return "grab";
 			return "default";
 		}};
     * {

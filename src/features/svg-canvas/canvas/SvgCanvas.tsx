@@ -61,8 +61,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			multiSelectGroup,
 			textEditorState,
 			previewConnectLineState,
-			isGrabScrollReady,
-			isGrabScrolling,
+			grabScrollState,
 			selectionState,
 			// actions
 			onClick,
@@ -104,22 +103,25 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		const containerRef = useRef<HTMLDivElement>(null);
 		// Reference to the SVG element
 		const svgRef = useRef<SVGSVGElement>(null);
-		// Container dimensions state
-		const [containerWidth, setContainerWidth] = useState(0);
-		const [containerHeight, setContainerHeight] = useState(0);
-
 		// Forward refs to parent using useImperativeHandle
 		useImperativeHandle(ref, () => ({
 			containerRef,
 			svgRef,
 		}));
 
+		// Container dimensions state
+		const [containerWidth, setContainerWidth] = useState(0);
+		const [containerHeight, setContainerHeight] = useState(0);
+
 		// Flag indicating whether the SVG element has focus
 		const hasFocus = useRef(false);
 
 		// Use the context menu hook to handle context menu events.
-		const { contextMenuProps, contextMenuHandlers, contextMenuFunctions } =
-			useContextMenu(props);
+		const {
+			contextMenuProps,
+			contextMenuHandlers: { onContextMenu },
+			contextMenuFunctions,
+		} = useContextMenu(props);
 
 		// Use the diagram menu hook to handle diagram menu events.
 		const { diagramMenuProps } = useDiagramMenu(props);
@@ -187,13 +189,11 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					refBus.current;
 
 				if (e.target === e.currentTarget) {
-					// Check for Ctrl+drag to start grab scrolling
-					if (e.ctrlKey && onGrabStart?.(e)) {
-						return;
-					}
+					// If grab scrolling is active, handle the grab start.
+					onGrabStart?.(e);
 
-					// Start area selection if not pressing Ctrl key
-					if (!e.ctrlKey && onAreaSelection) {
+					// Start area selection if not pressing right mouse button
+					if (e.button !== 2 && onAreaSelection) {
 						onAreaSelection({
 							eventId: newEventId(),
 							eventType: "Start",
@@ -228,10 +228,12 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					return;
 				}
 
+				// Call the grab move handler
 				refBus.current.onGrabMove?.(e);
 			},
 			[selectionState?.isSelecting, onAreaSelection],
 		);
+
 		/**
 		 * Handle the pointer up event to end grab scrolling and area selection.
 		 */
@@ -318,7 +320,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		useEffect(() => {
 			// Prevent browser zoom with Ctrl+wheel at document level
 			const onDocumentWheel = (e: WheelEvent) => {
-				if (e.ctrlKey && !isGrabScrolling) {
+				if (e.ctrlKey) {
 					e.preventDefault();
 					e.stopPropagation();
 
@@ -336,7 +338,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			return () => {
 				document.removeEventListener("wheel", onDocumentWheel, true);
 			};
-		}, [isGrabScrolling]);
+		}, []);
 
 		// Render diagrams
 		const renderedItems = items.map((item) => {
@@ -375,8 +377,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 							viewBox={`${minX / zoom} ${minY / zoom} ${containerWidth / zoom} ${containerHeight / zoom}`}
 							tabIndex={0}
 							ref={svgRef}
-							isGrabScrollReady={isGrabScrollReady}
-							isGrabScrolling={isGrabScrolling}
+							isGrabScrolling={grabScrollState?.isGrabScrolling}
 							onPointerDown={handlePointerDown}
 							onPointerMove={handlePointerMove}
 							onPointerUp={handlePointerUp}
@@ -384,7 +385,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 							onFocus={handleFocus}
 							onBlur={handleBlur}
 							onWheel={handleWheel}
-							onContextMenu={contextMenuHandlers.onContextMenu}
+							onContextMenu={onContextMenu}
 						>
 							<title>{title}</title>
 							{/* Render the items in the SvgCanvas. */}

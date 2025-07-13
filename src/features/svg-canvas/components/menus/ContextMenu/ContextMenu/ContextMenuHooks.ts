@@ -18,6 +18,7 @@ export const useContextMenu = (canvasProps: SvgCanvasProps) => {
 		multiSelectGroup,
 		history,
 		historyIndex,
+		grabScrollState,
 		onUndo,
 		onRedo,
 		onSelectAll,
@@ -106,12 +107,21 @@ export const useContextMenu = (canvasProps: SvgCanvasProps) => {
 	/**
 	 * Handle right-click events to show the context menu.
 	 */
-	const onContextMenu = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
-		e.preventDefault();
-		const x = e.clientX;
-		const y = e.clientY;
-		setContextMenuState({ x, y, isVisible: true });
-	}, []);
+	const onContextMenu = useCallback(
+		(e: React.MouseEvent<SVGSVGElement>) => {
+			e.preventDefault();
+
+			console.log(grabScrollState);
+
+			// If grab scrolling is active, do not show the context menu.
+			if (grabScrollState?.grabScrollOccurred === true) return;
+
+			const x = e.clientX;
+			const y = e.clientY;
+			setContextMenuState({ x, y, isVisible: true });
+		},
+		[grabScrollState],
+	);
 
 	/**
 	 * Close the context menu.

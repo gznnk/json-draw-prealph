@@ -1,11 +1,10 @@
 // Import React.
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 
 // Import types.
 import type { CanvasHooksProps } from "../../SvgCanvasTypes";
 
 // Import hooks.
-import { useCtrl } from "../keyboard/useCtrl";
 import { useScroll } from "./useScroll";
 
 /**
@@ -25,12 +24,11 @@ type UseGrabScrollReturn = {
  */
 export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 	const {
-		canvasState: { minX, minY, isGrabScrolling },
+		canvasState: { minX, minY, grabScrollState },
 		setCanvasState,
 	} = props;
 
-	// Use Ctrl key hook for grab scrolling
-	const { isCtrlPressed } = useCtrl();
+	// Reference to store the initial drag start state
 	const dragStartState = useRef<{
 		clientX: number;
 		clientY: number;
@@ -45,31 +43,12 @@ export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 	const refBusVal = {
 		minX,
 		minY,
-		isCtrlPressed,
-		isGrabScrolling,
+		isGrabScrolling: grabScrollState?.isGrabScrolling,
 		setCanvasState,
 		onScroll,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-
-	// Manage grab scrolling state
-	useEffect(() => {
-		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current;
-
-		// Update canvas state based on Ctrl key state
-		setCanvasState((prevState) => ({
-			...prevState,
-			isGrabScrollReady: isCtrlPressed,
-			isGrabScrolling: prevState.isGrabScrolling && !isCtrlPressed,
-		}));
-
-		// If Ctrl is released, reset the drag start state
-		if (!isCtrlPressed) {
-			dragStartState.current = null;
-		}
-	}, [isCtrlPressed]);
 
 	/**
 	 * Handle the start of grab scrolling when Ctrl+pointer down
@@ -79,16 +58,20 @@ export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 	 */
 	const onGrabStart = useCallback(
 		(e: React.PointerEvent<SVGSVGElement>): boolean => {
-			// Check for Ctrl+drag to start grab scrolling
-			if (e.ctrlKey && e.target === e.currentTarget) {
-				// Bypass references to avoid function creation in every render.
-				const { setCanvasState, minX, minY } = refBus.current;
+			// Bypass references to avoid function creation in every render.
+			const { setCanvasState, minX, minY } = refBus.current;
 
-				setCanvasState((prevState) => ({
-					...prevState,
-					isGrabScrolling: true,
-				}));
+			// Reset the drag start state if already set
+			setCanvasState((prevState) => ({
+				...prevState,
+				grabScrollState: {
+					isGrabScrolling: false,
+					grabScrollOccurred: false,
+				},
+			}));
 
+			// Check for right click and if the target is the SVG element
+			if (e.button === 2 && e.target === e.currentTarget) {
 				// Store the initial drag start state
 				dragStartState.current = {
 					clientX: e.clientX,
@@ -114,25 +97,36 @@ export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 	 */
 	const onGrabMove = useCallback(
 		(e: React.PointerEvent<SVGSVGElement>): void => {
+			// If drag start state is not set, do nothing
+			if (!dragStartState.current) return;
+
 			// Bypass references to avoid function creation in every render.
-			const { isGrabScrolling, onScroll } = refBus.current;
-			if (isGrabScrolling && dragStartState.current) {
-				// Calculate total movement from the start position
-				const totalDeltaX = e.clientX - dragStartState.current.clientX;
-				const totalDeltaY = e.clientY - dragStartState.current.clientY;
+			const { setCanvasState, onScroll } = refBus.current;
 
-				// Calculate new scroll position from the initial canvas position
-				const newMinX = dragStartState.current.minX - totalDeltaX;
-				const newMinY = dragStartState.current.minY - totalDeltaY;
+			// Calculate total movement from the start position
+			const totalDeltaX = e.clientX - dragStartState.current.clientX;
+			const totalDeltaY = e.clientY - dragStartState.current.clientY;
 
-				// Update scroll position
-				onScroll?.({
-					minX: newMinX,
-					minY: newMinY,
-					clientX: e.clientX,
-					clientY: e.clientY,
-				});
-			}
+			// Calculate new scroll position from the initial canvas position
+			const newMinX = dragStartState.current.minX - totalDeltaX;
+			const newMinY = dragStartState.current.minY - totalDeltaY;
+
+			// Mark that grab scrolling occurred
+			setCanvasState((prevState) => ({
+				...prevState,
+				grabScrollState: {
+					isGrabScrolling: true,
+					grabScrollOccurred: true,
+				},
+			}));
+
+			// Update scroll position
+			onScroll?.({
+				minX: newMinX,
+				minY: newMinY,
+				clientX: e.clientX,
+				clientY: e.clientY,
+			});
 		},
 		[],
 	);
@@ -144,19 +138,23 @@ export const useGrabScroll = (props: CanvasHooksProps): UseGrabScrollReturn => {
 	 */
 	const onGrabEnd = useCallback(
 		(e: React.PointerEvent<SVGSVGElement>): void => {
-			// Bypass references to avoid function creation in every render.
-			const { isGrabScrolling, setCanvasState } = refBus.current;
+			// If grab scrolling is active, reset the state
+			if (refBus.current.isGrabScrolling) {
+				// Bypass references to avoid function creation in every render.
+				const { setCanvasState } = refBus.current;
 
-			if (isGrabScrolling) {
 				setCanvasState((prevState) => ({
 					...prevState,
-					isGrabScrolling: false,
+					grabScrollState: {
+						isGrabScrolling: false,
+						grabScrollOccurred: true,
+					},
 				}));
-
-				// Reset drag start state
-				dragStartState.current = null;
-				e.currentTarget.releasePointerCapture(e.pointerId);
 			}
+
+			// Reset drag start state
+			dragStartState.current = null;
+			e.currentTarget.releasePointerCapture(e.pointerId);
 		},
 		[],
 	);

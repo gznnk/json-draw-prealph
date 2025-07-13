@@ -68,8 +68,10 @@ export type SvgCanvasState = {
 	lastHistoryEventId: string;
 	textEditorState: TextEditorState;
 	previewConnectLineState?: PathData;
-	isGrabScrollReady?: boolean;
-	isGrabScrolling?: boolean;
+	grabScrollState?: {
+		isGrabScrolling: boolean;
+		grabScrollOccurred: boolean;
+	}; // TODO: どこかで型化
 	interactionState: InteractionState;
 } & SvgCanvasData;
 
