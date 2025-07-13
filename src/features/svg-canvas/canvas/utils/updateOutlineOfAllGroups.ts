@@ -1,7 +1,5 @@
 import type { Diagram } from "../../types/data/catalog/Diagram";
-import { calcGroupOrientedBox } from "../../utils/shapes/group/calcGroupOrientedBox";
-import { isItemableData } from "../../utils/validation/isItemableData";
-import { applyFunctionRecursively } from "./applyFunctionRecursively";
+import { updateOutlineOfGroup } from "./updateOutlineOfGroup";
 
 /**
  * Update the outline of all groups in the diagram.
@@ -10,30 +8,5 @@ import { applyFunctionRecursively } from "./applyFunctionRecursively";
  * @returns {Diagram[]} - The updated list of diagrams with the outline of all groups updated.
  */
 export const updateOutlineOfAllGroups = (items: Diagram[]): Diagram[] => {
-	return applyFunctionRecursively(items, (item) => {
-		if (isItemableData(item)) {
-			// Calculate the bounds of the group.
-			const box = calcGroupOrientedBox(item);
-			if (
-				item.x === box.x &&
-				item.y === box.y &&
-				item.width === box.width &&
-				item.height === box.height
-			) {
-				// If the bounds are the same, return the original object.
-				// This is important for React to detect no changes in the reference.
-				return item;
-			}
-
-			// Return the new object with updated bounds.
-			return {
-				...item,
-				x: box.x,
-				y: box.y,
-				width: box.width,
-				height: box.height,
-			};
-		}
-		return item;
-	});
+	return items.map((item) => updateOutlineOfGroup(item));
 };
