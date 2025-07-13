@@ -5,12 +5,18 @@ import { useEffect, useRef } from "react";
 import type { ExecutionPropagationEvent } from "../types/events/ExecutionPropagationEvent";
 import { EVENT_NAME_EXECUTION_PROPAGATION } from "../constants/EventNames";
 
+// Import EventBus.
+import { useEventBus } from "../context/EventBusContext";
+
 type ExecutionChainProps = {
 	id: string;
 	onPropagation: (e: ExecutionPropagationEvent) => void;
 };
 
 export const useExecutionChain = (props: ExecutionChainProps) => {
+	// Get EventBus instance from context
+	const eventBus = useEventBus();
+
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		...props,
@@ -19,7 +25,7 @@ export const useExecutionChain = (props: ExecutionChainProps) => {
 	refBus.current = refBusVal;
 
 	useEffect(() => {
-		const handlePropagation = (e: Event) => {
+		const handlePropagation = (e: CustomEvent) => {
 			const customEvent = e as CustomEvent<ExecutionPropagationEvent>;
 			// If the event is triggered by itself, do nothing.
 			if (customEvent.detail.id === refBus.current.id) return;
@@ -31,18 +37,19 @@ export const useExecutionChain = (props: ExecutionChainProps) => {
 				refBus.current.onPropagation(customEvent.detail);
 			}
 		};
-		// Add the event listener to the document object.
-		document.addEventListener(
+
+		// Add the event listener to the EventBus instead of document.
+		eventBus.addEventListener(
 			EVENT_NAME_EXECUTION_PROPAGATION,
 			handlePropagation,
 		);
 
 		return () => {
-			// Remove the event listener from the document object.
-			document.removeEventListener(
+			// Remove the event listener from the EventBus instead of document.
+			eventBus.removeEventListener(
 				EVENT_NAME_EXECUTION_PROPAGATION,
 				handlePropagation,
 			);
 		};
-	}, []);
+	}, [eventBus]);
 };

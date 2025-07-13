@@ -111,8 +111,6 @@ export const useContextMenu = (canvasProps: SvgCanvasProps) => {
 		(e: React.MouseEvent<SVGSVGElement>) => {
 			e.preventDefault();
 
-			console.log(grabScrollState);
-
 			// If grab scrolling is active, do not show the context menu.
 			if (grabScrollState?.grabScrollOccurred === true) return;
 
