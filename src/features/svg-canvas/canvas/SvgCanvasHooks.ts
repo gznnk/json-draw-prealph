@@ -25,8 +25,8 @@ import { useOnConnect } from "./hooks/handlers/useOnConnect";
 import { useOnCopy } from "./hooks/handlers/useOnCopy";
 import { useOnDelete } from "./hooks/handlers/useOnDelete";
 import { useDiagramChange } from "./hooks/actions/useDiagramChange";
-import { useOnDiagramConstraintChange } from "./hooks/handlers/useOnDiagramConstraintChange";
-import { useOnDiagramStyleChange } from "./hooks/handlers/useOnDiagramStyleChange";
+import { useOnConstraintChange } from "./hooks/handlers/useOnConstraintChange";
+import { useOnStyleChange } from "./hooks/handlers/useOnStyleChange";
 import { useOnDrag } from "./hooks/handlers/useOnDrag";
 import { useOnDragOver } from "./hooks/handlers/useOnDragOver";
 import { useOnDragLeave } from "./hooks/handlers/useOnDragLeave";
@@ -143,11 +143,10 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onDiagramChange = useDiagramChange(canvasHooksProps);
 
 	// Handler for the diagram style change event.
-	const onDiagramStyleChange = useOnDiagramStyleChange(canvasHooksProps);
+	const onDiagramStyleChange = useOnStyleChange(canvasHooksProps);
 
 	// Handler for the diagram constraint change event.
-	const onDiagramConstraintChange =
-		useOnDiagramConstraintChange(canvasHooksProps);
+	const onDiagramConstraintChange = useOnConstraintChange(canvasHooksProps);
 
 	// Handler for the drag event.
 	const onDrag = useOnDrag(canvasHooksProps);
