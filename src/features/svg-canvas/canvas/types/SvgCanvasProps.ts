@@ -17,7 +17,7 @@ import type { PreviewConnectLineEvent } from "../../types/events/PreviewConnectL
 import type { StackOrderChangeEvent } from "../../types/events/StackOrderChangeEvent";
 import type { SvgCanvasResizeEvent } from "../../types/events/SvgCanvasResizeEvent";
 import type { SvgCanvasScrollEvent } from "../../types/events/SvgCanvasScrollEvent";
-import type { AreaSelectionState } from "../hooks/selection/useAreaSelection";
+import type { AreaSelectionState } from "./AreaSelectionState";
 import type { EventBus } from "../../../../shared/event-bus/EventBus";
 import type { SvgCanvasData } from "./SvgCanvasData";
 import type { SvgCanvasState } from "./SvgCanvasState";

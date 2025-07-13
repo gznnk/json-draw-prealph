@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 // Import types related to SvgCanvas.
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 import type { AreaSelectionEvent } from "../../../types/events/AreaSelectionEvent";
+import type { AreaSelectionState } from "../../types/AreaSelectionState";
 
 // Import functions related to SvgCanvas.
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
@@ -13,17 +14,6 @@ import { newEventId } from "../../../utils/common/newEventId";
 // Import selection hooks
 import { useSelect } from "./useSelect";
 import { useClearAllSelection } from "./useClearAllSelection";
-
-/**
- * Area selection state type
- */
-export type AreaSelectionState = {
-	isSelecting: boolean;
-	startX: number;
-	startY: number;
-	endX: number;
-	endY: number;
-};
 
 /**
  * Custom hook to handle area selection on the canvas.
