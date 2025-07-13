@@ -11,6 +11,8 @@ export const isConnectableData = (obj: unknown): obj is ConnectableData => {
 	return (
 		obj !== null &&
 		typeof obj === "object" &&
+		"showConnectPoints" in obj &&
+		typeof (obj as ConnectableData).showConnectPoints === "boolean" &&
 		"connectPoints" in obj &&
 		Array.isArray((obj as ConnectableData).connectPoints)
 	);
