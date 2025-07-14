@@ -13,7 +13,6 @@ export const MiniMapContainer = styled.div<{ width: number; height: number }>`
 	border: 1px solid rgba(24, 144, 255, 0.15);
 	border-radius: 8px;
 	cursor: pointer;
-	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
 	overflow: hidden;
 	z-index: 1000;
 	pointer-events: auto;
