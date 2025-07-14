@@ -23,6 +23,9 @@ import { generateOptimalShapeToShapeConnection } from "../../../utils/shapes/con
 import { generatePathFromShapeToPoint } from "../../../utils/shapes/connectPoint/generatePathFromShapeToPoint";
 import { getLineDirection } from "../../../utils/shapes/connectPoint/getLineDirection";
 
+// Import constants.
+import { DEFAULT_CONNECT_LINE_DATA } from "../../../constants/DefaultData";
+
 // Import local module files.
 import { EVENT_NAME_CONNECTION } from "../../../constants/EventNames";
 import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
@@ -102,23 +105,12 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		onPreviewConnectLine?.({
 			eventType,
 			pathData: {
+				...DEFAULT_CONNECT_LINE_DATA,
 				id: `${id}-connecting-path`,
-				type: "Path",
 				x: 0,
 				y: 0,
 				width: 0,
 				height: 0,
-				rotation: 0,
-				scaleX: 1,
-				scaleY: 1,
-				stroke: "#3A415C",
-				strokeWidth: "3px",
-				keepProportion: false,
-				isSelected: false,
-				showTransformControls: false,
-				showOutline: false,
-				isTransforming: false,
-				endArrowHead: "Circle",
 				items: newPathPoints,
 			},
 		});

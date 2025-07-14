@@ -16,6 +16,9 @@ import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { isConnectableData } from "../../../utils/validation/isConnectableData";
 import { addHistory } from "../../utils/addHistory";
 
+// Import constants.
+import { DEFAULT_CONNECT_LINE_DATA } from "../../../constants/DefaultData";
+
 /**
  * Custom hook to handle connect events on the canvas.
  */
@@ -29,30 +32,18 @@ export const useOnConnect = (props: SvgCanvasSubHooksProps) => {
 			);
 
 			const newConnectLine: ConnectLineData = {
+				...DEFAULT_CONNECT_LINE_DATA,
 				id: newId(),
-				type: "ConnectLine",
 				x: shape.x,
 				y: shape.y,
 				width: shape.width,
 				height: shape.height,
-				rotation: 0,
-				scaleX: 1,
-				scaleY: 1,
-				stroke: "#49546e",
-				strokeWidth: "2px",
-				isSelected: false,
-				showOutline: false,
-				showTransformControls: false,
-				keepProportion: false,
-				isTransforming: false,
 				items: e.points.map((p: PathPointData) => ({
 					...p,
 					type: "PathPoint",
 				})) as PathPointData[],
 				startOwnerId: e.startOwnerId,
 				endOwnerId: e.endOwnerId,
-				autoRouting: true,
-				endArrowHead: "Circle",
 			};
 
 			setCanvasState((prevState) => {

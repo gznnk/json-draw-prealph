@@ -1,4 +1,5 @@
 import type { ConnectPointData } from "../types/data/shapes/ConnectPointData";
+import type { ConnectLineData } from "../types/data/shapes/ConnectLineData";
 import type { ConnectableData } from "../types/data/shapes/ConnectableData";
 import type { Diagram } from "../types/data/catalog/Diagram";
 import type { DiagramBaseData } from "../types/data/core/DiagramBaseData";
@@ -157,3 +158,21 @@ export const DEFAULT_PATH_DATA = {
 	...DEFAULT_STROKABLE_DATA,
 	type: "Path",
 } as const satisfies PathData;
+
+/**
+ * Default connect line data.
+ */
+export const DEFAULT_CONNECT_LINE_DATA = {
+	...DEFAULT_DIAGRAM_BASE_DATA,
+	...DEFAULT_SELECTABLE_DATA,
+	...DEFAULT_TRANSFORMATIVE_DATA,
+	...DEFAULT_ITEMABLE_DATA,
+	...DEFAULT_STROKABLE_DATA,
+	type: "ConnectLine",
+	stroke: "#002766",
+	strokeWidth: "2px",
+	startOwnerId: "",
+	endOwnerId: "",
+	autoRouting: true,
+	endArrowHead: "Circle",
+} as const satisfies ConnectLineData;
