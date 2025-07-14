@@ -259,7 +259,7 @@ const processConnectLineForPaste = (
  * @param props - Canvas hook properties containing setCanvasState and other context
  * @returns A callback function that executes the paste operation
  */
-export const useOnPaste = (props: SvgCanvasSubHooksProps) => {
+export const usePaste = (props: SvgCanvasSubHooksProps) => {
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,

@@ -17,7 +17,7 @@ import { removeGroupedRecursive } from "../../utils/removeGroupedRecursive";
 /**
  * Custom hook to handle group events on the canvas.
  */
-export const useOnGroup = (props: SvgCanvasSubHooksProps) => {
+export const useGroup = (props: SvgCanvasSubHooksProps) => {
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,

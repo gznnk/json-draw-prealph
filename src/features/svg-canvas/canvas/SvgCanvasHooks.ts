@@ -26,21 +26,21 @@ import { useOnCopy } from "./hooks/handlers/useOnCopy";
 import { useOnDelete } from "./hooks/handlers/useOnDelete";
 import { useDiagramChange } from "./hooks/actions/useDiagramChange";
 import { useOnDiagramConstraintChange } from "./hooks/handlers/useOnDiagramConstraintChange";
-import { useOnDiagramStyleChange } from "./hooks/handlers/useOnDiagramStyleChange";
+import { useDiagramStyleChange } from "./hooks/actions/useDiagramStyleChange";
 import { useOnDrag } from "./hooks/handlers/useOnDrag";
 import { useOnDragOver } from "./hooks/handlers/useOnDragOver";
 import { useOnDragLeave } from "./hooks/handlers/useOnDragLeave";
 import { useOnExecute } from "./hooks/handlers/useOnExecute";
-import { useOnExport } from "./hooks/handlers/useOnExport";
-import { useOnGroup } from "./hooks/handlers/useOnGroup";
+import { useExport } from "./hooks/actions/useExport";
+import { useGroup } from "./hooks/actions/useGroup";
 import { useOnHoverChange } from "./hooks/handlers/useOnHoverChange";
 import { useNewDiagram } from "./hooks/actions/useNewDiagram";
-import { useOnPaste } from "./hooks/handlers/useOnPaste";
+import { usePaste } from "./hooks/actions/usePaste";
 import { useOnPreviewConnectLine } from "./hooks/handlers/useOnPreviewConnectLine";
-import { useOnStackOrderChange } from "./hooks/handlers/useOnStackOrderChange";
+import { useStackOrderChange } from "./hooks/actions/useStackOrderChange";
 import { useOnTextChange } from "./hooks/handlers/useOnTextChange";
 import { useOnTransform } from "./hooks/handlers/useOnTransform";
-import { useOnUngroup } from "./hooks/handlers/useOnUngroup";
+import { useUngroup } from "./hooks/actions/useUngroup";
 import { useRedo } from "./hooks/history/useRedo";
 import { useUndo } from "./hooks/history/useUndo";
 import { useCtrl } from "./hooks/keyboard/useCtrl";
@@ -143,7 +143,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onDiagramChange = useDiagramChange(canvasHooksProps);
 
 	// Handler for the diagram style change event.
-	const onDiagramStyleChange = useOnDiagramStyleChange(canvasHooksProps);
+	const onDiagramStyleChange = useDiagramStyleChange(canvasHooksProps);
 
 	// Handler for the diagram constraint change event.
 	const onDiagramConstraintChange =
@@ -162,10 +162,10 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onExecute = useOnExecute(canvasHooksProps);
 
 	// Handler for the export event.
-	const onExport = useOnExport(canvasHooksProps);
+	const onExport = useExport(canvasHooksProps);
 
 	// Handler for the group event.
-	const onGroup = useOnGroup(canvasHooksProps);
+	const onGroup = useGroup(canvasHooksProps);
 
 	// Handler for the hover change event.
 	const onHoverChange = useOnHoverChange(canvasHooksProps);
@@ -174,13 +174,13 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onNewDiagram = useNewDiagram(canvasHooksProps);
 
 	// Handler for the paste event.
-	const onPaste = useOnPaste(canvasHooksProps);
+	const onPaste = usePaste(canvasHooksProps);
 
 	// Handler for the preview connect line event.
 	const onPreviewConnectLine = useOnPreviewConnectLine(canvasHooksProps);
 
 	// Handler for the stack order change event.
-	const onStackOrderChange = useOnStackOrderChange(canvasHooksProps);
+	const onStackOrderChange = useStackOrderChange(canvasHooksProps);
 
 	// Handler for the text change event (includes text editing initiation).
 	const onTextChange = useOnTextChange(canvasHooksProps);
@@ -189,7 +189,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onTransform = useOnTransform(canvasHooksProps);
 
 	// Handler for the ungroup event.
-	const onUngroup = useOnUngroup(canvasHooksProps);
+	const onUngroup = useUngroup(canvasHooksProps);
 
 	// history
 	// Handler for the redo event.
