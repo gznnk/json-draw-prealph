@@ -2,7 +2,7 @@
 import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
-import type { DiagramConstraintChangeEvent } from "../../../types/events/DiagramConstraintChangeEvent";
+import type { DiagramStyleChangeEvent } from "../../../types/events/DiagramStyleChangeEvent";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import functions related to SvgCanvas.
@@ -11,9 +11,9 @@ import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 
 /**
- * Custom hook to handle diagram constraint change events on the canvas.
+ * Custom hook to handle diagram style change events on the canvas.
  */
-export const useOnConstraintChange = (props: SvgCanvasSubHooksProps) => {
+export const useOnDiagramStyleChange = (props: SvgCanvasSubHooksProps) => {
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
@@ -21,23 +21,23 @@ export const useOnConstraintChange = (props: SvgCanvasSubHooksProps) => {
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	return useCallback((e: DiagramConstraintChangeEvent) => {
+	return useCallback((e: DiagramStyleChangeEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const {
 			props: { setCanvasState, onDataChange },
 		} = refBus.current;
 
 		setCanvasState((prevState) => {
-			// Update items with constraint changes.
+			// Update items with style changes.
 			const items = applyFunctionRecursively(prevState.items, (item) => {
 				// If the id does not match, return the original item.
 				if (item.id !== e.id) return item;
 
-				// Extract constraint properties from the event.
-				const { eventId, id, ...constraintChanges } = e;
+				// Extract style properties from the event.
+				const { eventId, id, ...styleChanges } = e;
 
-				// If the id matches, update the item with the new constraint properties.
-				return { ...item, ...constraintChanges };
+				// If the id matches, update the item with the new style properties.
+				return { ...item, ...styleChanges };
 			});
 
 			// Create new state with updated items.
