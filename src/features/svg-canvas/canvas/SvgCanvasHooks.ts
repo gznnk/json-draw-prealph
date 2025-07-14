@@ -1,9 +1,9 @@
 // Import React.
-import { useState, useRef, type RefObject } from "react";
+import { useRef, useState, type RefObject } from "react";
 
 // Import types related to SvgCanvas.
-import type { Diagram } from "../types/data/catalog/Diagram";
 import type { TextEditorState } from "../components/core/Textable";
+import type { Diagram } from "../types/data/catalog/Diagram";
 
 // Import functions related to SvgCanvas.
 import { deepCopy } from "../utils/common/deepCopy";
@@ -13,34 +13,35 @@ import { calcCanvasBounds } from "./utils/calcCanvasBounds";
 import { EventBus } from "../../../shared/event-bus/EventBus";
 
 // Imports related to this component.
+import { InteractionState } from "./types/InteractionState";
 import type { SvgCanvasData } from "./types/SvgCanvasData";
 import type { SvgCanvasRef } from "./types/SvgCanvasRef";
 import type { SvgCanvasState } from "./types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "./types/SvgCanvasSubHooksProps";
-import { InteractionState } from "./types/InteractionState";
 
 // Import canvas custom hooks.
-import { useAreaSelection } from "./hooks/selection/useAreaSelection";
-import { useConnect } from "./hooks/actions/useConnect";
+import { useConstraintChange } from "./hooks/actions/useConstraintChange";
 import { useCopy } from "./hooks/actions/useCopy";
 import { useDelete } from "./hooks/actions/useDelete";
 import { useDiagramChange } from "./hooks/actions/useDiagramChange";
-import { useConstraintChange } from "./hooks/actions/useConstraintChange";
-import { useStyleChange } from "./hooks/actions/useStyleChange";
-import { useDrag } from "./hooks/actions/useDrag";
-import { useDragOver } from "./hooks/actions/useDragOver";
-import { useDragLeave } from "./hooks/actions/useDragLeave";
-import { useExecute } from "./hooks/actions/useExecute";
 import { useExport } from "./hooks/actions/useExport";
 import { useGroup } from "./hooks/actions/useGroup";
-import { useHoverChange } from "./hooks/actions/useHoverChange";
 import { useNewDiagram } from "./hooks/actions/useNewDiagram";
 import { usePaste } from "./hooks/actions/usePaste";
 import { usePreviewConnectLine } from "./hooks/actions/usePreviewConnectLine";
 import { useStackOrderChange } from "./hooks/actions/useStackOrderChange";
-import { useTextChange } from "./hooks/actions/useTextChange";
-import { useTransform } from "./hooks/actions/useTransform";
+import { useStyleChange } from "./hooks/actions/useStyleChange";
 import { useUngroup } from "./hooks/actions/useUngroup";
+import { useOnClick } from "./hooks/diagram/useOnClick";
+import { useOnConnect } from "./hooks/diagram/useOnConnect";
+import { useOnDrag } from "./hooks/diagram/useOnDrag";
+import { useOnDragLeave } from "./hooks/diagram/useOnDragLeave";
+import { useOnDragOver } from "./hooks/diagram/useOnDragOver";
+import { useOnExecute } from "./hooks/diagram/useOnExecute";
+import { useOnHoverChange } from "./hooks/diagram/useOnHoverChange";
+import { useOnSelect } from "./hooks/diagram/useOnSelect";
+import { useOnTextChange } from "./hooks/diagram/useOnTextChange";
+import { useOnTransform } from "./hooks/diagram/useOnTransform";
 import { useRedo } from "./hooks/history/useRedo";
 import { useUndo } from "./hooks/history/useUndo";
 import { useCtrl } from "./hooks/keyboard/useCtrl";
@@ -50,10 +51,9 @@ import { useGrabScroll } from "./hooks/navigation/useGrabScroll";
 import { useNavigate } from "./hooks/navigation/useNavigate";
 import { useScroll } from "./hooks/navigation/useScroll";
 import { useZoom } from "./hooks/navigation/useZoom";
+import { useAreaSelection } from "./hooks/selection/useAreaSelection";
 import { useClearAllSelection } from "./hooks/selection/useClearAllSelection";
-import { useSelect } from "./hooks/selection/useSelect";
 import { useSelectAll } from "./hooks/selection/useSelectAll";
-import { useClick } from "./hooks/actions/useClick";
 
 /**
  * Props for the useSvgCanvas hook.
@@ -128,10 +128,10 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// actions
 	// Handler for the click event.
-	const onClick = useClick(canvasHooksProps, isCtrlPressed);
+	const onClick = useOnClick(canvasHooksProps, isCtrlPressed);
 
 	// Handler for the diagram connect event.
-	const onConnect = useConnect(canvasHooksProps);
+	const onConnect = useOnConnect(canvasHooksProps);
 
 	// Handler for the copy event.
 	const onCopy = useCopy(canvasHooksProps);
@@ -149,16 +149,16 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onConstraintChange = useConstraintChange(canvasHooksProps);
 
 	// Handler for the drag event.
-	const onDrag = useDrag(canvasHooksProps);
+	const onDrag = useOnDrag(canvasHooksProps);
 
 	// Handler for the drag leave event.
-	const onDragLeave = useDragLeave(canvasHooksProps);
+	const onDragLeave = useOnDragLeave(canvasHooksProps);
 
 	// Handler for the drag over event.
-	const onDragOver = useDragOver(canvasHooksProps);
+	const onDragOver = useOnDragOver(canvasHooksProps);
 
 	// Handler for the execute event.
-	const onExecute = useExecute(canvasHooksProps);
+	const onExecute = useOnExecute(canvasHooksProps);
 
 	// Handler for the export event.
 	const onExport = useExport(canvasHooksProps);
@@ -167,7 +167,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onGroup = useGroup(canvasHooksProps);
 
 	// Handler for the hover change event.
-	const onHoverChange = useHoverChange(canvasHooksProps);
+	const onHoverChange = useOnHoverChange(canvasHooksProps);
 
 	// Handler for the new diagram event.
 	const onNewDiagram = useNewDiagram(canvasHooksProps);
@@ -182,10 +182,10 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onStackOrderChange = useStackOrderChange(canvasHooksProps);
 
 	// Handler for the text change event (includes text editing initiation).
-	const onTextChange = useTextChange(canvasHooksProps);
+	const onTextChange = useOnTextChange(canvasHooksProps);
 
 	// Handler for the transfrom event.
-	const onTransform = useTransform(canvasHooksProps);
+	const onTransform = useOnTransform(canvasHooksProps);
 
 	// Handler for the ungroup event.
 	const onUngroup = useUngroup(canvasHooksProps);
@@ -216,7 +216,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onClearAllSelection = useClearAllSelection(canvasHooksProps);
 
 	// Handler for the select event.
-	const onSelect = useSelect(canvasHooksProps, isCtrlPressed);
+	const onSelect = useOnSelect(canvasHooksProps, isCtrlPressed);
 
 	// Handler for the select all event.
 	const onSelectAll = useSelectAll(canvasHooksProps);
