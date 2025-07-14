@@ -9,6 +9,7 @@ export const DiagramMenuItemDiv = styled.div`
     width: 32px;
     height: 32px;
     border-radius: 4px;
+    border: 1px solid transparent;
     cursor: pointer;
     user-select: none;
     transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -19,7 +20,7 @@ export const DiagramMenuItemDiv = styled.div`
     
     &.active {
         background-color: #e6f4ff;
-        border: 1px solid #1890ff;
+        border-color: #1890ff;
     }
     
     &.disabled {
