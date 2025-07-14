@@ -173,27 +173,25 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 
 	return (
 		<>
-			<g transform="translate(0.5,0.5)">
-				<RectangleElement
-					id={id}
-					x={-width / 2}
-					y={-height / 2}
-					width={width}
-					height={height}
-					rx={radius}
-					ry={radius}
-					fill={fill}
-					stroke={stroke}
-					strokeWidth={strokeWidth}
-					tabIndex={0}
-					cursor="move"
-					isTransparent={isTransparent}
-					transform={transform}
-					ref={svgRef}
-					onDoubleClick={onDoubleClick}
-					{...composedProps}
-				/>
-			</g>
+			<RectangleElement
+				id={id}
+				x={-width / 2}
+				y={-height / 2}
+				width={width}
+				height={height}
+				rx={radius}
+				ry={radius}
+				fill={fill}
+				stroke={stroke}
+				strokeWidth={strokeWidth}
+				tabIndex={0}
+				cursor="move"
+				isTransparent={isTransparent}
+				transform={transform}
+				ref={svgRef}
+				onDoubleClick={onDoubleClick}
+				{...composedProps}
+			/>
 			{isTextEditEnabled && (
 				<Textable
 					x={-width / 2}

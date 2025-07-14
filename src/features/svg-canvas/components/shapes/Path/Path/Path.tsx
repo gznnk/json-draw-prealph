@@ -338,15 +338,13 @@ const PathComponent: React.FC<PathProps> = ({
 	return (
 		<>
 			{/* Path for drawing */}
-			<g transform="translate(0.5,0.5)">
-				<PathElement
-					d={d}
-					fill="none"
-					stroke={stroke}
-					strokeWidth={strokeWidth}
-					isTransparent={false}
-				/>
-			</g>
+			<PathElement
+				d={d}
+				fill="none"
+				stroke={stroke}
+				strokeWidth={strokeWidth}
+				isTransparent={false}
+			/>
 			{/* Path for dragging */}
 			<path
 				id={id}

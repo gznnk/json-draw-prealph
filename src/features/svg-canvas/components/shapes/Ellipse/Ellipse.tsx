@@ -167,25 +167,23 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 
 	return (
 		<>
-			<g transform="translate(0.5,0.5)">
-				<EllipseElement
-					id={id}
-					cx={0}
-					cy={0}
-					rx={width / 2}
-					ry={height / 2}
-					fill={fill}
-					stroke={stroke}
-					strokeWidth={strokeWidth}
-					tabIndex={0}
-					cursor="move"
-					isTransparent={isTransparent}
-					transform={transform}
-					ref={svgRef}
-					onDoubleClick={onDoubleClick}
-					{...composedProps}
-				/>
-			</g>
+			<EllipseElement
+				id={id}
+				cx={0}
+				cy={0}
+				rx={width / 2}
+				ry={height / 2}
+				fill={fill}
+				stroke={stroke}
+				strokeWidth={strokeWidth}
+				tabIndex={0}
+				cursor="move"
+				isTransparent={isTransparent}
+				transform={transform}
+				ref={svgRef}
+				onDoubleClick={onDoubleClick}
+				{...composedProps}
+			/>
 			{isTextEditEnabled && (
 				<Textable
 					x={-width / 2}

@@ -43,20 +43,18 @@ const OutlineComponent: React.FC<OutlineProps> = ({
 	const radians = degreesToRadians(rotation);
 
 	return (
-		<g transform="translate(0.5,0.5)">
-			<rect
-				x={-width / 2}
-				y={-height / 2}
-				width={width}
-				height={height}
-				fill="transparent"
-				stroke="rgba(24, 144, 255, 0.8)"
-				strokeWidth="1px"
-				strokeDasharray="4,2"
-				pointerEvents="none"
-				transform={createSvgTransform(scaleX, scaleY, radians, x, y)}
-			/>
-		</g>
+		<rect
+			x={-width / 2}
+			y={-height / 2}
+			width={width}
+			height={height}
+			fill="transparent"
+			stroke="rgba(24, 144, 255, 0.8)"
+			strokeWidth="1px"
+			strokeDasharray="4,2"
+			pointerEvents="none"
+			transform={createSvgTransform(scaleX, scaleY, radians, x, y)}
+		/>
 	);
 };
 
