@@ -26,18 +26,20 @@ export const DiagramMenuWrapper = styled.div<DiagramMenuWrapperProps>`
  * Styled element for the diagram menu.
  */
 export const DiagramMenuDiv = styled.div`
-    height: 34px;
+    height: 40px;
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
+    align-items: center;
     font-size: 14px;
-    padding: 3px 4px;
-    background-color: #F9F9F9;
-    border: 1px solid #E0E0E0;
-    border-radius: 4px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 4px 8px;
+    background-color: #ffffff;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
     pointer-events: auto;
     user-select: none;
+    z-index: 1000;
 `;
 
 /**
@@ -45,10 +47,10 @@ export const DiagramMenuDiv = styled.div`
  */
 export const DiagramMenuDivider = styled.div`
     width: 1px;
-    height: 100%;
-    margin-left: 3px;
-    margin-right: 3px;
-    background-color: #E0E0E0;
+    height: 16px;
+    margin: 0 8px;
+    background-color: #f0f0f0;
+    align-self: center;
 `;
 
 /**

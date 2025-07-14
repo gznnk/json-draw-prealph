@@ -5,19 +5,20 @@ import styled from "@emotion/styled";
  * Styled container element for the number stepper.
  */
 export const NumberStepperContainer = styled.div`
-	height: 34px;
+	height: 40px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	box-sizing: border-box;
 	flex-direction: row;
-	background-color: #F9F9F9;
-	border: 1px solid #E0E0E0;
-	border-radius: 4px;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-	padding: 3px 4px;
+	background-color: #ffffff;
+	border: 1px solid #d9d9d9;
+	border-radius: 6px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+	padding: 4px;
 	pointer-events: auto;
 	user-select: none;
+	z-index: 1100;
 `;
 
 /**
@@ -25,13 +26,27 @@ export const NumberStepperContainer = styled.div`
  */
 export const NumberStepperInput = styled.input`
 	display: block;
-	width: 32px;
-	height: 24px;
-	margin: 0 3px;
+	width: 48px;
+	height: 28px;
+	margin: 0 4px;
+	padding: 4px 8px;
 	text-align: center;
 	outline: none;
-	border: 1px solid #E0E0E0;
+	border: 1px solid #d9d9d9;
 	border-radius: 4px;
+	background-color: #ffffff;
+	color: rgba(0, 0, 0, 0.88);
+	font-size: 14px;
+	transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+	
+	&:focus {
+		border-color: #1890ff;
+		box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+	}
+	
+	&:hover {
+		border-color: #40a9ff;
+	}
 `;
 
 /**
@@ -39,21 +54,32 @@ export const NumberStepperInput = styled.input`
  */
 export const NumberStepperButton = styled.div`
 	display: flex;
-	width: 26px;
-	height: 26px;
+	width: 28px;
+	height: 28px;
 	box-sizing: border-box;
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
-	padding: 3px 3px;
+	border-radius: 4px;
 	cursor: pointer;
 	user-select: none;
-	transition: background-color 0.2s ease-in-out;
+	transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 
 	&:hover {
-		background-color: #EEEEEE;
+		background-color: #f5f5f5;
 	}
+	
 	&:active {
-		background-color: #DDDDDD;
+		background-color: #e6f4ff;
+		transform: scale(0.95);
+	}
+	
+	svg {
+		color: rgba(0, 0, 0, 0.65);
+		transition: color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+	}
+	
+	&:hover svg {
+		color: #1890ff;
 	}
 `;

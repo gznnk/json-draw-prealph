@@ -6,14 +6,45 @@ export const DiagramMenuItemDiv = styled.div`
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 3px 3px;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
     cursor: pointer;
     user-select: none;
-    transition: background-color 0.2s ease-in-out;
+    transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+    
     &:hover {
-        background-color: #EEEEEE;
+        background-color: #f5f5f5;
     }
+    
     &.active {
-        background-color: #DDDDDD;
+        background-color: #e6f4ff;
+        border: 1px solid #1890ff;
+    }
+    
+    &.disabled {
+        cursor: not-allowed;
+        opacity: 0.25;
+        
+        &:hover {
+            background-color: transparent;
+        }
+    }
+    
+    svg {
+        color: rgba(0, 0, 0, 0.65);
+        transition: color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+    }
+    
+    &:hover svg {
+        color: #1890ff;
+    }
+    
+    &.active svg {
+        color: #1890ff;
+    }
+    
+    &.disabled svg {
+        color: rgba(0, 0, 0, 0.25);
     }
 `;

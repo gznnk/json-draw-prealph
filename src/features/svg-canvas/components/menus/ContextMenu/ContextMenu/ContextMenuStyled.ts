@@ -17,13 +17,14 @@ export const ContextMenuDiv = styled.div<ContextMenuDivProps>`
     top: ${(props) => props.y}px;
     left: ${(props) => props.x}px;
     min-width: 200px;
-    padding: 3px 4px;
-    background-color: #F9F9F9;
-    border: 1px solid #E0E0E0;
-    border-radius: 4px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 4px 0;
+    background-color: #ffffff;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
     pointer-events: auto;
     user-select: none;
+    z-index: 1050;
 `;
 
 /**
@@ -32,7 +33,6 @@ export const ContextMenuDiv = styled.div<ContextMenuDivProps>`
  */
 export const ContextMenuDivider = styled.div`
 	height: 1px;
-	margin-top: 3px;
-	margin-bottom: 3px;
-	background-color: #E0E0E0;
+	margin: 4px 12px;
+	background-color: #f0f0f0;
 `;
