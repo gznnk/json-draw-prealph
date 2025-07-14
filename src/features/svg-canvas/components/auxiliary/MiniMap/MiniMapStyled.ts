@@ -9,14 +9,18 @@ export const MiniMapContainer = styled.div<{ width: number; height: number }>`
 	right: 16px;
 	width: ${(props) => props.width}px;
 	height: ${(props) => props.height}px;
-	background-color: #DDDDDD;
-	border: 1px solid #2A2F4C;
-	border-radius: 4px;
+	background-color: #ffffff;
+	border: 1px solid rgba(24, 144, 255, 0.15);
+	border-radius: 8px;
 	cursor: pointer;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
 	overflow: hidden;
 	z-index: 1000;
 	pointer-events: auto;
+	
+	&:hover {
+		border-color: rgba(24, 144, 255, 0.3);
+	}
 `;
 
 /**
@@ -40,21 +44,25 @@ export const MiniMapSvg = styled.svg`
  * Background rectangle for the minimap
  */
 export const MiniMapBackground = styled.rect`
-	fill: #EEEEEE;
+	fill: #fafafa;
+	stroke: rgba(24, 144, 255, 0.08);
+	stroke-width: 0.5;
 `;
 
 /**
  * Viewport indicator rectangle
  */
 export const ViewportIndicator = styled.rect`
-	fill: transparent;
-	stroke: #4EA1FF;
-	stroke-width: 1;
-	opacity: 0.8;
+	fill: rgba(24, 144, 255, 0.08);
+	stroke: rgba(24, 144, 255, 0.8);
+	stroke-width: 1.5;
+	opacity: 0.9;
 	cursor: grab !important;
 	pointer-events: all !important;
 	
 	&:hover {
+		fill: rgba(24, 144, 255, 0.12);
+		stroke: rgba(24, 144, 255, 1);
 		stroke-width: 2;
 		opacity: 1;
 		cursor: grab !important;
@@ -62,6 +70,8 @@ export const ViewportIndicator = styled.rect`
 	
 	&:active {
 		cursor: grabbing !important;
+		fill: rgba(24, 144, 255, 0.15);
+		stroke: rgba(24, 144, 255, 1);
 		stroke-width: 2;
 		opacity: 1;
 	}
@@ -71,6 +81,6 @@ export const ViewportIndicator = styled.rect`
  * Item representation in the minimap
  */
 export const MiniMapItem = styled.rect`
-	fill: #C0C4D2;
-	opacity: 0.6;
+	fill: rgba(24, 144, 255, 0.6);
+	opacity: 0.8;
 `;
