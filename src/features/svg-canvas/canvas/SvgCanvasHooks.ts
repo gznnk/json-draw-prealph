@@ -25,8 +25,8 @@ import { useConnect } from "./hooks/actions/useConnect";
 import { useCopy } from "./hooks/actions/useCopy";
 import { useDelete } from "./hooks/actions/useDelete";
 import { useDiagramChange } from "./hooks/actions/useDiagramChange";
-import { useDiagramConstraintChange } from "./hooks/actions/useDiagramConstraintChange";
-import { useDiagramStyleChange } from "./hooks/actions/useDiagramStyleChange";
+import { useConstraintChange } from "./hooks/actions/useConstraintChange";
+import { useStyleChange } from "./hooks/actions/useStyleChange";
 import { useDrag } from "./hooks/actions/useDrag";
 import { useDragOver } from "./hooks/actions/useDragOver";
 import { useDragLeave } from "./hooks/actions/useDragLeave";
@@ -143,11 +143,10 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onDiagramChange = useDiagramChange(canvasHooksProps);
 
 	// Handler for the diagram style change event.
-	const onDiagramStyleChange = useDiagramStyleChange(canvasHooksProps);
+	const onStyleChange = useStyleChange(canvasHooksProps);
 
 	// Handler for the diagram constraint change event.
-	const onDiagramConstraintChange =
-		useDiagramConstraintChange(canvasHooksProps);
+	const onConstraintChange = useConstraintChange(canvasHooksProps);
 
 	// Handler for the drag event.
 	const onDrag = useDrag(canvasHooksProps);
@@ -239,8 +238,8 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onCopy,
 		onDelete,
 		onDiagramChange,
-		onDiagramStyleChange,
-		onDiagramConstraintChange,
+		onStyleChange,
+		onConstraintChange,
 		onDrag,
 		onDragOver,
 		onDragLeave,
