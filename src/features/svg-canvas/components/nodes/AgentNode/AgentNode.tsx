@@ -18,7 +18,6 @@ import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import functions related to SvgCanvas.
 import { dispatchNewItemEvent } from "../../../canvas/hooks/listeners/addNewItem";
-import { dispatchConnectNodesEvent } from "../../../canvas/hooks/listeners/connectNodes";
 import { newEventId } from "../../../utils/common/newEventId";
 import { createImageGenNodeData } from "../../../utils/nodes/imageGenNode/createImageGenNodeData";
 import { createLLMNodeData } from "../../../utils/nodes/llmNodeData/createLLMNodeData";
@@ -236,25 +235,6 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 										type: "SvgToDiagramNode",
 										width: node.width,
 										height: node.height,
-									}),
-								});
-							}
-							if (functionName === "connect_nodes") {
-								const sourceNodeId = functionCallArguments.sourceNodeId;
-								const targetNodeId = functionCallArguments.targetNodeId;
-								dispatchConnectNodesEvent({
-									eventId,
-									sourceNodeId,
-									targetNodeId,
-								});
-
-								input.push(event.item);
-								input.push({
-									type: "function_call_output",
-									call_id: event.item.call_id,
-									output: JSON.stringify({
-										sourceNodeId,
-										targetNodeId,
 									}),
 								});
 							}

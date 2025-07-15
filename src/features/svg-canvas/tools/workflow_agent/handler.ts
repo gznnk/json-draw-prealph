@@ -35,7 +35,7 @@ const functionHandlerMap: FunctionHandlerMap = {
 	add_llm_node: addLLMNode.handler,
 	add_text_node: addTextNode.handler,
 	add_svg_to_canvas_node: addSvgToCanvasNode.handler,
-	connect_nodes: connectNodes.handler,
+	// connect_nodes: connectNodes.handler,
 };
 
 // Import FunctionCallHandler type

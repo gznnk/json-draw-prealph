@@ -2,30 +2,33 @@
 import type React from "react";
 import { memo } from "react";
 
-// Import types related to this component.
+// Import types.
 import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { SvgToDiagramNodeProps } from "../../../types/props/nodes/SvgToDiagramNodeProps";
 
-// Import components related to SvgCanvas.
-import { Rectangle } from "../../shapes/Rectangle";
-import { Gachapon } from "../../icons/Gachapon";
+// Import components.
 import { IconContainer } from "../../core/IconContainer";
+import { Gachapon } from "../../icons/Gachapon";
+import { Rectangle } from "../../shapes/Rectangle";
 
 // Import constants.
 import { DEFAULT_RECTANGLE_DATA } from "../../../constants/DefaultData";
 
-// Import hooks related to SvgCanvas.
+// Import hooks.
+import { useAddDiagram } from "../../../hooks/useAddDiagram";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
-// Import functions related to SvgCanvas.
+// Import utils.
 import { createSvgDataFromText } from "../../../utils/shapes/svg/createSvgDataFromText";
-import { newEventId } from "../../../utils/common/newEventId";
-import { dispatchNewItemEvent } from "../../../canvas/hooks/listeners/addNewItem";
 
 /**
  * SvgToDiagramNode component.
  */
 const SvgToDiagramNodeComponent: React.FC<SvgToDiagramNodeProps> = (props) => {
+	// Create a function to add a new diagram.
+	const addDiagram = useAddDiagram();
+
+	// Use execution chain to handle the event propagation.
 	useExecutionChain({
 		id: props.id,
 		onPropagation: (e) => {
@@ -42,10 +45,7 @@ const SvgToDiagramNodeComponent: React.FC<SvgToDiagramNodeProps> = (props) => {
 			svgData.x = props.x + (Math.random() - 0.5) * 300;
 			svgData.y = props.y + (Math.random() - 0.5) * 300;
 
-			dispatchNewItemEvent({
-				eventId: newEventId(),
-				item: svgData as Diagram,
-			});
+			addDiagram(svgData as Diagram);
 		},
 	});
 

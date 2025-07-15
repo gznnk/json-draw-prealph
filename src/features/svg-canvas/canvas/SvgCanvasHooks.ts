@@ -32,6 +32,7 @@ import { usePreviewConnectLine } from "./hooks/actions/usePreviewConnectLine";
 import { useStackOrderChange } from "./hooks/actions/useStackOrderChange";
 import { useStyleChange } from "./hooks/actions/useStyleChange";
 import { useUngroup } from "./hooks/actions/useUngroup";
+import { useAddDiagram } from "./hooks/diagram/useOnAddDiagram";
 import { useOnClick } from "./hooks/diagram/useOnClick";
 import { useOnConnect } from "./hooks/diagram/useOnConnect";
 import { useOnDrag } from "./hooks/diagram/useOnDrag";
@@ -46,7 +47,6 @@ import { useRedo } from "./hooks/history/useRedo";
 import { useUndo } from "./hooks/history/useUndo";
 import { useCtrl } from "./hooks/keyboard/useCtrl";
 import { useNewItem } from "./hooks/listeners/addNewItem";
-import { useConnectNodes } from "./hooks/listeners/connectNodes";
 import { useGrabScroll } from "./hooks/navigation/useGrabScroll";
 import { useNavigate } from "./hooks/navigation/useNavigate";
 import { useScroll } from "./hooks/navigation/useScroll";
@@ -225,10 +225,10 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Observer for the new item event.
 	useNewItem(canvasHooksProps);
 
-	// Observer for the connect nodes event.
-	useConnectNodes(canvasHooksProps);
-
 	// Tool hooks
+	// Hooks for the add diagram tool.
+	useAddDiagram(canvasHooksProps);
+
 	// Hook for the connect nodes tool.
 	useOnConnectNodes(canvasHooksProps);
 

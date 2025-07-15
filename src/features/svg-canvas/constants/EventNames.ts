@@ -10,6 +10,9 @@ export const EVENT_NAME_BROADCAST_DRAG = "BroadcastDrag" as const;
 // Canvas events
 export const EVENT_NAME_SVG_CANVAS_SCROLL = "SvgCanvasScroll" as const;
 
+// Tool events
+export const ADD_NEW_DIAGRAM_EVENT_NAME = "AddNewDiagram" as const;
+
 // Connection events
 export const EVENT_NAME_CONNECT_POINTS_MOVE = "ConnectPointMove" as const;
 export const EVENT_NAME_FLASH_CONNECT_LINE = "FlashConnectLine" as const;
