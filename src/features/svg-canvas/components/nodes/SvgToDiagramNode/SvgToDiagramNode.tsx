@@ -15,7 +15,7 @@ import { IconContainer } from "../../core/IconContainer";
 import { DEFAULT_RECTANGLE_DATA } from "../../../constants/DefaultData";
 
 // Import hooks related to SvgCanvas.
-import { useExecutionChain } from "../../../hooks/useExecutionChain";
+import { useExecutionChain } from "../../../hooks/diagram/useExecutionChain";
 
 // Import functions related to SvgCanvas.
 import { createSvgDataFromText } from "../../../utils/shapes/svg/createSvgDataFromText";

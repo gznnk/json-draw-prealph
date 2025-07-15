@@ -14,7 +14,7 @@ import { Rectangle } from "../../shapes/Rectangle";
 import { DEFAULT_RECTANGLE_DATA } from "../../../constants/DefaultData";
 
 // Import hooks related to SvgCanvas.
-import { useExecutionChain } from "../../../hooks/useExecutionChain";
+import { useExecutionChain } from "../../../hooks/diagram/useExecutionChain";
 
 // Import functions related to SvgCanvas.
 import { dispatchNewItemEvent } from "../../../canvas/hooks/listeners/addNewItem";
