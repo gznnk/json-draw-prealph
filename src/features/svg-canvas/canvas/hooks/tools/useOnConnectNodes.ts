@@ -18,19 +18,26 @@ import { getDiagramById } from "../../../utils/common/getDiagramById";
 import { calcOrientedShapeFromPoints } from "../../../utils/math/geometry/calcOrientedShapeFromPoints";
 import { newId } from "../../../utils/shapes/common/newId";
 import { generateOptimalShapeToShapeConnection } from "../../../utils/shapes/connectPoint/generateOptimalShapeToShapeConnection";
-import { dispatchNewItemEvent } from "../listeners/addNewItem";
+import { useAddDiagram } from "../../../hooks/useAddDiagram";
 
 /**
  * Hook that monitors ConnectNodes events and performs node connections.
  */
 export const useOnConnectNodes = (props: SvgCanvasSubHooksProps) => {
+	// Create a function to add a new diagram.
+	const addDiagram = useAddDiagram();
+
 	// Create references bypass to avoid function creation in every render.
-	const refBus = useRef({ props });
-	refBus.current = { props };
+	const refBusVal = {
+		props,
+		addDiagram,
+	};
+	const refBus = useRef(refBusVal);
+	refBus.current = refBusVal;
 
 	useEffect(() => {
 		// Bypass references to avoid function creation in every render.
-		const { props } = refBus.current;
+		const { props, addDiagram } = refBus.current;
 		const { canvasState, eventBus } = props;
 
 		const connectNodesListener = (e: Event) => {
@@ -88,26 +95,23 @@ export const useOnConnectNodes = (props: SvgCanvasSubHooksProps) => {
 				type: "PathPoint",
 			})) as PathPointData[];
 
-			dispatchNewItemEvent({
-				eventId: event.eventId,
-				item: {
-					id: newId(),
-					type: "ConnectLine",
-					x: shape.x,
-					y: shape.y,
-					width: shape.width,
-					height: shape.height,
-					stroke: "#3A415C",
-					strokeWidth: "3px",
-					isSelected: false,
-					keepProportion: false,
-					items: pathPoints,
-					startOwnerId: sourceNode.id,
-					endOwnerId: targetNode.id,
-					autoRouting: true,
-					endArrowHead: "Circle",
-				} as ConnectLineData,
-			});
+			addDiagram({
+				id: newId(),
+				type: "ConnectLine",
+				x: shape.x,
+				y: shape.y,
+				width: shape.width,
+				height: shape.height,
+				stroke: "#3A415C",
+				strokeWidth: "3px",
+				isSelected: false,
+				keepProportion: false,
+				items: pathPoints,
+				startOwnerId: sourceNode.id,
+				endOwnerId: targetNode.id,
+				autoRouting: true,
+				endArrowHead: "Circle",
+			} as ConnectLineData);
 		};
 
 		eventBus.addEventListener(EVENT_NAME_CONNECT_NODES, connectNodesListener);
