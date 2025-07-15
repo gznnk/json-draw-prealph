@@ -54,6 +54,7 @@ import { useZoom } from "./hooks/navigation/useZoom";
 import { useAreaSelection } from "./hooks/selection/useAreaSelection";
 import { useClearAllSelection } from "./hooks/selection/useClearAllSelection";
 import { useSelectAll } from "./hooks/selection/useSelectAll";
+import { useOnConnectNodes } from "./hooks/tools/useOnConnectNodes";
 
 /**
  * Props for the useSvgCanvas hook.
@@ -226,6 +227,10 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// Observer for the connect nodes event.
 	useConnectNodes(canvasHooksProps);
+
+	// Tool hooks
+	// Hook for the connect nodes tool.
+	useOnConnectNodes(canvasHooksProps);
 
 	// Create the canvas props object that will be passed to the SvgCanvas component.
 	const canvasProps = {

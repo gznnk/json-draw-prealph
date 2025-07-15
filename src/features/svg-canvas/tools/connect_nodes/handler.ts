@@ -6,6 +6,7 @@ import type {
 import { dispatchConnectNodesEvent } from "../../canvas/hooks/listeners/connectNodes";
 import { newEventId } from "../../utils/common/newEventId";
 
+// TODO: 削除
 /**
  * Handles the connection between two nodes.
  * Creates a connection and dispatches the connect nodes event.

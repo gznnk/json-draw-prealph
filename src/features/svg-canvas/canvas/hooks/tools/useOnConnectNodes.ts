@@ -11,7 +11,7 @@ import type { ConnectNodesEvent } from "../../../types/events/ConnectNodesEvent"
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import constants.
-import { EVENT_NAME_CONNECT_NODE } from "../../../constants/EventNames";
+import { EVENT_NAME_CONNECT_NODES } from "../../../constants/EventNames";
 
 // Import utils.
 import { getDiagramById } from "../../../utils/common/getDiagramById";
@@ -21,7 +21,7 @@ import { generateOptimalShapeToShapeConnection } from "../../../utils/shapes/con
 import { dispatchNewItemEvent } from "../listeners/addNewItem";
 
 /**
- * Hook that monitors ConnectNode events and performs node connections.
+ * Hook that monitors ConnectNodes events and performs node connections.
  */
 export const useOnConnectNodes = (props: SvgCanvasSubHooksProps) => {
 	// Create references bypass to avoid function creation in every render.
@@ -110,11 +110,11 @@ export const useOnConnectNodes = (props: SvgCanvasSubHooksProps) => {
 			});
 		};
 
-		eventBus.addEventListener(EVENT_NAME_CONNECT_NODE, connectNodesListener);
+		eventBus.addEventListener(EVENT_NAME_CONNECT_NODES, connectNodesListener);
 
 		return () => {
 			eventBus.removeEventListener(
-				EVENT_NAME_CONNECT_NODE,
+				EVENT_NAME_CONNECT_NODES,
 				connectNodesListener,
 			);
 		};
