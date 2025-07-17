@@ -5,33 +5,56 @@ import type {
 	FunctionCallInfo,
 } from "../../../../shared/llm-client/types";
 import { OpenAiKeyManager } from "../../../../utils/KeyManager";
-import { addImageGenNode } from "../add_image_gen_node";
-import { addLLMNode } from "../add_llm_node";
-import { addSvgToCanvasNode } from "../add_svg_to_canvas_node";
-import { addTextNode } from "../add_text_node";
-import { connectNodes } from "../connect_nodes";
+import {
+	definition as imageGenDefinition,
+	useAddImageGenNodeTool,
+} from "../add_image_gen_node";
+import {
+	definition as llmDefinition,
+	useAddLLMNodeTool,
+} from "../add_llm_node";
+import {
+	definition as textNodeDefinition,
+	useAddTextNodeTool,
+} from "../add_text_node";
+import {
+	definition as svgToCanvasDefinition,
+	useAddSvgToCanvasNodeTool,
+} from "../add_svg_to_canvas_node";
+import { definition as connectNodesDefinition } from "../connect_nodes/definition";
+import { useConnectNodesTool } from "../connect_nodes/hook";
 import AI_AGENT_INSTRUCTIONS from "./prompts/agent-instructions.md?raw";
+import type { EventBus } from "../../../../shared/event-bus/EventBus";
 
 /**
  * Workflow agent handler function (hook版)
  * 必要な依存を受け取り、FunctionCallHandlerを返す
  */
-export const useWorkflowAgentHandler = (): FunctionCallHandler => {
+export const useWorkflowAgentHandler = (
+	eventBus: EventBus,
+): FunctionCallHandler => {
+	// 各ツールのhandlerをhookで生成
+	const addImageGenNodeHandler = useAddImageGenNodeTool(eventBus);
+	const addLLMNodeHandler = useAddLLMNodeTool(eventBus);
+	const addTextNodeHandler = useAddTextNodeTool(eventBus);
+	const addSvgToCanvasNodeHandler = useAddSvgToCanvasNodeTool(eventBus);
+	const connectNodesHandler = useConnectNodesTool(eventBus);
+
 	// handler本体はuseMemoで生成
 	return useMemo<FunctionCallHandler>(() => {
 		const AI_TOOLS = [
-			addImageGenNode.definition,
-			addLLMNode.definition,
-			addTextNode.definition,
-			addSvgToCanvasNode.definition,
-			connectNodes.definition,
+			imageGenDefinition,
+			llmDefinition,
+			textNodeDefinition,
+			svgToCanvasDefinition,
+			connectNodesDefinition,
 		];
 		const functionHandlerMap = {
-			add_image_gen_node: addImageGenNode.handler,
-			add_llm_node: addLLMNode.handler,
-			add_text_node: addTextNode.handler,
-			add_svg_to_canvas_node: addSvgToCanvasNode.handler,
-			// connect_nodes: connectNodes.handler,
+			add_image_gen_node: addImageGenNodeHandler,
+			add_llm_node: addLLMNodeHandler,
+			add_text_node: addTextNodeHandler,
+			add_svg_to_canvas_node: addSvgToCanvasNodeHandler,
+			connect_nodes: connectNodesHandler,
 		};
 		const handler: FunctionCallHandler = async (
 			functionCall: FunctionCallInfo,
@@ -74,5 +97,11 @@ export const useWorkflowAgentHandler = (): FunctionCallHandler => {
 			};
 		};
 		return handler;
-	}, []);
+	}, [
+		addImageGenNodeHandler,
+		addLLMNodeHandler,
+		addTextNodeHandler,
+		addSvgToCanvasNodeHandler,
+		connectNodesHandler,
+	]);
 };
