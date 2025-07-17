@@ -13,7 +13,6 @@ export const TextAreaButton = styled.rect`
     
     &:active {
         filter: brightness(0.9);
-        transform: scale(0.98);
     }
 `;
 
