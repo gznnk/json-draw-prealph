@@ -3,15 +3,16 @@ import { ADD_NEW_DIAGRAM_EVENT_NAME } from "../../constants/EventNames";
 import type { Diagram } from "../../types/data/catalog/Diagram";
 import type { AddDiagramEvent } from "../../types/events/AddDiagramEvent";
 import { newEventId } from "../../utils/common/newEventId";
+// Import context.
+import type { EventBus } from "../../../../shared/event-bus/EventBus";
 
 /**
  * Returns a callback for tool modules to dispatch an AddDiagramEvent using the provided eventBus.
  * @param eventBus - The EventBus instance to dispatch the event through
  */
-export const useAddDiagramForTools = (eventBus: EventTarget | undefined) => {
+export const useAddDiagramForTools = (eventBus: EventBus) => {
 	return useCallback(
 		(diagram: Diagram) => {
-			if (!eventBus) return;
 			const event: AddDiagramEvent = {
 				eventId: newEventId(),
 				item: diagram,
