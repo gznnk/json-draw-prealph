@@ -27,10 +27,13 @@ export const useOnAddDiagram = (props: SvgCanvasSubHooksProps) => {
 
 	useEffect(() => {
 		// Bypass references to avoid function creation in every render.
-		const { eventBus, setCanvasState, onDataChange } = refBus.current.props;
+		const { eventBus } = refBus.current.props;
 
 		// Listener for new diagram events.
 		const newDiagramListener = (e: Event) => {
+			// Bypass references to avoid function creation in every render.
+			const { setCanvasState, onDataChange } = refBus.current.props;
+
 			const event = (e as CustomEvent<AddDiagramEvent>).detail;
 
 			// Call the function to add a new item to the canvas.

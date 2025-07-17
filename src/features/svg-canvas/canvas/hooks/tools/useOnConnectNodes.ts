@@ -11,6 +11,7 @@ import type { ConnectNodesEvent } from "../../../types/events/ConnectNodesEvent"
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import constants.
+import { DEFAULT_CONNECT_LINE_DATA } from "../../../constants/DefaultData";
 import { EVENT_NAME_CONNECT_NODES } from "../../../constants/EventNames";
 
 // Import utils.
@@ -39,10 +40,13 @@ export const useOnConnectNodes = (props: SvgCanvasSubHooksProps) => {
 
 	useEffect(() => {
 		// Bypass references to avoid function creation in every render.
-		const { props, addDiagram } = refBus.current;
-		const { canvasState, eventBus } = props;
+		const { eventBus } = refBus.current.props;
 
 		const connectNodesListener = (e: Event) => {
+			// Bypass references to avoid function creation in every render.
+			const { props, addDiagram } = refBus.current;
+			const { canvasState } = props;
+
 			const event = (e as CustomEvent<ConnectNodesEvent>).detail;
 
 			const sourceNode = getDiagramById(
@@ -100,21 +104,15 @@ export const useOnConnectNodes = (props: SvgCanvasSubHooksProps) => {
 			addDiagram({
 				eventId: event.eventId,
 				item: {
+					...DEFAULT_CONNECT_LINE_DATA,
 					id: newId(),
-					type: "ConnectLine",
 					x: shape.x,
 					y: shape.y,
 					width: shape.width,
 					height: shape.height,
-					stroke: "#3A415C",
-					strokeWidth: "3px",
-					isSelected: false,
-					keepProportion: false,
 					items: pathPoints,
 					startOwnerId: sourceNode.id,
 					endOwnerId: targetNode.id,
-					autoRouting: true,
-					endArrowHead: "Circle",
 				} as ConnectLineData,
 			});
 		};
