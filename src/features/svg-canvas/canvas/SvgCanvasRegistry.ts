@@ -11,6 +11,17 @@ import { Path, PathPoint } from "../components/shapes/Path";
 import { Rectangle } from "../components/shapes/Rectangle";
 import { Svg } from "../components/shapes/Svg";
 
+// Import minimap shape components
+import { ConnectLineMinimap } from "../components/shapes/ConnectLine/ConnectLineMinimap";
+import { ConnectPointMinimap } from "../components/shapes/ConnectPoint/ConnectPointMinimap";
+import { EllipseMinimap } from "../components/shapes/Ellipse/EllipseMinimap";
+import { GroupMinimap } from "../components/shapes/Group/GroupMinimap";
+import { ImageMinimap } from "../components/shapes/Image/ImageMinimap";
+import { PathMinimap } from "../components/shapes/Path/PathMinimap";
+import { PathPointMinimap } from "../components/shapes/Path/PathPoint/PathPointMinimap";
+import { RectangleMinimap } from "../components/shapes/Rectangle/RectangleMinimap";
+import { SvgMinimap } from "../components/shapes/Svg/SvgMinimap";
+
 // Import node components and their functions
 import { AgentNode } from "../components/nodes/AgentNode";
 import { HubNode } from "../components/nodes/HubNode";
@@ -21,6 +32,17 @@ import { SvgToDiagramNode } from "../components/nodes/SvgToDiagramNode";
 import { TextAreaNode } from "../components/nodes/TextAreaNode";
 import { VectorStoreNode } from "../components/nodes/VectorStoreNode";
 import { WebSearchNode } from "../components/nodes/WebSearchNode";
+
+// Import minimap node components
+import { AgentNodeMinimap } from "../components/nodes/AgentNode/AgentNodeMinimap";
+import { HubNodeMinimap } from "../components/nodes/HubNode/HubNodeMinimap";
+import { ImageGenNodeMinimap } from "../components/nodes/ImageGenNode/ImageGenNodeMinimap";
+import { LLMNodeMinimap } from "../components/nodes/LLMNode/LLMNodeMinimap";
+import { PageDesignNodeMinimap } from "../components/nodes/PageDesignNode/PageDesignNodeMinimap";
+import { SvgToDiagramNodeMinimap } from "../components/nodes/SvgToDiagramNode/SvgToDiagramNodeMinimap";
+import { TextAreaNodeMinimap } from "../components/nodes/TextAreaNode/TextAreaNodeMinimap";
+import { VectorStoreNodeMinimap } from "../components/nodes/VectorStoreNode/VectorStoreNodeMinimap";
+import { WebSearchNodeMinimap } from "../components/nodes/WebSearchNode/WebSearchNodeMinimap";
 
 // Import connect point calculators
 import { calcEllipseConnectPointPosition } from "../utils/shapes/ellipse/calcEllipseConnectPointPosition";
@@ -57,6 +79,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "Rectangle",
 		component: Rectangle,
+		minimapComponent: RectangleMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
 		createFunction: createRectangleData,
 		exportFunction: undefined,
@@ -65,6 +88,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "Ellipse",
 		component: Ellipse,
+		minimapComponent: EllipseMinimap,
 		connectPointCalculator: calcEllipseConnectPointPosition,
 		createFunction: createEllipseData,
 		exportFunction: undefined,
@@ -73,6 +97,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "Image",
 		component: Image,
+		minimapComponent: ImageMinimap,
 		connectPointCalculator: () => [],
 		createFunction: createImageData,
 		exportFunction: imageToBlob,
@@ -81,6 +106,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "Path",
 		component: Path,
+		minimapComponent: PathMinimap,
 		connectPointCalculator: () => [],
 		createFunction: createPathData,
 		exportFunction: undefined,
@@ -89,6 +115,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "PathPoint",
 		component: PathPoint,
+		minimapComponent: PathPointMinimap,
 		connectPointCalculator: () => [],
 		createFunction: () => undefined,
 		exportFunction: undefined,
@@ -97,6 +124,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "Svg",
 		component: Svg,
+		minimapComponent: SvgMinimap,
 		connectPointCalculator: () => [],
 		createFunction: () => undefined,
 		exportFunction: svgToBlob,
@@ -105,6 +133,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "ConnectLine",
 		component: ConnectLine,
+		minimapComponent: ConnectLineMinimap,
 		connectPointCalculator: () => [],
 		createFunction: () => undefined,
 		exportFunction: undefined,
@@ -113,6 +142,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "ConnectPoint",
 		component: ConnectPoint,
+		minimapComponent: ConnectPointMinimap,
 		connectPointCalculator: () => [],
 		createFunction: () => undefined,
 		exportFunction: undefined,
@@ -121,6 +151,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "Group",
 		component: Group,
+		minimapComponent: GroupMinimap,
 		connectPointCalculator: () => [],
 		createFunction: () => undefined,
 		exportFunction: undefined,
@@ -130,6 +161,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "AgentNode",
 		component: AgentNode,
+		minimapComponent: AgentNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
 		createFunction: createAgentNodeData,
 		exportFunction: undefined,
@@ -138,6 +170,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "HubNode",
 		component: HubNode,
+		minimapComponent: HubNodeMinimap,
 		connectPointCalculator: calcEllipseConnectPointPosition,
 		createFunction: createHubNodeData,
 		exportFunction: undefined,
@@ -146,6 +179,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "ImageGenNode",
 		component: ImageGenNode,
+		minimapComponent: ImageGenNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
 		createFunction: createImageGenNodeData,
 		exportFunction: undefined,
@@ -154,6 +188,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "LLMNode",
 		component: LLMNode,
+		minimapComponent: LLMNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
 		createFunction: createLLMNodeData,
 		exportFunction: undefined,
@@ -162,6 +197,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "PageDesignNode",
 		component: PageDesignNode,
+		minimapComponent: PageDesignNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
 		createFunction: createPageDesignNodeData,
 		exportFunction: undefined,
@@ -170,6 +206,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "SvgToDiagramNode",
 		component: SvgToDiagramNode,
+		minimapComponent: SvgToDiagramNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
 		createFunction: createSvgToDiagramNodeData,
 		exportFunction: undefined,
@@ -178,6 +215,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "TextAreaNode",
 		component: TextAreaNode,
+		minimapComponent: TextAreaNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
 		createFunction: createTextAreaNodeData,
 		exportFunction: undefined,
@@ -186,6 +224,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "VectorStoreNode",
 		component: VectorStoreNode,
+		minimapComponent: VectorStoreNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
 		createFunction: createVectorStoreNodeData,
 		exportFunction: undefined,
@@ -194,6 +233,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register({
 		type: "WebSearchNode",
 		component: WebSearchNode,
+		minimapComponent: WebSearchNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
 		createFunction: createWebSearchNodeData,
 		exportFunction: undefined,

@@ -41,6 +41,17 @@ class DiagramRegistryClass {
 	}
 
 	/**
+	 * Get the minimap component for a diagram type.
+	 *
+	 * @param type - The diagram type
+	 * @returns The minimap component or undefined if not found
+	 */
+	// biome-ignore lint/suspicious/noExplicitAny: Different shapes have different prop types
+	getMinimapComponent(type: DiagramType): React.FC<any> | undefined {
+		return this.definitions.get(type)?.minimapComponent;
+	}
+
+	/**
 	 * Get the connect point calculator for a diagram type.
 	 *
 	 * @param type - The diagram type

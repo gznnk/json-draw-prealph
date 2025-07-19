@@ -222,23 +222,30 @@ const MiniMapComponent: React.FC<MiniMapProps> = ({
 		[],
 	);
 
-	// Generate minimap items by rendering actual diagram components scaled down
+	// Generate minimap items by rendering lightweight diagram components
 	const diagramElements = useMemo(() => {
 		return items.map((item) => {
-			const component = DiagramRegistry.getComponent(item.type);
-			if (!component) {
-				console.warn(`Component not found for type: ${item.type}`);
+			const minimapComponent = DiagramRegistry.getMinimapComponent(item.type);
+			if (!minimapComponent) {
+				console.warn(`Minimap component not found for type: ${item.type}`);
 				return null;
 			}
 
-			// Create props for the diagram component
+			// Create props for the minimap component
 			// We pass minimal props to avoid any interactive behavior in minimap
 			const props = {
 				...item,
 				key: item.id,
+				isSelected: false,
+				showOutline: false,
+				showTransformControls: false,
+				showConnectPoints: false,
+				isTransforming: false,
+				isDragging: false,
+				isTextEditing: false,
 			};
 
-			return React.createElement(component, props);
+			return React.createElement(minimapComponent, props);
 		});
 	}, [items]);
 

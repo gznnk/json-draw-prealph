@@ -14,6 +14,10 @@ export type DiagramDefinition = {
 	// biome-ignore lint/suspicious/noExplicitAny: Different shapes have different prop types
 	component: React.FC<any>;
 
+	/** Lightweight react component for MiniMap rendering without outlines, controls, and labels */
+	// biome-ignore lint/suspicious/noExplicitAny: Different shapes have different prop types
+	minimapComponent: React.FC<any>;
+
 	/** Function to calculate connect point positions for the diagram */
 	connectPointCalculator: (diagram: Diagram) => ConnectPointData[];
 	/** Function to create a new instance of the diagram */
