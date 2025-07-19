@@ -5,11 +5,14 @@ import { useCallback, useRef, useState } from "react";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 import type { AreaSelectionEvent } from "../../../types/events/AreaSelectionEvent";
 import type { AreaSelectionState } from "../../types/AreaSelectionState";
+import type { Diagram } from "../../../types/data/catalog/Diagram";
 
 // Import functions related to SvgCanvas.
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
+import { isItemableData } from "../../../utils/validation/isItemableData";
 import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundingBox";
 import { newEventId } from "../../../utils/common/newEventId";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
 // Import selection hooks
 import { useOnSelect } from "../diagram/useOnSelect";
@@ -91,26 +94,35 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
 			const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
 
-			// Find items that are within the selection bounds
+			// Find items that are within the selection bounds recursively
 			const itemsToSelect: string[] = [];
 
-			for (const item of canvasState.items) {
-				if (!isSelectableData(item)) continue;
+			const collectSelectableItems = (items: Diagram[]) => {
+				for (const item of items) {
+					if (!isSelectableData(item)) continue;
 
-				// Calculate item bounding box using calcItemBoundingBox function
-				const itemBounds = calcItemBoundingBox(item);
+					// Calculate item bounding box using calcItemBoundingBox function
+					const itemBounds = calcItemBoundingBox(item);
 
-				// Check if item's bounding box is completely contained within selection rectangle
-				const isSelected =
-					itemBounds.left >= minX &&
-					itemBounds.right <= maxX &&
-					itemBounds.top >= minY &&
-					itemBounds.bottom <= maxY;
+					// Check if item's bounding box is completely contained within selection rectangle
+					const isSelected =
+						itemBounds.left >= minX &&
+						itemBounds.right <= maxX &&
+						itemBounds.top >= minY &&
+						itemBounds.bottom <= maxY;
 
-				if (isSelected) {
-					itemsToSelect.push(item.id);
+					if (isSelected) {
+						itemsToSelect.push(item.id);
+					}
+
+					// Recursively check child items
+					if (isItemableData(item) && item.items) {
+						collectSelectableItems(item.items);
+					}
 				}
-			}
+			};
+
+			collectSelectableItems(canvasState.items);
 
 			// Apply selection using the proper useSelect logic
 			// For area selection, we want to select the first item (clearing previous selections)
@@ -156,7 +168,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 
 			setCanvasState((prevState) => ({
 				...prevState,
-				items: prevState.items.map((item) => {
+				items: applyFunctionRecursively(prevState.items, (item) => {
 					if (!isSelectableData(item)) return item;
 
 					// Calculate item bounding box using calcItemBoundingBox function
@@ -189,7 +201,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 
 		setCanvasState((prevState) => ({
 			...prevState,
-			items: prevState.items.map((item) => {
+			items: applyFunctionRecursively(prevState.items, (item) => {
 				if (!isSelectableData(item)) return item;
 				return {
 					...item,
