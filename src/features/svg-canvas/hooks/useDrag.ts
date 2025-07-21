@@ -544,15 +544,21 @@ export const useDrag = (props: DragProps) => {
 
 				const customEvent = e as CustomEvent<SvgCanvasScrollEvent>;
 
+				// Pre-calculate adjusted pointer coordinates for scroll
+				const adjustedClientX =
+					customEvent.detail.clientX + customEvent.detail.deltaX;
+				const adjustedClientY =
+					customEvent.detail.clientY + customEvent.detail.deltaY;
+
 				// Get drag coordinates adjusted for scroll
 				const dragPoint = getPointOnDrag(
-					customEvent.detail.clientX + customEvent.detail.deltaX, // Adjust drag point based on scroll
-					customEvent.detail.clientY + customEvent.detail.deltaY, // Adjust drag point based on scroll
+					adjustedClientX, // Adjust drag point based on scroll
+					adjustedClientY, // Adjust drag point based on scroll
 				);
 				// Get cursor position in SVG coordinate system adjusted for scroll
 				const svgCursorPoint = getSvgPoint(
-					customEvent.detail.clientX + customEvent.detail.deltaX,
-					customEvent.detail.clientY + customEvent.detail.deltaY,
+					adjustedClientX,
+					adjustedClientY,
 					ref.current,
 				);
 
