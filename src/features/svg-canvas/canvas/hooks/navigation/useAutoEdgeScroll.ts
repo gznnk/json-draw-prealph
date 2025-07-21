@@ -80,13 +80,13 @@ export const useAutoEdgeScroll = (
 		}
 	}, []);
 
-	// Function to perform a single scroll action with known base client coordinates
+	// Function to perform a single scroll action with known client coordinates
 	const performScroll = useCallback(
 		(
 			horizontal: "left" | "right" | null,
 			vertical: "top" | "bottom" | null,
-			baseClientX: number,
-			baseClientY: number,
+			clientX: number,
+			clientY: number,
 		) => {
 			const { canvasState } = refBus.current.props;
 			const { minX, minY } = canvasState;
@@ -114,17 +114,15 @@ export const useAutoEdgeScroll = (
 				newMinY = minY + scrollDeltaY;
 			}
 
-			// Calculate adjusted client coordinates by adding scroll delta
-			// Similar to how handleWheel does: clientX: e.clientX + e.deltaX
-			const adjustedClientX = baseClientX + scrollDeltaX;
-			const adjustedClientY = baseClientY + scrollDeltaY;
+			// Use base client coordinates without delta adjustment
+			// Delta will be applied in drag handler
 
 			// Dispatch a custom event with scroll position to notify other components
 			const scrollEvent: SvgCanvasScrollEvent = {
 				newMinX,
 				newMinY,
-				clientX: adjustedClientX,
-				clientY: adjustedClientY,
+				clientX,
+				clientY,
 				deltaX: scrollDeltaX,
 				deltaY: scrollDeltaY,
 				isFromAutoEdgeScroll: true,
@@ -161,9 +159,9 @@ export const useAutoEdgeScroll = (
 			currentCursorRef.current.x = cursorX;
 			currentCursorRef.current.y = cursorY;
 
-			// Convert initial cursor position to client coordinates and store it
-			let baseClientX = 0;
-			let baseClientY = 0;
+			// Convert initial cursor position to client coordinates
+			let initialClientX = 0;
+			let initialClientY = 0;
 
 			const { canvasRef } = refBus.current.props;
 			if (canvasRef?.svgRef?.current) {
@@ -175,13 +173,13 @@ export const useAutoEdgeScroll = (
 				const screenCTM = svgElement.getScreenCTM();
 				if (screenCTM) {
 					const clientPoint = svgPoint.matrixTransform(screenCTM);
-					baseClientX = clientPoint.x;
-					baseClientY = clientPoint.y;
+					initialClientX = clientPoint.x;
+					initialClientY = clientPoint.y;
 				}
 			}
 
 			// Perform initial scroll immediately
-			performScroll(horizontal, vertical, baseClientX, baseClientY);
+			performScroll(horizontal, vertical, initialClientX, initialClientY);
 
 			// Start interval for continuous scrolling
 			scrollIntervalRef.current = setInterval(() => {

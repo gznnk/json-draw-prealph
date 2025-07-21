@@ -133,6 +133,7 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 
 			return newState;
 		});
+
 		// Auto scroll if the cursor is near the edges.
 		if (e.cursorX !== undefined && e.cursorY !== undefined) {
 			autoEdgeScroll({
