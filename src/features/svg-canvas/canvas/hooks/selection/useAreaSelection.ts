@@ -1,49 +1,89 @@
 // Import React.
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
-import type { AreaSelectionEvent } from "../../../types/events/AreaSelectionEvent";
-import type { AreaSelectionState } from "../../types/AreaSelectionState";
+// Import types.
 import type { Diagram } from "../../../types/data/catalog/Diagram";
+import type { AreaSelectionEvent } from "../../../types/events/AreaSelectionEvent";
+import type { SvgCanvasScrollEvent } from "../../../types/events/SvgCanvasScrollEvent";
+import { InteractionState } from "../../types/InteractionState";
+import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import functions related to SvgCanvas.
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundingBox";
+// Import constants.
+import { EVENT_NAME_SVG_CANVAS_SCROLL } from "../../../constants/EventNames";
+
+// Import utils.
 import { newEventId } from "../../../utils/common/newEventId";
+import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundingBox";
+import { isItemableData } from "../../../utils/validation/isItemableData";
+import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
-// Import selection hooks
+// Import hooks.
 import { useOnSelect } from "../diagram/useOnSelect";
+import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
 import { useClearAllSelection } from "./useClearAllSelection";
 
 /**
  * Custom hook to handle area selection on the canvas.
  */
 export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
-	const [selectionState, setSelectionState] = useState<AreaSelectionState>({
-		isSelecting: false,
-		startX: 0,
-		startY: 0,
-		endX: 0,
-		endY: 0,
-	});
-
 	// Get the select function from useSelect hook with Ctrl key pressed (for multi-select)
 	const onSelect = useOnSelect(props, true);
 
 	// Get the clear all selection function
 	const onClearAllSelection = useClearAllSelection(props);
 
+	// Get the auto edge scroll function with area selection source
+	const { autoEdgeScroll } = useAutoEdgeScroll(props);
+
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		selectionState,
 		onSelect,
+		autoEdgeScroll,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
+
+	// Handle scroll events from auto edge scroll
+	useEffect(() => {
+		const { eventBus } = refBus.current.props;
+
+		const handleScrollEvent = (event: CustomEvent<SvgCanvasScrollEvent>) => {
+			// Bypass references to avoid function creation in every render.
+			const { setCanvasState, canvasState } = refBus.current.props;
+			const { interactionState } = canvasState;
+
+			// If area selection is not active, do nothing
+			if (interactionState !== InteractionState.AreaSelection) {
+				return;
+			}
+
+			const { minX, minY, clientX, clientY } = event.detail;
+			const { x, y } = clientToCanvasCoords(clientX, clientY);
+
+			// Update the area selection state with new end coordinates
+			setCanvasState((prevState) => ({
+				...prevState,
+				minX,
+				minY,
+				areaSelectionState: {
+					...prevState.areaSelectionState,
+					endX: x,
+					endY: y,
+				},
+			}));
+		};
+
+		eventBus.addEventListener(EVENT_NAME_SVG_CANVAS_SCROLL, handleScrollEvent);
+
+		return () => {
+			eventBus.removeEventListener(
+				EVENT_NAME_SVG_CANVAS_SCROLL,
+				handleScrollEvent,
+			);
+		};
+	}, []);
 
 	/**
 	 * Convert client coordinates to SVG canvas coordinates using matrixTransform
@@ -216,6 +256,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	 */
 	const onAreaSelection = useCallback(
 		(event: AreaSelectionEvent) => {
+			const { canvasState, setCanvasState } = refBus.current.props;
 			const { eventType, clientX, clientY } = event;
 
 			switch (eventType) {
@@ -225,51 +266,70 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					// Clear existing selections when starting area selection
 					onClearAllSelection();
 
-					setSelectionState({
-						isSelecting: true,
-						startX: x,
-						startY: y,
-						endX: x,
-						endY: y,
-					});
+					// Set interaction state to AreaSelection and initialize selection state
+					setCanvasState((prevState) => ({
+						...prevState,
+						interactionState: InteractionState.AreaSelection,
+						areaSelectionState: {
+							startX: x,
+							startY: y,
+							endX: x,
+							endY: y,
+						},
+					}));
 					break;
 				}
 
 				case "InProgress": {
-					const { selectionState } = refBus.current;
+					// If area selection is not active, do nothing
+					if (canvasState.interactionState !== InteractionState.AreaSelection) {
+						return;
+					}
+
 					const { x, y } = clientToCanvasCoords(clientX, clientY);
+					const { areaSelectionState } = canvasState;
 
 					const newSelectionState = {
-						isSelecting: true,
-						startX: selectionState.startX,
-						startY: selectionState.startY,
+						startX: areaSelectionState.startX,
+						startY: areaSelectionState.startY,
 						endX: x,
 						endY: y,
 					};
 
-					setSelectionState(newSelectionState);
+					setCanvasState((prevState) => ({
+						...prevState,
+						areaSelectionState: newSelectionState,
+					}));
 
 					// Update outline display for items within selection bounds
 					updateOutlineDisplay(newSelectionState);
+
+					// Trigger auto edge scroll based on current cursor position (use canvas coordinates)
+					refBus.current.autoEdgeScroll({ cursorX: x, cursorY: y });
 					break;
 				}
 
 				case "End": {
-					const { selectionState } = refBus.current;
-
-					if (!selectionState.isSelecting) return;
+					// If area selection is not active, do nothing
+					if (canvasState.interactionState !== InteractionState.AreaSelection) {
+						return;
+					}
 
 					// Update items selection with current selection bounds
-					updateItemsSelection(selectionState);
+					const { areaSelectionState } = canvasState;
+					updateItemsSelection(areaSelectionState);
 
-					// Reset selection state
-					setSelectionState({
-						isSelecting: false,
-						startX: 0,
-						startY: 0,
-						endX: 0,
-						endY: 0,
-					});
+					// Update interaction state to Idle and reset selection state
+					setCanvasState((prevState) => ({
+						...prevState,
+						interactionState: InteractionState.Idle,
+						areaSelectionState: {
+							startX: 0,
+							startY: 0,
+							endX: 0,
+							endY: 0,
+						},
+					}));
 					break;
 				}
 			}
@@ -286,16 +346,22 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 		// Clear outline display for all items
 		clearOutlineDisplay();
 
-		setSelectionState({
-			isSelecting: false,
-			startX: 0,
-			startY: 0,
-			endX: 0,
-			endY: 0,
-		});
+		// Reset interaction state to Idle and selection state
+		const { setCanvasState } = refBus.current.props;
+		setCanvasState((prevState) => ({
+			...prevState,
+			interactionState: InteractionState.Idle,
+			areaSelectionState: {
+				startX: 0,
+				startY: 0,
+				endX: 0,
+				endY: 0,
+			},
+		}));
 	}, [clearOutlineDisplay]);
+
 	return {
-		selectionState,
+		selectionState: props.canvasState.areaSelectionState,
 		onAreaSelection,
 		onCancelAreaSelection,
 	};

@@ -108,6 +108,12 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		lastHistoryEventId: "",
 		textEditorState: { isActive: false } as TextEditorState,
 		interactionState: InteractionState.Idle,
+		areaSelectionState: {
+			startX: 0,
+			startY: 0,
+			endX: 0,
+			endY: 0,
+		},
 	});
 
 	// Create props for the canvas hooks.

@@ -9,4 +9,6 @@ export enum InteractionState {
 	Dragging = "dragging",
 	/** Transforming state - user is transforming elements (resize, rotate, etc.) */
 	Transforming = "transforming",
+	/** Area selection state - user is selecting multiple elements by drawing a rectangle */
+	AreaSelection = "areaSelection",
 }

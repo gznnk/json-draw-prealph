@@ -43,6 +43,7 @@ import type { SvgCanvasRef } from "./types/SvgCanvasRef";
 
 // Import SvgCanvas context.
 import { EventBusProvider } from "../context/EventBusContext";
+import { InteractionState } from "./types/InteractionState";
 
 // Initialize all diagram types when this module is loaded
 initializeSvgCanvasDiagrams();
@@ -66,6 +67,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			previewConnectLineState,
 			grabScrollState,
 			selectionState,
+			interactionState,
 			// actions
 			onClick,
 			onConnect,
@@ -221,7 +223,10 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		const handlePointerMove = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
 				// Handle area selection if active
-				if (selectionState?.isSelecting && onAreaSelection) {
+				if (
+					interactionState === InteractionState.AreaSelection &&
+					onAreaSelection
+				) {
 					onAreaSelection({
 						eventId: newEventId(),
 						eventType: "InProgress",
@@ -234,7 +239,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				// Call the grab move handler
 				refBus.current.onGrabMove?.(e);
 			},
-			[selectionState?.isSelecting, onAreaSelection],
+			[interactionState, onAreaSelection],
 		);
 
 		/**
@@ -243,7 +248,10 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		const handlePointerUp = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
 				// Handle area selection end
-				if (selectionState?.isSelecting && onAreaSelection) {
+				if (
+					interactionState === InteractionState.AreaSelection &&
+					onAreaSelection
+				) {
 					onAreaSelection({
 						eventId: newEventId(),
 						eventType: "End",
@@ -255,7 +263,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 				refBus.current.onGrabEnd?.(e);
 			},
-			[selectionState?.isSelecting, onAreaSelection],
+			[interactionState, onAreaSelection],
 		);
 
 		/**
@@ -279,7 +287,10 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		const handleKeyDown = useCallback(
 			(e: React.KeyboardEvent<SVGSVGElement>) => {
 				// Cancel area selection on Escape key
-				if (e.key === "Escape" && selectionState?.isSelecting) {
+				if (
+					e.key === "Escape" &&
+					interactionState === InteractionState.AreaSelection
+				) {
 					e.preventDefault();
 					if (onCancelAreaSelection) {
 						onCancelAreaSelection();
@@ -292,7 +303,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					e.preventDefault();
 				}
 			},
-			[selectionState?.isSelecting, onCancelAreaSelection],
+			[interactionState, onCancelAreaSelection],
 		);
 
 		// Monitor container size changes with ResizeObserver
@@ -421,7 +432,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 									y={Math.min(selectionState.startY, selectionState.endY)}
 									width={Math.abs(selectionState.endX - selectionState.startX)}
 									height={Math.abs(selectionState.endY - selectionState.startY)}
-									visible={selectionState.isSelecting}
+									visible={interactionState === InteractionState.AreaSelection}
 								/>
 							)}
 						</Svg>
