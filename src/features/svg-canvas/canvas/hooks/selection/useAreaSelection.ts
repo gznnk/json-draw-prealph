@@ -17,7 +17,6 @@ import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundi
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
-import { getSvgPoint } from "../../../utils/math/points/getSvgPoint";
 
 // Import hooks.
 import { useOnSelect } from "../diagram/useOnSelect";
@@ -102,14 +101,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			}
 
 			const { newMinX, newMinY, clientX, clientY } = event.detail;
-			const svgElement = refBus.current.props.canvasRef?.svgRef.current;
-			let x = 0;
-			let y = 0;
-			if (svgElement) {
-				const svgPoint = getSvgPoint(clientX, clientY, svgElement);
-				x = svgPoint.x;
-				y = svgPoint.y;
-			}
+			const { x, y } = clientToCanvasCoords(clientX, clientY);
 
 			const newSelectionBounds = {
 				startX: canvasState.areaSelectionState.startX,
@@ -141,6 +133,34 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			);
 		};
 	}, [updateItemsWithOutline]);
+
+	/**
+	 * Convert client coordinates to SVG canvas coordinates using matrixTransform
+	 */
+	const clientToCanvasCoords = useCallback(
+		(clientX: number, clientY: number) => {
+			const { canvasRef } = refBus.current.props;
+
+			if (!canvasRef?.svgRef.current) {
+				return { x: 0, y: 0 };
+			}
+
+			const svgElement = canvasRef.svgRef.current;
+			const svgPoint = svgElement.createSVGPoint();
+			svgPoint.x = clientX;
+			svgPoint.y = clientY;
+
+			const screenCTM = svgElement.getScreenCTM();
+			if (screenCTM) {
+				// Inverse transform to convert from client coordinates to SVG coordinates
+				const svgCoords = svgPoint.matrixTransform(screenCTM.inverse());
+				return { x: svgCoords.x, y: svgCoords.y };
+			}
+
+			return { x: 0, y: 0 };
+		},
+		[],
+	);
 
 	/**
 	 * Update items selection based on the current selection state
@@ -267,14 +287,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 
 			switch (eventType) {
 				case "Start": {
-					const svgElement = refBus.current.props.canvasRef?.svgRef.current;
-					let x = 0;
-					let y = 0;
-					if (svgElement) {
-						const svgPoint = getSvgPoint(clientX, clientY, svgElement);
-						x = svgPoint.x;
-						y = svgPoint.y;
-					}
+					const { x, y } = clientToCanvasCoords(clientX, clientY);
 
 					// Clear existing selections when starting area selection
 					onClearAllSelection();
@@ -299,14 +312,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 						return;
 					}
 
-					const svgElement = refBus.current.props.canvasRef?.svgRef.current;
-					let x = 0;
-					let y = 0;
-					if (svgElement) {
-						const svgPoint = getSvgPoint(clientX, clientY, svgElement);
-						x = svgPoint.x;
-						y = svgPoint.y;
-					}
+					const { x, y } = clientToCanvasCoords(clientX, clientY);
 					const { areaSelectionState } = canvasState;
 
 					const newSelectionState = {
@@ -325,12 +331,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					updateOutlineDisplay(newSelectionState);
 
 					// Trigger auto edge scroll based on current cursor position
-					refBus.current.autoEdgeScroll({
-						cursorX: x,
-						cursorY: y,
-						clientX,
-						clientY,
-					});
+					refBus.current.autoEdgeScroll({ cursorX: x, cursorY: y, clientX, clientY });
 					break;
 				}
 
@@ -359,7 +360,12 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 				}
 			}
 		},
-		[onClearAllSelection, updateItemsSelection, updateOutlineDisplay],
+		[
+			clientToCanvasCoords,
+			onClearAllSelection,
+			updateItemsSelection,
+			updateOutlineDisplay,
+		],
 	);
 
 	const onCancelAreaSelection = useCallback(() => {
