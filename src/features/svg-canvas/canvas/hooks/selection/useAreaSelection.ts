@@ -45,6 +45,47 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
+	/**
+	 * Update items array with outline display based on selection bounds
+	 */
+	const updateItemsWithOutline = useCallback(
+		(
+			items: Diagram[],
+			selectionBounds: {
+				startX: number;
+				startY: number;
+				endX: number;
+				endY: number;
+			},
+		) => {
+			// Calculate selection bounds in canvas coordinates
+			const minX = Math.min(selectionBounds.startX, selectionBounds.endX);
+			const maxX = Math.max(selectionBounds.startX, selectionBounds.endX);
+			const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
+			const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
+
+			return applyFunctionRecursively(items, (item) => {
+				if (!isSelectableData(item)) return item;
+
+				// Calculate item bounding box using calcItemBoundingBox function
+				const itemBounds = calcItemBoundingBox(item);
+
+				// Check if item's bounding box is completely contained within selection rectangle
+				const isInSelection =
+					itemBounds.left >= minX &&
+					itemBounds.right <= maxX &&
+					itemBounds.top >= minY &&
+					itemBounds.bottom <= maxY;
+
+				return {
+					...item,
+					showOutline: isInSelection,
+				};
+			});
+		},
+		[],
+	);
+
 	// Handle scroll events from auto edge scroll
 	useEffect(() => {
 		const { eventBus } = refBus.current.props;
@@ -62,7 +103,14 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			const { newMinX, newMinY, clientX, clientY } = event.detail;
 			const { x, y } = clientToCanvasCoords(clientX, clientY);
 
-			// Update the area selection state with new end coordinates
+			const newSelectionBounds = {
+				startX: canvasState.areaSelectionState.startX,
+				startY: canvasState.areaSelectionState.startY,
+				endX: x,
+				endY: y,
+			};
+
+			// Update both the area selection state and items outline in a single setCanvasState call
 			setCanvasState((prevState) => ({
 				...prevState,
 				minX: newMinX,
@@ -72,6 +120,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					endX: x,
 					endY: y,
 				},
+				items: updateItemsWithOutline(prevState.items, newSelectionBounds),
 			}));
 		};
 
@@ -83,7 +132,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 				handleScrollEvent,
 			);
 		};
-	}, []);
+	}, [updateItemsWithOutline]);
 
 	/**
 	 * Convert client coordinates to SVG canvas coordinates using matrixTransform
@@ -200,35 +249,12 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 				props: { setCanvasState },
 			} = refBus.current;
 
-			// Calculate selection bounds in canvas coordinates
-			const minX = Math.min(selectionBounds.startX, selectionBounds.endX);
-			const maxX = Math.max(selectionBounds.startX, selectionBounds.endX);
-			const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
-			const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
-
 			setCanvasState((prevState) => ({
 				...prevState,
-				items: applyFunctionRecursively(prevState.items, (item) => {
-					if (!isSelectableData(item)) return item;
-
-					// Calculate item bounding box using calcItemBoundingBox function
-					const itemBounds = calcItemBoundingBox(item);
-
-					// Check if item's bounding box is completely contained within selection rectangle
-					const isInSelection =
-						itemBounds.left >= minX &&
-						itemBounds.right <= maxX &&
-						itemBounds.top >= minY &&
-						itemBounds.bottom <= maxY;
-
-					return {
-						...item,
-						showOutline: isInSelection,
-					};
-				}),
+				items: updateItemsWithOutline(prevState.items, selectionBounds),
 			}));
 		},
-		[],
+		[updateItemsWithOutline],
 	);
 
 	/**
