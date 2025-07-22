@@ -42,13 +42,15 @@ const getIsTransformingState = (eventType: EventType): boolean => {
  * Custom hook to handle transform events on the canvas.
  */
 export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
-	// Get the auto edge scroll function and scrolling state to handle canvas auto scrolling.
-	const { autoEdgeScroll, isAutoScrolling } = useAutoEdgeScroll(props);
+	// Get the auto edge scroll function, clear function, and scrolling state to handle canvas auto scrolling.
+	const { autoEdgeScroll, clearAutoEdgeScroll, isAutoScrolling } =
+		useAutoEdgeScroll(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
 		autoEdgeScroll,
+		clearAutoEdgeScroll,
 		isAutoScrolling,
 	};
 	const refBus = useRef(refBusVal);
@@ -250,6 +252,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 			const {
 				props: { setCanvasState, onDataChange },
 				autoEdgeScroll,
+				clearAutoEdgeScroll,
 				isAutoScrolling,
 			} = refBus.current;
 
@@ -344,6 +347,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 
 				// Clean up the stored items at the end of transform
 				if (e.eventType === "End") {
+					clearAutoEdgeScroll();
 					startCanvasState.current = undefined;
 					initialItemsMap.current.clear();
 					multiSelectedItemIds.current.clear();

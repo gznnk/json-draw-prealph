@@ -25,6 +25,8 @@ export type UseAutoEdgeScrollReturn = {
 		clientX: number;
 		clientY: number;
 	}) => void;
+	/** Function to clear the auto scroll interval explicitly */
+	clearAutoEdgeScroll: () => void;
 	/** Flag indicating whether auto edge scroll is currently active */
 	isAutoScrolling: boolean;
 };
@@ -150,7 +152,22 @@ export const useAutoEdgeScroll = (
 			clientX: number,
 			clientY: number,
 		) => {
-			// Clear existing interval if any
+			// Check if direction hasn't changed and interval is already running
+			const currentHorizontal = lastScrollDirectionRef.current.horizontal;
+			const currentVertical = lastScrollDirectionRef.current.vertical;
+			
+			if (
+				scrollIntervalRef.current &&
+				horizontal === currentHorizontal &&
+				vertical === currentVertical
+			) {
+				// Just update client positions and continue with existing interval
+				currentClientRef.current.x = clientX;
+				currentClientRef.current.y = clientY;
+				return;
+			}
+
+			// Clear existing interval only if direction changed
 			clearScrollInterval();
 
 			// Set the new directions
@@ -287,6 +304,7 @@ export const useAutoEdgeScroll = (
 
 	return {
 		autoEdgeScroll: autoEdgeScrollCallback,
+		clearAutoEdgeScroll: clearScrollInterval,
 		isAutoScrolling,
 	};
 };

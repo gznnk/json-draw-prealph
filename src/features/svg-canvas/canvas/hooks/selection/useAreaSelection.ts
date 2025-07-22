@@ -33,8 +33,8 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	// Get the clear all selection function
 	const onClearAllSelection = useClearAllSelection(props);
 
-	// Get the auto edge scroll function and scrolling state
-	const { autoEdgeScroll, isAutoScrolling } = useAutoEdgeScroll(props);
+	// Get the auto edge scroll function, clear function, and scrolling state
+	const { autoEdgeScroll, clearAutoEdgeScroll, isAutoScrolling } = useAutoEdgeScroll(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
@@ -362,6 +362,9 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					const { areaSelectionState } = canvasState;
 					updateItemsSelection(areaSelectionState);
 
+					// Clear auto edge scroll when area selection ends
+					clearAutoEdgeScroll();
+
 					// Update interaction state to Idle and reset selection state
 					setCanvasState((prevState) => ({
 						...prevState,
@@ -382,6 +385,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			onClearAllSelection,
 			updateItemsSelection,
 			updateOutlineDisplay,
+			clearAutoEdgeScroll,
 			isAutoScrolling,
 		],
 	);
@@ -389,6 +393,9 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	const onCancelAreaSelection = useCallback(() => {
 		// Clear outline display for all items
 		clearOutlineDisplay();
+
+		// Clear auto edge scroll when area selection is cancelled
+		clearAutoEdgeScroll();
 
 		// Reset interaction state to Idle and selection state
 		const { setCanvasState } = refBus.current.props;
@@ -402,7 +409,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 				endY: 0,
 			},
 		}));
-	}, [clearOutlineDisplay]);
+	}, [clearOutlineDisplay, clearAutoEdgeScroll]);
 
 	return {
 		selectionState: props.canvasState.areaSelectionState,

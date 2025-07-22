@@ -30,11 +30,13 @@ import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
  */
 export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 	// Get the auto edge scroll function and scrolling state to handle canvas auto scrolling.
-	const { autoEdgeScroll, isAutoScrolling } = useAutoEdgeScroll(props);
+	const { autoEdgeScroll, clearAutoEdgeScroll, isAutoScrolling } =
+		useAutoEdgeScroll(props);
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
 		autoEdgeScroll,
+		clearAutoEdgeScroll,
 		isAutoScrolling,
 	};
 	const refBus = useRef(refBusVal);
@@ -52,6 +54,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 		const {
 			props: { setCanvasState, onDataChange },
 			autoEdgeScroll,
+			clearAutoEdgeScroll,
 			isAutoScrolling,
 		} = refBus.current;
 
@@ -211,6 +214,9 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 
 			// If the drag event is ended
 			if (e.eventType === "End") {
+				// Clear auto edge scroll when drag ends
+				clearAutoEdgeScroll();
+
 				// Restore showTransformControls from initial state for transformative items
 				newState.items = applyFunctionRecursively(newState.items, (item) => {
 					if (selectedIds.has(item.id) && isTransformativeData(item)) {
