@@ -15,7 +15,7 @@ import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 import { getAncestorItemsById } from "../../utils/getAncestorItemsById";
-import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
+import { removeNonTransformativeShowTransformControls } from "../../utils/removeNonTransformativeShowTransformControls";
 
 /**
  * Custom hook to handle select events on the canvas.
@@ -341,17 +341,8 @@ export const useOnSelect = (
 			});
 
 			// If the item is not transformative, remove the showTransformControls property.
-			items = applyFunctionRecursively(items, (item) => {
-				if (!isTransformativeData(item) && "showTransformControls" in item) {
-					const { showTransformControls, ...rest } = item as Diagram & {
-						showTransformControls: boolean;
-					};
-					return {
-						...rest,
-					};
-				}
-				return item;
-			});
+			// Remove showTransformControls from non-transformative items using shared utility
+			items = removeNonTransformativeShowTransformControls(items);
 
 			return {
 				...prevState,

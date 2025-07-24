@@ -17,9 +17,9 @@ import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundi
 import { getSelectedItems } from "../../../utils/common/getSelectedItems";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
-import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
+import { removeNonTransformativeShowTransformControls } from "../../utils/removeNonTransformativeShowTransformControls";
 
 // Import hooks.
 import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
@@ -292,19 +292,9 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			});
 
 			/**
-			 * Step 5: Remove transform controls from non-transformative items
+			 * Step 5: Remove transform controls from non-transformative items (shared utility)
 			 */
-			items = applyFunctionRecursively(items, (item) => {
-				if (!isTransformativeData(item) && "showTransformControls" in item) {
-					const { showTransformControls, ...rest } = item as Diagram & {
-						showTransformControls: boolean;
-					};
-					return {
-						...rest,
-					};
-				}
-				return item;
-			});
+			items = removeNonTransformativeShowTransformControls(items);
 
 			return {
 				...prevState,
