@@ -16,6 +16,7 @@ import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 import { getAncestorItemsById } from "../../utils/getAncestorItemsById";
 import { removeNonTransformativeShowTransformControls } from "../../utils/removeNonTransformativeShowTransformControls";
+import { updateOutlineBySelection } from "../../utils/updateOutlineBySelection";
 
 /**
  * Custom hook to handle select events on the canvas.
@@ -320,25 +321,7 @@ export const useOnSelect = (
 			}
 
 			// After processing the selection, update the items to show outlines and transform controls based on selection state.
-			items = applyFunctionRecursively(items, (item, ancestors) => {
-				if (!isSelectableData(item)) {
-					// Skip if the item is not selectable.
-					return item;
-				}
-
-				const isAncestorSelected = ancestors.some(
-					(ancestor) => isSelectableData(ancestor) && ancestor.isSelected,
-				);
-
-				// Show outline when the item is selected or when any ancestor is selected
-				const shouldShowOutline = item.isSelected || isAncestorSelected;
-
-				return {
-					...item,
-					isAncestorSelected,
-					showOutline: shouldShowOutline,
-				};
-			});
+			items = updateOutlineBySelection(items);
 
 			// If the item is not transformative, remove the showTransformControls property.
 			// Remove showTransformControls from non-transformative items using shared utility

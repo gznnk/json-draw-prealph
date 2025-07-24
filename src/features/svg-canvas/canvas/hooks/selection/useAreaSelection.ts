@@ -20,6 +20,7 @@ import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 import { removeNonTransformativeShowTransformControls } from "../../utils/removeNonTransformativeShowTransformControls";
+import { updateOutlineBySelection } from "../../utils/updateOutlineBySelection";
 
 // Import hooks.
 import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
@@ -273,23 +274,9 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			}
 
 			/**
-			 * Step 4: Update outline display for selected items and their ancestors
-			 * showOutline is true if the item or any ancestor is selected
+			 * Step 4: Update outline display for selected items and their ancestors (shared utility)
 			 */
-			items = applyFunctionRecursively(items, (item, ancestors) => {
-				if (!isSelectableData(item)) {
-					return item;
-				}
-				const isAncestorSelected = ancestors.some(
-					(ancestor) => isSelectableData(ancestor) && ancestor.isSelected,
-				);
-				const shouldShowOutline = item.isSelected || isAncestorSelected;
-				return {
-					...item,
-					isAncestorSelected,
-					showOutline: shouldShowOutline,
-				};
-			});
+			items = updateOutlineBySelection(items);
 
 			/**
 			 * Step 5: Remove transform controls from non-transformative items (shared utility)
