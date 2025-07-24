@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 // Import types.
 import type { Diagram } from "../../../types/data/catalog/Diagram";
+import type { GroupData } from "../../../types/data/shapes/GroupData";
 import type { AreaSelectionEvent } from "../../../types/events/AreaSelectionEvent";
 import type { SvgCanvasScrollEvent } from "../../../types/events/SvgCanvasScrollEvent";
 import { InteractionState } from "../../types/InteractionState";
@@ -12,14 +13,15 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import { EVENT_NAME_SVG_CANVAS_SCROLL } from "../../../constants/EventNames";
 
 // Import utils.
-import { newEventId } from "../../../utils/common/newEventId";
 import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundingBox";
+import { getSelectedItems } from "../../../utils/common/getSelectedItems";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
+import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
+import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 
 // Import hooks.
-import { useOnSelect } from "../diagram/useOnSelect";
 import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
 import { useClearAllSelection } from "./useClearAllSelection";
 
@@ -43,6 +45,7 @@ const updateItemsWithOutline = (
 
 	return applyFunctionRecursively(items, (item) => {
 		if (!isSelectableData(item)) return item;
+		if (item.type === "ConnectLine") return item;
 
 		// Calculate item bounding box using calcItemBoundingBox function
 		const itemBounds = calcItemBoundingBox(item);
@@ -91,9 +94,6 @@ const clientToCanvasCoords = (
  * Custom hook to handle area selection on the canvas.
  */
 export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
-	// Get the select function from useSelect hook with Ctrl key pressed (for multi-select)
-	const onSelect = useOnSelect(props, true);
-
 	// Get the clear all selection function
 	const onClearAllSelection = useClearAllSelection(props);
 
@@ -104,7 +104,6 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onSelect,
 		autoEdgeScroll,
 	};
 	const refBus = useRef(refBusVal);
@@ -167,75 +166,144 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	/**
 	 * Update items selection based on the current selection state
 	 */
-	const updateItemsSelection = useCallback(
-		(selectionBounds: {
-			startX: number;
-			startY: number;
-			endX: number;
-			endY: number;
-		}) => {
-			const {
-				props: { canvasState },
-				onSelect,
-			} = refBus.current;
+	const updateItemsSelection = useCallback(() => {
+		const {
+			props: { setCanvasState },
+		} = refBus.current;
 
-			// Calculate selection bounds in canvas coordinates
-			const minX = Math.min(selectionBounds.startX, selectionBounds.endX);
-			const maxX = Math.max(selectionBounds.startX, selectionBounds.endX);
-			const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
-			const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
-
-			// Find items that are within the selection bounds recursively
-			const itemsToSelect: string[] = [];
-
-			const collectSelectableItems = (items: Diagram[]) => {
-				for (const item of items) {
-					if (!isSelectableData(item)) continue;
-
-					// Calculate item bounding box using calcItemBoundingBox function
-					const itemBounds = calcItemBoundingBox(item);
-
-					// Check if item's bounding box is completely contained within selection rectangle
-					const isSelected =
-						itemBounds.left >= minX &&
-						itemBounds.right <= maxX &&
-						itemBounds.top >= minY &&
-						itemBounds.bottom <= maxY;
-
-					if (isSelected) {
-						itemsToSelect.push(item.id);
-					}
-
-					// Recursively check child items
-					if (isItemableData(item) && item.items) {
-						collectSelectableItems(item.items);
-					}
+		setCanvasState((prevState) => {
+			// Step 1: Update isSelected based on showOutline state
+			let items = applyFunctionRecursively(prevState.items, (item) => {
+				if (!isSelectableData(item)) {
+					return item;
 				}
+
+				// Select items that have showOutline set to true
+				if (item.showOutline) {
+					return {
+						...item,
+						isSelected: true,
+					};
+				}
+
+				return item;
+			});
+
+			// Step 2: Process group selection - update isSelected and showTransformControls for groups
+			const processGroupSelectionLogic = (items: Diagram[]): Diagram[] => {
+				const processItem = (item: Diagram): Diagram => {
+					// First, recursively process all nested items (bottom-up approach)
+					if (isItemableData(item)) {
+						const updatedItems = item.items.map(processItem);
+
+						// After processing children, check if this group should be selected
+						if (
+							updatedItems.length > 0 && // Ensure the group has children
+							updatedItems.every(
+								(child) => isSelectableData(child) && child.isSelected,
+							)
+						) {
+							// Deselect all children when the group is selected
+							const deselectedItems = updatedItems.map((child) => {
+								if (isSelectableData(child)) {
+									return {
+										...child,
+										isSelected: false,
+									};
+								}
+								return child;
+							});
+							return {
+								...item,
+								items: deselectedItems,
+								isSelected: true,
+								showOutline: true, // Show outline for the group
+							};
+						}
+
+						// Return with updated items
+						return {
+							...item,
+							items: updatedItems,
+						};
+					}
+
+					return item;
+				};
+
+				return items.map(processItem);
 			};
 
-			collectSelectableItems(canvasState.items);
+			items = processGroupSelectionLogic(items);
 
-			// Apply selection using the proper useSelect logic
-			// For area selection, we want to select the first item (clearing previous selections)
-			// then add additional items with multi-select behavior
-			if (itemsToSelect.length > 0) {
-				// Select first item (this clears existing selections)
-				onSelect({
-					eventId: newEventId(),
-					id: itemsToSelect[0],
+			// Step 3: Multi-selection logic - create multiSelectGroup if multiple items are selected
+			const selectedItems = getSelectedItems(items);
+			let multiSelectGroup: GroupData | undefined = undefined;
+			if (selectedItems.length > 1) {
+				// Create initial values for the multi-select group
+				multiSelectGroup = createMultiSelectGroup(
+					selectedItems,
+					prevState.multiSelectGroup?.keepProportion,
+				);
+			} else {
+				// If only one item is selected, show transform controls for it
+				items = applyFunctionRecursively(items, (item) => {
+					if (!isSelectableData(item)) {
+						return item;
+					}
+
+					// Show transform controls only for the selected item
+					if (item.isSelected) {
+						return {
+							...item,
+							showTransformControls: true,
+						};
+					}
+
+					return item;
 				});
-
-				// Add remaining items with multi-select
-				for (let i = 1; i < itemsToSelect.length; i++) {
-					onSelect({
-						eventId: newEventId(),
-						id: itemsToSelect[i],
-					});
-				}
 			}
-		},
-		[],
-	);
+
+			// Update the items to show outlines based on selection state
+			items = applyFunctionRecursively(items, (item, ancestors) => {
+				if (!isSelectableData(item)) {
+					return item;
+				}
+
+				const isAncestorSelected = ancestors.some(
+					(ancestor) => isSelectableData(ancestor) && ancestor.isSelected,
+				);
+
+				// Show outline when the item is selected or when any ancestor is selected
+				const shouldShowOutline = item.isSelected || isAncestorSelected;
+
+				return {
+					...item,
+					isAncestorSelected,
+					showOutline: shouldShowOutline,
+				};
+			});
+
+			// If the item is not transformative, remove the showTransformControls property
+			items = applyFunctionRecursively(items, (item) => {
+				if (!isTransformativeData(item) && "showTransformControls" in item) {
+					const { showTransformControls, ...rest } = item as Diagram & {
+						showTransformControls: boolean;
+					};
+					return {
+						...rest,
+					};
+				}
+				return item;
+			});
+
+			return {
+				...prevState,
+				items,
+				multiSelectGroup,
+			};
+		});
+	}, []);
 
 	/**
 	 * Clear outline display for all items
@@ -352,9 +420,8 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 						return;
 					}
 
-					// Update items selection with current selection bounds
-					const { areaSelectionState } = canvasState;
-					updateItemsSelection(areaSelectionState);
+					// Update items selection based on current showOutline state
+					updateItemsSelection();
 
 					// Clear auto edge scroll when area selection ends
 					clearAutoEdgeScroll();
