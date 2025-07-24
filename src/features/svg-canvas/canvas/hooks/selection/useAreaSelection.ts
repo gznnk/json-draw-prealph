@@ -164,7 +164,15 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	}, []);
 
 	/**
-	 * Update items selection based on the current selection state
+	 * Updates the selection state of items after area selection.
+	 * This function applies selection logic, group selection, and transform controls according to the current outline state.
+	 *
+	 * - Sets isSelected for items with showOutline
+	 * - Handles group selection and deselects children when a group is selected
+	 * - Creates a multiSelectGroup if multiple items are selected
+	 * - Shows transform controls for single selection
+	 * - Updates outline display for selected items and their ancestors
+	 * - Removes transform controls from non-transformative items
 	 */
 	const updateItemsSelection = useCallback(() => {
 		const {
@@ -172,38 +180,41 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 		} = refBus.current;
 
 		setCanvasState((prevState) => {
-			// Step 1: Update isSelected based on showOutline state
+			/**
+			 * Step 1: Set isSelected for items with showOutline
+			 * Only items with showOutline are marked as selected
+			 */
 			let items = applyFunctionRecursively(prevState.items, (item) => {
 				if (!isSelectableData(item)) {
 					return item;
 				}
-
-				// Select items that have showOutline set to true
+				// Mark item as selected if showOutline is true
 				if (item.showOutline) {
 					return {
 						...item,
 						isSelected: true,
 					};
 				}
-
 				return item;
 			});
 
-			// Step 2: Process group selection - update isSelected and showTransformControls for groups
+			/**
+			 * Step 2: Handle group selection logic
+			 * If all children of a group are selected, select the group and deselect its children
+			 */
 			const processGroupSelectionLogic = (items: Diagram[]): Diagram[] => {
 				const processItem = (item: Diagram): Diagram => {
-					// First, recursively process all nested items (bottom-up approach)
+					// Recursively process nested items (bottom-up)
 					if (isItemableData(item)) {
 						const updatedItems = item.items.map(processItem);
-
-						// After processing children, check if this group should be selected
+						// Select group if all children are selected
 						if (
-							updatedItems.length > 0 && // Ensure the group has children
+							updatedItems.length > 0 &&
 							updatedItems.every(
 								(child) => isSelectableData(child) && child.isSelected,
 							)
 						) {
-							// Deselect all children when the group is selected
+							// Deselect children when group is selected
 							const deselectedItems = updatedItems.map((child) => {
 								if (isSelectableData(child)) {
 									return {
@@ -217,66 +228,62 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 								...item,
 								items: deselectedItems,
 								isSelected: true,
-								showOutline: true, // Show outline for the group
+								showOutline: true,
 							};
 						}
-
-						// Return with updated items
+						// Return group with updated children
 						return {
 							...item,
 							items: updatedItems,
 						};
 					}
-
 					return item;
 				};
-
 				return items.map(processItem);
 			};
-
 			items = processGroupSelectionLogic(items);
 
-			// Step 3: Multi-selection logic - create multiSelectGroup if multiple items are selected
+			/**
+			 * Step 3: Multi-selection logic
+			 * If multiple items are selected, create a multiSelectGroup
+			 * If only one item is selected, show transform controls for it
+			 */
 			const selectedItems = getSelectedItems(items);
 			let multiSelectGroup: GroupData | undefined = undefined;
 			if (selectedItems.length > 1) {
-				// Create initial values for the multi-select group
+				// Create multiSelectGroup for multiple selection
 				multiSelectGroup = createMultiSelectGroup(
 					selectedItems,
 					prevState.multiSelectGroup?.keepProportion,
 				);
 			} else {
-				// If only one item is selected, show transform controls for it
+				// Show transform controls for single selected item
 				items = applyFunctionRecursively(items, (item) => {
 					if (!isSelectableData(item)) {
 						return item;
 					}
-
-					// Show transform controls only for the selected item
 					if (item.isSelected) {
 						return {
 							...item,
 							showTransformControls: true,
 						};
 					}
-
 					return item;
 				});
 			}
 
-			// Update the items to show outlines based on selection state
+			/**
+			 * Step 4: Update outline display for selected items and their ancestors
+			 * showOutline is true if the item or any ancestor is selected
+			 */
 			items = applyFunctionRecursively(items, (item, ancestors) => {
 				if (!isSelectableData(item)) {
 					return item;
 				}
-
 				const isAncestorSelected = ancestors.some(
 					(ancestor) => isSelectableData(ancestor) && ancestor.isSelected,
 				);
-
-				// Show outline when the item is selected or when any ancestor is selected
 				const shouldShowOutline = item.isSelected || isAncestorSelected;
-
 				return {
 					...item,
 					isAncestorSelected,
@@ -284,7 +291,9 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 				};
 			});
 
-			// If the item is not transformative, remove the showTransformControls property
+			/**
+			 * Step 5: Remove transform controls from non-transformative items
+			 */
 			items = applyFunctionRecursively(items, (item) => {
 				if (!isTransformativeData(item) && "showTransformControls" in item) {
 					const { showTransformControls, ...rest } = item as Diagram & {
