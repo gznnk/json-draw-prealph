@@ -4,8 +4,8 @@ import type { EdgeProximityResult } from "./detectEdgeProximity";
  * Object representing scroll direction derived from edge proximity
  */
 export type ScrollDirection = {
-  horizontal: "left" | "right" | null;
-  vertical: "top" | "bottom" | null;
+	horizontal: "left" | "right" | null;
+	vertical: "top" | "bottom" | null;
 };
 
 /**
@@ -16,8 +16,8 @@ export type ScrollDirection = {
  * @returns True if proximity changed, otherwise false
  */
 export const detectEdgeProximityChange = (
-  previous: ScrollDirection,
-  current: EdgeProximityResult,
+	previous: ScrollDirection,
+	current: EdgeProximityResult,
 ): boolean =>
-  previous.horizontal !== current.horizontal ||
-  previous.vertical !== current.vertical;
+	previous.horizontal !== current.horizontal ||
+	previous.vertical !== current.vertical;

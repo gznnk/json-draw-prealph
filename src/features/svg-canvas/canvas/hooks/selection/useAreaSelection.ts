@@ -25,8 +25,8 @@ import { removeNonTransformativeShowTransformControls } from "../../utils/remove
 import { updateOutlineBySelection } from "../../utils/updateOutlineBySelection";
 import { detectEdgeProximity } from "../../utils/detectEdgeProximity";
 import {
-        detectEdgeProximityChange,
-        type ScrollDirection,
+	detectEdgeProximityChange,
+	type ScrollDirection,
 } from "../../utils/detectEdgeProximityChange";
 
 // Import hooks.
@@ -112,10 +112,10 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 		y: number;
 	} | null>(null);
 	// Reference to store the last scroll direction for continuous scrolling
-        const lastScrollDirectionRef = useRef<ScrollDirection>({
-                horizontal: null,
-                vertical: null,
-        });
+	const lastScrollDirectionRef = useRef<ScrollDirection>({
+		horizontal: null,
+		vertical: null,
+	});
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
@@ -250,7 +250,6 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			};
 		});
 	}, []);
-
 
 	/**
 	 * Clear edge scrolling interval and reset state
@@ -393,16 +392,12 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					currentCursorPosRef.current = { x, y };
 
 					// Check if we need to start edge scrolling
-                                        const edgeProximity = detectEdgeProximity(
-                                                refBus.current.props,
-                                                x,
-                                                y,
-                                        );
-                                        if (edgeProximity.isNearEdge) {
-                                                const isProximityChanged = detectEdgeProximityChange(
-                                                        lastScrollDirectionRef.current as ScrollDirection,
-                                                        edgeProximity,
-                                                );
+					const edgeProximity = detectEdgeProximity(refBus.current.props, x, y);
+					if (edgeProximity.isNearEdge) {
+						const isProximityChanged = detectEdgeProximityChange(
+							lastScrollDirectionRef.current as ScrollDirection,
+							edgeProximity,
+						);
 
 						if (isProximityChanged) {
 							if (scrollIntervalRef.current) {
@@ -470,7 +465,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	const onCancelAreaSelection = useCallback(() => {
 		// Clear edge scroll when area selection is cancelled
 		clearEdgeScroll();
-		
+
 		// Reset interaction state and remove outlines
 		const { setCanvasState } = refBus.current.props;
 		setCanvasState((prevState) => ({
@@ -478,19 +473,19 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			items: applyFunctionRecursively(prevState.items, (item) => {
 				if (!isSelectableData(item)) return item;
 				return {
-				...item,
-								showOutline: false,
-								};
-						}),
-						interactionState: InteractionState.Idle,
-						areaSelectionState: {
-								startX: 0,
-								startY: 0,
-								endX: 0,
-								endY: 0,
-						},
-				}));
-}, [clearEdgeScroll]);
+					...item,
+					showOutline: false,
+				};
+			}),
+			interactionState: InteractionState.Idle,
+			areaSelectionState: {
+				startX: 0,
+				startY: 0,
+				endX: 0,
+				endY: 0,
+			},
+		}));
+	}, [clearEdgeScroll]);
 
 	return {
 		selectionState: props.canvasState.areaSelectionState,
