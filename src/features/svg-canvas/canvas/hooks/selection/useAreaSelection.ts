@@ -51,7 +51,8 @@ const updateItemsWithOutline = (
 		if (item.type === "ConnectLine") return item;
 
 		// Use cached bounding box if available, otherwise calculate
-		const itemBounds = cachedBoundingBoxes?.get(item.id) ?? calcItemBoundingBox(item);
+		const itemBounds =
+			cachedBoundingBoxes?.get(item.id) ?? calcItemBoundingBox(item);
 
 		// Check if item's bounding box is completely contained within selection rectangle
 		const isInSelection =
@@ -112,7 +113,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 		x: number;
 		y: number;
 	}>({ x: 0, y: 0 });
-	
+
 	// Reference to store cached bounding boxes for area selection
 	const cachedBoundingBoxesRef = useRef<Map<string, Box>>(new Map());
 
@@ -306,7 +307,11 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 				minX: prevState.minX + currentDeltaX,
 				minY: prevState.minY + currentDeltaY,
 				areaSelectionState: newSelectionBounds,
-				items: updateItemsWithOutline(prevState.items, newSelectionBounds, cachedBoundingBoxesRef.current),
+				items: updateItemsWithOutline(
+					prevState.items,
+					newSelectionBounds,
+					cachedBoundingBoxesRef.current,
+				),
 			}));
 		};
 
@@ -343,7 +348,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					// Pre-calculate and cache bounding boxes for all selectable items
 					const { items } = canvasState;
 					cachedBoundingBoxesRef.current.clear();
-					
+
 					applyFunctionRecursively(items, (item) => {
 						if (isSelectableData(item) && item.type !== "ConnectLine") {
 							const boundingBox = calcItemBoundingBox(item);
@@ -402,12 +407,14 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 						currentDeltaRef.current.x = deltaX;
 						currentDeltaRef.current.y = deltaY;
 
-						if (isScrollingRef.current) {
-							break;
+						if (!isScrollingRef.current) {
+							// If scrolling is not active, start edge scrolling
+							startEdgeScroll();
 						}
-						// If scrolling is not active, start edge scrolling
-						startEdgeScroll();
-					} else if (isScrollingRef.current) {
+						break;
+					}
+
+					if (isScrollingRef.current) {
 						// If edge proximity is not detected, clear edge scroll
 						clearEdgeScroll();
 					}
@@ -415,7 +422,11 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					// Update canvas state with new selection bounds
 					setCanvasState((prevState) => ({
 						...prevState,
-						items: updateItemsWithOutline(prevState.items, newSelectionState, cachedBoundingBoxesRef.current),
+						items: updateItemsWithOutline(
+							prevState.items,
+							newSelectionState,
+							cachedBoundingBoxesRef.current,
+						),
 						areaSelectionState: newSelectionState,
 					}));
 					break;

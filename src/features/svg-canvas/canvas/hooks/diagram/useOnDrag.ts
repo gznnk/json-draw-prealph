@@ -22,7 +22,6 @@ import { calculateScrollDelta } from "../../utils/calculateScrollDelta";
 import { createItemMap } from "../../utils/createItemMap";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 import { detectEdgeProximity } from "../../utils/detectEdgeProximity";
-import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
 import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
@@ -138,6 +137,9 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 		);
 	}, []);
 
+	/**
+	 * Create a new state based on the drag event.
+	 */
 	const createDraggedState = useCallback(
 		(
 			prevState: SvgCanvasState,
@@ -262,6 +264,37 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				props: { setCanvasState, onDataChange },
 			} = refBus.current;
 
+			// Check if we need to start edge scrolling
+			const edgeProximity = detectEdgeProximity(
+				refBus.current.props,
+				e.cursorX,
+				e.cursorY,
+			);
+
+			if (edgeProximity.isNearEdge) {
+				// Calculate scroll delta and start edge scrolling
+				const { deltaX, deltaY } = calculateScrollDelta(
+					edgeProximity.horizontal,
+					edgeProximity.vertical,
+				);
+				// Store new delta values
+				currentDeltaRef.current.x = deltaX;
+				currentDeltaRef.current.y = deltaY;
+				// Update the current end position reference
+				currentEndPosRef.current = { x: e.endX, y: e.endY };
+
+				if (!isScrollingRef.current) {
+					// If scrolling is not active, start edge scrolling
+					startEdgeScroll();
+				}
+				return;
+			}
+
+			if (isScrollingRef.current) {
+				// If not near an edge, clear edge scrolling
+				clearEdgeScroll();
+			}
+
 			// Update the canvas state based on the drag event.
 			setCanvasState((prevState) => {
 				// Check if currently dragging
@@ -283,40 +316,6 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 					initialItemsMap.current = createItemMap(prevState.items);
 				}
 
-				// Get selected item IDs from ref (stored at drag start)
-				const selectedIds = selectedItemIds.current;
-				// Get initial items from ref (stored at drag start)
-				const initialItems = initialItemsMap.current;
-
-				// Check if we need to start edge scrolling
-				const edgeProximity = detectEdgeProximity(
-					refBus.current.props,
-					e.cursorX,
-					e.cursorY,
-				);
-
-				if (edgeProximity.isNearEdge) {
-					// Calculate scroll delta and start edge scrolling
-					const { deltaX, deltaY } = calculateScrollDelta(
-						edgeProximity.horizontal,
-						edgeProximity.vertical,
-					);
-					// Store new delta values
-					currentDeltaRef.current.x = deltaX;
-					currentDeltaRef.current.y = deltaY;
-					// Update the current end position reference
-					currentEndPosRef.current = { x: e.endX, y: e.endY };
-
-					if (isScrollingRef.current) {
-						return prevState; // If already scrolling, do nothing
-					}
-					// If scrolling is not active, start edge scrolling
-					startEdgeScroll();
-				} else {
-					// If not near an edge, clear edge scrolling
-					clearEdgeScroll();
-				}
-
 				// Calculate the movement delta
 				const dx = e.endX - e.startX;
 				const dy = e.endY - e.startY;
@@ -324,19 +323,15 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				// Create the new state based on the dx and dy values
 				let newState = createDraggedState(prevState, dx, dy, isDragging);
 
-				if (isHistoryEvent(e.eventType)) {
-					// Add a new history entry.
-					newState.lastHistoryEventId = e.eventId;
-					newState = addHistory(prevState, newState);
-
-					// Notify the data change.
-					onDataChange?.(svgCanvasStateToData(newState));
-				}
-
 				// If the drag event is ended
 				if (e.eventType === "End") {
 					// Clear auto edge scroll when drag ends
 					clearEdgeScroll();
+
+					// Get selected item IDs from ref (stored at drag start)
+					const selectedIds = selectedItemIds.current;
+					// Get initial items from ref (stored at drag start)
+					const initialItems = initialItemsMap.current;
 
 					// Restore showTransformControls from initial state for transformative items
 					newState.items = applyFunctionRecursively(newState.items, (item) => {
@@ -351,8 +346,17 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 						}
 						return item;
 					});
+
 					// Update outline of all groups.
 					newState.items = updateOutlineOfAllGroups(newState.items);
+
+					// Add a new history entry.
+					newState.lastHistoryEventId = e.eventId;
+					newState = addHistory(prevState, newState);
+
+					// Notify the data change.
+					onDataChange?.(svgCanvasStateToData(newState));
+
 					// Clean up the canvas state reference.
 					startCanvasState.current = undefined;
 					// Clean up the selected item IDs and initial items map.
