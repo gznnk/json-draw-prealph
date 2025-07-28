@@ -260,6 +260,10 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 		}
 		isScrollingRef.current = false;
 		edgeScrollStateRef.current = { cursorPos: null, delta: { x: 0, y: 0 } };
+
+		return () => {
+			clearEdgeScroll();
+		};
 	}, []);
 
 	/**
@@ -394,9 +398,9 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 							edgeProximity.horizontal,
 							edgeProximity.vertical,
 						);
-						edgeScrollStateRef.current = { 
-							cursorPos: { x, y }, 
-							delta: { x: deltaX, y: deltaY } 
+						edgeScrollStateRef.current = {
+							cursorPos: { x, y },
+							delta: { x: deltaX, y: deltaY },
 						};
 
 						if (!isScrollingRef.current) {

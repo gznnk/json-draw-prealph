@@ -5,13 +5,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // Import types.
 import type { DiagramType } from "../types/core/DiagramType";
 import type { Point } from "../types/core/Point";
-import type { ContainerSizeChangeEvent } from "../types/events/ContainerSizeChangeEvent";
 import type { DiagramDragDropEvent } from "../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../types/events/DiagramPointerEvent";
 import type { EventType } from "../types/events/EventType";
 import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
-import type { ZoomChangeEvent } from "../types/events/ZoomChangeEvent";
 
 // Import utils.
 import { newEventId } from "../utils/common/newEventId";
@@ -25,14 +23,13 @@ import {
 import { DRAG_DEAD_ZONE } from "../constants/Constants";
 import {
 	EVENT_NAME_BROADCAST_DRAG,
-	EVENT_NAME_CONTAINER_SIZE_CHANGE,
 	EVENT_NAME_SVG_CANVAS_SCROLL,
-	EVENT_NAME_ZOOM_CHANGE,
 } from "../constants/EventNames";
 
 // Import EventBus.
-import { useEventBus } from "../context/EventBusContext";
 import { calculateScrollDelta } from "../canvas/utils/calculateScrollDelta";
+import { useEventBus } from "../context/EventBusContext";
+import { useSvgViewport } from "../context/SvgViewportContext";
 
 /**
  * Type definition for broadcast drag event
@@ -87,6 +84,7 @@ export type DragProps = {
  */
 export const useDrag = (props: DragProps) => {
 	const eventBus = useEventBus();
+	const svgViewport = useSvgViewport();
 	const {
 		id,
 		x,
@@ -116,13 +114,6 @@ export const useDrag = (props: DragProps) => {
 	// The offset between the center and the pointer.
 	const offsetXBetweenCenterAndPointer = useRef(0);
 	const offsetYBetweenCenterAndPointer = useRef(0);
-	// Container size ref
-	const containerSizeRef = useRef({ width: 0, height: 0 });
-	// Canvas scroll position refs
-	const minXRef = useRef(0);
-	const minYRef = useRef(0);
-	// Zoom level ref
-	const zoomRef = useRef(1);
 	// Internal state for edge scrolling
 	const scrollIntervalRef = useRef<number | null>(null);
 	const isScrollingRef = useRef(false);
@@ -175,6 +166,7 @@ export const useDrag = (props: DragProps) => {
 		onDragLeave,
 		onDrop,
 		// Internal variables and functions
+		svgViewport,
 		isDragging,
 		getPointOnDrag,
 	};
@@ -223,6 +215,10 @@ export const useDrag = (props: DragProps) => {
 			scrollIntervalRef.current = null;
 			isScrollingRef.current = false;
 		}
+
+		return () => {
+			clearEdgeScroll();
+		};
 	}, []);
 
 	/**
@@ -242,12 +238,12 @@ export const useDrag = (props: DragProps) => {
 			}
 
 			// Bypass references to avoid function creation in every render
-			const { id, onDrag } = refBus.current;
+			const { id, svgViewport, onDrag } = refBus.current;
 
 			// Auto edge scroll if the cursor is near the edges.
-			const zoom = zoomRef.current;
-			const minX = minXRef.current;
-			const minY = minYRef.current;
+			const zoom = svgViewport.current.zoom;
+			const minX = svgViewport.current.minX;
+			const minY = svgViewport.current.minY;
 
 			const deltaX = delta.x / zoom;
 			const deltaY = delta.y / zoom;
@@ -273,10 +269,6 @@ export const useDrag = (props: DragProps) => {
 			// Calculate new scroll positions
 			const newMinX = minX + delta.x;
 			const newMinY = minY + delta.y;
-
-			// Update minX and minY ref
-			minXRef.current = newMinX;
-			minYRef.current = newMinY;
 
 			// dispatch dragging event
 			const dragEvent = {
@@ -386,11 +378,8 @@ export const useDrag = (props: DragProps) => {
 		}
 
 		// Auto edge scroll if the cursor is near the edges.
-		const zoom = zoomRef.current;
-		const minX = minXRef.current;
-		const minY = minYRef.current;
-		const { width: containerWidth, height: containerHeight } =
-			containerSizeRef.current;
+		const { zoom, minX, minY, containerWidth, containerHeight } =
+			svgViewport.current;
 		const cursorX = svgCursorPoint.x;
 		const cursorY = svgCursorPoint.y;
 
@@ -518,20 +507,6 @@ export const useDrag = (props: DragProps) => {
 						clientX: e.clientX,
 						clientY: e.clientY,
 					} as BroadcastDragEvent,
-				}),
-			);
-
-			eventBus.dispatchEvent(
-				new CustomEvent(EVENT_NAME_SVG_CANVAS_SCROLL, {
-					detail: {
-						newMinX: minXRef.current,
-						newMinY: minYRef.current,
-						clientX: e.clientX,
-						clientY: e.clientY,
-						deltaX: 0,
-						deltaY: 0,
-						isFromAutoEdgeScroll: false,
-					} as SvgCanvasScrollEvent,
 				}),
 			);
 		}
@@ -763,10 +738,6 @@ export const useDrag = (props: DragProps) => {
 
 			const customEvent = e as CustomEvent<SvgCanvasScrollEvent>;
 
-			// Update minX and minY refs with new scroll position
-			minXRef.current = customEvent.detail.newMinX;
-			minYRef.current = customEvent.detail.newMinY;
-
 			if (!isDragging) {
 				// If not dragging, do nothing
 				return;
@@ -818,52 +789,6 @@ export const useDrag = (props: DragProps) => {
 			}
 		};
 	}, [eventBus, ref]);
-
-	/**
-	 * Handle container size change event.
-	 */
-	useEffect(() => {
-		const handleContainerSizeChange = (e: CustomEvent) => {
-			const customEvent = e as CustomEvent<ContainerSizeChangeEvent>;
-			containerSizeRef.current = {
-				width: customEvent.detail.width,
-				height: customEvent.detail.height,
-			};
-			// Update minX and minY refs from the event
-			minXRef.current = customEvent.detail.minX;
-			minYRef.current = customEvent.detail.minY;
-		};
-
-		eventBus.addEventListener(
-			EVENT_NAME_CONTAINER_SIZE_CHANGE,
-			handleContainerSizeChange,
-		);
-
-		return () => {
-			eventBus.removeEventListener(
-				EVENT_NAME_CONTAINER_SIZE_CHANGE,
-				handleContainerSizeChange,
-			);
-		};
-	}, [eventBus]);
-
-	/**
-	 * Handle zoom change event.
-	 */
-	useEffect(() => {
-		const handleZoomChange = (e: CustomEvent) => {
-			const customEvent = e as CustomEvent<ZoomChangeEvent>;
-			zoomRef.current = customEvent.detail.zoom;
-			minXRef.current = customEvent.detail.minX;
-			minYRef.current = customEvent.detail.minY;
-		};
-
-		eventBus.addEventListener(EVENT_NAME_ZOOM_CHANGE, handleZoomChange);
-
-		return () => {
-			eventBus.removeEventListener(EVENT_NAME_ZOOM_CHANGE, handleZoomChange);
-		};
-	}, [eventBus]);
 
 	return {
 		onPointerDown: handlePointerDown,

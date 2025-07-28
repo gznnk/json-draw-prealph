@@ -9,26 +9,26 @@ import React, {
 	useState,
 } from "react";
 
-// Import SvgCanvas related type definitions
+// Import types.
 import { DiagramRegistry } from "../registry";
-import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
+import type { SvgViewport } from "../types/core/SvgViewport";
 import { newEventId } from "../utils/common/newEventId";
-import { EVENT_NAME_CONTAINER_SIZE_CHANGE } from "../constants/EventNames";
-import type { ContainerSizeChangeEvent } from "../types/events/ContainerSizeChangeEvent";
+import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
+import { InteractionState } from "./types/InteractionState";
 
-// Import SvgCanvas related components
+// Import components.
+import { GridBackground } from "../components/auxiliary/GridBackground";
+import { GridPattern } from "../components/auxiliary/GridPattern";
+import { MiniMap } from "../components/auxiliary/MiniMap";
+import { PointerCaptureElement } from "../components/auxiliary/PointerCaptureElement";
+import { PreviewConnectLine } from "../components/auxiliary/PreviewConnectLine";
 import { TextEditor } from "../components/core/Textable";
 import { CanvasMenu } from "../components/menus/CanvasMenu";
 import { ContextMenu, useContextMenu } from "../components/menus/ContextMenu";
 import { DiagramMenu, useDiagramMenu } from "../components/menus/DiagramMenu";
-import { FlashConnectLine } from "../components/shapes/ConnectLine";
-import { PreviewConnectLine } from "../components/auxiliary/PreviewConnectLine";
-import { Group } from "../components/shapes/Group";
 import UserMenu from "../components/menus/UserMenu/UserMenu";
-import { MiniMap } from "../components/auxiliary/MiniMap";
-import { GridPattern } from "../components/auxiliary/GridPattern";
-import { GridBackground } from "../components/auxiliary/GridBackground";
-import { PointerCaptureElement } from "../components/auxiliary/PointerCaptureElement";
+import { FlashConnectLine } from "../components/shapes/ConnectLine";
+import { Group } from "../components/shapes/Group";
 
 // Imports related to this component.
 import { useShortcutKey } from "./hooks/keyboard/useShortcutKey";
@@ -44,9 +44,9 @@ import {
 import type { SvgCanvasProps } from "./types/SvgCanvasProps";
 import type { SvgCanvasRef } from "./types/SvgCanvasRef";
 
-// Import SvgCanvas context.
+// Import context.
 import { EventBusProvider } from "../context/EventBusContext";
-import { InteractionState } from "./types/InteractionState";
+import { SvgViewportProvider } from "../context/SvgViewportContext";
 
 // Initialize all diagram types when this module is loaded
 initializeSvgCanvasDiagrams();
@@ -120,6 +120,22 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		// Container dimensions state
 		const [containerWidth, setContainerWidth] = useState(0);
 		const [containerHeight, setContainerHeight] = useState(0);
+
+		// Reference of the SVG viewport
+		const viewportRef = useRef<SvgViewport>({
+			minX,
+			minY,
+			containerWidth,
+			containerHeight,
+			zoom,
+		});
+		viewportRef.current = {
+			minX,
+			minY,
+			containerWidth,
+			containerHeight,
+			zoom,
+		};
 
 		// Flag indicating whether the SVG element has focus
 		const hasFocus = useRef(false);
@@ -312,31 +328,11 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			const container = containerRef.current;
 			if (!container) return;
 
-			// Common function to emit container size change event
-			const emitContainerSizeChangeEvent = (width: number, height: number) => {
-				setContainerWidth(width);
-				setContainerHeight(height);
-
-				const { minX, minY } = refBus.current;
-
-				const event: ContainerSizeChangeEvent = {
-					eventId: newEventId(),
-					width,
-					height,
-					minX,
-					minY,
-				};
-				eventBus.dispatchEvent(
-					new CustomEvent(EVENT_NAME_CONTAINER_SIZE_CHANGE, {
-						detail: event,
-					}),
-				);
-			};
-
 			const resizeObserver = new ResizeObserver((entries) => {
 				for (const entry of entries) {
 					const { width, height } = entry.contentRect;
-					emitContainerSizeChangeEvent(width, height);
+					setContainerWidth(width);
+					setContainerHeight(height);
 				}
 			});
 
@@ -344,12 +340,13 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 			// Initialize with current dimensions
 			const rect = container.getBoundingClientRect();
-			emitContainerSizeChangeEvent(rect.width, rect.height);
+			setContainerWidth(rect.width);
+			setContainerHeight(rect.height);
 
 			return () => {
 				resizeObserver.disconnect();
 			};
-		}, [eventBus]);
+		}, []);
 
 		useEffect(() => {
 			// Prevent browser zoom with Ctrl+wheel at document level
@@ -462,76 +459,84 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			<Viewport>
 				<Container ref={containerRef}>
 					<EventBusProvider eventBus={eventBus}>
-						<Svg
-							width={containerWidth}
-							height={containerHeight}
-							viewBox={`${minX / zoom} ${minY / zoom} ${containerWidth / zoom} ${containerHeight / zoom}`}
-							tabIndex={0}
-							ref={svgRef}
-							isGrabScrolling={grabScrollState?.isGrabScrolling}
-							onPointerDown={handlePointerDown}
-							onPointerMove={handlePointerMove}
-							onPointerUp={handlePointerUp}
-							onKeyDown={handleKeyDown}
-							onFocus={handleFocus}
-							onBlur={handleBlur}
-							onWheel={handleWheel}
-							onContextMenu={onContextMenu}
-						>
-							<title>{title}</title>
-							{/* Grid pattern definition */}
-							<GridPattern gridSize={20} color="rgba(24, 144, 255, 0.1)" />
-							{/* Grid background */}
-							<GridBackground
-								x={minX / zoom}
-								y={minY / zoom}
-								width={containerWidth / zoom}
-								height={containerHeight / zoom}
-							/>
-							{/* Render the items in the SvgCanvas. */}
-							{renderedItems}
-							{/* Dummy group for multi-select. */}
-							{multiSelectGroup && (
-								<Group
-									{...multiSelectGroup}
-									id={MULTI_SELECT_GROUP}
-									onTransform={onTransform}
+						<SvgViewportProvider viewportRef={viewportRef}>
+							<Svg
+								width={containerWidth}
+								height={containerHeight}
+								viewBox={`${minX / zoom} ${minY / zoom} ${containerWidth / zoom} ${containerHeight / zoom}`}
+								tabIndex={0}
+								ref={svgRef}
+								isGrabScrolling={grabScrollState?.isGrabScrolling}
+								onPointerDown={handlePointerDown}
+								onPointerMove={handlePointerMove}
+								onPointerUp={handlePointerUp}
+								onKeyDown={handleKeyDown}
+								onFocus={handleFocus}
+								onBlur={handleBlur}
+								onWheel={handleWheel}
+								onContextMenu={onContextMenu}
+							>
+								<title>{title}</title>
+								{/* Grid pattern definition */}
+								<GridPattern gridSize={20} color="rgba(24, 144, 255, 0.1)" />
+								{/* Grid background */}
+								<GridBackground
+									x={minX / zoom}
+									y={minY / zoom}
+									width={containerWidth / zoom}
+									height={containerHeight / zoom}
 								/>
-							)}
-							{/* Render preview connect line. */}
-							<PreviewConnectLine pathData={previewConnectLineState} />
-							{/* Render flash connect lines */}
-							<FlashConnectLine />
-							{/* Render area selection rectangle */}
-							{selectionState && (
-								<SelectionRect
-									x={Math.min(selectionState.startX, selectionState.endX)}
-									y={Math.min(selectionState.startY, selectionState.endY)}
-									width={Math.abs(selectionState.endX - selectionState.startX)}
-									height={Math.abs(selectionState.endY - selectionState.startY)}
-									visible={interactionState === InteractionState.AreaSelection}
-								/>
-							)}
-						</Svg>
-						{/* Container for HTML elements that follow the scroll of the SVG canvas with zoom scaling. */}
-						<HTMLElementsContainer
-							left={-minX}
-							top={-minY}
-							width={containerWidth + minX}
-							height={containerHeight + minY}
-							zoom={zoom}
-						>
-							<TextEditor {...textEditorState} onTextChange={onTextChange} />
-						</HTMLElementsContainer>
-						{/* Container for HTML elements that follow the scroll but not zoom. */}
-						<HTMLElementsContainer
-							left={-minX}
-							top={-minY}
-							width={containerWidth + minX}
-							height={containerHeight + minY}
-						>
-							<DiagramMenu {...diagramMenuProps} />
-						</HTMLElementsContainer>
+								{/* Render the items in the SvgCanvas. */}
+								{renderedItems}
+								{/* Dummy group for multi-select. */}
+								{multiSelectGroup && (
+									<Group
+										{...multiSelectGroup}
+										id={MULTI_SELECT_GROUP}
+										onTransform={onTransform}
+									/>
+								)}
+								{/* Render preview connect line. */}
+								<PreviewConnectLine pathData={previewConnectLineState} />
+								{/* Render flash connect lines */}
+								<FlashConnectLine />
+								{/* Render area selection rectangle */}
+								{selectionState && (
+									<SelectionRect
+										x={Math.min(selectionState.startX, selectionState.endX)}
+										y={Math.min(selectionState.startY, selectionState.endY)}
+										width={Math.abs(
+											selectionState.endX - selectionState.startX,
+										)}
+										height={Math.abs(
+											selectionState.endY - selectionState.startY,
+										)}
+										visible={
+											interactionState === InteractionState.AreaSelection
+										}
+									/>
+								)}
+							</Svg>
+							{/* Container for HTML elements that follow the scroll of the SVG canvas with zoom scaling. */}
+							<HTMLElementsContainer
+								left={-minX}
+								top={-minY}
+								width={containerWidth + minX}
+								height={containerHeight + minY}
+								zoom={zoom}
+							>
+								<TextEditor {...textEditorState} onTextChange={onTextChange} />
+							</HTMLElementsContainer>
+							{/* Container for HTML elements that follow the scroll but not zoom. */}
+							<HTMLElementsContainer
+								left={-minX}
+								top={-minY}
+								width={containerWidth + minX}
+								height={containerHeight + minY}
+							>
+								<DiagramMenu {...diagramMenuProps} />
+							</HTMLElementsContainer>
+						</SvgViewportProvider>
 					</EventBusProvider>
 				</Container>
 				{/* Container for HTML elements fixed to the viewport. */}
