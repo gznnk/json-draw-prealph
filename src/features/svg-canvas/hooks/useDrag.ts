@@ -18,7 +18,6 @@ import { getSvgPoint } from "../utils/math/points/getSvgPoint";
 // Import constants.
 import {
 	AUTO_SCROLL_INTERVAL_MS,
-	AUTO_SCROLL_THRESHOLD,
 } from "../canvas/SvgCanvasConstants"; // TODO: Move to constants file
 import { DRAG_DEAD_ZONE } from "../constants/Constants";
 import {
@@ -28,6 +27,7 @@ import {
 
 // Import EventBus.
 import { calculateScrollDelta } from "../canvas/utils/calculateScrollDelta";
+import { detectEdgeProximity } from "../canvas/utils/detectEdgeProximity";
 import { useEventBus } from "../context/EventBusContext";
 import { useSvgViewport } from "../context/SvgViewportContext";
 
@@ -372,53 +372,21 @@ export const useDrag = (props: DragProps) => {
 		}
 
 		// Auto edge scroll if the cursor is near the edges.
-		const { zoom, minX, minY, containerWidth, containerHeight } =
-			svgViewport.current;
+		const viewport = svgViewport.current;
 		const cursorX = svgCursorPoint.x;
 		const cursorY = svgCursorPoint.y;
 
-		// Calculate the viewBox boundaries considering zoom
+		// Check edge proximity using shared function
+		const edgeProximity = detectEdgeProximity(viewport, cursorX, cursorY);
 
-		const viewBoxX = minX / zoom;
-		const viewBoxY = minY / zoom;
-		const viewBoxWidth = containerWidth / zoom;
-		const viewBoxHeight = containerHeight / zoom;
-
-		// Calculate distances from each edge in viewBox coordinates
-		const distFromLeft = cursorX - viewBoxX;
-		const distFromTop = cursorY - viewBoxY;
-		const distFromRight = viewBoxX + viewBoxWidth - cursorX;
-		const distFromBottom = viewBoxY + viewBoxHeight - cursorY;
-
-		// Determine which edges the cursor is close to
-		let newHorizontal: "left" | "right" | null = null;
-		let newVertical: "top" | "bottom" | null = null;
-
-		// Calculate zoom-adjusted threshold for more consistent behavior across zoom levels
-		const adjustedThreshold = AUTO_SCROLL_THRESHOLD * zoom;
-
-		// Check horizontal edges
-		if (distFromLeft < adjustedThreshold) {
-			newHorizontal = "left";
-		} else if (distFromRight < adjustedThreshold) {
-			newHorizontal = "right";
-		}
-
-		// Check vertical edges
-		if (distFromTop < adjustedThreshold) {
-			newVertical = "top";
-		} else if (distFromBottom < adjustedThreshold) {
-			newVertical = "bottom";
-		}
-
-		if (newHorizontal === null && newVertical === null) {
+		if (!edgeProximity.isNearEdge) {
 			// Cursor moved away from all edges, stop scrolling
 			clearEdgeScroll();
 		} else {
 			// Calculate scroll delta and update edge scroll state atomically
 			const { deltaX, deltaY } = calculateScrollDelta(
-				newHorizontal,
-				newVertical,
+				edgeProximity.horizontal,
+				edgeProximity.vertical,
 			);
 			edgeScrollStateRef.current = {
 				endPos: dragPoint,

@@ -391,7 +391,20 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					};
 
 					// Check if we need to start edge scrolling
-					const edgeProximity = detectEdgeProximity(refBus.current.props, x, y);
+					const { zoom, minX, minY } = canvasState;
+					const containerRect = canvasRef?.containerRef?.current?.getBoundingClientRect();
+					if (!containerRect) {
+						return;
+					}
+					
+					const viewport = {
+						zoom,
+						minX,
+						minY,
+						containerWidth: containerRect.width,
+						containerHeight: containerRect.height,
+					};
+					const edgeProximity = detectEdgeProximity(viewport, x, y);
 					if (edgeProximity.isNearEdge) {
 						// Calculate scroll delta and update edge scroll state atomically
 						const { deltaX, deltaY } = calculateScrollDelta(

@@ -1,5 +1,5 @@
 import { AUTO_SCROLL_THRESHOLD } from "../SvgCanvasConstants";
-import type { SvgCanvasSubHooksProps } from "../types/SvgCanvasSubHooksProps";
+import type { SvgViewport } from "../../types/core/SvgViewport";
 
 /**
  * Result type for edge proximity detection.
@@ -16,34 +16,17 @@ export type EdgeProximityResult = {
 /**
  * Detects if the cursor is near the edges of the canvas viewport.
  * 
- * @param props - Canvas hook props containing canvas state and refs
+ * @param viewport - SVG viewport information
  * @param cursorX - Cursor X position in SVG coordinates
  * @param cursorY - Cursor Y position in SVG coordinates
  * @returns Object containing edge proximity information
  */
 export const detectEdgeProximity = (
-	props: SvgCanvasSubHooksProps,
+	viewport: SvgViewport,
 	cursorX: number,
 	cursorY: number,
 ): EdgeProximityResult => {
-	const { canvasState, canvasRef } = props;
-	const { minX, minY, zoom } = canvasState;
-
-	// Default result when no edge proximity is detected
-	const defaultResult: EdgeProximityResult = {
-		isNearEdge: false,
-		horizontal: null,
-		vertical: null,
-	};
-
-	if (!canvasRef?.containerRef?.current) {
-		return defaultResult;
-	}
-
-	// Get current container dimensions
-	const containerRect = canvasRef.containerRef.current.getBoundingClientRect();
-	const containerWidth = containerRect.width;
-	const containerHeight = containerRect.height;
+	const { zoom, minX, minY, containerWidth, containerHeight } = viewport;
 
 	// Calculate the viewBox boundaries considering zoom
 	const viewBoxX = minX / zoom;
