@@ -297,13 +297,6 @@ export const useDrag = (props: DragProps) => {
 
 			// Fire drag event
 			onDrag?.(dragEvent);
-
-			// Dispatch the dragging event
-			eventBus.dispatchEvent(
-				new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
-					detail: dragEvent,
-				}),
-			);
 		};
 
 		// Execute immediately
@@ -314,7 +307,7 @@ export const useDrag = (props: DragProps) => {
 			executeScroll,
 			AUTO_SCROLL_INTERVAL_MS,
 		);
-	}, [eventBus]);
+	}, []);
 
 	/**
 	 * Pointer move event handler within the drag area
@@ -390,16 +383,6 @@ export const useDrag = (props: DragProps) => {
 			return;
 		}
 
-		// Fire dragging event
-		onDrag?.(dragEvent);
-
-		// Fire dragging event for handling by shapes without parent-child relationship
-		eventBus.dispatchEvent(
-			new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
-				detail: broadcastDragEvent,
-			}),
-		);
-
 		// Auto edge scroll if the cursor is near the edges.
 		const zoom = zoomRef.current;
 		const minX = minXRef.current;
@@ -472,7 +455,18 @@ export const useDrag = (props: DragProps) => {
 				// Cursor moved to a different edge or started near an edge
 				startEdgeScroll();
 			}
+			return;
 		}
+
+		// Fire dragging event
+		onDrag?.(dragEvent);
+
+		// Fire dragging event for handling by shapes without parent-child relationship
+		eventBus.dispatchEvent(
+			new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
+				detail: broadcastDragEvent,
+			}),
+		);
 	};
 
 	/**
