@@ -27,6 +27,13 @@ export const useScroll = (props: SvgCanvasSubHooksProps) => {
 			// Bypass references to avoid function creation in every render.
 			const { setCanvasState } = refBus.current.props;
 
+			// Dispatch the scroll event to the event bus.
+			eventBus.dispatchEvent(
+				new CustomEvent(EVENT_NAME_SVG_CANVAS_SCROLL, {
+					detail: e,
+				}),
+			);
+
 			setCanvasState((prevState) => {
 				// Only update state directly if interaction state is Idle
 				if (prevState.interactionState === InteractionState.Idle) {
@@ -36,14 +43,6 @@ export const useScroll = (props: SvgCanvasSubHooksProps) => {
 						minY: e.newMinY,
 					};
 				}
-
-				// When not in Normal state, just dispatch the event for other handlers
-				eventBus.dispatchEvent(
-					new CustomEvent(EVENT_NAME_SVG_CANVAS_SCROLL, {
-						detail: e,
-					}),
-				);
-
 				return prevState;
 			});
 		},

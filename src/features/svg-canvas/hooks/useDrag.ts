@@ -1,37 +1,38 @@
 // Import React.
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
 import type { DiagramType } from "../types/core/DiagramType";
 import type { Point } from "../types/core/Point";
+import type { ContainerSizeChangeEvent } from "../types/events/ContainerSizeChangeEvent";
 import type { DiagramDragDropEvent } from "../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../types/events/DiagramPointerEvent";
 import type { EventType } from "../types/events/EventType";
 import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
+import type { ZoomChangeEvent } from "../types/events/ZoomChangeEvent";
 
 // Import utils.
 import { newEventId } from "../utils/common/newEventId";
 import { getSvgPoint } from "../utils/math/points/getSvgPoint";
 
 // Import constants.
+import {
+	AUTO_SCROLL_INTERVAL_MS,
+	AUTO_SCROLL_THRESHOLD,
+} from "../canvas/SvgCanvasConstants"; // TODO: Move to constants file
 import { DRAG_DEAD_ZONE } from "../constants/Constants";
-
-// Import EventBus.
-import { useEventBus } from "../context/EventBusContext";
-
-// Import event names
 import {
 	EVENT_NAME_BROADCAST_DRAG,
-	EVENT_NAME_SVG_CANVAS_SCROLL,
 	EVENT_NAME_CONTAINER_SIZE_CHANGE,
+	EVENT_NAME_SVG_CANVAS_SCROLL,
 	EVENT_NAME_ZOOM_CHANGE,
 } from "../constants/EventNames";
 
-// Import event types
-import type { ContainerSizeChangeEvent } from "../types/events/ContainerSizeChangeEvent";
-import type { ZoomChangeEvent } from "../types/events/ZoomChangeEvent";
+// Import EventBus.
+import { useEventBus } from "../context/EventBusContext";
+import { calculateScrollDelta } from "../canvas/utils/calculateScrollDelta";
 
 /**
  * Type definition for broadcast drag event
@@ -122,6 +123,20 @@ export const useDrag = (props: DragProps) => {
 	const minYRef = useRef(0);
 	// Zoom level ref
 	const zoomRef = useRef(1);
+	// Internal state for edge scrolling
+	const scrollIntervalRef = useRef<number | null>(null);
+	const isScrollingRef = useRef(false);
+	const edgeScrollStateRef = useRef<{
+		endPos: Point | null;
+		cursorPos: Point | null;
+		clientPos: Point | null;
+		delta: Point;
+	}>({
+		endPos: null,
+		cursorPos: null,
+		clientPos: null,
+		delta: { x: 0, y: 0 },
+	});
 
 	/**
 	 * Get the drag area coordinates from the SVG point during dragging.
@@ -145,6 +160,26 @@ export const useDrag = (props: DragProps) => {
 			y: newY,
 		};
 	};
+
+	// Register global broadcast drag event listener
+	// Use ref to hold referenced values to avoid frequent handler generation
+	const refBusVal = {
+		// Properties
+		id,
+		x,
+		y,
+		type,
+		ref,
+		onDrag,
+		onDragOver,
+		onDragLeave,
+		onDrop,
+		// Internal variables and functions
+		isDragging,
+		getPointOnDrag,
+	};
+	const refBus = useRef(refBusVal);
+	refBus.current = refBusVal;
 
 	/**
 	 * Pointer down event handler within the drag area
@@ -178,6 +213,108 @@ export const useDrag = (props: DragProps) => {
 			});
 		}
 	};
+
+	/**
+	 * Clear the edge scroll interval if it exists
+	 */
+	const clearEdgeScroll = useCallback(() => {
+		if (scrollIntervalRef.current) {
+			clearInterval(scrollIntervalRef.current);
+			scrollIntervalRef.current = null;
+			isScrollingRef.current = false;
+		}
+	}, []);
+
+	/**
+	 * Start edge scrolling with calculated delta values
+	 */
+	const startEdgeScroll = useCallback(() => {
+		// Mark scrolling as active
+		isScrollingRef.current = true;
+
+		// Execute scroll processing immediately
+		const executeScroll = () => {
+			const { endPos, cursorPos, clientPos, delta } =
+				edgeScrollStateRef.current;
+			// console.log(endPos, cursorPos, clientPos, delta);
+			if (!endPos || !cursorPos || !clientPos) {
+				return;
+			}
+
+			// Bypass references to avoid function creation in every render
+			const { id, onDrag } = refBus.current;
+
+			// Auto edge scroll if the cursor is near the edges.
+			const zoom = zoomRef.current;
+			const minX = minXRef.current;
+			const minY = minYRef.current;
+
+			const deltaX = delta.x / zoom;
+			const deltaY = delta.y / zoom;
+
+			const newEndPos = {
+				x: endPos.x + deltaX,
+				y: endPos.y + deltaY,
+			};
+
+			const newCursorPos = {
+				x: cursorPos.x + deltaX,
+				y: cursorPos.y + deltaY,
+			};
+
+			// Update edgeScrollStateRef
+			edgeScrollStateRef.current = {
+				endPos: newEndPos,
+				cursorPos: newCursorPos,
+				clientPos: clientPos,
+				delta: { x: deltaX, y: deltaY },
+			};
+
+			// Calculate new scroll positions
+			const newMinX = minX + delta.x;
+			const newMinY = minY + delta.y;
+
+			// Update minX and minY ref
+			minXRef.current = newMinX;
+			minYRef.current = newMinY;
+
+			// dispatch dragging event
+			const dragEvent = {
+				eventId: newEventId(),
+				eventType: "InProgress",
+				id,
+				startX: startX.current,
+				startY: startY.current,
+				endX: newEndPos.x,
+				endY: newEndPos.y,
+				cursorX: newCursorPos.x,
+				cursorY: newCursorPos.y,
+				clientX: clientPos.x,
+				clientY: clientPos.y,
+				minX: newMinX,
+				minY: newMinY,
+			} as DiagramDragEvent;
+
+			// Fire drag event
+			onDrag?.(dragEvent);
+
+			// Dispatch the dragging event
+			eventBus.dispatchEvent(
+				new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
+					detail: dragEvent,
+				}),
+			);
+		};
+
+		// Execute immediately
+		executeScroll();
+
+		// Continue with interval
+		scrollIntervalRef.current = window.setInterval(
+			executeScroll,
+			AUTO_SCROLL_INTERVAL_MS,
+		);
+	}, [eventBus]);
 
 	/**
 	 * Pointer move event handler within the drag area
@@ -262,6 +399,80 @@ export const useDrag = (props: DragProps) => {
 				detail: broadcastDragEvent,
 			}),
 		);
+
+		// Auto edge scroll if the cursor is near the edges.
+		const zoom = zoomRef.current;
+		const minX = minXRef.current;
+		const minY = minYRef.current;
+		const { width: containerWidth, height: containerHeight } =
+			containerSizeRef.current;
+		const cursorX = svgCursorPoint.x;
+		const cursorY = svgCursorPoint.y;
+
+		//console.log(minX, minY, zoom, containerWidth, containerHeight);
+
+		// Calculate the viewBox boundaries considering zoom
+
+		const viewBoxX = minX / zoom;
+		const viewBoxY = minY / zoom;
+		const viewBoxWidth = containerWidth / zoom;
+		const viewBoxHeight = containerHeight / zoom;
+
+		// Calculate distances from each edge in viewBox coordinates
+		const distFromLeft = cursorX - viewBoxX;
+		const distFromTop = cursorY - viewBoxY;
+		const distFromRight = viewBoxX + viewBoxWidth - cursorX;
+		const distFromBottom = viewBoxY + viewBoxHeight - cursorY;
+
+		// Determine which edges the cursor is close to
+		let newHorizontal: "left" | "right" | null = null;
+		let newVertical: "top" | "bottom" | null = null;
+
+		// Calculate zoom-adjusted threshold for more consistent behavior across zoom levels
+		const adjustedThreshold = AUTO_SCROLL_THRESHOLD * zoom;
+
+		// Check horizontal edges
+		if (distFromLeft < adjustedThreshold) {
+			newHorizontal = "left";
+		} else if (distFromRight < adjustedThreshold) {
+			newHorizontal = "right";
+		}
+
+		// Check vertical edges
+		if (distFromTop < adjustedThreshold) {
+			newVertical = "top";
+		} else if (distFromBottom < adjustedThreshold) {
+			newVertical = "bottom";
+		}
+
+		// console.log({
+		// 	newHorizontal,
+		// 	newVertical,
+		// });
+
+		if (newHorizontal === null && newVertical === null) {
+			// Cursor moved away from all edges, stop scrolling
+			clearEdgeScroll();
+		} else {
+			// Calculate scroll delta and update edge scroll state atomically
+			const { deltaX, deltaY } = calculateScrollDelta(
+				newHorizontal,
+				newVertical,
+			);
+			edgeScrollStateRef.current = {
+				endPos: dragPoint,
+				cursorPos: svgCursorPoint,
+				clientPos: {
+					x: e.clientX,
+					y: e.clientY,
+				},
+				delta: { x: deltaX, y: deltaY },
+			};
+			if (!isScrollingRef.current) {
+				// Cursor moved to a different edge or started near an edge
+				startEdgeScroll();
+			}
+		}
 	};
 
 	/**
@@ -470,25 +681,6 @@ export const useDrag = (props: DragProps) => {
 		}
 	};
 
-	// Register global broadcast drag event listener
-	// Use ref to hold referenced values to avoid frequent handler generation
-	const refBusVal = {
-		// Properties
-		id,
-		x,
-		y,
-		type,
-		ref,
-		onDrag,
-		onDragOver,
-		onDragLeave,
-		onDrop,
-		// Internal variables and functions
-		getPointOnDrag,
-	};
-	const refBus = useRef(refBusVal);
-	refBus.current = refBusVal;
-
 	useEffect(() => {
 		let handleBroadcastDrag: (e: CustomEvent) => void;
 		const { onDragOver, onDrop } = refBus.current;
@@ -553,54 +745,57 @@ export const useDrag = (props: DragProps) => {
 	 * Handle SvgCanvas scroll event.
 	 */
 	useEffect(() => {
-		let handleSvgCanvasScroll: (e: CustomEvent) => void;
-		if (isDragging) {
-			handleSvgCanvasScroll = (e: CustomEvent) => {
-				const { id, getPointOnDrag, onDrag } = refBus.current;
+		const handleSvgCanvasScroll = (e: CustomEvent) => {
+			const { id, isDragging, getPointOnDrag, onDrag } = refBus.current;
 
-				const customEvent = e as CustomEvent<SvgCanvasScrollEvent>;
+			const customEvent = e as CustomEvent<SvgCanvasScrollEvent>;
 
-				// Update minX and minY refs with new scroll position
-				minXRef.current = customEvent.detail.newMinX;
-				minYRef.current = customEvent.detail.newMinY;
+			// Update minX and minY refs with new scroll position
+			minXRef.current = customEvent.detail.newMinX;
+			minYRef.current = customEvent.detail.newMinY;
 
-				// Pre-calculate adjusted pointer coordinates for scroll
-				const adjustedClientX =
-					customEvent.detail.clientX + customEvent.detail.deltaX;
-				const adjustedClientY =
-					customEvent.detail.clientY + customEvent.detail.deltaY;
+			if (!isDragging) {
+				// If not dragging, do nothing
+				return;
+			}
 
-				// Calculate SVG coordinates first
-				const svgCursorPoint = getSvgPoint(
-					adjustedClientX,
-					adjustedClientY,
-					ref.current,
-				);
-				// Get drag coordinates adjusted for scroll
-				const dragPoint = getPointOnDrag(svgCursorPoint);
+			// Pre-calculate adjusted pointer coordinates for scroll
+			const adjustedClientX =
+				customEvent.detail.clientX + customEvent.detail.deltaX;
+			const adjustedClientY =
+				customEvent.detail.clientY + customEvent.detail.deltaY;
 
-				onDrag?.({
-					eventId: newEventId(),
-					eventType: "InProgress",
-					id,
-					startX: startX.current,
-					startY: startY.current,
-					endX: dragPoint.x,
-					endY: dragPoint.y,
-					cursorX: svgCursorPoint.x,
-					cursorY: svgCursorPoint.y,
-					clientX: customEvent.detail.clientX,
-					clientY: customEvent.detail.clientY,
-					minX: customEvent.detail.newMinX,
-					minY: customEvent.detail.newMinY,
-					isFromAutoEdgeScroll: customEvent.detail.isFromAutoEdgeScroll,
-				});
-			};
-			eventBus.addEventListener(
-				EVENT_NAME_SVG_CANVAS_SCROLL,
-				handleSvgCanvasScroll,
+			// Calculate SVG coordinates first
+			const svgCursorPoint = getSvgPoint(
+				adjustedClientX,
+				adjustedClientY,
+				ref.current,
 			);
-		}
+			// Get drag coordinates adjusted for scroll
+			const dragPoint = getPointOnDrag(svgCursorPoint);
+
+			onDrag?.({
+				eventId: newEventId(),
+				eventType: "InProgress",
+				id,
+				startX: startX.current,
+				startY: startY.current,
+				endX: dragPoint.x,
+				endY: dragPoint.y,
+				cursorX: svgCursorPoint.x,
+				cursorY: svgCursorPoint.y,
+				clientX: customEvent.detail.clientX,
+				clientY: customEvent.detail.clientY,
+				minX: customEvent.detail.newMinX,
+				minY: customEvent.detail.newMinY,
+				isFromAutoEdgeScroll: customEvent.detail.isFromAutoEdgeScroll,
+			});
+		};
+		eventBus.addEventListener(
+			EVENT_NAME_SVG_CANVAS_SCROLL,
+			handleSvgCanvasScroll,
+		);
+
 		return () => {
 			if (handleSvgCanvasScroll) {
 				eventBus.removeEventListener(
@@ -609,7 +804,7 @@ export const useDrag = (props: DragProps) => {
 				);
 			}
 		};
-	}, [isDragging, eventBus, ref]);
+	}, [eventBus, ref]);
 
 	/**
 	 * Handle container size change event.
@@ -621,12 +816,21 @@ export const useDrag = (props: DragProps) => {
 				width: customEvent.detail.width,
 				height: customEvent.detail.height,
 			};
+			// Update minX and minY refs from the event
+			minXRef.current = customEvent.detail.minX;
+			minYRef.current = customEvent.detail.minY;
 		};
 
-		eventBus.addEventListener(EVENT_NAME_CONTAINER_SIZE_CHANGE, handleContainerSizeChange);
+		eventBus.addEventListener(
+			EVENT_NAME_CONTAINER_SIZE_CHANGE,
+			handleContainerSizeChange,
+		);
 
 		return () => {
-			eventBus.removeEventListener(EVENT_NAME_CONTAINER_SIZE_CHANGE, handleContainerSizeChange);
+			eventBus.removeEventListener(
+				EVENT_NAME_CONTAINER_SIZE_CHANGE,
+				handleContainerSizeChange,
+			);
 		};
 	}, [eventBus]);
 

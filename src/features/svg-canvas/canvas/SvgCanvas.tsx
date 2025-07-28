@@ -312,23 +312,31 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			const container = containerRef.current;
 			if (!container) return;
 
+			// Common function to emit container size change event
+			const emitContainerSizeChangeEvent = (width: number, height: number) => {
+				setContainerWidth(width);
+				setContainerHeight(height);
+
+				const { minX, minY } = refBus.current;
+
+				const event: ContainerSizeChangeEvent = {
+					eventId: newEventId(),
+					width,
+					height,
+					minX,
+					minY,
+				};
+				eventBus.dispatchEvent(
+					new CustomEvent(EVENT_NAME_CONTAINER_SIZE_CHANGE, {
+						detail: event,
+					}),
+				);
+			};
+
 			const resizeObserver = new ResizeObserver((entries) => {
 				for (const entry of entries) {
 					const { width, height } = entry.contentRect;
-					setContainerWidth(width);
-					setContainerHeight(height);
-
-					// Emit container size change event
-					const event: ContainerSizeChangeEvent = {
-						eventId: newEventId(),
-						width,
-						height,
-					};
-					eventBus.dispatchEvent(
-						new CustomEvent(EVENT_NAME_CONTAINER_SIZE_CHANGE, {
-							detail: event,
-						}),
-					);
+					emitContainerSizeChangeEvent(width, height);
 				}
 			});
 
@@ -336,20 +344,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 			// Initialize with current dimensions
 			const rect = container.getBoundingClientRect();
-			setContainerWidth(rect.width);
-			setContainerHeight(rect.height);
-
-			// Emit initial container size change event
-			const initialEvent: ContainerSizeChangeEvent = {
-				eventId: newEventId(),
-				width: rect.width,
-				height: rect.height,
-			};
-			eventBus.dispatchEvent(
-				new CustomEvent(EVENT_NAME_CONTAINER_SIZE_CHANGE, {
-					detail: initialEvent,
-				}),
-			);
+			emitContainerSizeChangeEvent(rect.width, rect.height);
 
 			return () => {
 				resizeObserver.disconnect();
