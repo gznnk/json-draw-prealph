@@ -13,6 +13,8 @@ import React, {
 import { DiagramRegistry } from "../registry";
 import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
 import { newEventId } from "../utils/common/newEventId";
+import { EVENT_NAME_CONTAINER_SIZE_CHANGE } from "../constants/EventNames";
+import type { ContainerSizeChangeEvent } from "../types/events/ContainerSizeChangeEvent";
 
 // Import SvgCanvas related components
 import { TextEditor } from "../components/core/Textable";
@@ -202,7 +204,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 							dummyElementRef.current.setPointerCapture(e.pointerId);
 							capturedPointerIdRef.current = e.pointerId;
 						}
-						
+
 						onAreaSelection({
 							eventId: newEventId(),
 							eventType: "Start",
@@ -278,9 +280,14 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				) {
 					e.preventDefault();
 					// Release pointer capture from dummy element
-					if (dummyElementRef.current && capturedPointerIdRef.current !== null) {
+					if (
+						dummyElementRef.current &&
+						capturedPointerIdRef.current !== null
+					) {
 						try {
-							dummyElementRef.current.releasePointerCapture(capturedPointerIdRef.current);
+							dummyElementRef.current.releasePointerCapture(
+								capturedPointerIdRef.current,
+							);
 							capturedPointerIdRef.current = null;
 						} catch {
 							// Ignore errors if pointer capture wasn't set
@@ -310,6 +317,18 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					const { width, height } = entry.contentRect;
 					setContainerWidth(width);
 					setContainerHeight(height);
+
+					// Emit container size change event
+					const event: ContainerSizeChangeEvent = {
+						eventId: newEventId(),
+						width,
+						height,
+					};
+					eventBus.dispatchEvent(
+						new CustomEvent(EVENT_NAME_CONTAINER_SIZE_CHANGE, {
+							detail: event,
+						}),
+					);
 				}
 			});
 
@@ -320,10 +339,22 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			setContainerWidth(rect.width);
 			setContainerHeight(rect.height);
 
+			// Emit initial container size change event
+			const initialEvent: ContainerSizeChangeEvent = {
+				eventId: newEventId(),
+				width: rect.width,
+				height: rect.height,
+			};
+			eventBus.dispatchEvent(
+				new CustomEvent(EVENT_NAME_CONTAINER_SIZE_CHANGE, {
+					detail: initialEvent,
+				}),
+			);
+
 			return () => {
 				resizeObserver.disconnect();
 			};
-		}, []);
+		}, [eventBus]);
 
 		useEffect(() => {
 			// Prevent browser zoom with Ctrl+wheel at document level
@@ -384,11 +415,16 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					onAreaSelection
 				) {
 					// Release pointer capture from dummy element
-					if (dummyElementRef.current && capturedPointerIdRef.current !== null) {
-						dummyElementRef.current.releasePointerCapture(capturedPointerIdRef.current);
+					if (
+						dummyElementRef.current &&
+						capturedPointerIdRef.current !== null
+					) {
+						dummyElementRef.current.releasePointerCapture(
+							capturedPointerIdRef.current,
+						);
 						capturedPointerIdRef.current = null;
 					}
-					
+
 					onAreaSelection({
 						eventId: newEventId(),
 						eventType: "End",

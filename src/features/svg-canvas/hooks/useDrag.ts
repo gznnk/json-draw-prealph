@@ -25,7 +25,13 @@ import { useEventBus } from "../context/EventBusContext";
 import {
 	EVENT_NAME_BROADCAST_DRAG,
 	EVENT_NAME_SVG_CANVAS_SCROLL,
+	EVENT_NAME_CONTAINER_SIZE_CHANGE,
+	EVENT_NAME_ZOOM_CHANGE,
 } from "../constants/EventNames";
+
+// Import event types
+import type { ContainerSizeChangeEvent } from "../types/events/ContainerSizeChangeEvent";
+import type { ZoomChangeEvent } from "../types/events/ZoomChangeEvent";
 
 /**
  * Type definition for broadcast drag event
@@ -109,6 +115,13 @@ export const useDrag = (props: DragProps) => {
 	// The offset between the center and the pointer.
 	const offsetXBetweenCenterAndPointer = useRef(0);
 	const offsetYBetweenCenterAndPointer = useRef(0);
+	// Container size ref
+	const containerSizeRef = useRef({ width: 0, height: 0 });
+	// Canvas scroll position refs
+	const minXRef = useRef(0);
+	const minYRef = useRef(0);
+	// Zoom level ref
+	const zoomRef = useRef(1);
 
 	/**
 	 * Get the drag area coordinates from the SVG point during dragging.
@@ -547,6 +560,10 @@ export const useDrag = (props: DragProps) => {
 
 				const customEvent = e as CustomEvent<SvgCanvasScrollEvent>;
 
+				// Update minX and minY refs with new scroll position
+				minXRef.current = customEvent.detail.newMinX;
+				minYRef.current = customEvent.detail.newMinY;
+
 				// Pre-calculate adjusted pointer coordinates for scroll
 				const adjustedClientX =
 					customEvent.detail.clientX + customEvent.detail.deltaX;
@@ -593,6 +610,43 @@ export const useDrag = (props: DragProps) => {
 			}
 		};
 	}, [isDragging, eventBus, ref]);
+
+	/**
+	 * Handle container size change event.
+	 */
+	useEffect(() => {
+		const handleContainerSizeChange = (e: CustomEvent) => {
+			const customEvent = e as CustomEvent<ContainerSizeChangeEvent>;
+			containerSizeRef.current = {
+				width: customEvent.detail.width,
+				height: customEvent.detail.height,
+			};
+		};
+
+		eventBus.addEventListener(EVENT_NAME_CONTAINER_SIZE_CHANGE, handleContainerSizeChange);
+
+		return () => {
+			eventBus.removeEventListener(EVENT_NAME_CONTAINER_SIZE_CHANGE, handleContainerSizeChange);
+		};
+	}, [eventBus]);
+
+	/**
+	 * Handle zoom change event.
+	 */
+	useEffect(() => {
+		const handleZoomChange = (e: CustomEvent) => {
+			const customEvent = e as CustomEvent<ZoomChangeEvent>;
+			zoomRef.current = customEvent.detail.zoom;
+			minXRef.current = customEvent.detail.minX;
+			minYRef.current = customEvent.detail.minY;
+		};
+
+		eventBus.addEventListener(EVENT_NAME_ZOOM_CHANGE, handleZoomChange);
+
+		return () => {
+			eventBus.removeEventListener(EVENT_NAME_ZOOM_CHANGE, handleZoomChange);
+		};
+	}, [eventBus]);
 
 	return {
 		onPointerDown: handlePointerDown,

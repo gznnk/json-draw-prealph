@@ -3,6 +3,9 @@ import { useCallback, useRef } from "react";
 
 // Import types related to SvgCanvas.
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+import type { ZoomChangeEvent } from "../../../types/events/ZoomChangeEvent";
+import { EVENT_NAME_ZOOM_CHANGE } from "../../../constants/EventNames";
+import { newEventId } from "../../../utils/common/newEventId";
 
 // Import constants.
 import { MAX_ZOOM_LEVEL, MIN_ZOOM_LEVEL } from "../../SvgCanvasConstants";
@@ -12,9 +15,12 @@ import { MAX_ZOOM_LEVEL, MIN_ZOOM_LEVEL } from "../../SvgCanvasConstants";
  * Zooms around the center of the current view to maintain the center point.
  */
 export const useZoom = (props: SvgCanvasSubHooksProps) => {
+	const { eventBus } = props;
+	
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
+		eventBus,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -22,6 +28,7 @@ export const useZoom = (props: SvgCanvasSubHooksProps) => {
 	return useCallback((newZoom: number) => {
 		// Bypass references to avoid function creation in every render.
 		const { canvasState, setCanvasState, canvasRef } = refBus.current.props;
+		const { eventBus } = refBus.current;
 
 		// Clamp zoom value within min/max limits
 		const clampedZoom = Math.max(
@@ -35,6 +42,19 @@ export const useZoom = (props: SvgCanvasSubHooksProps) => {
 				...prevState,
 				zoom: clampedZoom,
 			}));
+			
+			// Emit zoom change event for fallback case
+			const zoomEvent: ZoomChangeEvent = {
+				eventId: newEventId(),
+				zoom: clampedZoom,
+				minX: canvasState.minX,
+				minY: canvasState.minY,
+			};
+			eventBus.dispatchEvent(
+				new CustomEvent(EVENT_NAME_ZOOM_CHANGE, {
+					detail: zoomEvent,
+				}),
+			);
 			return;
 		}
 
@@ -76,5 +96,18 @@ export const useZoom = (props: SvgCanvasSubHooksProps) => {
 			minX: newMinX,
 			minY: newMinY,
 		}));
+		
+		// Emit zoom change event
+		const zoomEvent: ZoomChangeEvent = {
+			eventId: newEventId(),
+			zoom: clampedZoom,
+			minX: newMinX,
+			minY: newMinY,
+		};
+		eventBus.dispatchEvent(
+			new CustomEvent(EVENT_NAME_ZOOM_CHANGE, {
+				detail: zoomEvent,
+			}),
+		);
 	}, []);
 };

@@ -8,9 +8,6 @@ import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import hooks.
-import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
-
 // Import utils.
 import { getSelectedItems } from "../../../utils/common/getSelectedItems";
 import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
@@ -29,15 +26,9 @@ import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
  * Custom hook to handle drag events on the canvas.
  */
 export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
-	// Get the auto edge scroll function and scrolling state to handle canvas auto scrolling.
-	const { autoEdgeScroll, clearAutoEdgeScroll, isAutoScrolling } =
-		useAutoEdgeScroll(props);
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		autoEdgeScroll,
-		clearAutoEdgeScroll,
-		isAutoScrolling,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -53,23 +44,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 		// Bypass references to avoid function creation in every render.
 		const {
 			props: { setCanvasState, onDataChange },
-			autoEdgeScroll,
-			clearAutoEdgeScroll,
-			isAutoScrolling,
 		} = refBus.current;
-
-		// If auto scrolling is active and this event is not from auto edge scroll,
-		// ignore diagram movement processing but continue auto edge scroll detection
-		if (isAutoScrolling && !e.isFromAutoEdgeScroll) {
-			// Auto scroll if the cursor is near the edges.
-			autoEdgeScroll({
-				cursorX: e.cursorX,
-				cursorY: e.cursorY,
-				clientX: e.clientX,
-				clientY: e.clientY,
-			});
-			return;
-		}
 
 		// Update the canvas state based on the drag event.
 		setCanvasState((prevState) => {
@@ -214,9 +189,6 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 
 			// If the drag event is ended
 			if (e.eventType === "End") {
-				// Clear auto edge scroll when drag ends
-				clearAutoEdgeScroll();
-
 				// Restore showTransformControls from initial state for transformative items
 				newState.items = applyFunctionRecursively(newState.items, (item) => {
 					if (selectedIds.has(item.id) && isTransformativeData(item)) {
@@ -240,14 +212,6 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 			}
 
 			return newState;
-		});
-
-		// Auto scroll if the cursor is near the edges.
-		autoEdgeScroll({
-			cursorX: e.cursorX,
-			cursorY: e.cursorY,
-			clientX: e.clientX,
-			clientY: e.clientY,
 		});
 	}, []);
 };
