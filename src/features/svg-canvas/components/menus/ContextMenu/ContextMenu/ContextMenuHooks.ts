@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import type { SvgCanvasProps } from "../../../../canvas/types/SvgCanvasProps";
 
 // Import functions related to SvgCanvas.
-import { getSelectedItems } from "../../../../utils/core/getSelectedItems";
+import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams";
 import { isExportable } from "../../../../utils/validation/isExportable";
 
 // Imports related to this component.
@@ -38,7 +38,7 @@ export const useContextMenu = (canvasProps: SvgCanvasProps) => {
 	});
 
 	// Create a map of context menu states.
-	const selectedItems = getSelectedItems(items);
+	const selectedItems = getSelectedDiagrams(items);
 	const isItemSelected = selectedItems.length > 0;
 	const isGroupSelected = selectedItems.some((item) => item.type === "Group");
 	const isExportableSelected = selectedItems.some((item) => isExportable(item));

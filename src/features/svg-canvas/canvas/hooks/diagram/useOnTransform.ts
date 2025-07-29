@@ -20,7 +20,7 @@ import { updateOutlineOfGroup } from "../../utils/updateOutlineOfGroup";
 
 // Import utility functions for transformation.
 import type { GroupData } from "../../../types/data/shapes/GroupData";
-import { getSelectedItems } from "../../../utils/core/getSelectedItems";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { rotatePoint } from "../../../utils/math/points/rotatePoint";
 import { isItemableData } from "../../../utils/validation/isItemableData";
@@ -251,7 +251,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 					startCanvasState.current = prevState;
 
 					// Store selected item IDs for performance
-					const selectedItems = getSelectedItems(prevState.items);
+					const selectedItems = getSelectedDiagrams(prevState.items);
 					if (selectedItems.length > 1) {
 						// If multiple items are selected, store their IDs for multi-selection.
 						multiSelectedItemIds.current = new Set(

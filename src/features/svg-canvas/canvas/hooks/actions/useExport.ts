@@ -6,7 +6,7 @@ import { DiagramRegistry } from "../../../registry";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import functions related to SvgCanvas.
-import { getSelectedItems } from "../../../utils/core/getSelectedItems";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { mimeToExtension } from "../../../utils/core/mimeToExtension";
 
 /**
@@ -26,7 +26,7 @@ export const useExport = (props: SvgCanvasSubHooksProps) => {
 			canvasState: { items },
 		} = refBus.current.props;
 
-		const selectedItems = getSelectedItems(items);
+		const selectedItems = getSelectedDiagrams(items);
 
 		for (const item of selectedItems) {
 			const exportFunction = DiagramRegistry.getExportFunction(item.type);

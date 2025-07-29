@@ -13,7 +13,7 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import { AUTO_SCROLL_INTERVAL_MS } from "../../../constants/Constants";
 
 // Import utils.
-import { getSelectedItems } from "../../../utils/core/getSelectedItems";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundingBox";
 import { calculateScrollDelta } from "../../../utils/math/geometry/calculateScrollDelta";
 import { detectEdgeProximity } from "../../../utils/math/geometry/detectEdgeProximity";
@@ -208,7 +208,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			 * If multiple items are selected, create a multiSelectGroup
 			 * If only one item is selected, show transform controls for it
 			 */
-			const selectedItems = getSelectedItems(items);
+			const selectedItems = getSelectedDiagrams(items);
 			let multiSelectGroup: GroupData | undefined = undefined;
 			if (selectedItems.length > 1) {
 				// Create multiSelectGroup for multiple selection

@@ -7,7 +7,7 @@ import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
-import { getSelectedItems } from "../../../utils/core/getSelectedItems";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 
 /**
@@ -67,7 +67,7 @@ export const useCopy = (props: SvgCanvasSubHooksProps) => {
 		} = refBus.current.props;
 
 		// Get selected items from the main items array
-		const selectedItems = getSelectedItems(items);
+		const selectedItems = getSelectedDiagrams(items);
 
 		// If no items are selected, do nothing
 		if (selectedItems.length === 0) return;

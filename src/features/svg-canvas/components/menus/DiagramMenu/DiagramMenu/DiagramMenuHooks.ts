@@ -11,7 +11,7 @@ import type { RectangleData } from "../../../../types/data/shapes/RectangleData"
 import type { DiagramStyleChangeEvent } from "../../../../types/events/DiagramStyleChangeEvent";
 
 // Import functions related to SvgCanvas.
-import { getSelectedItems } from "../../../../utils/core/getSelectedItems";
+import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams";
 import { newEventId } from "../../../../utils/core/newEventId";
 import { isItemableData } from "../../../../utils/validation/isItemableData";
 import { isTextableData } from "../../../../utils/validation/isTextableData";
@@ -71,7 +71,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 	} as DiagramMenuStateMap;
 
 	// Get selected items and check if the diagram menu should be shown.
-	const selectedItems = getSelectedItems(items);
+	const selectedItems = getSelectedDiagrams(items);
 	const showDiagramMenu =
 		0 < selectedItems.length && interactionState === InteractionState.Idle;
 	const singleSelectedItem = selectedItems[0];

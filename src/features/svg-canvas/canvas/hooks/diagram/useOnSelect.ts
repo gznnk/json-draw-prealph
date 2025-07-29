@@ -9,7 +9,7 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 
 // Import utils.
 import { getDiagramById } from "../../../utils/core/getDiagramById";
-import { getSelectedItems } from "../../../utils/core/getSelectedItems";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
@@ -162,7 +162,7 @@ export const useOnSelect = (
 							reversedAncestorsOfSelectingItem.findIndex(
 								(ancestor) =>
 									isItemableData(ancestor) &&
-									getSelectedItems(ancestor.items).length > 0,
+									getSelectedDiagrams(ancestor.items).length > 0,
 							);
 						if (0 <= commonAncestorOfSelectedItemIdx) {
 							if (!isEventTriggeredItemSelected) {
@@ -249,7 +249,7 @@ export const useOnSelect = (
 			// Multi-selection logic.
 
 			// Get the selected diagrams from the updated state.
-			const selectedItems = getSelectedItems(items);
+			const selectedItems = getSelectedDiagrams(items);
 
 			// When multiple items are selected, create a dummy group to manage the selected items.
 			let multiSelectGroup: GroupData | undefined = undefined;

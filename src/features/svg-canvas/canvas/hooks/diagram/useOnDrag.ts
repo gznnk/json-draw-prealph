@@ -9,7 +9,7 @@ import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
-import { getSelectedItems } from "../../../utils/core/getSelectedItems";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
@@ -57,7 +57,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				startCanvasState.current = prevState;
 
 				// Store selected item IDs for performance
-				const selectedItems = getSelectedItems(prevState.items);
+				const selectedItems = getSelectedDiagrams(prevState.items);
 				selectedItemIds.current = new Set(selectedItems.map((item) => item.id));
 				// Store initial items map
 				initialItemsMap.current = createItemMap(prevState.items);
