@@ -7,7 +7,7 @@ import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { getSelectedItems } from "../../../utils/core/getSelectedItems";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 
 /**

@@ -7,7 +7,7 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 
 // Import utils.
-import { newEventId } from "../../../utils/common/newEventId";
+import { newEventId } from "../../../utils/core/newEventId";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { addHistory } from "../../utils/addHistory";

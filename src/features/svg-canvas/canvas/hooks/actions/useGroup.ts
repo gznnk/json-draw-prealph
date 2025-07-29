@@ -8,10 +8,10 @@ import type { SvgCanvasState } from "../../types/SvgCanvasState";
 
 // Import functions related to SvgCanvas.
 import { newId } from "../../../utils/shapes/common/newId";
-import { newEventId } from "../../../utils/common/newEventId";
+import { newEventId } from "../../../utils/core/newEventId";
 import { addHistory } from "../../utils/addHistory";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { getSelectedItems } from "../../../utils/core/getSelectedItems";
 import { removeGroupedRecursive } from "../../utils/removeGroupedRecursive";
 
 /**

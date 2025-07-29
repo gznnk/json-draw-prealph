@@ -20,7 +20,7 @@ import { updateOutlineOfGroup } from "../../utils/updateOutlineOfGroup";
 
 // Import utility functions for transformation.
 import type { GroupData } from "../../../types/data/shapes/GroupData";
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { getSelectedItems } from "../../../utils/core/getSelectedItems";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { rotatePoint } from "../../../utils/math/points/rotatePoint";
 import { isItemableData } from "../../../utils/validation/isItemableData";

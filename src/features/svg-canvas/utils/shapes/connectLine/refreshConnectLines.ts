@@ -4,7 +4,7 @@ import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData
 import { generateOptimalShapeToShapeConnection } from "../connectPoint/generateOptimalShapeToShapeConnection";
 import { updateManualConnectLinePath } from "../connectPoint/updateManualConnectLinePath";
 import { newId } from "../common/newId";
-import { getDiagramById } from "../../common/getDiagramById";
+import { getDiagramById } from "../../core/getDiagramById";
 import { isConnectableData } from "../../validation/isConnectableData";
 
 /**

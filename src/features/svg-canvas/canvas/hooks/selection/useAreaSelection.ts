@@ -13,7 +13,7 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import { AUTO_SCROLL_INTERVAL_MS } from "../../../constants/Constants";
 
 // Import utils.
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { getSelectedItems } from "../../../utils/core/getSelectedItems";
 import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundingBox";
 import { calculateScrollDelta } from "../../../utils/math/geometry/calculateScrollDelta";
 import { detectEdgeProximity } from "../../../utils/math/geometry/detectEdgeProximity";

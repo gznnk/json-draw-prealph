@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import type { SvgCanvasProps } from "../../../../canvas/types/SvgCanvasProps";
 
 // Import functions related to SvgCanvas.
-import { getSelectedItems } from "../../../../utils/common/getSelectedItems";
+import { getSelectedItems } from "../../../../utils/core/getSelectedItems";
 import { isExportable } from "../../../../utils/validation/isExportable";
 
 // Imports related to this component.

@@ -21,7 +21,7 @@ import { useSelect } from "../../../hooks/useSelect";
 import { useText } from "../../../hooks/useText";
 
 // Import utils.
-import { mergeProps } from "../../../utils/common/mergeProps";
+import { mergeProps } from "../../../utils/core/mergeProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 

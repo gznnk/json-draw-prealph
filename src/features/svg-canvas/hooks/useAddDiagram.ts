@@ -9,7 +9,7 @@ import type { Diagram } from "../types/data/catalog/Diagram";
 import type { AddDiagramEvent } from "../types/events/AddDiagramEvent";
 
 // Import utils.
-import { newEventId } from "../utils/common/newEventId";
+import { newEventId } from "../utils/core/newEventId";
 
 // Import context.
 import { useEventBus } from "../context/EventBusContext";

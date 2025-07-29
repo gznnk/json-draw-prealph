@@ -11,8 +11,8 @@ import type { RectangleData } from "../../../../types/data/shapes/RectangleData"
 import type { DiagramStyleChangeEvent } from "../../../../types/events/DiagramStyleChangeEvent";
 
 // Import functions related to SvgCanvas.
-import { getSelectedItems } from "../../../../utils/common/getSelectedItems";
-import { newEventId } from "../../../../utils/common/newEventId";
+import { getSelectedItems } from "../../../../utils/core/getSelectedItems";
+import { newEventId } from "../../../../utils/core/newEventId";
 import { isItemableData } from "../../../../utils/validation/isItemableData";
 import { isTextableData } from "../../../../utils/validation/isTextableData";
 import { isTransformativeData } from "../../../../utils/validation/isTransformativeData";

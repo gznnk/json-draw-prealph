@@ -12,8 +12,8 @@ import type { EventType } from "../types/events/EventType";
 import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
 
 // Import utils.
-import { newEventId } from "../utils/common/newEventId";
-import { getSvgPoint } from "../utils/math/points/getSvgPoint";
+import { newEventId } from "../utils/core/newEventId";
+import { getSvgPoint } from "../utils/core/getSvgPoint";
 
 // Import constants.
 import { AUTO_SCROLL_INTERVAL_MS, DRAG_DEAD_ZONE } from "../constants/Constants";

@@ -6,8 +6,8 @@ import { useRef } from "react";
 import type { DiagramClickEvent } from "../types/events/DiagramClickEvent";
 
 // Import utils.
-import { newEventId } from "../utils/common/newEventId";
-import { getSvgPoint } from "../utils/math/points/getSvgPoint";
+import { newEventId } from "../utils/core/newEventId";
+import { getSvgPoint } from "../utils/core/getSvgPoint";
 
 // Import constants.
 import { DRAG_DEAD_ZONE } from "../constants/Constants";

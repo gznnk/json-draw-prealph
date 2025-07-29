@@ -6,7 +6,7 @@ import type { TextEditorState } from "../components/core/Textable";
 import type { Diagram } from "../types/data/catalog/Diagram";
 
 // Import functions related to SvgCanvas.
-import { deepCopy } from "../utils/common/deepCopy";
+import { deepCopy } from "../utils/core/deepCopy";
 import { calcCanvasBounds } from "./utils/calcCanvasBounds";
 
 // Import EventBus.

@@ -5,7 +5,7 @@ import { useCallback, useRef } from "react";
 import type { FileDropEvent } from "../types/events/FileDropEvent";
 
 // Import utils.
-import { newEventId } from "../utils/common/newEventId";
+import { newEventId } from "../utils/core/newEventId";
 
 /**
  * Type definition for useFileDrop hook options

@@ -9,7 +9,7 @@ import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEv
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
-import { newEventId } from "../../../utils/common/newEventId";
+import { newEventId } from "../../../utils/core/newEventId";
 import { calcOrientedShapeFromPoints } from "../../../utils/math/geometry/calcOrientedShapeFromPoints";
 import { newId } from "../../../utils/shapes/common/newId";
 import { isConnectableData } from "../../../utils/validation/isConnectableData";

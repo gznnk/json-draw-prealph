@@ -5,7 +5,7 @@ import { useCallback, useRef } from "react";
 import type { DiagramTextChangeEvent } from "../types/events/DiagramTextChangeEvent";
 
 // Import utils.
-import { newEventId } from "../utils/common/newEventId";
+import { newEventId } from "../utils/core/newEventId";
 
 export type UseTextProps = {
 	id: string;

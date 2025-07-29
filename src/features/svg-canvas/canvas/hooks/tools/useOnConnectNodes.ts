@@ -15,7 +15,7 @@ import { DEFAULT_CONNECT_LINE_DATA } from "../../../constants/DefaultData";
 import { EVENT_NAME_CONNECT_NODES } from "../../../constants/EventNames";
 
 // Import utils.
-import { getDiagramById } from "../../../utils/common/getDiagramById";
+import { getDiagramById } from "../../../utils/core/getDiagramById";
 import { calcOrientedShapeFromPoints } from "../../../utils/math/geometry/calcOrientedShapeFromPoints";
 import { newId } from "../../../utils/shapes/common/newId";
 import { generateOptimalShapeToShapeConnection } from "../../../utils/shapes/connectPoint/generateOptimalShapeToShapeConnection";

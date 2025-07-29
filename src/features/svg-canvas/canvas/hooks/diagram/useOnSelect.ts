@@ -8,8 +8,8 @@ import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEven
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
-import { getDiagramById } from "../../../utils/common/getDiagramById";
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { getDiagramById } from "../../../utils/core/getDiagramById";
+import { getSelectedItems } from "../../../utils/core/getSelectedItems";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";

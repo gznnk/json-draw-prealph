@@ -6,8 +6,8 @@ import { DiagramRegistry } from "../../../registry";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import functions related to SvgCanvas.
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
-import { mimeToExtension } from "../../../utils/common/mimeToExtension";
+import { getSelectedItems } from "../../../utils/core/getSelectedItems";
+import { mimeToExtension } from "../../../utils/core/mimeToExtension";
 
 /**
  * Custom hook to handle export events on the canvas.

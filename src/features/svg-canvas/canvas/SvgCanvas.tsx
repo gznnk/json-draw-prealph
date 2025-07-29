@@ -12,7 +12,7 @@ import React, {
 // Import types.
 import { DiagramRegistry } from "../registry";
 import type { SvgViewport } from "../types/core/SvgViewport";
-import { newEventId } from "../utils/common/newEventId";
+import { newEventId } from "../utils/core/newEventId";
 import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
 import { InteractionState } from "./types/InteractionState";
 

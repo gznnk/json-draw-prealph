@@ -32,7 +32,7 @@ import {
 } from "../../../../utils/shapes/path/createArrowHeads";
 import { createDValue } from "../../../../utils/shapes/path/createDValue";
 import { isItemableData } from "../../../../utils/validation/isItemableData";
-import { mergeProps } from "../../../../utils/common/mergeProps";
+import { mergeProps } from "../../../../utils/core/mergeProps";
 
 // TODO: Cannot enter vertex editing mode when overlapping with border
 /**

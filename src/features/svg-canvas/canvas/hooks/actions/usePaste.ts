@@ -10,7 +10,7 @@ import type { GroupData } from "../../../types/data/shapes/GroupData";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
-import { getDiagramById } from "../../../utils/common/getDiagramById";
+import { getDiagramById } from "../../../utils/core/getDiagramById";
 import { newId } from "../../../utils/shapes/common/newId";
 import { isConnectableData } from "../../../utils/validation/isConnectableData";
 import { isItemableData } from "../../../utils/validation/isItemableData";

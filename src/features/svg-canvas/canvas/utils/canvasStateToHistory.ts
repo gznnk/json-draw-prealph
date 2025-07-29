@@ -1,4 +1,4 @@
-import { deepCopy } from "../../utils/common/deepCopy";
+import { deepCopy } from "../../utils/core/deepCopy";
 import type { SvgCanvasHistory } from "../types/SvgCanvasHistory";
 import type { SvgCanvasState } from "../types/SvgCanvasState";
 

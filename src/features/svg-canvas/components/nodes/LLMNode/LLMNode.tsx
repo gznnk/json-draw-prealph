@@ -17,7 +17,7 @@ import { Rectangle } from "../../shapes/Rectangle";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import functions related to SvgCanvas.
-import { newEventId } from "../../../utils/common/newEventId";
+import { newEventId } from "../../../utils/core/newEventId";
 
 // Import utilities.
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";

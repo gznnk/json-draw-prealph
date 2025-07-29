@@ -6,7 +6,7 @@ import { memo } from "react";
 import type { AddDiagramByTypeEvent } from "../../../../types/events/AddDiagramByTypeEvent";
 
 // Import functions related to SvgCanvas.
-import { newEventId } from "../../../../utils/common/newEventId";
+import { newEventId } from "../../../../utils/core/newEventId";
 
 // Imports related to this component.
 import { CanvasMenuDiv } from "./CanvasMenuStyled";

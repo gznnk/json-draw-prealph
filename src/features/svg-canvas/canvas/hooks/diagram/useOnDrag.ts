@@ -9,7 +9,7 @@ import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { getSelectedItems } from "../../../utils/core/getSelectedItems";
 import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
