@@ -120,12 +120,10 @@ export const useDrag = (props: DragProps) => {
 	const scrollIntervalRef = useRef<number | null>(null);
 	const isScrollingRef = useRef(false);
 	const edgeScrollStateRef = useRef<{
-		endPos: Point | null;
 		cursorPos: Point | null;
 		clientPos: Point | null;
 		delta: Point;
 	}>({
-		endPos: null,
 		cursorPos: null,
 		clientPos: null,
 		delta: { x: 0, y: 0 },
@@ -232,9 +230,8 @@ export const useDrag = (props: DragProps) => {
 
 		// Execute scroll processing immediately
 		const executeScroll = () => {
-			const { endPos, cursorPos, clientPos, delta } =
-				edgeScrollStateRef.current;
-			if (!endPos || !cursorPos || !clientPos) {
+			const { cursorPos, clientPos, delta } = edgeScrollStateRef.current;
+			if (!cursorPos || !clientPos) {
 				return;
 			}
 
@@ -258,7 +255,6 @@ export const useDrag = (props: DragProps) => {
 
 			// Update edgeScrollStateRef
 			edgeScrollStateRef.current = {
-				endPos: newEndPos,
 				cursorPos: newCursorPos,
 				clientPos: clientPos,
 				delta,
@@ -392,7 +388,6 @@ export const useDrag = (props: DragProps) => {
 					edgeProximity.vertical,
 				);
 				edgeScrollStateRef.current = {
-					endPos: dragPoint,
 					cursorPos: svgCursorPoint,
 					clientPos: {
 						x: e.clientX,
