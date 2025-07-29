@@ -25,7 +25,6 @@ export const useNavigate = (props: SvgCanvasSubHooksProps) => {
 				clientY: 0,
 				deltaX: 0,
 				deltaY: 0,
-				isFromAutoEdgeScroll: false,
 			});
 		},
 		[onScroll],

@@ -25,5 +25,4 @@ export type DiagramDragEvent = {
 	clientY: number;
 	minX?: number;
 	minY?: number;
-	isFromAutoEdgeScroll?: boolean;
 };

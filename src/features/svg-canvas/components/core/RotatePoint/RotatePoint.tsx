@@ -62,6 +62,7 @@ const RotatePointComponent: React.FC<RotatePointProps> = ({
 		x,
 		y,
 		ref: svgRef,
+		disableAutoEdgeScroll: true,
 		onDrag: handleDrag,
 		dragPositioningFunction,
 	});

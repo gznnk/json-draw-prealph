@@ -180,7 +180,6 @@ const TransformativeComponent: React.FC<Props> = ({
 			clientY: e.clientY,
 			minX: e.minX,
 			minY: e.minY,
-			isFromAutoEdgeScroll: e.isFromAutoEdgeScroll,
 		};
 
 		onTransform?.(event);

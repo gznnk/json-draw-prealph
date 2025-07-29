@@ -5,5 +5,4 @@ export type SvgCanvasScrollEvent = {
 	clientY: number; // Y coordinate of the mouse pointer when the scroll event occurred (viewport coordinates)
 	deltaX: number; // Optional horizontal scroll delta
 	deltaY: number; // Optional vertical scroll delta
-	isFromAutoEdgeScroll?: boolean;
 };

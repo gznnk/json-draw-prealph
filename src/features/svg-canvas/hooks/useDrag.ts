@@ -16,7 +16,10 @@ import { newEventId } from "../utils/core/newEventId";
 import { getSvgPoint } from "../utils/core/getSvgPoint";
 
 // Import constants.
-import { AUTO_SCROLL_INTERVAL_MS, DRAG_DEAD_ZONE } from "../constants/Constants";
+import {
+	AUTO_SCROLL_INTERVAL_MS,
+	DRAG_DEAD_ZONE,
+} from "../constants/Constants";
 import {
 	EVENT_NAME_BROADCAST_DRAG,
 	EVENT_NAME_SVG_CANVAS_SCROLL,
@@ -52,6 +55,7 @@ export type DragProps = {
 	type?: DiagramType;
 	x: number;
 	y: number;
+	disableAutoEdgeScroll?: boolean;
 	ref: React.RefObject<SVGElement>;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onPointerUp?: (e: DiagramPointerEvent) => void;
@@ -88,6 +92,7 @@ export const useDrag = (props: DragProps) => {
 		y,
 		type,
 		ref,
+		disableAutoEdgeScroll = false,
 		onPointerDown,
 		onPointerUp,
 		onDrag,
@@ -368,37 +373,39 @@ export const useDrag = (props: DragProps) => {
 			return;
 		}
 
-		// Auto edge scroll if the cursor is near the edges.
-		const viewport = svgViewport.current;
-		const cursorX = svgCursorPoint.x;
-		const cursorY = svgCursorPoint.y;
+		if (!disableAutoEdgeScroll) {
+			// Auto edge scroll if the cursor is near the edges.
+			const viewport = svgViewport.current;
+			const cursorX = svgCursorPoint.x;
+			const cursorY = svgCursorPoint.y;
 
-		// Check edge proximity using shared function
-		const edgeProximity = detectEdgeProximity(viewport, cursorX, cursorY);
+			// Check edge proximity using shared function
+			const edgeProximity = detectEdgeProximity(viewport, cursorX, cursorY);
 
-		if (!edgeProximity.isNearEdge) {
-			// Cursor moved away from all edges, stop scrolling
-			clearEdgeScroll();
-		} else {
-			// Calculate scroll delta and update edge scroll state atomically
-			const { deltaX, deltaY } = calculateScrollDelta(
-				edgeProximity.horizontal,
-				edgeProximity.vertical,
-			);
-			edgeScrollStateRef.current = {
-				endPos: dragPoint,
-				cursorPos: svgCursorPoint,
-				clientPos: {
-					x: e.clientX,
-					y: e.clientY,
-				},
-				delta: { x: deltaX, y: deltaY },
-			};
-			if (!isScrollingRef.current) {
-				// Cursor moved to a different edge or started near an edge
-				startEdgeScroll();
+			if (!edgeProximity.isNearEdge) {
+				// Cursor moved away from all edges, stop scrolling
+				clearEdgeScroll();
+			} else {
+				// Calculate scroll delta and update edge scroll state atomically
+				const { deltaX, deltaY } = calculateScrollDelta(
+					edgeProximity.horizontal,
+					edgeProximity.vertical,
+				);
+				edgeScrollStateRef.current = {
+					endPos: dragPoint,
+					cursorPos: svgCursorPoint,
+					clientPos: {
+						x: e.clientX,
+						y: e.clientY,
+					},
+					delta: { x: deltaX, y: deltaY },
+				};
+				if (!isScrollingRef.current) {
+					// Cursor moved to a different edge or started near an edge
+					startEdgeScroll();
+				}
+				return;
 			}
-			return;
 		}
 
 		// Fire dragging event
@@ -724,7 +731,6 @@ export const useDrag = (props: DragProps) => {
 				clientY: customEvent.detail.clientY,
 				minX: customEvent.detail.newMinX,
 				minY: customEvent.detail.newMinY,
-				isFromAutoEdgeScroll: customEvent.detail.isFromAutoEdgeScroll,
 			});
 		};
 		eventBus.addEventListener(

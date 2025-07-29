@@ -21,5 +21,4 @@ export type DiagramTransformEvent = {
 	clientY: number;
 	minX?: number;
 	minY?: number;
-	isFromAutoEdgeScroll?: boolean;
 };
