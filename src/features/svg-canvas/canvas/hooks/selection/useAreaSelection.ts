@@ -14,7 +14,7 @@ import { AUTO_SCROLL_INTERVAL_MS } from "../../../constants/Constants";
 
 // Import utils.
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
-import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundingBox";
+import { calcDiagramBoundingBox } from "../../../utils/math/geometry/calcDiagramBoundingBox";
 import { calculateScrollDelta } from "../../../utils/math/geometry/calculateScrollDelta";
 import { detectEdgeProximity } from "../../../utils/math/geometry/detectEdgeProximity";
 import { isItemableData } from "../../../utils/validation/isItemableData";
@@ -52,7 +52,7 @@ const updateItemsWithOutline = (
 
 		// Use cached bounding box if available, otherwise calculate
 		const itemBounds =
-			cachedBoundingBoxes?.get(item.id) ?? calcItemBoundingBox(item);
+			cachedBoundingBoxes?.get(item.id) ?? calcDiagramBoundingBox(item);
 
 		// Check if item's bounding box is completely contained within selection rectangle
 		const isInSelection =
@@ -349,7 +349,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 
 					applyFunctionRecursively(items, (item) => {
 						if (isSelectableData(item) && item.type !== "ConnectLine") {
-							const boundingBox = calcItemBoundingBox(item);
+							const boundingBox = calcDiagramBoundingBox(item);
 							cachedBoundingBoxesRef.current.set(item.id, boundingBox);
 						}
 						return item;

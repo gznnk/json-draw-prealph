@@ -6,7 +6,7 @@ import type { Diagram } from "../../../types/data/catalog/Diagram";
 import { calcGroupOrientedBox } from "../../../utils/shapes/group/calcGroupOrientedBox";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
-import { calcItemBoundingBox } from "./calcItemBoundingBox";
+import { calcDiagramBoundingBox } from "./calcDiagramBoundingBox";
 
 /**
  * Calculate the bounding box of all provided items.
@@ -36,7 +36,7 @@ export const calcItemsBoundingBox = (items: Diagram[]): Box => {
 				groupOrientedBox.y + groupOrientedBox.height,
 			);
 		} else if (isTransformativeData(item)) {
-			const itemBox = calcItemBoundingBox(item);
+			const itemBox = calcDiagramBoundingBox(item);
 			box.top = Math.min(box.top, itemBox.top);
 			box.left = Math.min(box.left, itemBox.left);
 			box.right = Math.max(box.right, itemBox.right);
