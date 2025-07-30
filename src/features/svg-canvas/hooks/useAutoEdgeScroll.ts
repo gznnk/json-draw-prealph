@@ -127,9 +127,10 @@ export const useAutoEdgeScroll = (
 	/**
 	 * Auto edge scroll handler
 	 * @param cursorPos - The current cursor position
+	 * @return {boolean} - Returns true if auto edge scrolling was triggered, false otherwise.
 	 */
 	const autoEdgeScroll = useCallback(
-		(cursorPos: Point) => {
+		(cursorPos: Point): boolean => {
 			// Auto edge scroll if the cursor is near the edges.
 			const { x: cursorX, y: cursorY } = cursorPos;
 
@@ -139,21 +140,23 @@ export const useAutoEdgeScroll = (
 			if (!edgeProximity.isNearEdge) {
 				// Cursor moved away from all edges, stop scrolling
 				clearEdgeScroll();
-			} else {
-				// Calculate scroll delta and update edge scroll state atomically
-				const { deltaX, deltaY } = calculateScrollDelta(
-					edgeProximity.horizontal,
-					edgeProximity.vertical,
-				);
-				edgeScrollStateRef.current = {
-					cursorPos,
-					delta: { x: deltaX, y: deltaY },
-				};
-				if (!isScrollingRef.current) {
-					// Cursor moved to a different edge or started near an edge
-					startEdgeScroll();
-				}
+				return false;
 			}
+
+			// Calculate scroll delta and update edge scroll state atomically
+			const { deltaX, deltaY } = calculateScrollDelta(
+				edgeProximity.horizontal,
+				edgeProximity.vertical,
+			);
+			edgeScrollStateRef.current = {
+				cursorPos,
+				delta: { x: deltaX, y: deltaY },
+			};
+			if (!isScrollingRef.current) {
+				// Cursor moved to a different edge or started near an edge
+				startEdgeScroll();
+			}
+			return true;
 		},
 		[viewport, startEdgeScroll, clearEdgeScroll],
 	);

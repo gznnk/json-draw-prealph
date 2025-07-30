@@ -16,10 +16,7 @@ import { newEventId } from "../utils/core/newEventId";
 import { getSvgPoint } from "../utils/core/getSvgPoint";
 
 // Import constants.
-import {
-	AUTO_SCROLL_INTERVAL_MS,
-	DRAG_DEAD_ZONE,
-} from "../constants/Constants";
+import { DRAG_DEAD_ZONE } from "../constants/Constants";
 import {
 	EVENT_NAME_BROADCAST_DRAG,
 	EVENT_NAME_SVG_CANVAS_SCROLL,
@@ -28,8 +25,8 @@ import {
 // Import EventBus.
 import { useEventBus } from "../context/EventBusContext";
 import { useSvgViewport } from "../context/SvgViewportContext";
-import { calculateScrollDelta } from "../utils/math/geometry/calculateScrollDelta";
-import { detectEdgeProximity } from "../utils/math/geometry/detectEdgeProximity";
+import { useAutoEdgeScroll } from "./useAutoEdgeScroll";
+import type { DoStartEdgeScrollArgs } from "./useAutoEdgeScroll";
 
 /**
  * Type definition for broadcast drag event
@@ -116,18 +113,8 @@ export const useDrag = (props: DragProps) => {
 	// The offset between the center and the pointer.
 	const offsetXBetweenCenterAndPointer = useRef(0);
 	const offsetYBetweenCenterAndPointer = useRef(0);
-	// Internal state for edge scrolling
-	const scrollIntervalRef = useRef<number | null>(null);
-	const isScrollingRef = useRef(false);
-	const edgeScrollStateRef = useRef<{
-		cursorPos: Point | null;
-		clientPos: Point | null;
-		delta: Point;
-	}>({
-		cursorPos: null,
-		clientPos: null,
-		delta: { x: 0, y: 0 },
-	});
+	// Client position ref for edge scrolling
+	const clientPosRef = useRef<Point | null>(null);
 
 	/**
 	 * Get the drag area coordinates from the SVG point during dragging.
@@ -207,93 +194,45 @@ export const useDrag = (props: DragProps) => {
 	};
 
 	/**
-	 * Clear the edge scroll interval if it exists
+	 * Handle edge scroll start with custom logic for drag events
 	 */
-	const clearEdgeScroll = useCallback(() => {
-		if (scrollIntervalRef.current) {
-			clearInterval(scrollIntervalRef.current);
-			scrollIntervalRef.current = null;
-			isScrollingRef.current = false;
+	const doStartEdgeScroll = useCallback((state: DoStartEdgeScrollArgs) => {
+		const clientPos = clientPosRef.current;
+		if (!clientPos) {
+			return;
 		}
 
-		return () => {
-			clearEdgeScroll();
-		};
+		// Bypass references to avoid function creation in every render
+		const { id, onDrag, getPointOnDrag } = refBus.current;
+
+		const newEndPos = getPointOnDrag(state.cursorPos);
+
+		// dispatch dragging event
+		const dragEvent = {
+			eventId: newEventId(),
+			eventType: "InProgress",
+			id,
+			startX: startX.current,
+			startY: startY.current,
+			endX: newEndPos.x,
+			endY: newEndPos.y,
+			cursorX: state.cursorPos.x,
+			cursorY: state.cursorPos.y,
+			clientX: clientPos.x,
+			clientY: clientPos.y,
+			minX: state.minX,
+			minY: state.minY,
+		} as DiagramDragEvent;
+
+		// Fire drag event
+		onDrag?.(dragEvent);
 	}, []);
 
-	/**
-	 * Start edge scrolling with calculated delta values
-	 */
-	const startEdgeScroll = useCallback(() => {
-		// Mark scrolling as active
-		isScrollingRef.current = true;
-
-		// Execute scroll processing immediately
-		const executeScroll = () => {
-			const { cursorPos, clientPos, delta } = edgeScrollStateRef.current;
-			if (!cursorPos || !clientPos) {
-				return;
-			}
-
-			// Bypass references to avoid function creation in every render
-			const { id, svgViewport, onDrag, getPointOnDrag } = refBus.current;
-
-			// Auto edge scroll if the cursor is near the edges.
-			const zoom = svgViewport.current.zoom;
-			const minX = svgViewport.current.minX;
-			const minY = svgViewport.current.minY;
-
-			const deltaX = delta.x / zoom;
-			const deltaY = delta.y / zoom;
-
-			const newCursorPos = {
-				x: cursorPos.x + deltaX,
-				y: cursorPos.y + deltaY,
-			};
-
-			const newEndPos = getPointOnDrag(newCursorPos);
-
-			// Update edgeScrollStateRef
-			edgeScrollStateRef.current = {
-				cursorPos: newCursorPos,
-				clientPos: clientPos,
-				delta,
-			};
-
-			// Calculate new scroll positions
-			const newMinX = minX + delta.x;
-			const newMinY = minY + delta.y;
-
-			// dispatch dragging event
-			const dragEvent = {
-				eventId: newEventId(),
-				eventType: "InProgress",
-				id,
-				startX: startX.current,
-				startY: startY.current,
-				endX: newEndPos.x,
-				endY: newEndPos.y,
-				cursorX: newCursorPos.x,
-				cursorY: newCursorPos.y,
-				clientX: clientPos.x,
-				clientY: clientPos.y,
-				minX: newMinX,
-				minY: newMinY,
-			} as DiagramDragEvent;
-
-			// Fire drag event
-			onDrag?.(dragEvent);
-		};
-
-		// Execute immediately
-		executeScroll();
-
-		// Continue with interval
-		scrollIntervalRef.current = window.setInterval(
-			executeScroll,
-			AUTO_SCROLL_INTERVAL_MS,
-		);
-	}, []);
+	// Use the shared auto edge scroll hook
+	const { autoEdgeScroll, clearEdgeScroll } = useAutoEdgeScroll(
+		svgViewport.current,
+		doStartEdgeScroll,
+	);
 
 	/**
 	 * Pointer move event handler within the drag area
@@ -370,37 +309,14 @@ export const useDrag = (props: DragProps) => {
 		}
 
 		if (!disableAutoEdgeScroll) {
-			// Auto edge scroll if the cursor is near the edges.
-			const viewport = svgViewport.current;
-			const cursorX = svgCursorPoint.x;
-			const cursorY = svgCursorPoint.y;
+			// Update client position reference
+			clientPosRef.current = {
+				x: e.clientX,
+				y: e.clientY,
+			};
 
-			// Check edge proximity using shared function
-			const edgeProximity = detectEdgeProximity(viewport, cursorX, cursorY);
-
-			if (!edgeProximity.isNearEdge) {
-				// Cursor moved away from all edges, stop scrolling
-				clearEdgeScroll();
-			} else {
-				// Calculate scroll delta and update edge scroll state atomically
-				const { deltaX, deltaY } = calculateScrollDelta(
-					edgeProximity.horizontal,
-					edgeProximity.vertical,
-				);
-				edgeScrollStateRef.current = {
-					cursorPos: svgCursorPoint,
-					clientPos: {
-						x: e.clientX,
-						y: e.clientY,
-					},
-					delta: { x: deltaX, y: deltaY },
-				};
-				if (!isScrollingRef.current) {
-					// Cursor moved to a different edge or started near an edge
-					startEdgeScroll();
-				}
-				return;
-			}
+			// Use the shared auto edge scroll functionality
+			if (autoEdgeScroll(svgCursorPoint)) return;
 		}
 
 		// Fire dragging event
