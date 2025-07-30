@@ -11,7 +11,7 @@ import { useClick } from "../../../hooks/useClick";
 import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent";
 
 // Import utils.
-import { mergeProps } from "../../../utils/common/mergeProps";
+import { mergeProps } from "../../../utils/core/mergeProps";
 
 /**
  * Props for the DragLine component.

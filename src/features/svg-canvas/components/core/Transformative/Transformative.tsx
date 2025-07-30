@@ -122,13 +122,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			startShape.current.y,
 		);
 
-	const triggerTransformStart = (
-		eventId: string,
-		cursorX: number,
-		cursorY: number,
-		minX?: number,
-		minY?: number,
-	) => {
+	const triggerTransformStart = (e: DiagramDragEvent) => {
 		startShape.current = {
 			x,
 			y,
@@ -142,34 +136,30 @@ const TransformativeComponent: React.FC<Props> = ({
 		};
 
 		onTransform?.({
-			eventId,
+			eventId: e.eventId,
 			eventType: "Start",
 			transformationType: "Resize",
 			id,
 			startShape: startShape.current,
 			endShape: startShape.current,
-			cursorX,
-			cursorY,
-			minX,
-			minY,
+			cursorX: e.cursorX,
+			cursorY: e.cursorY,
+			clientX: e.clientX,
+			clientY: e.clientY,
+			minX: e.minX,
+			minY: e.minY,
 		});
 	};
 
 	const triggerTransform = (
-		eventId: string,
+		e: DiagramDragEvent,
 		centerPoint: Point,
 		newWidth: number,
 		newHeight: number,
-		eventType: EventType,
-		cursorX: number,
-		cursorY: number,
-		minX?: number,
-		minY?: number,
-		isFromAutoEdgeScroll?: boolean,
 	) => {
 		const event = {
-			eventId,
-			eventType,
+			eventId: e.eventId,
+			eventType: e.eventType,
 			transformationType: "Resize" as TransformationType,
 			id,
 			startShape: {
@@ -184,11 +174,12 @@ const TransformativeComponent: React.FC<Props> = ({
 				scaleY: signNonZero(newHeight),
 				rotation,
 			},
-			cursorX,
-			cursorY,
-			minX,
-			minY,
-			isFromAutoEdgeScroll,
+			cursorX: e.cursorX,
+			cursorY: e.cursorY,
+			clientX: e.clientX,
+			clientY: e.clientY,
+			minX: e.minX,
+			minY: e.minY,
 		};
 
 		onTransform?.(event);
@@ -280,13 +271,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(
-				e.eventId,
-				e.cursorX,
-				e.cursorY,
-				e.minX,
-				e.minY,
-			);
+			return triggerTransformStart(e);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -314,18 +299,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
 		// Pass cursor position to enable auto-scrolling
-		triggerTransform(
-			e.eventId,
-			center,
-			newWidth,
-			newHeight,
-			e.eventType,
-			e.cursorX,
-			e.cursorY,
-			e.minX,
-			e.minY,
-			e.isFromAutoEdgeScroll,
-		);
+		triggerTransform(e, center, newWidth, newHeight);
 	}, []);
 
 	const linearDragFunctionLeftTop = useCallback(
@@ -353,13 +327,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(
-				e.eventId,
-				e.cursorX,
-				e.cursorY,
-				e.minX,
-				e.minY,
-			);
+			return triggerTransformStart(e);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -386,18 +354,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(
-			e.eventId,
-			center,
-			newWidth,
-			newHeight,
-			e.eventType,
-			e.cursorX,
-			e.cursorY,
-			e.minX,
-			e.minY,
-			e.isFromAutoEdgeScroll,
-		);
+		triggerTransform(e, center, newWidth, newHeight);
 	}, []);
 
 	const linearDragFunctionLeftBottom = useCallback(
@@ -425,13 +382,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(
-				e.eventId,
-				e.cursorX,
-				e.cursorY,
-				e.minX,
-				e.minY,
-			);
+			return triggerTransformStart(e);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -458,18 +409,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(
-			e.eventId,
-			center,
-			newWidth,
-			newHeight,
-			e.eventType,
-			e.cursorX,
-			e.cursorY,
-			e.minX,
-			e.minY,
-			e.isFromAutoEdgeScroll,
-		);
+		triggerTransform(e, center, newWidth, newHeight);
 	}, []);
 
 	const linearDragFunctionRightTop = useCallback(
@@ -497,13 +437,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(
-				e.eventId,
-				e.cursorX,
-				e.cursorY,
-				e.minX,
-				e.minY,
-			);
+			return triggerTransformStart(e);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -530,18 +464,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(
-			e.eventId,
-			center,
-			newWidth,
-			newHeight,
-			e.eventType,
-			e.cursorX,
-			e.cursorY,
-			e.minX,
-			e.minY,
-			e.isFromAutoEdgeScroll,
-		);
+		triggerTransform(e, center, newWidth, newHeight);
 	}, []);
 
 	const linearDragFunctionRightBottom = useCallback(
@@ -569,13 +492,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(
-				e.eventId,
-				e.cursorX,
-				e.cursorY,
-				e.minX,
-				e.minY,
-			);
+			return triggerTransformStart(e);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -602,18 +519,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(
-			e.eventId,
-			center,
-			newWidth,
-			newHeight,
-			e.eventType,
-			e.cursorX,
-			e.cursorY,
-			e.minX,
-			e.minY,
-			e.isFromAutoEdgeScroll,
-		);
+		triggerTransform(e, center, newWidth, newHeight);
 	}, []);
 
 	const linearDragFunctionTopCenter = useCallback(
@@ -646,13 +552,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(
-				e.eventId,
-				e.cursorX,
-				e.cursorY,
-				e.minX,
-				e.minY,
-			);
+			return triggerTransformStart(e);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -679,18 +579,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(
-			e.eventId,
-			center,
-			newWidth,
-			newHeight,
-			e.eventType,
-			e.cursorX,
-			e.cursorY,
-			e.minX,
-			e.minY,
-			e.isFromAutoEdgeScroll,
-		);
+		triggerTransform(e, center, newWidth, newHeight);
 	}, []);
 
 	const linearDragFunctionLeftCenter = useCallback(
@@ -723,13 +612,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(
-				e.eventId,
-				e.cursorX,
-				e.cursorY,
-				e.minX,
-				e.minY,
-			);
+			return triggerTransformStart(e);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -756,18 +639,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(
-			e.eventId,
-			center,
-			newWidth,
-			newHeight,
-			e.eventType,
-			e.cursorX,
-			e.cursorY,
-			e.minX,
-			e.minY,
-			e.isFromAutoEdgeScroll,
-		);
+		triggerTransform(e, center, newWidth, newHeight);
 	}, []);
 
 	const linearDragFunctionRightCenter = useCallback(
@@ -800,13 +672,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventType);
 
 		if (e.eventType === "Start") {
-			return triggerTransformStart(
-				e.eventId,
-				e.cursorX,
-				e.cursorY,
-				e.minX,
-				e.minY,
-			);
+			return triggerTransformStart(e);
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -833,18 +699,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		const center = affineTransformationOnDrag(inversedCenterX, inversedCenterY);
 
-		triggerTransform(
-			e.eventId,
-			center,
-			newWidth,
-			newHeight,
-			e.eventType,
-			e.cursorX,
-			e.cursorY,
-			e.minX,
-			e.minY,
-			e.isFromAutoEdgeScroll,
-		);
+		triggerTransform(e, center, newWidth, newHeight);
 	}, []);
 
 	const linearDragFunctionBottomCenter = useCallback(
@@ -940,6 +795,8 @@ const TransformativeComponent: React.FC<Props> = ({
 				endShape: startShape.current,
 				cursorX: e.cursorX,
 				cursorY: e.cursorY,
+				clientX: e.clientX,
+				clientY: e.clientY,
 				minX: e.minX,
 				minY: e.minY,
 			});
@@ -970,6 +827,8 @@ const TransformativeComponent: React.FC<Props> = ({
 			},
 			cursorX: e.cursorX,
 			cursorY: e.cursorY,
+			clientX: e.clientX,
+			clientY: e.clientY,
 		};
 
 		onTransform?.(event);

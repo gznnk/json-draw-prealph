@@ -21,7 +21,7 @@ import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import utils.
 import { useAddDiagram } from "../../../hooks/useAddDiagram";
-import { newEventId } from "../../../utils/common/newEventId";
+import { newEventId } from "../../../utils/core/newEventId";
 import { createImageData } from "../../../utils/shapes/image/createImageData";
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 

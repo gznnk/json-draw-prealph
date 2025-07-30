@@ -8,7 +8,7 @@ import type { ConnectNodesEvent } from "../../types/events/ConnectNodesEvent";
 import { EVENT_NAME_CONNECT_NODES } from "../../constants/EventNames";
 
 // Import utils.
-import { newEventId } from "../../utils/common/newEventId";
+import { newEventId } from "../../utils/core/newEventId";
 
 // Import context.
 import type { EventBus } from "../../../../shared/event-bus/EventBus";

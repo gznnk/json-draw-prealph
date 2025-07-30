@@ -6,6 +6,7 @@ import type { GrabScrollState } from "./GrabScrollState";
 import type { InteractionState } from "./InteractionState";
 import type { SvgCanvasData } from "./SvgCanvasData";
 import type { SvgCanvasHistory } from "./SvgCanvasHistory";
+import type { AreaSelectionState } from "./AreaSelectionState";
 
 /**
  * Type for the state of the SvgCanvas.
@@ -13,7 +14,6 @@ import type { SvgCanvasHistory } from "./SvgCanvasHistory";
 export type SvgCanvasState = {
 	zoom: number;
 	multiSelectGroup?: GroupData;
-	isDiagramChanging: boolean;
 	history: SvgCanvasHistory[];
 	historyIndex: number;
 	lastHistoryEventId: string;
@@ -21,4 +21,5 @@ export type SvgCanvasState = {
 	previewConnectLineState?: PathData;
 	grabScrollState?: GrabScrollState;
 	interactionState: InteractionState;
+	areaSelectionState: AreaSelectionState;
 } & SvgCanvasData;

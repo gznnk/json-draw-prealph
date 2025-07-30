@@ -55,7 +55,6 @@ const createMockCanvasState = (items: Diagram[] = []): SvgCanvasState => ({
 	minX: 0,
 	minY: 0,
 	zoom: 1,
-	isDiagramChanging: false,
 	history: [],
 	historyIndex: 0,
 	lastHistoryEventId: "",
@@ -78,7 +77,13 @@ const createMockCanvasState = (items: Diagram[] = []): SvgCanvasState => ({
 		fontWeight: "normal",
 		isActive: false,
 	},
-	interactionState: InteractionState.Normal,
+	interactionState: InteractionState.Idle,
+	areaSelectionState: {
+		startX: 0,
+		startY: 0,
+		endX: 0,
+		endY: 0,
+	},
 	items,
 });
 

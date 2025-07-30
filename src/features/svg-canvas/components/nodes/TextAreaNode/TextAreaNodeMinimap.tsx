@@ -6,16 +6,16 @@ import { memo } from "react";
 import type { TextAreaNodeProps } from "../../../types/props/nodes/TextAreaNodeProps";
 
 // Import components related to SvgCanvas.
-import { Rectangle } from "../../shapes/Rectangle";
+import { RectangleMinimap } from "../../shapes/Rectangle/RectangleMinimap";
 
 /**
  * TextAreaNode minimap component - lightweight version without outlines, controls, and labels.
  */
 const TextAreaNodeMinimapComponent: React.FC<TextAreaNodeProps> = (props) => {
 	return (
-		<Rectangle 
-			{...props} 
-			text={props.text} 
+		<RectangleMinimap
+			{...props}
+			text={props.text}
 			textType="markdown"
 			showOutline={false}
 			isSelected={false}

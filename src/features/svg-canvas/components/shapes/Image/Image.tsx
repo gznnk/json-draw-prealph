@@ -19,7 +19,7 @@ import { useSelect } from "../../../hooks/useSelect";
 // Import utils.
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
-import { mergeProps } from "../../../utils/common/mergeProps";
+import { mergeProps } from "../../../utils/core/mergeProps";
 
 /**
  * Image component.

@@ -8,18 +8,18 @@ import { degreesToRadians } from "../common/degreesToRadians";
 import { affineTransformation } from "../transform/affineTransformation";
 
 /**
- * Calculates the bounding box of a diagram item.
- * Returns the box coordinates representing the item's outer bounds.
- * Note: x and y represent the center coordinates of the item.
+ * Calculates the bounding box of a diagram.
+ * Returns the box coordinates representing the diagram's outer bounds.
+ * Note: x and y represent the center coordinates of the diagram.
  *
- * @param item - The diagram item to calculate bounding box for
+ * @param diagram - The diagram to calculate bounding box for
  * @returns The bounding box with top, left, right, bottom coordinates
  */
-export const calcItemBoundingBox = (item: Diagram): Box => {
-	const { x, y } = item;
+export const calcDiagramBoundingBox = (diagram: Diagram): Box => {
+	const { x, y } = diagram;
 
-	// For non-shape items (points, etc.), return a point box
-	if (!isShape(item)) {
+	// For non-shape diagrams (points, etc.), return a point box
+	if (!isShape(diagram)) {
 		return {
 			top: y,
 			left: x,
@@ -28,12 +28,12 @@ export const calcItemBoundingBox = (item: Diagram): Box => {
 		};
 	}
 
-	const { width, height, rotation, scaleX, scaleY } = item;
+	const { width, height, rotation, scaleX, scaleY } = diagram;
 
 	const halfWidth = width / 2;
 	const halfHeight = height / 2;
 
-	// For items with rotation, calculate all four corners and find bounding box
+	// For diagrams with rotation, calculate all four corners and find bounding box
 	if (rotation !== 0) {
 		const radians = degreesToRadians(rotation);
 
@@ -87,7 +87,7 @@ export const calcItemBoundingBox = (item: Diagram): Box => {
 		return { top, left, right, bottom };
 	}
 
-	// For non-rotated transformative items, calculate simple bounding box
+	// For non-rotated transformative diagrams, calculate simple bounding box
 	return {
 		top: y - halfHeight,
 		left: x - halfWidth,

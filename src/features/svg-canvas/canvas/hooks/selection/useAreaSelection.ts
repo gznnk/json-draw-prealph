@@ -1,204 +1,424 @@
 // Import React.
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
-import type { AreaSelectionEvent } from "../../../types/events/AreaSelectionEvent";
-import type { AreaSelectionState } from "../../types/AreaSelectionState";
+// Import types.
+import type { Box } from "../../../types/core/Box";
 import type { Diagram } from "../../../types/data/catalog/Diagram";
+import type { GroupData } from "../../../types/data/shapes/GroupData";
+import type { AreaSelectionEvent } from "../../../types/events/AreaSelectionEvent";
+import { InteractionState } from "../../types/InteractionState";
+import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import functions related to SvgCanvas.
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
+// Import utils.
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
+import { calcDiagramBoundingBox } from "../../../utils/math/geometry/calcDiagramBoundingBox";
 import { isItemableData } from "../../../utils/validation/isItemableData";
-import { calcItemBoundingBox } from "../../../utils/math/geometry/calcItemBoundingBox";
-import { newEventId } from "../../../utils/common/newEventId";
+import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
+import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
+import { removeNonTransformativeShowTransformControls } from "../../utils/removeNonTransformativeShowTransformControls";
+import { updateOutlineBySelection } from "../../utils/updateOutlineBySelection";
 
-// Import selection hooks
-import { useOnSelect } from "../diagram/useOnSelect";
+// Import hooks.
+import type { DoStartEdgeScrollArgs } from "../../../hooks/useAutoEdgeScroll";
+import { useAutoEdgeScroll } from "../../../hooks/useAutoEdgeScroll";
 import { useClearAllSelection } from "./useClearAllSelection";
+
+/**
+ * Update items array with outline display based on selection bounds
+ */
+const updateItemsWithOutline = (
+	items: Diagram[],
+	selectionBounds: {
+		startX: number;
+		startY: number;
+		endX: number;
+		endY: number;
+	},
+	cachedBoundingBoxes?: Map<string, Box>,
+) => {
+	// Calculate selection bounds in canvas coordinates
+	const minX = Math.min(selectionBounds.startX, selectionBounds.endX);
+	const maxX = Math.max(selectionBounds.startX, selectionBounds.endX);
+	const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
+	const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
+
+	return applyFunctionRecursively(items, (item) => {
+		if (!isSelectableData(item)) return item;
+		if (item.type === "ConnectLine") return item;
+
+		// Use cached bounding box if available, otherwise calculate
+		const itemBounds =
+			cachedBoundingBoxes?.get(item.id) ?? calcDiagramBoundingBox(item);
+
+		// Check if item's bounding box is completely contained within selection rectangle
+		const isInSelection =
+			itemBounds.left >= minX &&
+			itemBounds.right <= maxX &&
+			itemBounds.top >= minY &&
+			itemBounds.bottom <= maxY;
+
+		return {
+			...item,
+			showOutline: isInSelection,
+		};
+	});
+};
+
+/**
+ * Convert client coordinates to SVG canvas coordinates using matrixTransform
+ */
+const clientToCanvasCoords = (
+	clientX: number,
+	clientY: number,
+	svgElement: SVGSVGElement | null,
+) => {
+	if (!svgElement) {
+		return { x: 0, y: 0 };
+	}
+
+	const svgPoint = svgElement.createSVGPoint();
+	svgPoint.x = clientX;
+	svgPoint.y = clientY;
+
+	const screenCTM = svgElement.getScreenCTM();
+	if (screenCTM) {
+		// Inverse transform to convert from client coordinates to SVG coordinates
+		const svgCoords = svgPoint.matrixTransform(screenCTM.inverse());
+		return { x: svgCoords.x, y: svgCoords.y };
+	}
+
+	return { x: 0, y: 0 };
+};
 
 /**
  * Custom hook to handle area selection on the canvas.
  */
 export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
-	const [selectionState, setSelectionState] = useState<AreaSelectionState>({
-		isSelecting: false,
-		startX: 0,
-		startY: 0,
-		endX: 0,
-		endY: 0,
-	});
-
-	// Get the select function from useSelect hook with Ctrl key pressed (for multi-select)
-	const onSelect = useOnSelect(props, true);
+	const { canvasState, canvasRef } = props;
 
 	// Get the clear all selection function
 	const onClearAllSelection = useClearAllSelection(props);
 
+	// Client position reference for edge scrolling
+	const clientPosRef = useRef<{ x: number; y: number } | null>(null);
+
+	// Reference to store cached bounding boxes for area selection
+	const cachedBoundingBoxesRef = useRef<Map<string, Box>>(new Map());
+
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		selectionState,
-		onSelect,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	/**
-	 * Convert client coordinates to SVG canvas coordinates using matrixTransform
+	 * Updates the selection state of items after area selection.
+	 * This function applies selection logic, group selection, and transform controls according to the current outline state.
+	 *
+	 * - Sets isSelected for items with showOutline
+	 * - Handles group selection and deselects children when a group is selected
+	 * - Creates a multiSelectGroup if multiple items are selected
+	 * - Shows transform controls for single selection
+	 * - Updates outline display for selected items and their ancestors
+	 * - Removes transform controls from non-transformative items
 	 */
-	const clientToCanvasCoords = useCallback(
-		(clientX: number, clientY: number) => {
-			const { canvasRef } = refBus.current.props;
-
-			if (!canvasRef?.svgRef.current) {
-				return { x: 0, y: 0 };
-			}
-
-			const svgElement = canvasRef.svgRef.current;
-			const svgPoint = svgElement.createSVGPoint();
-			svgPoint.x = clientX;
-			svgPoint.y = clientY;
-
-			const screenCTM = svgElement.getScreenCTM();
-			if (screenCTM) {
-				// Inverse transform to convert from client coordinates to SVG coordinates
-				const svgCoords = svgPoint.matrixTransform(screenCTM.inverse());
-				return { x: svgCoords.x, y: svgCoords.y };
-			}
-
-			return { x: 0, y: 0 };
-		},
-		[],
-	);
-
-	/**
-	 * Update items selection based on the current selection state
-	 */
-	const updateItemsSelection = useCallback(
-		(selectionBounds: {
-			startX: number;
-			startY: number;
-			endX: number;
-			endY: number;
-		}) => {
-			const {
-				props: { canvasState },
-				onSelect,
-			} = refBus.current;
-
-			// Calculate selection bounds in canvas coordinates
-			const minX = Math.min(selectionBounds.startX, selectionBounds.endX);
-			const maxX = Math.max(selectionBounds.startX, selectionBounds.endX);
-			const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
-			const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
-
-			// Find items that are within the selection bounds recursively
-			const itemsToSelect: string[] = [];
-
-			const collectSelectableItems = (items: Diagram[]) => {
-				for (const item of items) {
-					if (!isSelectableData(item)) continue;
-
-					// Calculate item bounding box using calcItemBoundingBox function
-					const itemBounds = calcItemBoundingBox(item);
-
-					// Check if item's bounding box is completely contained within selection rectangle
-					const isSelected =
-						itemBounds.left >= minX &&
-						itemBounds.right <= maxX &&
-						itemBounds.top >= minY &&
-						itemBounds.bottom <= maxY;
-
-					if (isSelected) {
-						itemsToSelect.push(item.id);
-					}
-
-					// Recursively check child items
-					if (isItemableData(item) && item.items) {
-						collectSelectableItems(item.items);
-					}
-				}
-			};
-
-			collectSelectableItems(canvasState.items);
-
-			// Apply selection using the proper useSelect logic
-			// For area selection, we want to select the first item (clearing previous selections)
-			// then add additional items with multi-select behavior
-			if (itemsToSelect.length > 0) {
-				// Select first item (this clears existing selections)
-				onSelect({
-					eventId: newEventId(),
-					id: itemsToSelect[0],
-				});
-
-				// Add remaining items with multi-select
-				for (let i = 1; i < itemsToSelect.length; i++) {
-					onSelect({
-						eventId: newEventId(),
-						id: itemsToSelect[i],
-					});
-				}
-			}
-		},
-		[],
-	);
-
-	/**
-	 * Update outline display for items within the selection bounds during area selection
-	 */
-	const updateOutlineDisplay = useCallback(
-		(selectionBounds: {
-			startX: number;
-			startY: number;
-			endX: number;
-			endY: number;
-		}) => {
-			const {
-				props: { setCanvasState },
-			} = refBus.current;
-
-			// Calculate selection bounds in canvas coordinates
-			const minX = Math.min(selectionBounds.startX, selectionBounds.endX);
-			const maxX = Math.max(selectionBounds.startX, selectionBounds.endX);
-			const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
-			const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
-
-			setCanvasState((prevState) => ({
-				...prevState,
-				items: applyFunctionRecursively(prevState.items, (item) => {
-					if (!isSelectableData(item)) return item;
-
-					// Calculate item bounding box using calcItemBoundingBox function
-					const itemBounds = calcItemBoundingBox(item);
-
-					// Check if item's bounding box is completely contained within selection rectangle
-					const isInSelection =
-						itemBounds.left >= minX &&
-						itemBounds.right <= maxX &&
-						itemBounds.top >= minY &&
-						itemBounds.bottom <= maxY;
-
-					return {
-						...item,
-						showOutline: isInSelection,
-					};
-				}),
-			}));
-		},
-		[],
-	);
-
-	/**
-	 * Clear outline display for all items
-	 */
-	const clearOutlineDisplay = useCallback(() => {
+	const updateItemsSelection = useCallback(() => {
 		const {
 			props: { setCanvasState },
 		} = refBus.current;
 
+		setCanvasState((prevState) => {
+			/**
+			 * Step 1: Set isSelected for items with showOutline
+			 * Only items with showOutline are marked as selected
+			 */
+			let items = applyFunctionRecursively(prevState.items, (item) => {
+				if (!isSelectableData(item)) {
+					return item;
+				}
+				// Mark item as selected if showOutline is true
+				if (item.showOutline) {
+					return {
+						...item,
+						isSelected: true,
+					};
+				}
+				return item;
+			});
+
+			/**
+			 * Step 2: Handle group selection logic
+			 * If all children of a group are selected, select the group and deselect its children
+			 */
+			const processGroupSelectionLogic = (items: Diagram[]): Diagram[] => {
+				const processItem = (item: Diagram): Diagram => {
+					// Recursively process nested items (bottom-up)
+					if (isItemableData(item)) {
+						const updatedItems = item.items.map(processItem);
+						// Select group if all children are selected
+						if (
+							updatedItems.length > 0 &&
+							updatedItems.every(
+								(child) => isSelectableData(child) && child.isSelected,
+							)
+						) {
+							// Deselect children when group is selected
+							const deselectedItems = updatedItems.map((child) => {
+								if (isSelectableData(child)) {
+									return {
+										...child,
+										isSelected: false,
+									};
+								}
+								return child;
+							});
+							return {
+								...item,
+								items: deselectedItems,
+								isSelected: true,
+								showOutline: true,
+							};
+						}
+						// Return group with updated children
+						return {
+							...item,
+							items: updatedItems,
+						};
+					}
+					return item;
+				};
+				return items.map(processItem);
+			};
+			items = processGroupSelectionLogic(items);
+
+			/**
+			 * Step 3: Multi-selection logic
+			 * If multiple items are selected, create a multiSelectGroup
+			 * If only one item is selected, show transform controls for it
+			 */
+			const selectedItems = getSelectedDiagrams(items);
+			let multiSelectGroup: GroupData | undefined = undefined;
+			if (selectedItems.length > 1) {
+				// Create multiSelectGroup for multiple selection
+				multiSelectGroup = createMultiSelectGroup(
+					selectedItems,
+					prevState.multiSelectGroup?.keepProportion,
+				);
+			} else {
+				// Show transform controls for single selected item
+				items = applyFunctionRecursively(items, (item) => {
+					if (!isSelectableData(item)) {
+						return item;
+					}
+					if (item.isSelected) {
+						return {
+							...item,
+							showTransformControls: true,
+						};
+					}
+					return item;
+				});
+			}
+
+			/**
+			 * Step 4: Update outline display for selected items and their ancestors (shared utility)
+			 */
+			items = updateOutlineBySelection(items);
+
+			/**
+			 * Step 5: Remove transform controls from non-transformative items (shared utility)
+			 */
+			items = removeNonTransformativeShowTransformControls(items);
+
+			return {
+				...prevState,
+				items,
+				multiSelectGroup,
+			};
+		});
+	}, []);
+
+	/**
+	 * Handle edge scroll start with custom logic for area selection
+	 */
+	const doStartEdgeScroll = useCallback((state: DoStartEdgeScrollArgs) => {
+		const {
+			setCanvasState,
+			canvasState: { areaSelectionState },
+		} = refBus.current.props;
+
+		const newSelectionBounds = {
+			startX: areaSelectionState.startX,
+			startY: areaSelectionState.startY,
+			endX: state.cursorPos.x,
+			endY: state.cursorPos.y,
+		};
+
+		// Update canvas state with new scroll position and selection
+		setCanvasState((prevState) => ({
+			...prevState,
+			minX: state.minX,
+			minY: state.minY,
+			areaSelectionState: newSelectionBounds,
+			items: updateItemsWithOutline(
+				prevState.items,
+				newSelectionBounds,
+				cachedBoundingBoxesRef.current,
+			),
+		}));
+	}, []);
+
+	// Use the shared auto edge scroll hook
+	const { autoEdgeScroll, clearEdgeScroll } = useAutoEdgeScroll(
+		{
+			zoom: canvasState.zoom,
+			minX: canvasState.minX,
+			minY: canvasState.minY,
+			containerWidth:
+				canvasRef?.containerRef?.current?.getBoundingClientRect()?.width ?? 0,
+			containerHeight:
+				canvasRef?.containerRef?.current?.getBoundingClientRect()?.height ?? 0,
+		},
+		doStartEdgeScroll,
+	);
+
+	/**
+	 * Handle area selection events
+	 */
+	const onAreaSelection = useCallback(
+		(event: AreaSelectionEvent) => {
+			const { canvasState, setCanvasState } = refBus.current.props;
+			const { eventType, clientX, clientY } = event;
+
+			switch (eventType) {
+				case "Start": {
+					const { canvasRef } = refBus.current.props;
+					const { x, y } = clientToCanvasCoords(
+						clientX,
+						clientY,
+						canvasRef?.svgRef.current || null,
+					);
+
+					// Clear existing selections when starting area selection
+					onClearAllSelection();
+
+					// Pre-calculate and cache bounding boxes for all selectable items
+					const { items } = canvasState;
+					cachedBoundingBoxesRef.current.clear();
+
+					applyFunctionRecursively(items, (item) => {
+						if (isSelectableData(item) && item.type !== "ConnectLine") {
+							const boundingBox = calcDiagramBoundingBox(item);
+							cachedBoundingBoxesRef.current.set(item.id, boundingBox);
+						}
+						return item;
+					});
+
+					// Set interaction state to AreaSelection and initialize selection state
+					setCanvasState((prevState) => ({
+						...prevState,
+						interactionState: InteractionState.AreaSelection,
+						areaSelectionState: {
+							startX: x,
+							startY: y,
+							endX: x,
+							endY: y,
+						},
+					}));
+					break;
+				}
+
+				case "InProgress": {
+					// If area selection is not active, do nothing
+					if (canvasState.interactionState !== InteractionState.AreaSelection) {
+						return;
+					}
+
+					const { canvasRef } = refBus.current.props;
+					const { x, y } = clientToCanvasCoords(
+						clientX,
+						clientY,
+						canvasRef?.svgRef.current || null,
+					);
+					const { areaSelectionState } = canvasState;
+
+					const newSelectionState = {
+						startX: areaSelectionState.startX,
+						startY: areaSelectionState.startY,
+						endX: x,
+						endY: y,
+					};
+
+					// Update client position reference
+					clientPosRef.current = { x: clientX, y: clientY };
+
+					// Use the shared auto edge scroll functionality
+					if (autoEdgeScroll({ x, y })) {
+						break;
+					}
+
+					// Update canvas state with new selection bounds
+					setCanvasState((prevState) => ({
+						...prevState,
+						items: updateItemsWithOutline(
+							prevState.items,
+							newSelectionState,
+							cachedBoundingBoxesRef.current,
+						),
+						areaSelectionState: newSelectionState,
+					}));
+					break;
+				}
+
+				case "End": {
+					// If area selection is not active, do nothing
+					if (canvasState.interactionState !== InteractionState.AreaSelection) {
+						return;
+					}
+
+					// Clear edge scroll when area selection ends
+					clearEdgeScroll();
+
+					// Clear cached bounding boxes
+					cachedBoundingBoxesRef.current.clear();
+
+					// Update items selection based on current showOutline state
+					updateItemsSelection();
+
+					// Update interaction state to Idle and reset selection state
+					setCanvasState((prevState) => ({
+						...prevState,
+						interactionState: InteractionState.Idle,
+						areaSelectionState: {
+							startX: 0,
+							startY: 0,
+							endX: 0,
+							endY: 0,
+						},
+					}));
+					break;
+				}
+			}
+		},
+		[
+			onClearAllSelection,
+			updateItemsSelection,
+			clearEdgeScroll,
+			autoEdgeScroll,
+		],
+	);
+
+	const onCancelAreaSelection = useCallback(() => {
+		// Clear edge scroll when area selection is cancelled
+		clearEdgeScroll();
+
+		// Clear cached bounding boxes
+		cachedBoundingBoxesRef.current.clear();
+
+		// Reset interaction state and remove outlines
+		const { setCanvasState } = refBus.current.props;
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyFunctionRecursively(prevState.items, (item) => {
@@ -208,94 +428,18 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					showOutline: false,
 				};
 			}),
+			interactionState: InteractionState.Idle,
+			areaSelectionState: {
+				startX: 0,
+				startY: 0,
+				endX: 0,
+				endY: 0,
+			},
 		}));
-	}, []);
+	}, [clearEdgeScroll]);
 
-	/**
-	 * Handle area selection events
-	 */
-	const onAreaSelection = useCallback(
-		(event: AreaSelectionEvent) => {
-			const { eventType, clientX, clientY } = event;
-
-			switch (eventType) {
-				case "Start": {
-					const { x, y } = clientToCanvasCoords(clientX, clientY);
-
-					// Clear existing selections when starting area selection
-					onClearAllSelection();
-
-					setSelectionState({
-						isSelecting: true,
-						startX: x,
-						startY: y,
-						endX: x,
-						endY: y,
-					});
-					break;
-				}
-
-				case "InProgress": {
-					const { selectionState } = refBus.current;
-					const { x, y } = clientToCanvasCoords(clientX, clientY);
-
-					const newSelectionState = {
-						isSelecting: true,
-						startX: selectionState.startX,
-						startY: selectionState.startY,
-						endX: x,
-						endY: y,
-					};
-
-					setSelectionState(newSelectionState);
-
-					// Update outline display for items within selection bounds
-					updateOutlineDisplay(newSelectionState);
-					break;
-				}
-
-				case "End": {
-					const { selectionState } = refBus.current;
-
-					if (!selectionState.isSelecting) return;
-
-					// Update items selection with current selection bounds
-					updateItemsSelection(selectionState);
-
-					// Reset selection state
-					setSelectionState({
-						isSelecting: false,
-						startX: 0,
-						startY: 0,
-						endX: 0,
-						endY: 0,
-					});
-					break;
-				}
-			}
-		},
-		[
-			clientToCanvasCoords,
-			onClearAllSelection,
-			updateItemsSelection,
-			updateOutlineDisplay,
-		],
-	);
-
-	const onCancelAreaSelection = useCallback(() => {
-		// Clear outline display for all items
-		clearOutlineDisplay();
-
-		setSelectionState({
-			isSelecting: false,
-			startX: 0,
-			startY: 0,
-			endX: 0,
-			endY: 0,
-		});
-	}, [clearOutlineDisplay]);
 	return {
-		selectionState,
+		selectionState: props.canvasState.areaSelectionState,
 		onAreaSelection,
 		onCancelAreaSelection,
 	};

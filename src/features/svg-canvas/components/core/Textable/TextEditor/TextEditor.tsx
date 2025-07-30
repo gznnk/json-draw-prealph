@@ -5,7 +5,7 @@ import { memo, useEffect, useRef } from "react";
 // Import utils.
 import { createSvgTransform } from "../../../../utils/shapes/common/createSvgTransform";
 import { degreesToRadians } from "../../../../utils/math/common/degreesToRadians";
-import { newEventId } from "../../../../utils/common/newEventId";
+import { newEventId } from "../../../../utils/core/newEventId";
 
 // Import local module files.
 import { Input, TextArea } from "./TextEditorStyled";

@@ -2,7 +2,7 @@
 import type { DiagramHoverChangeEvent } from "../types/events/DiagramHoverChangeEvent";
 
 // Import utils.
-import { newEventId } from "../utils/common/newEventId";
+import { newEventId } from "../utils/core/newEventId";
 
 /**
  * Type definition for hover props

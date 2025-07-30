@@ -7,15 +7,11 @@ import type { GroupData } from "../../../types/data/shapes/GroupData";
 import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEvent";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import hooks related to SvgCanvas.
-import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
-
 // Import functions related to SvgCanvas.
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { addHistory } from "../../utils/addHistory";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
-import { isDiagramChangingEvent } from "../../utils/isDiagramChangingEvent";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
@@ -28,13 +24,9 @@ import type { SvgCanvasState } from "../../types/SvgCanvasState";
  * Custom hook to handle diagram change events on the canvas.
  */
 export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
-	// Get the auto edge scroll function to handle canvas auto scrolling.
-	const { autoEdgeScroll } = useAutoEdgeScroll(props);
-
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		autoEdgeScroll,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -43,7 +35,6 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 		// Bypass references to avoid function creation in every render.
 		const {
 			props: { setCanvasState, onDataChange },
-			autoEdgeScroll,
 		} = refBus.current;
 
 		setCanvasState((prevState) => {
@@ -120,7 +111,6 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 			let newState = {
 				...prevState,
 				items,
-				isDiagramChanging: isDiagramChangingEvent(e.eventType),
 				multiSelectGroup,
 			} as SvgCanvasState;
 
@@ -135,12 +125,5 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 
 			return newState;
 		});
-		// Auto scroll if the cursor is near the edges.
-		if (e.cursorX !== undefined && e.cursorY !== undefined) {
-			autoEdgeScroll({
-				cursorX: e.cursorX,
-				cursorY: e.cursorY,
-			});
-		}
 	}, []);
 };

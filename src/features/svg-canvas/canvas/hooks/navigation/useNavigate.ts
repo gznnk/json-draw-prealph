@@ -18,7 +18,14 @@ export const useNavigate = (props: SvgCanvasSubHooksProps) => {
 	return useCallback(
 		(minX: number, minY: number) => {
 			// Use scroll handler with the specified coordinates
-			onScroll({ minX, minY, clientX: 0, clientY: 0 });
+			onScroll({
+				newMinX: minX,
+				newMinY: minY,
+				clientX: 0,
+				clientY: 0,
+				deltaX: 0,
+				deltaY: 0,
+			});
 		},
 		[onScroll],
 	);

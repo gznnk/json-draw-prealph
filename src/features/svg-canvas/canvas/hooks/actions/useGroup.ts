@@ -8,10 +8,10 @@ import type { SvgCanvasState } from "../../types/SvgCanvasState";
 
 // Import functions related to SvgCanvas.
 import { newId } from "../../../utils/shapes/common/newId";
-import { newEventId } from "../../../utils/common/newEventId";
+import { newEventId } from "../../../utils/core/newEventId";
 import { addHistory } from "../../utils/addHistory";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { removeGroupedRecursive } from "../../utils/removeGroupedRecursive";
 
 /**
@@ -30,7 +30,7 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 		const { setCanvasState, onDataChange } = refBus.current.props;
 
 		setCanvasState((prevState) => {
-			const selectedItems = getSelectedItems(prevState.items);
+			const selectedItems = getSelectedDiagrams(prevState.items);
 			if (selectedItems.length < 2) {
 				// Do not group if there are less than 2 selected shapes
 				// If this is reached, there is a flaw in the caller's control logic

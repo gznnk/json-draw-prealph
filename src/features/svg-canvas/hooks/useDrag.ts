@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
 import type { DiagramType } from "../types/core/DiagramType";
@@ -12,20 +12,21 @@ import type { EventType } from "../types/events/EventType";
 import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
 
 // Import utils.
-import { newEventId } from "../utils/common/newEventId";
-import { getSvgPoint } from "../utils/math/points/getSvgPoint";
+import { newEventId } from "../utils/core/newEventId";
+import { getSvgPoint } from "../utils/core/getSvgPoint";
 
 // Import constants.
 import { DRAG_DEAD_ZONE } from "../constants/Constants";
-
-// Import EventBus.
-import { useEventBus } from "../context/EventBusContext";
-
-// Import event names
 import {
 	EVENT_NAME_BROADCAST_DRAG,
 	EVENT_NAME_SVG_CANVAS_SCROLL,
 } from "../constants/EventNames";
+
+// Import EventBus.
+import { useEventBus } from "../context/EventBusContext";
+import { useSvgViewport } from "../context/SvgViewportContext";
+import { useAutoEdgeScroll } from "./useAutoEdgeScroll";
+import type { DoStartEdgeScrollArgs } from "./useAutoEdgeScroll";
 
 /**
  * Type definition for broadcast drag event
@@ -51,6 +52,7 @@ export type DragProps = {
 	type?: DiagramType;
 	x: number;
 	y: number;
+	disableAutoEdgeScroll?: boolean;
 	ref: React.RefObject<SVGElement>;
 	onPointerDown?: (e: DiagramPointerEvent) => void;
 	onPointerUp?: (e: DiagramPointerEvent) => void;
@@ -80,12 +82,14 @@ export type DragProps = {
  */
 export const useDrag = (props: DragProps) => {
 	const eventBus = useEventBus();
+	const svgViewport = useSvgViewport();
 	const {
 		id,
 		x,
 		y,
 		type,
 		ref,
+		disableAutoEdgeScroll = false,
 		onPointerDown,
 		onPointerUp,
 		onDrag,
@@ -109,23 +113,18 @@ export const useDrag = (props: DragProps) => {
 	// The offset between the center and the pointer.
 	const offsetXBetweenCenterAndPointer = useRef(0);
 	const offsetYBetweenCenterAndPointer = useRef(0);
+	// Client position ref for edge scrolling
+	const clientPosRef = useRef<Point | null>(null);
 
 	/**
-	 * Get the drag area coordinates from the pointer position during dragging
+	 * Get the drag area coordinates from the SVG point during dragging.
 	 *
-	 * @param {number} clientX X coordinate of the pointer on the browser window
-	 * @param {number} clientY Y coordinate of the pointer on the browser window
-	 * @returns {Point} Drag area coordinates
+	 * @param svgPoint - Pointer position in SVG coordinate system
+	 * @returns Drag area coordinates
 	 */
-	const getPointOnDrag = (clientX: number, clientY: number): Point => {
-		const svgPoint = getSvgPoint(clientX, clientY, ref.current);
-
-		let newX = svgPoint.x;
-		let newY = svgPoint.y;
-
-		// Adjust the coordinates by the offset between the center and the pointer
-		newX -= offsetXBetweenCenterAndPointer.current;
-		newY -= offsetYBetweenCenterAndPointer.current;
+	const getPointOnDrag = (svgPoint: Point): Point => {
+		let newX = svgPoint.x - offsetXBetweenCenterAndPointer.current;
+		let newY = svgPoint.y - offsetYBetweenCenterAndPointer.current;
 
 		// If a drag position transformation function is specified, apply that function
 		if (dragPositioningFunction) {
@@ -139,6 +138,27 @@ export const useDrag = (props: DragProps) => {
 			y: newY,
 		};
 	};
+
+	// Register global broadcast drag event listener
+	// Use ref to hold referenced values to avoid frequent handler generation
+	const refBusVal = {
+		// Properties
+		id,
+		x,
+		y,
+		type,
+		ref,
+		onDrag,
+		onDragOver,
+		onDragLeave,
+		onDrop,
+		// Internal variables and functions
+		svgViewport,
+		isDragging,
+		getPointOnDrag,
+	};
+	const refBus = useRef(refBusVal);
+	refBus.current = refBusVal;
 
 	/**
 	 * Pointer down event handler within the drag area
@@ -174,6 +194,47 @@ export const useDrag = (props: DragProps) => {
 	};
 
 	/**
+	 * Handle edge scroll start with custom logic for drag events
+	 */
+	const doStartEdgeScroll = useCallback((state: DoStartEdgeScrollArgs) => {
+		const clientPos = clientPosRef.current;
+		if (!clientPos) {
+			return;
+		}
+
+		// Bypass references to avoid function creation in every render
+		const { id, onDrag, getPointOnDrag } = refBus.current;
+
+		const newEndPos = getPointOnDrag(state.cursorPos);
+
+		// dispatch dragging event
+		const dragEvent = {
+			eventId: newEventId(),
+			eventType: "InProgress",
+			id,
+			startX: startX.current,
+			startY: startY.current,
+			endX: newEndPos.x,
+			endY: newEndPos.y,
+			cursorX: state.cursorPos.x,
+			cursorY: state.cursorPos.y,
+			clientX: clientPos.x,
+			clientY: clientPos.y,
+			minX: state.minX,
+			minY: state.minY,
+		} as DiagramDragEvent;
+
+		// Fire drag event
+		onDrag?.(dragEvent);
+	}, []);
+
+	// Use the shared auto edge scroll hook
+	const { autoEdgeScroll, clearEdgeScroll } = useAutoEdgeScroll(
+		svgViewport.current,
+		doStartEdgeScroll,
+	);
+
+	/**
 	 * Pointer move event handler within the drag area
 	 */
 	const handlePointerMove = (e: React.PointerEvent<SVGElement>): void => {
@@ -182,10 +243,10 @@ export const useDrag = (props: DragProps) => {
 			return;
 		}
 
-		// Get drag coordinates
-		const dragPoint = getPointOnDrag(e.clientX, e.clientY);
-		// Get cursor position in SVG coordinate system
+		// Calculate SVG coordinates first
 		const svgCursorPoint = getSvgPoint(e.clientX, e.clientY, ref.current);
+		// Get drag coordinates
+		const dragPoint = getPointOnDrag(svgCursorPoint);
 		// Generate event ID
 		const eventId = newEventId();
 
@@ -200,6 +261,8 @@ export const useDrag = (props: DragProps) => {
 			endY: dragPoint.y,
 			cursorX: svgCursorPoint.x,
 			cursorY: svgCursorPoint.y,
+			clientX: e.clientX,
+			clientY: e.clientY,
 		} as DiagramDragEvent;
 
 		// Create broadcast drag event information
@@ -245,6 +308,17 @@ export const useDrag = (props: DragProps) => {
 			return;
 		}
 
+		if (!disableAutoEdgeScroll) {
+			// Update client position reference
+			clientPosRef.current = {
+				x: e.clientX,
+				y: e.clientY,
+			};
+
+			// Use the shared auto edge scroll functionality
+			if (autoEdgeScroll(svgCursorPoint)) return;
+		}
+
 		// Fire dragging event
 		onDrag?.(dragEvent);
 
@@ -266,9 +340,13 @@ export const useDrag = (props: DragProps) => {
 		const eventId = newEventId();
 
 		if (isDragging) {
-			// Get drag coordinates
-			const dragPoint = getPointOnDrag(e.clientX, e.clientY); // Get cursor position in SVG coordinate system
+			// Clear edge scroll if it exists
+			clearEdgeScroll();
+
+			// Calculate SVG coordinates first
 			const svgCursorPoint = getSvgPoint(e.clientX, e.clientY, ref.current);
+			// Get drag coordinates
+			const dragPoint = getPointOnDrag(svgCursorPoint);
 
 			// Fire drag end event if dragging was in progress
 			onDrag?.({
@@ -281,6 +359,8 @@ export const useDrag = (props: DragProps) => {
 				endY: dragPoint.y,
 				cursorX: svgCursorPoint.x,
 				cursorY: svgCursorPoint.y,
+				clientX: e.clientX,
+				clientY: e.clientY,
 			});
 			// Fire drag end event for handling by shapes without parent-child relationship
 			eventBus.dispatchEvent(
@@ -351,6 +431,8 @@ export const useDrag = (props: DragProps) => {
 				endY: newPoint.y,
 				cursorX: newPoint.x, // Use shape center as cursor position
 				cursorY: newPoint.y, // Use shape center as cursor position
+				clientX: 0, // No client coordinates for keyboard events
+				clientY: 0, // No client coordinates for keyboard events
 			} as DiagramDragEvent;
 
 			if (!isArrowDragging.current) {
@@ -397,6 +479,8 @@ export const useDrag = (props: DragProps) => {
 						endY: y,
 						cursorX: x, // Use shape center as cursor position
 						cursorY: y, // Use shape center as cursor position
+						clientX: 0, // No client coordinates for keyboard events
+						clientY: 0, // No client coordinates for keyboard events
 					});
 
 					// Mark arrow key drag as ended
@@ -428,6 +512,8 @@ export const useDrag = (props: DragProps) => {
 			endY: y,
 			cursorX: x, // Use shape center as cursor position
 			cursorY: y, // Use shape center as cursor position
+			clientX: 0, // No client coordinates for keyboard events
+			clientY: 0, // No client coordinates for keyboard events
 		} as DiagramDragEvent;
 
 		if (isArrowDragging.current) {
@@ -452,25 +538,6 @@ export const useDrag = (props: DragProps) => {
 			}
 		}
 	};
-
-	// Register global broadcast drag event listener
-	// Use ref to hold referenced values to avoid frequent handler generation
-	const refBusVal = {
-		// Properties
-		id,
-		x,
-		y,
-		type,
-		ref,
-		onDrag,
-		onDragOver,
-		onDragLeave,
-		onDrop,
-		// Internal variables and functions
-		getPointOnDrag,
-	};
-	const refBus = useRef(refBusVal);
-	refBus.current = refBusVal;
 
 	useEffect(() => {
 		let handleBroadcastDrag: (e: CustomEvent) => void;
@@ -536,44 +603,52 @@ export const useDrag = (props: DragProps) => {
 	 * Handle SvgCanvas scroll event.
 	 */
 	useEffect(() => {
-		let handleSvgCanvasScroll: (e: CustomEvent) => void;
-		if (isDragging) {
-			handleSvgCanvasScroll = (e: CustomEvent) => {
-				const { id, getPointOnDrag, onDrag } = refBus.current;
+		const handleSvgCanvasScroll = (e: CustomEvent) => {
+			const { id, isDragging, getPointOnDrag, onDrag } = refBus.current;
 
-				const customEvent = e as CustomEvent<SvgCanvasScrollEvent>;
+			const customEvent = e as CustomEvent<SvgCanvasScrollEvent>;
 
-				const dragPoint = getPointOnDrag(
-					customEvent.detail.clientX,
-					customEvent.detail.clientY,
-				);
-				// Get cursor position in SVG coordinate system
-				const svgCursorPoint = getSvgPoint(
-					customEvent.detail.clientX,
-					customEvent.detail.clientY,
-					ref.current,
-				);
+			if (!isDragging) {
+				// If not dragging, do nothing
+				return;
+			}
 
-				onDrag?.({
-					eventId: newEventId(),
-					eventType: "InProgress",
-					id,
-					startX: startX.current,
-					startY: startY.current,
-					endX: dragPoint.x,
-					endY: dragPoint.y,
-					cursorX: svgCursorPoint.x,
-					cursorY: svgCursorPoint.y,
-					minX: customEvent.detail.minX,
-					minY: customEvent.detail.minY,
-					isFromAutoEdgeScroll: customEvent.detail.isFromAutoEdgeScroll,
-				});
-			};
-			eventBus.addEventListener(
-				EVENT_NAME_SVG_CANVAS_SCROLL,
-				handleSvgCanvasScroll,
+			// Pre-calculate adjusted pointer coordinates for scroll
+			const adjustedClientX =
+				customEvent.detail.clientX + customEvent.detail.deltaX;
+			const adjustedClientY =
+				customEvent.detail.clientY + customEvent.detail.deltaY;
+
+			// Calculate SVG coordinates first
+			const svgCursorPoint = getSvgPoint(
+				adjustedClientX,
+				adjustedClientY,
+				ref.current,
 			);
-		}
+			// Get drag coordinates adjusted for scroll
+			const dragPoint = getPointOnDrag(svgCursorPoint);
+
+			onDrag?.({
+				eventId: newEventId(),
+				eventType: "InProgress",
+				id,
+				startX: startX.current,
+				startY: startY.current,
+				endX: dragPoint.x,
+				endY: dragPoint.y,
+				cursorX: svgCursorPoint.x,
+				cursorY: svgCursorPoint.y,
+				clientX: customEvent.detail.clientX,
+				clientY: customEvent.detail.clientY,
+				minX: customEvent.detail.newMinX,
+				minY: customEvent.detail.newMinY,
+			});
+		};
+		eventBus.addEventListener(
+			EVENT_NAME_SVG_CANVAS_SCROLL,
+			handleSvgCanvasScroll,
+		);
+
 		return () => {
 			if (handleSvgCanvasScroll) {
 				eventBus.removeEventListener(
@@ -582,7 +657,7 @@ export const useDrag = (props: DragProps) => {
 				);
 			}
 		};
-	}, [isDragging, eventBus, ref]);
+	}, [eventBus, ref]);
 
 	return {
 		onPointerDown: handlePointerDown,

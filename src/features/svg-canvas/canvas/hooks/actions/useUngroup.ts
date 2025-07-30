@@ -6,7 +6,7 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 
 // Import functions related to SvgCanvas.
-import { newEventId } from "../../../utils/common/newEventId";
+import { newEventId } from "../../../utils/core/newEventId";
 import { addHistory } from "../../utils/addHistory";
 import { ungroupSelectedGroupsRecursive } from "../../utils/ungroupSelectedGroupsRecursive";
 

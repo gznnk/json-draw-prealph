@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { ADD_NEW_DIAGRAM_EVENT_NAME } from "../constants/EventNames";
 import type { Diagram } from "../types/data/catalog/Diagram";
 import type { AddDiagramEvent } from "../types/events/AddDiagramEvent";
-import { newEventId } from "../utils/common/newEventId";
+import { newEventId } from "../utils/core/newEventId";
 // Import context.
 import type { EventBus } from "../../../shared/event-bus/EventBus";
 

@@ -8,14 +8,15 @@ import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEven
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
-import { getDiagramById } from "../../../utils/common/getDiagramById";
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { getDiagramById } from "../../../utils/core/getDiagramById";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 import { getAncestorItemsById } from "../../utils/getAncestorItemsById";
-import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
+import { removeNonTransformativeShowTransformControls } from "../../utils/removeNonTransformativeShowTransformControls";
+import { updateOutlineBySelection } from "../../utils/updateOutlineBySelection";
 
 /**
  * Custom hook to handle select events on the canvas.
@@ -161,7 +162,7 @@ export const useOnSelect = (
 							reversedAncestorsOfSelectingItem.findIndex(
 								(ancestor) =>
 									isItemableData(ancestor) &&
-									getSelectedItems(ancestor.items).length > 0,
+									getSelectedDiagrams(ancestor.items).length > 0,
 							);
 						if (0 <= commonAncestorOfSelectedItemIdx) {
 							if (!isEventTriggeredItemSelected) {
@@ -248,7 +249,7 @@ export const useOnSelect = (
 			// Multi-selection logic.
 
 			// Get the selected diagrams from the updated state.
-			const selectedItems = getSelectedItems(items);
+			const selectedItems = getSelectedDiagrams(items);
 
 			// When multiple items are selected, create a dummy group to manage the selected items.
 			let multiSelectGroup: GroupData | undefined = undefined;
@@ -320,38 +321,11 @@ export const useOnSelect = (
 			}
 
 			// After processing the selection, update the items to show outlines and transform controls based on selection state.
-			items = applyFunctionRecursively(items, (item, ancestors) => {
-				if (!isSelectableData(item)) {
-					// Skip if the item is not selectable.
-					return item;
-				}
-
-				const isAncestorSelected = ancestors.some(
-					(ancestor) => isSelectableData(ancestor) && ancestor.isSelected,
-				);
-
-				// Show outline when the item is selected or when any ancestor is selected
-				const shouldShowOutline = item.isSelected || isAncestorSelected;
-
-				return {
-					...item,
-					isAncestorSelected,
-					showOutline: shouldShowOutline,
-				};
-			});
+			items = updateOutlineBySelection(items);
 
 			// If the item is not transformative, remove the showTransformControls property.
-			items = applyFunctionRecursively(items, (item) => {
-				if (!isTransformativeData(item) && "showTransformControls" in item) {
-					const { showTransformControls, ...rest } = item as Diagram & {
-						showTransformControls: boolean;
-					};
-					return {
-						...rest,
-					};
-				}
-				return item;
-			});
+			// Remove showTransformControls from non-transformative items using shared utility
+			items = removeNonTransformativeShowTransformControls(items);
 
 			return {
 				...prevState,

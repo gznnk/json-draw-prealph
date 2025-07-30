@@ -1,4 +1,4 @@
-import { newEventId } from "../../utils/common/newEventId";
+import { newEventId } from "../../utils/core/newEventId";
 import type { SvgCanvasState } from "../types/SvgCanvasState";
 import { canvasStateToHistory } from "./canvasStateToHistory";
 

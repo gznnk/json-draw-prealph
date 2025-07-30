@@ -9,23 +9,26 @@ import React, {
 	useState,
 } from "react";
 
-// Import SvgCanvas related type definitions
+// Import types.
 import { DiagramRegistry } from "../registry";
+import type { SvgViewport } from "../types/core/SvgViewport";
+import { newEventId } from "../utils/core/newEventId";
 import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
-import { newEventId } from "../utils/common/newEventId";
+import { InteractionState } from "./types/InteractionState";
 
-// Import SvgCanvas related components
+// Import components.
+import { GridBackground } from "../components/auxiliary/GridBackground";
+import { GridPattern } from "../components/auxiliary/GridPattern";
+import { MiniMap } from "../components/auxiliary/MiniMap";
+import { PointerCaptureElement } from "../components/auxiliary/PointerCaptureElement";
+import { PreviewConnectLine } from "../components/auxiliary/PreviewConnectLine";
 import { TextEditor } from "../components/core/Textable";
 import { CanvasMenu } from "../components/menus/CanvasMenu";
 import { ContextMenu, useContextMenu } from "../components/menus/ContextMenu";
 import { DiagramMenu, useDiagramMenu } from "../components/menus/DiagramMenu";
-import { FlashConnectLine } from "../components/shapes/ConnectLine";
-import { PreviewConnectLine } from "../components/auxiliary/PreviewConnectLine";
-import { Group } from "../components/shapes/Group";
 import UserMenu from "../components/menus/UserMenu/UserMenu";
-import { MiniMap } from "../components/auxiliary/MiniMap";
-import { GridPattern } from "../components/auxiliary/GridPattern";
-import { GridBackground } from "../components/auxiliary/GridBackground";
+import { FlashConnectLine } from "../components/shapes/ConnectLine";
+import { Group } from "../components/shapes/Group";
 
 // Imports related to this component.
 import { useShortcutKey } from "./hooks/keyboard/useShortcutKey";
@@ -41,8 +44,9 @@ import {
 import type { SvgCanvasProps } from "./types/SvgCanvasProps";
 import type { SvgCanvasRef } from "./types/SvgCanvasRef";
 
-// Import SvgCanvas context.
+// Import context.
 import { EventBusProvider } from "../context/EventBusContext";
+import { SvgViewportProvider } from "../context/SvgViewportContext";
 
 // Initialize all diagram types when this module is loaded
 initializeSvgCanvasDiagrams();
@@ -66,6 +70,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			previewConnectLineState,
 			grabScrollState,
 			selectionState,
+			interactionState,
 			// actions
 			onClick,
 			onConnect,
@@ -115,6 +120,22 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		// Container dimensions state
 		const [containerWidth, setContainerWidth] = useState(0);
 		const [containerHeight, setContainerHeight] = useState(0);
+
+		// Reference of the SVG viewport
+		const viewportRef = useRef<SvgViewport>({
+			minX,
+			minY,
+			containerWidth,
+			containerHeight,
+			zoom,
+		});
+		viewportRef.current = {
+			minX,
+			minY,
+			containerWidth,
+			containerHeight,
+			zoom,
+		};
 
 		// Flag indicating whether the SVG element has focus
 		const hasFocus = useRef(false);
@@ -192,17 +213,25 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					refBus.current;
 
 				if (e.target === e.currentTarget) {
-					// If grab scrolling is active, handle the grab start.
-					onGrabStart?.(e);
+					// Start area selection if left mouse button is pressed
+					if (e.button === 0 && onAreaSelection) {
+						// Use dummy element for pointer capture to enable auto-scroll when pointer is outside viewport
+						if (dummyElementRef.current) {
+							dummyElementRef.current.setPointerCapture(e.pointerId);
+							capturedPointerIdRef.current = e.pointerId;
+						}
 
-					// Start area selection if not pressing right mouse button
-					if (e.button !== 2 && onAreaSelection) {
 						onAreaSelection({
 							eventId: newEventId(),
 							eventType: "Start",
 							clientX: e.clientX,
 							clientY: e.clientY,
 						});
+					}
+
+					// Handle grab start for right mouse button
+					if (e.button === 2) {
+						onGrabStart?.(e);
 					}
 
 					// Clear the selection when pointer is down on the canvas.
@@ -216,46 +245,26 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		);
 
 		/**
-		 * Handle the pointer move event for grab scrolling and area selection.
+		 * Handle the pointer move event for grab scrolling.
+		 * Area selection is handled by PointerCaptureElement when pointer capture is active.
 		 */
 		const handlePointerMove = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
-				// Handle area selection if active
-				if (selectionState?.isSelecting && onAreaSelection) {
-					onAreaSelection({
-						eventId: newEventId(),
-						eventType: "InProgress",
-						clientX: e.clientX,
-						clientY: e.clientY,
-					});
-					return;
-				}
-
 				// Call the grab move handler
 				refBus.current.onGrabMove?.(e);
 			},
-			[selectionState?.isSelecting, onAreaSelection],
+			[],
 		);
 
 		/**
-		 * Handle the pointer up event to end grab scrolling and area selection.
+		 * Handle the pointer up event to end grab scrolling.
+		 * Area selection end is handled by PointerCaptureElement when pointer capture is active.
 		 */
 		const handlePointerUp = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
-				// Handle area selection end
-				if (selectionState?.isSelecting && onAreaSelection) {
-					onAreaSelection({
-						eventId: newEventId(),
-						eventType: "End",
-						clientX: e.clientX,
-						clientY: e.clientY,
-					});
-					return;
-				}
-
 				refBus.current.onGrabEnd?.(e);
 			},
-			[selectionState?.isSelecting, onAreaSelection],
+			[],
 		);
 
 		/**
@@ -266,10 +275,12 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			const { minX, minY, onScroll } = refBus.current;
 
 			onScroll?.({
-				minX: minX + e.deltaX,
-				minY: minY + e.deltaY,
-				clientX: e.clientX + e.deltaX, // TODO: ここで加算するのはわかりにくい
-				clientY: e.clientY + e.deltaY, // TODO: ここで加算するのはわかりにくい
+				newMinX: minX + e.deltaX,
+				newMinY: minY + e.deltaY,
+				clientX: e.clientX,
+				clientY: e.clientY,
+				deltaX: e.deltaX,
+				deltaY: e.deltaY,
 			});
 		}, []);
 
@@ -279,8 +290,25 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		const handleKeyDown = useCallback(
 			(e: React.KeyboardEvent<SVGSVGElement>) => {
 				// Cancel area selection on Escape key
-				if (e.key === "Escape" && selectionState?.isSelecting) {
+				if (
+					e.key === "Escape" &&
+					interactionState === InteractionState.AreaSelection
+				) {
 					e.preventDefault();
+					// Release pointer capture from dummy element
+					if (
+						dummyElementRef.current &&
+						capturedPointerIdRef.current !== null
+					) {
+						try {
+							dummyElementRef.current.releasePointerCapture(
+								capturedPointerIdRef.current,
+							);
+							capturedPointerIdRef.current = null;
+						} catch {
+							// Ignore errors if pointer capture wasn't set
+						}
+					}
 					if (onCancelAreaSelection) {
 						onCancelAreaSelection();
 					}
@@ -292,7 +320,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					e.preventDefault();
 				}
 			},
-			[selectionState?.isSelecting, onCancelAreaSelection],
+			[interactionState, onCancelAreaSelection],
 		);
 
 		// Monitor container size changes with ResizeObserver
@@ -343,6 +371,63 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			};
 		}, []);
 
+		// Create a dummy element for pointer capture during area selection
+		const dummyElementRef = useRef<HTMLDivElement>(null);
+		const capturedPointerIdRef = useRef<number | null>(null);
+
+		/**
+		 * Handle pointer move events from the capture element
+		 */
+		const handleCaptureElementPointerMove = useCallback(
+			(e: React.PointerEvent<HTMLDivElement>) => {
+				// Forward pointer move events to area selection when captured
+				if (
+					interactionState === InteractionState.AreaSelection &&
+					onAreaSelection
+				) {
+					onAreaSelection({
+						eventId: newEventId(),
+						eventType: "InProgress",
+						clientX: e.clientX,
+						clientY: e.clientY,
+					});
+				}
+			},
+			[interactionState, onAreaSelection],
+		);
+
+		/**
+		 * Handle pointer up events from the capture element
+		 */
+		const handleCaptureElementPointerUp = useCallback(
+			(e: React.PointerEvent<HTMLDivElement>) => {
+				// Forward pointer up events to area selection when captured
+				if (
+					interactionState === InteractionState.AreaSelection &&
+					onAreaSelection
+				) {
+					// Release pointer capture from dummy element
+					if (
+						dummyElementRef.current &&
+						capturedPointerIdRef.current !== null
+					) {
+						dummyElementRef.current.releasePointerCapture(
+							capturedPointerIdRef.current,
+						);
+						capturedPointerIdRef.current = null;
+					}
+
+					onAreaSelection({
+						eventId: newEventId(),
+						eventType: "End",
+						clientX: e.clientX,
+						clientY: e.clientY,
+					});
+				}
+			},
+			[interactionState, onAreaSelection],
+		);
+
 		// Render diagrams
 		const renderedItems = items.map((item) => {
 			const component = DiagramRegistry.getComponent(item.type);
@@ -374,76 +459,84 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			<Viewport>
 				<Container ref={containerRef}>
 					<EventBusProvider eventBus={eventBus}>
-						<Svg
-							width={containerWidth}
-							height={containerHeight}
-							viewBox={`${minX / zoom} ${minY / zoom} ${containerWidth / zoom} ${containerHeight / zoom}`}
-							tabIndex={0}
-							ref={svgRef}
-							isGrabScrolling={grabScrollState?.isGrabScrolling}
-							onPointerDown={handlePointerDown}
-							onPointerMove={handlePointerMove}
-							onPointerUp={handlePointerUp}
-							onKeyDown={handleKeyDown}
-							onFocus={handleFocus}
-							onBlur={handleBlur}
-							onWheel={handleWheel}
-							onContextMenu={onContextMenu}
-						>
-							<title>{title}</title>
-							{/* Grid pattern definition */}
-							<GridPattern gridSize={20} color="rgba(24, 144, 255, 0.1)" />
-							{/* Grid background */}
-							<GridBackground
-								x={minX / zoom}
-								y={minY / zoom}
-								width={containerWidth / zoom}
-								height={containerHeight / zoom}
-							/>
-							{/* Render the items in the SvgCanvas. */}
-							{renderedItems}
-							{/* Dummy group for multi-select. */}
-							{multiSelectGroup && (
-								<Group
-									{...multiSelectGroup}
-									id={MULTI_SELECT_GROUP}
-									onTransform={onTransform}
+						<SvgViewportProvider viewportRef={viewportRef}>
+							<Svg
+								width={containerWidth}
+								height={containerHeight}
+								viewBox={`${minX / zoom} ${minY / zoom} ${containerWidth / zoom} ${containerHeight / zoom}`}
+								tabIndex={0}
+								ref={svgRef}
+								isGrabScrolling={grabScrollState?.isGrabScrolling}
+								onPointerDown={handlePointerDown}
+								onPointerMove={handlePointerMove}
+								onPointerUp={handlePointerUp}
+								onKeyDown={handleKeyDown}
+								onFocus={handleFocus}
+								onBlur={handleBlur}
+								onWheel={handleWheel}
+								onContextMenu={onContextMenu}
+							>
+								<title>{title}</title>
+								{/* Grid pattern definition */}
+								<GridPattern gridSize={20} color="rgba(24, 144, 255, 0.1)" />
+								{/* Grid background */}
+								<GridBackground
+									x={minX / zoom}
+									y={minY / zoom}
+									width={containerWidth / zoom}
+									height={containerHeight / zoom}
 								/>
-							)}
-							{/* Render preview connect line. */}
-							<PreviewConnectLine pathData={previewConnectLineState} />
-							{/* Render flash connect lines */}
-							<FlashConnectLine />
-							{/* Render area selection rectangle */}
-							{selectionState && (
-								<SelectionRect
-									x={Math.min(selectionState.startX, selectionState.endX)}
-									y={Math.min(selectionState.startY, selectionState.endY)}
-									width={Math.abs(selectionState.endX - selectionState.startX)}
-									height={Math.abs(selectionState.endY - selectionState.startY)}
-									visible={selectionState.isSelecting}
-								/>
-							)}
-						</Svg>
-						{/* Container for HTML elements that follow the scroll of the SVG canvas with zoom scaling. */}
-						<HTMLElementsContainer
-							left={-minX}
-							top={-minY}
-							width={containerWidth + minX}
-							height={containerHeight + minY}
-							zoom={zoom}
-						>
-							<TextEditor {...textEditorState} onTextChange={onTextChange} />
-						</HTMLElementsContainer>
-						{/* Container for HTML elements that follow the scroll but not zoom. */}
-						<HTMLElementsContainer
-							left={-minX}
-							top={-minY}
-							width={containerWidth + minX}
-							height={containerHeight + minY}
-						>
-							<DiagramMenu {...diagramMenuProps} />
-						</HTMLElementsContainer>
+								{/* Render the items in the SvgCanvas. */}
+								{renderedItems}
+								{/* Dummy group for multi-select. */}
+								{multiSelectGroup && (
+									<Group
+										{...multiSelectGroup}
+										id={MULTI_SELECT_GROUP}
+										onTransform={onTransform}
+									/>
+								)}
+								{/* Render preview connect line. */}
+								<PreviewConnectLine pathData={previewConnectLineState} />
+								{/* Render flash connect lines */}
+								<FlashConnectLine />
+								{/* Render area selection rectangle */}
+								{selectionState && (
+									<SelectionRect
+										x={Math.min(selectionState.startX, selectionState.endX)}
+										y={Math.min(selectionState.startY, selectionState.endY)}
+										width={Math.abs(
+											selectionState.endX - selectionState.startX,
+										)}
+										height={Math.abs(
+											selectionState.endY - selectionState.startY,
+										)}
+										visible={
+											interactionState === InteractionState.AreaSelection
+										}
+									/>
+								)}
+							</Svg>
+							{/* Container for HTML elements that follow the scroll of the SVG canvas with zoom scaling. */}
+							<HTMLElementsContainer
+								left={-minX}
+								top={-minY}
+								width={containerWidth + minX}
+								height={containerHeight + minY}
+								zoom={zoom}
+							>
+								<TextEditor {...textEditorState} onTextChange={onTextChange} />
+							</HTMLElementsContainer>
+							{/* Container for HTML elements that follow the scroll but not zoom. */}
+							<HTMLElementsContainer
+								left={-minX}
+								top={-minY}
+								width={containerWidth + minX}
+								height={containerHeight + minY}
+							>
+								<DiagramMenu {...diagramMenuProps} />
+							</HTMLElementsContainer>
+						</SvgViewportProvider>
 					</EventBusProvider>
 				</Container>
 				{/* Container for HTML elements fixed to the viewport. */}
@@ -459,6 +552,13 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 						containerHeight={containerHeight}
 						zoom={zoom}
 						onNavigate={onNavigate}
+					/>
+					{/* Pointer capture element for area selection */}
+					<PointerCaptureElement
+						elementRef={dummyElementRef}
+						capturedPointerId={capturedPointerIdRef.current}
+						onPointerMove={handleCaptureElementPointerMove}
+						onPointerUp={handleCaptureElementPointerUp}
 					/>
 				</ViewportOverlay>
 			</Viewport>

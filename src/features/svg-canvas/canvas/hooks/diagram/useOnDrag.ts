@@ -8,11 +8,8 @@ import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import hooks.
-import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
-
 // Import utils.
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
 import { isItemableData } from "../../../utils/validation/isItemableData";
 import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
@@ -20,7 +17,6 @@ import { addHistory } from "../../utils/addHistory";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createItemMap } from "../../utils/createItemMap";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
-import { isDiagramChangingEvent } from "../../utils/isDiagramChangingEvent";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
@@ -30,13 +26,9 @@ import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
  * Custom hook to handle drag events on the canvas.
  */
 export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
-	// Get the auto edge scroll function and scrolling state to handle canvas auto scrolling.
-	const { autoEdgeScroll, isAutoScrolling } = useAutoEdgeScroll(props);
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		autoEdgeScroll,
-		isAutoScrolling,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -52,20 +44,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 		// Bypass references to avoid function creation in every render.
 		const {
 			props: { setCanvasState, onDataChange },
-			autoEdgeScroll,
-			isAutoScrolling,
 		} = refBus.current;
-
-		// If auto scrolling is active and this event is not from auto edge scroll,
-		// ignore diagram movement processing but continue auto edge scroll detection
-		if (isAutoScrolling && !e.isFromAutoEdgeScroll) {
-			// Auto scroll if the cursor is near the edges.
-			autoEdgeScroll({
-				cursorX: e.cursorX,
-				cursorY: e.cursorY,
-			});
-			return;
-		}
 
 		// Update the canvas state based on the drag event.
 		setCanvasState((prevState) => {
@@ -78,7 +57,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				startCanvasState.current = prevState;
 
 				// Store selected item IDs for performance
-				const selectedItems = getSelectedItems(prevState.items);
+				const selectedItems = getSelectedDiagrams(prevState.items);
 				selectedItemIds.current = new Set(selectedItems.map((item) => item.id));
 				// Store initial items map
 				initialItemsMap.current = createItemMap(prevState.items);
@@ -172,11 +151,10 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 			let newState: SvgCanvasState = {
 				...prevState,
 				items: moveRecursively(prevState.items),
-				isDiagramChanging: isDiagramChangingEvent(e.eventType),
 				interactionState:
 					e.eventType === "Start" || e.eventType === "InProgress"
 						? InteractionState.Dragging
-						: InteractionState.Normal,
+						: InteractionState.Idle,
 			};
 
 			// If the event has minX and minY, update the canvas state
@@ -234,12 +212,6 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 			}
 
 			return newState;
-		});
-
-		// Auto scroll if the cursor is near the edges.
-		autoEdgeScroll({
-			cursorX: e.cursorX,
-			cursorY: e.cursorY,
 		});
 	}, []);
 };

@@ -11,8 +11,8 @@ import type { RectangleData } from "../../../../types/data/shapes/RectangleData"
 import type { DiagramStyleChangeEvent } from "../../../../types/events/DiagramStyleChangeEvent";
 
 // Import functions related to SvgCanvas.
-import { getSelectedItems } from "../../../../utils/common/getSelectedItems";
-import { newEventId } from "../../../../utils/common/newEventId";
+import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams";
+import { newEventId } from "../../../../utils/core/newEventId";
 import { isItemableData } from "../../../../utils/validation/isItemableData";
 import { isTextableData } from "../../../../utils/validation/isTextableData";
 import { isTransformativeData } from "../../../../utils/validation/isTransformativeData";
@@ -29,10 +29,11 @@ import type {
 	DiagramMenuStateMap,
 	DiagramMenuType,
 } from "./DiagramMenuTypes";
+import { InteractionState } from "../../../../canvas/types/InteractionState";
 
 export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 	// Extract properties from canvasProps.
-	const { items, isDiagramChanging, multiSelectGroup, zoom } = canvasProps;
+	const { items, interactionState, multiSelectGroup, zoom } = canvasProps;
 
 	// Diagram menu controls open/close state.
 	const [isBgColorPickerOpen, setIsBgColorPickerOpen] = useState(false);
@@ -70,8 +71,9 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 	} as DiagramMenuStateMap;
 
 	// Get selected items and check if the diagram menu should be shown.
-	const selectedItems = getSelectedItems(items);
-	const showDiagramMenu = 0 < selectedItems.length && !isDiagramChanging;
+	const selectedItems = getSelectedDiagrams(items);
+	const showDiagramMenu =
+		0 < selectedItems.length && interactionState === InteractionState.Idle;
 	const singleSelectedItem = selectedItems[0];
 
 	// If the diagram menu is not shown, close controls.

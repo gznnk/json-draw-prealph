@@ -6,7 +6,7 @@ import type { TextEditorState } from "../components/core/Textable";
 import type { Diagram } from "../types/data/catalog/Diagram";
 
 // Import functions related to SvgCanvas.
-import { deepCopy } from "../utils/common/deepCopy";
+import { deepCopy } from "../utils/core/deepCopy";
 import { calcCanvasBounds } from "./utils/calcCanvasBounds";
 
 // Import EventBus.
@@ -97,7 +97,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		id: props.id,
 		items: props.items,
 		zoom: props.zoom,
-		isDiagramChanging: false,
 		history: [
 			{
 				...initialBounds,
@@ -108,7 +107,13 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		historyIndex: 0,
 		lastHistoryEventId: "",
 		textEditorState: { isActive: false } as TextEditorState,
-		interactionState: InteractionState.Normal,
+		interactionState: InteractionState.Idle,
+		areaSelectionState: {
+			startX: 0,
+			startY: 0,
+			endX: 0,
+			endY: 0,
+		},
 	});
 
 	// Create props for the canvas hooks.

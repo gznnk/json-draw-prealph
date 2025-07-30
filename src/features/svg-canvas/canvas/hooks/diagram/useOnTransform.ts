@@ -9,22 +9,18 @@ import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import hooks related to SvgCanvas.
-import { useAutoEdgeScroll } from "../navigation/useAutoEdgeScroll";
-
 // Import functions related to SvgCanvas.
 import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
 import { isConnectableData } from "../../../utils/validation/isConnectableData";
 import { addHistory } from "../../utils/addHistory";
 import { createItemMap } from "../../utils/createItemMap";
-import { isDiagramChangingEvent } from "../../utils/isDiagramChangingEvent";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 import { updateOutlineOfGroup } from "../../utils/updateOutlineOfGroup";
 
 // Import utility functions for transformation.
 import type { GroupData } from "../../../types/data/shapes/GroupData";
-import { getSelectedItems } from "../../../utils/common/getSelectedItems";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { rotatePoint } from "../../../utils/math/points/rotatePoint";
 import { isItemableData } from "../../../utils/validation/isItemableData";
@@ -43,14 +39,9 @@ const getIsTransformingState = (eventType: EventType): boolean => {
  * Custom hook to handle transform events on the canvas.
  */
 export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
-	// Get the auto edge scroll function and scrolling state to handle canvas auto scrolling.
-	const { autoEdgeScroll, isAutoScrolling } = useAutoEdgeScroll(props);
-
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		autoEdgeScroll,
-		isAutoScrolling,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -196,6 +187,9 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 
 					// Update the connect points of the transformed item.
 					newItem = updateDiagramConnectPoints(newItem);
+					if (isConnectableData(newItem)) {
+						transformedDiagrams.push(newItem);
+					}
 
 					// Add top-level group to the set if this is a transformed item and we have ancestors
 					if (ancestors.length > 0 && ancestors[0]) {
@@ -247,20 +241,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 			// Bypass references to avoid function creation in every render.
 			const {
 				props: { setCanvasState, onDataChange },
-				autoEdgeScroll,
-				isAutoScrolling,
 			} = refBus.current;
-
-			// If auto scrolling is active and this event is not from auto edge scroll,
-			// ignore diagram transformation processing but continue auto edge scroll detection
-			if (isAutoScrolling && !e.isFromAutoEdgeScroll) {
-				// Auto scroll if the cursor is near the edges.
-				autoEdgeScroll({
-					cursorX: e.cursorX,
-					cursorY: e.cursorY,
-				});
-				return;
-			}
 
 			// Update the canvas state based on the transform event.
 			setCanvasState((prevState) => {
@@ -270,7 +251,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 					startCanvasState.current = prevState;
 
 					// Store selected item IDs for performance
-					const selectedItems = getSelectedItems(prevState.items);
+					const selectedItems = getSelectedDiagrams(prevState.items);
 					if (selectedItems.length > 1) {
 						// If multiple items are selected, store their IDs for multi-selection.
 						multiSelectedItemIds.current = new Set(
@@ -295,11 +276,10 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 						[],
 						topLevelGroupIds,
 					),
-					isDiagramChanging: isDiagramChangingEvent(e.eventType),
 					interactionState:
 						e.eventType === "Start" || e.eventType === "InProgress"
 							? InteractionState.Transforming
-							: InteractionState.Normal,
+							: InteractionState.Idle,
 					multiSelectGroup: prevState.multiSelectGroup
 						? ({
 								...prevState.multiSelectGroup,
@@ -348,14 +328,6 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 
 				return newState;
 			});
-
-			// Auto scroll if the cursor is near the edges, but skip for rotation operations
-			if (e.transformationType !== "Rotation") {
-				autoEdgeScroll({
-					cursorX: e.cursorX ?? e.endShape.x,
-					cursorY: e.cursorY ?? e.endShape.y,
-				});
-			}
 		},
 		[transformRecursively],
 	);

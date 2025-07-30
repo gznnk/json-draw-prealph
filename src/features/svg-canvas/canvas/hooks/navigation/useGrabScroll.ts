@@ -3,9 +3,8 @@ import { useCallback, useRef } from "react";
 
 // Import types.
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
-
-// Import hooks.
-import { useScroll } from "./useScroll";
+import type { SvgCanvasScrollEvent } from "../../../types/events/SvgCanvasScrollEvent";
+import { EVENT_NAME_SVG_CANVAS_SCROLL } from "../../../constants/EventNames";
 
 /**
  * Return type for the useGrabScroll hook
@@ -28,6 +27,7 @@ export const useGrabScroll = (
 	const {
 		canvasState: { minX, minY, grabScrollState },
 		setCanvasState,
+		eventBus,
 	} = props;
 
 	// Reference to store the initial drag start state
@@ -38,16 +38,13 @@ export const useGrabScroll = (
 		minY: number;
 	} | null>(null);
 
-	// Get scroll handler
-	const onScroll = useScroll(props);
-
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		minX,
 		minY,
 		isGrabScrolling: grabScrollState?.isGrabScrolling,
 		setCanvasState,
-		onScroll,
+		eventBus,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -103,7 +100,7 @@ export const useGrabScroll = (
 			if (!dragStartState.current) return;
 
 			// Bypass references to avoid function creation in every render.
-			const { setCanvasState, onScroll } = refBus.current;
+			const { setCanvasState, eventBus } = refBus.current;
 
 			// Calculate total movement from the start position
 			const totalDeltaX = e.clientX - dragStartState.current.clientX;
@@ -116,19 +113,28 @@ export const useGrabScroll = (
 			// Mark that grab scrolling occurred
 			setCanvasState((prevState) => ({
 				...prevState,
+				minX: newMinX,
+				minY: newMinY,
 				grabScrollState: {
 					isGrabScrolling: true,
 					grabScrollOccurred: true,
 				},
 			}));
 
-			// Update scroll position
-			onScroll?.({
-				minX: newMinX,
-				minY: newMinY,
+			// Emit scroll event for other components to handle
+			const scrollEvent: SvgCanvasScrollEvent = {
+				newMinX,
+				newMinY,
 				clientX: e.clientX,
 				clientY: e.clientY,
-			});
+				deltaX: -totalDeltaX,
+				deltaY: -totalDeltaY,
+			};
+			eventBus.dispatchEvent(
+				new CustomEvent(EVENT_NAME_SVG_CANVAS_SCROLL, {
+					detail: scrollEvent,
+				}),
+			);
 		},
 		[],
 	);
