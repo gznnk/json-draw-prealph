@@ -276,8 +276,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onClearAllSelection,
 		onSelect,
 		onSelectAll,
-		// other
-		onDataChange: props.onDataChange,
 	};
 
 	return {

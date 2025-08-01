@@ -103,8 +103,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onClearAllSelection,
 			onSelect,
 			onSelectAll,
-			// other
-			onDataChange,
 		} = props;
 
 		// Reference to the SVG element container
@@ -177,7 +175,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onDragLeave,
 			onDiagramChange,
 			onClearAllSelection,
-			onDataChange,
 			onHoverChange,
 			onScroll,
 			onZoom,

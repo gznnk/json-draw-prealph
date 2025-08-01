@@ -10,15 +10,21 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import { isSelectableData } from "../../../utils/validation/isSelectableData";
 import { addHistory } from "../../utils/addHistory";
 import { clearSelectionRecursively } from "../../utils/clearSelectionRecursively";
-import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
+
+// Import hooks.
+import { useDataChange } from "../history/useDataChange";
 
 /**
  * Custom hook to handle new diagram events on the canvas.
  */
 export const useAddDiagram = (props: SvgCanvasSubHooksProps) => {
+	// Get the data change handler.
+	const onDataChange = useDataChange(props);
+
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
+		onDataChange,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -43,7 +49,7 @@ export const useAddDiagram = (props: SvgCanvasSubHooksProps) => {
 			newState = addHistory(prevState, newState);
 
 			// Notify the data change.
-			onDataChange?.(svgCanvasStateToData(newState));
+			onDataChange?.(newState);
 
 			return newState;
 		});
