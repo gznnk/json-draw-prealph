@@ -1,14 +1,19 @@
 {
-	"permissions": {
-		"allow": [
-			"Bash(npm run build:*)",
-			"Bash(git add:*)",
-			"Bash(npm run lint)",
-			"Bash(npm test)",
-			"Bash(mkdir:*)",
-			"Bash(npm run lint:*)",
-			"Bash(mv:*)"
-		],
-		"deny": []
-	}
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(npm run lint)",
+      "Bash(npm test)",
+      "Bash(mkdir:*)",
+      "Bash(npm run lint:*)",
+      "Bash(mv:*)"
+    ],
+    "deny": []
+  },
+  "enabledMcpjsonServers": [
+    "serena"
+  ],
+  "enableAllProjectMcpServers": true
 }
