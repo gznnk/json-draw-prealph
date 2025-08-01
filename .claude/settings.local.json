@@ -8,12 +8,15 @@
       "Bash(npm test)",
       "Bash(mkdir:*)",
       "Bash(npm run lint:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "mcp__serena__read_file",
+      "mcp__serena__find_file",
+      "mcp__serena__write_memory"
     ],
     "deny": []
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "serena"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }
