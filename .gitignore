@@ -29,3 +29,6 @@ dist-ssr
 
 # Serena cache files
 .serena/cache/
+
+# Dependency analysis output
+.dependency-graph/
