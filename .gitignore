@@ -26,3 +26,6 @@ dist-ssr
 # Other files
 .VSCodeCounter
 *.drawio.png.bkp
+
+# Serena cache files
+.serena/cache/
