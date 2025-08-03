@@ -50,11 +50,11 @@ import { calcEllipseConnectPointPosition } from "../utils/shapes/ellipse/calcEll
 import { calcRectangleConnectPointPosition } from "../utils/shapes/rectangle/calcRectangleConnectPointPosition";
 
 // Import create functions
-import { createAgentNodeData } from "../components/nodes/AgentNode/AgentNodeFunctions";
-import { createHubNodeData } from "../components/nodes/HubNode/HubNodeFunctions";
+import { createAgentNodeData } from "../utils/nodes/agentNode/createAgentNodeData";
+import { createHubNodeData } from "../utils/nodes/hubNode/createHubNodeData";
 import { createImageGenNodeData } from "../utils/nodes/imageGenNode/createImageGenNodeData";
 import { createLLMNodeData } from "../utils/nodes/llmNodeData/createLLMNodeData";
-import { createPageDesignNodeData } from "../components/nodes/PageDesignNode";
+import { createPageDesignNodeData } from "../utils/nodes/pageDesignNode/createPageDesignNodeData";
 import { createSvgToDiagramNodeData } from "../utils/nodes/svgToDiagramNode/createSvgToDiagramNodeData";
 import { createTextAreaNodeData } from "../utils/nodes/textAreaNode/createTextAreaNodeData";
 import { createVectorStoreNodeData } from "../utils/nodes/vectorStoreNode/createVectorStoreNodeData";

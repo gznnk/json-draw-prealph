@@ -2,8 +2,8 @@
 import type { PageDesignNodeData } from "../../../types/data/nodes/PageDesignNodeData";
 
 // Import utils.
-import { newId } from "../../../utils/shapes/common/newId";
-import { createRectangleConnectPoint } from "../../../utils/shapes/rectangle/createRectangleConnectPoint";
+import { newId } from "../../shapes/common/newId";
+import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
 
 export const createPageDesignNodeData = ({
 	x,

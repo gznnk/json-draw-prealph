@@ -1,18 +1,18 @@
 // Import types.
-import type { HubNodeData } from "../../../types/data/nodes/HubNodeData";
+import type { AgentNodeData } from "../../../types/data/nodes/AgentNodeData";
 
 // Import utils.
-import { newId } from "../../../utils/shapes/common/newId";
-import { createEllipseConnectPoint } from "../../../utils/shapes/ellipse/createEllipseConnectPoint";
+import { newId } from "../../shapes/common/newId";
+import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
 
-export const createHubNodeData = ({
+export const createAgentNodeData = ({
 	x,
 	y,
 }: {
 	x: number;
 	y: number;
 }) => {
-	const connectPoints = createEllipseConnectPoint({
+	const connectPoints = createRectangleConnectPoint({
 		x,
 		y,
 		width: 100,
@@ -24,7 +24,7 @@ export const createHubNodeData = ({
 
 	return {
 		id: newId(),
-		type: "HubNode",
+		type: "AgentNode",
 		x,
 		y,
 		width: 100,
@@ -37,5 +37,6 @@ export const createHubNodeData = ({
 		isSelected: false,
 		showOutline: false,
 		showTransformControls: false,
-	} as HubNodeData;
+		showConnectPoints: false,
+	} as AgentNodeData;
 };
