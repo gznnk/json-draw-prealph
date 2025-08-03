@@ -13,14 +13,12 @@ import { IconContainer } from "../../core/IconContainer";
 import { CPU_1 } from "../../icons/CPU_1";
 import { Rectangle } from "../../shapes/Rectangle";
 
-// Import hooks related to SvgCanvas.
+// Import hooks.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
-// Import functions related to SvgCanvas.
-import { newEventId } from "../../../utils/core/newEventId";
-
-// Import utilities.
+// Import utils.
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
+import { newEventId } from "../../../utils/core/newEventId";
 
 // Import related to this component.
 import { RectangleWrapper } from "./LLMNodeStyled";

@@ -1,8 +1,8 @@
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 import { calcRadians } from "../../math/points/calcRadians";
 import { radiansToDegrees } from "../../math/common/radiansToDegrees";
-import { isConnectableData } from "../../validation/isConnectableData";
+import { isConnectableState } from "../../validation/isConnectableState";
 
 /**
  * Updates a manual connect line path by maintaining the shape's movement behavior.
@@ -30,8 +30,8 @@ export const updateManualConnectLinePath = (
 ): ConnectLineData | null => {
 	// Check if current owner shapes have connect points
 	if (
-		!isConnectableData(startOwnerShape) ||
-		!isConnectableData(endOwnerShape)
+		!isConnectableState(startOwnerShape) ||
+		!isConnectableState(endOwnerShape)
 	) {
 		return null;
 	}
@@ -50,8 +50,8 @@ export const updateManualConnectLinePath = (
 
 	// Check if original owner shapes have connect points
 	if (
-		!isConnectableData(originalStartOwner) ||
-		!isConnectableData(originalEndOwner)
+		!isConnectableState(originalStartOwner) ||
+		!isConnectableState(originalEndOwner)
 	) {
 		return null;
 	}

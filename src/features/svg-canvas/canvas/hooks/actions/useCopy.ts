@@ -2,13 +2,13 @@
 import { useCallback, useRef } from "react";
 
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
-import { isItemableData } from "../../../utils/validation/isItemableData";
+import { isItemableState } from "../../../utils/validation/isItemableState";
 
 /**
  * Collects all shape IDs contained in the specified list
@@ -22,7 +22,7 @@ const collectAllShapeIds = (items: Diagram[], idSet: Set<string>) => {
 		idSet.add(item.id);
 
 		// Process children recursively if they exist
-		if (isItemableData(item) && item.items) {
+		if (isItemableState(item) && item.items) {
 			collectAllShapeIds(item.items, idSet);
 		}
 	}

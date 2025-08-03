@@ -3,13 +3,13 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
-import type { Diagram } from "../../../../types/data/catalog/Diagram";
 import type { DiagramBaseData } from "../../../../types/data/core/DiagramBaseData";
 import type { PathData } from "../../../../types/data/shapes/PathData";
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
 import type { PathProps } from "../../../../types/props/shapes/PathProps";
+import type { Diagram } from "../../../../types/state/catalog/Diagram";
 
 // Import components.
 import { Outline } from "../../../core/Outline";
@@ -20,19 +20,19 @@ import { SegmentList } from "../SegmentList";
 import { PathElement } from "./PathStyled";
 
 // Import hooks.
-import { useDrag } from "../../../../hooks/useDrag";
 import { useClick } from "../../../../hooks/useClick";
+import { useDrag } from "../../../../hooks/useDrag";
 import { useSelect } from "../../../../hooks/useSelect";
 
 // Import utils.
+import { mergeProps } from "../../../../utils/core/mergeProps";
 import { calcOrientedShapeFromPoints } from "../../../../utils/math/geometry/calcOrientedShapeFromPoints";
 import {
 	createEndPointArrowHead,
 	createStartPointArrowHead,
 } from "../../../../utils/shapes/path/createArrowHeads";
 import { createDValue } from "../../../../utils/shapes/path/createDValue";
-import { isItemableData } from "../../../../utils/validation/isItemableData";
-import { mergeProps } from "../../../../utils/core/mergeProps";
+import { isItemableState } from "../../../../utils/validation/isItemableState";
 
 // TODO: Cannot enter vertex editing mode when overlapping with border
 /**
@@ -234,7 +234,7 @@ const PathComponent: React.FC<PathProps> = ({
 	 */
 	const handleDiagramChangeBySegumentAndNewVertex = useCallback(
 		(e: DiagramChangeEvent) => {
-			if (!isItemableData<DiagramBaseData>(e.endDiagram)) return; // Type guard with DiagramBaseData
+			if (!isItemableState<DiagramBaseData>(e.endDiagram)) return; // Type guard with DiagramBaseData
 
 			const { rotation, scaleX, scaleY, onDiagramChange } = refBus.current;
 			if (e.eventType === "End") {

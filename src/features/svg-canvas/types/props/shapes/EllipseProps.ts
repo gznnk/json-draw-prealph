@@ -1,12 +1,12 @@
-// Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../core/CreateDiagramProps";
-import type { EllipseData } from "../../data/shapes/EllipseData";
+// Import types.
+import type { CreateDiagramProps } from "./CreateDiagramProps";
+import type { EllipseState } from "../../state/shapes/EllipseState";
 
 /**
  * Props for Ellipse component
  */
 export type EllipseProps = CreateDiagramProps<
-	EllipseData,
+	EllipseState,
 	{
 		selectable: true;
 		transformative: true;

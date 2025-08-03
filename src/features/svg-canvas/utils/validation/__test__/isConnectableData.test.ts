@@ -1,10 +1,10 @@
-import { isConnectableData } from "../isConnectableData";
-import type { ConnectableData } from "../../../types/data/shapes/ConnectableData";
-import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
+import type { ConnectableState } from "../../../types/state/shapes/ConnectableState";
+import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
+import { isConnectableState } from "../isConnectableState";
 
-describe("isConnectableData", () => {
-	// Valid ConnectableData object for testing
-	const validConnectPointData: ConnectPointData = {
+describe("isConnectableState", () => {
+	// Valid ConnectableState object for testing
+	const validConnectPointState: ConnectPointState = {
 		id: "point1",
 		type: "Rectangle",
 		x: 0,
@@ -12,37 +12,37 @@ describe("isConnectableData", () => {
 		name: "connection-point",
 	};
 
-	const validConnectableData: ConnectableData = {
+	const validConnectableState: ConnectableState = {
 		showConnectPoints: true,
-		connectPoints: [validConnectPointData],
+		connectPoints: [validConnectPointState],
 	};
 
-	describe("Valid ConnectableData", () => {
-		it("should return true for valid ConnectableData with showConnectPoints true", () => {
-			expect(isConnectableData(validConnectableData)).toBe(true);
+	describe("Valid ConnectableState", () => {
+		it("should return true for valid ConnectableState with showConnectPoints true", () => {
+			expect(isConnectableState(validConnectableState)).toBe(true);
 		});
 
-		it("should return true for valid ConnectableData with showConnectPoints false", () => {
-			const data: ConnectableData = {
+		it("should return true for valid ConnectableState with showConnectPoints false", () => {
+			const data: ConnectableState = {
 				showConnectPoints: false,
-				connectPoints: [validConnectPointData],
+				connectPoints: [validConnectPointState],
 			};
-			expect(isConnectableData(data)).toBe(true);
+			expect(isConnectableState(data)).toBe(true);
 		});
 
-		it("should return true for valid ConnectableData with empty connectPoints array", () => {
-			const data: ConnectableData = {
+		it("should return true for valid ConnectableState with empty connectPoints array", () => {
+			const data: ConnectableState = {
 				showConnectPoints: true,
 				connectPoints: [],
 			};
-			expect(isConnectableData(data)).toBe(true);
+			expect(isConnectableState(data)).toBe(true);
 		});
 
-		it("should return true for valid ConnectableData with multiple connectPoints", () => {
-			const data: ConnectableData = {
+		it("should return true for valid ConnectableState with multiple connectPoints", () => {
+			const data: ConnectableState = {
 				showConnectPoints: true,
 				connectPoints: [
-					validConnectPointData,
+					validConnectPointState,
 					{
 						id: "point2",
 						type: "Ellipse",
@@ -52,33 +52,33 @@ describe("isConnectableData", () => {
 					},
 				],
 			};
-			expect(isConnectableData(data)).toBe(true);
+			expect(isConnectableState(data)).toBe(true);
 		});
 	});
 
 	describe("Invalid data types", () => {
 		it("should return false for null", () => {
-			expect(isConnectableData(null)).toBe(false);
+			expect(isConnectableState(null)).toBe(false);
 		});
 
 		it("should return false for undefined", () => {
-			expect(isConnectableData(undefined)).toBe(false);
+			expect(isConnectableState(undefined)).toBe(false);
 		});
 
 		it("should return false for string", () => {
-			expect(isConnectableData("not an object")).toBe(false);
+			expect(isConnectableState("not an object")).toBe(false);
 		});
 
 		it("should return false for number", () => {
-			expect(isConnectableData(123)).toBe(false);
+			expect(isConnectableState(123)).toBe(false);
 		});
 
 		it("should return false for boolean", () => {
-			expect(isConnectableData(true)).toBe(false);
+			expect(isConnectableState(true)).toBe(false);
 		});
 
 		it("should return false for array", () => {
-			expect(isConnectableData([])).toBe(false);
+			expect(isConnectableState([])).toBe(false);
 		});
 	});
 
@@ -87,14 +87,14 @@ describe("isConnectableData", () => {
 			const data = {
 				showConnectPoints: true,
 			};
-			expect(isConnectableData(data)).toBe(false);
+			expect(isConnectableState(data)).toBe(false);
 		});
 
 		it("should return false for object without showConnectPoints property", () => {
 			const data = {
 				connectPoints: [],
 			};
-			expect(isConnectableData(data)).toBe(false);
+			expect(isConnectableState(data)).toBe(false);
 		});
 
 		it("should return false for object with connectPoints that is not an array", () => {
@@ -102,7 +102,7 @@ describe("isConnectableData", () => {
 				showConnectPoints: true,
 				connectPoints: "not an array",
 			};
-			expect(isConnectableData(data)).toBe(false);
+			expect(isConnectableState(data)).toBe(false);
 		});
 
 		it("should return false for object with connectPoints as null", () => {
@@ -110,7 +110,7 @@ describe("isConnectableData", () => {
 				showConnectPoints: true,
 				connectPoints: null,
 			};
-			expect(isConnectableData(data)).toBe(false);
+			expect(isConnectableState(data)).toBe(false);
 		});
 
 		it("should return false for object with connectPoints as undefined", () => {
@@ -118,7 +118,7 @@ describe("isConnectableData", () => {
 				showConnectPoints: true,
 				connectPoints: undefined,
 			};
-			expect(isConnectableData(data)).toBe(false);
+			expect(isConnectableState(data)).toBe(false);
 		});
 
 		it("should return false for object with showConnectPoints that is not a boolean", () => {
@@ -126,7 +126,7 @@ describe("isConnectableData", () => {
 				showConnectPoints: "true",
 				connectPoints: [],
 			};
-			expect(isConnectableData(data)).toBe(false);
+			expect(isConnectableState(data)).toBe(false);
 		});
 
 		it("should return false for object with showConnectPoints as null", () => {
@@ -134,7 +134,7 @@ describe("isConnectableData", () => {
 				showConnectPoints: null,
 				connectPoints: [],
 			};
-			expect(isConnectableData(data)).toBe(false);
+			expect(isConnectableState(data)).toBe(false);
 		});
 
 		it("should return false for object with showConnectPoints as undefined", () => {
@@ -142,7 +142,7 @@ describe("isConnectableData", () => {
 				showConnectPoints: undefined,
 				connectPoints: [],
 			};
-			expect(isConnectableData(data)).toBe(false);
+			expect(isConnectableState(data)).toBe(false);
 		});
 	});
 
@@ -153,7 +153,7 @@ describe("isConnectableData", () => {
 				connectPoints: [],
 				extraProperty: "should be ignored",
 			};
-			expect(isConnectableData(data)).toBe(true);
+			expect(isConnectableState(data)).toBe(true);
 		});
 
 		it("should return false for object missing showConnectPoints", () => {
@@ -161,51 +161,51 @@ describe("isConnectableData", () => {
 			const data = {
 				connectPoints: [],
 			};
-			expect(isConnectableData(data)).toBe(false);
+			expect(isConnectableState(data)).toBe(false);
 		});
 	});
 
 	/**
 	 * Validation completeness test.
-	 * This test ensures that if ConnectableData type definition changes,
+	 * This test ensures that if ConnectableState type definition changes,
 	 * the validation function needs to be updated accordingly.
 	 *
 	 * If this test fails, it means:
-	 * 1. ConnectableData type has been modified
-	 * 2. isConnectableData validation function needs to be updated
+	 * 1. ConnectableState type has been modified
+	 * 2. isConnectableState validation function needs to be updated
 	 * 3. This test suite needs to be updated to include new properties
 	 */
 	describe("Validation completeness", () => {
-		it("should validate all required properties of ConnectableData type", () => {
-			// This test creates an object that should match ConnectableData exactly
-			const completeValidData: ConnectableData = {
+		it("should validate all required properties of ConnectableState type", () => {
+			// This test creates an object that should match ConnectableState exactly
+			const completeValidData: ConnectableState = {
 				showConnectPoints: true,
-				connectPoints: [validConnectPointData],
-			} as const satisfies ConnectableData;
+				connectPoints: [validConnectPointState],
+			} as const satisfies ConnectableState;
 
 			// Test that our validator accepts the complete valid data
-			expect(isConnectableData(completeValidData)).toBe(true);
+			expect(isConnectableState(completeValidData)).toBe(true);
 
 			// Test missing each required property one by one
-			// If ConnectableData gains new required properties, add tests here
+			// If ConnectableState gains new required properties, add tests here
 
 			// Missing showConnectPoints - now properly validated, should fail
 			const missingShowConnectPoints = {
-				connectPoints: [validConnectPointData],
+				connectPoints: [validConnectPointState],
 			};
-			expect(isConnectableData(missingShowConnectPoints)).toBe(false);
+			expect(isConnectableState(missingShowConnectPoints)).toBe(false);
 
 			// Missing connectPoints - should fail
 			const missingConnectPoints = {
 				showConnectPoints: true,
 			};
-			expect(isConnectableData(missingConnectPoints)).toBe(false);
+			expect(isConnectableState(missingConnectPoints)).toBe(false);
 		});
 
 		/**
 		 * Property coverage test.
 		 * This test documents which properties are currently being validated.
-		 * When ConnectableData type changes, update this test to maintain coverage.
+		 * When ConnectableState type changes, update this test to maintain coverage.
 		 */
 		it("should document current validation coverage", () => {
 			// Current implementation validates:
@@ -225,7 +225,7 @@ describe("isConnectableData", () => {
 				connectPoints: [], // Both properties are now validated
 			};
 
-			expect(isConnectableData(minimalValidObject)).toBe(true);
+			expect(isConnectableState(minimalValidObject)).toBe(true);
 
 			// This test serves as documentation of current behavior
 			// and will need updates when validation logic is enhanced
@@ -233,23 +233,23 @@ describe("isConnectableData", () => {
 
 		/**
 		 * Future-proofing test.
-		 * If ConnectableData type definition is extended with new required properties,
+		 * If ConnectableState type definition is extended with new required properties,
 		 * this test will help identify that the validator needs updating.
 		 */
-		it("should handle future ConnectableData extensions", () => {
-			// Create a type-safe object that satisfies current ConnectableData
-			const currentValidData: ConnectableData = {
+		it("should handle future ConnectableState extensions", () => {
+			// Create a type-safe object that satisfies current ConnectableState
+			const currentValidData: ConnectableState = {
 				showConnectPoints: false,
 				connectPoints: [],
 			};
 
 			// This should always pass for current valid data
-			expect(isConnectableData(currentValidData)).toBe(true);
+			expect(isConnectableState(currentValidData)).toBe(true);
 
-			// When new required properties are added to ConnectableData:
+			// When new required properties are added to ConnectableState:
 			// 1. TypeScript will error on the above object creation
 			// 2. Add the new properties to make it compile
-			// 3. Update isConnectableData function to validate new properties
+			// 3. Update isConnectableState function to validate new properties
 			// 4. Add specific tests for the new properties
 		});
 	});

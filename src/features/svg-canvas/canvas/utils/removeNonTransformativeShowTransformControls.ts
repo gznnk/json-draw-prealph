@@ -1,8 +1,8 @@
 // Import types.
-import type { Diagram } from "../../types/data/catalog/Diagram";
+import type { Diagram } from "../../types/state/catalog/Diagram";
 
 // Import utils.
-import { isTransformativeData } from "../../utils/validation/isTransformativeData";
+import { isTransformativeState } from "../../utils/validation/isTransformativeState";
 import { applyFunctionRecursively } from "./applyFunctionRecursively";
 
 /**
@@ -15,10 +15,11 @@ export const removeNonTransformativeShowTransformControls = (
 	items: Diagram[],
 ): Diagram[] => {
 	return applyFunctionRecursively(items, (item) => {
-		if (!isTransformativeData(item) && "showTransformControls" in item) {
-			const { showTransformControls: _showTransformControls, ...rest } = item as Diagram & {
-				showTransformControls: boolean;
-			};
+		if (!isTransformativeState(item) && "showTransformControls" in item) {
+			const { showTransformControls: _showTransformControls, ...rest } =
+				item as Diagram & {
+					showTransformControls: boolean;
+				};
 			return {
 				...rest,
 			};

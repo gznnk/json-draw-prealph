@@ -1,11 +1,14 @@
+// Import types.
 import type { SvgCanvasState } from "../../../canvas/types/SvgCanvasState";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+
+// Import utils.
+import { getDiagramById } from "../../core/getDiagramById";
+import { isConnectableState } from "../../validation/isConnectableState";
+import { newId } from "../common/newId";
 import { generateOptimalShapeToShapeConnection } from "../connectPoint/generateOptimalShapeToShapeConnection";
 import { updateManualConnectLinePath } from "../connectPoint/updateManualConnectLinePath";
-import { newId } from "../common/newId";
-import { getDiagramById } from "../../core/getDiagramById";
-import { isConnectableData } from "../../validation/isConnectableData";
 
 /**
  * Updates connection lines that are connected to the given updated diagrams.
@@ -23,7 +26,7 @@ export const refreshConnectLines = (
 ): SvgCanvasState => {
 	// Create a set of updated diagram IDs for efficient lookup
 	const updatedDiagramIds = new Set(
-		updatedDiagrams.filter((d) => isConnectableData(d)).map((d) => d.id),
+		updatedDiagrams.filter((d) => isConnectableState(d)).map((d) => d.id),
 	);
 
 	// Find all connect lines that need to be updated
@@ -60,8 +63,8 @@ export const refreshConnectLines = (
 
 		// Skip if either owner shape doesn't have connect points
 		if (
-			!isConnectableData(startOwnerShape) ||
-			!isConnectableData(endOwnerShape)
+			!isConnectableState(startOwnerShape) ||
+			!isConnectableState(endOwnerShape)
 		) {
 			return item;
 		}
@@ -139,11 +142,11 @@ export const refreshConnectLines = (
 		const originalStartOwner = getDiagramById(
 			startCanvasState.items,
 			connectLine.startOwnerId,
-		) as Diagram;
+		);
 		const originalEndOwner = getDiagramById(
 			startCanvasState.items,
 			connectLine.endOwnerId,
-		) as Diagram;
+		);
 
 		if (!originalStartOwner || !originalEndOwner) {
 			return item;

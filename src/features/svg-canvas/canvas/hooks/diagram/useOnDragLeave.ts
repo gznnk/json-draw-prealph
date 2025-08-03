@@ -2,12 +2,12 @@
 import { useCallback, useRef } from "react";
 
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { DiagramDragDropEvent } from "../../../types/events/DiagramDragDropEvent";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import utilities.
-import { isConnectableData } from "../../../utils/validation/isConnectableData";
+// Import utils.
+import { isConnectableState } from "../../../utils/validation/isConnectableState";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
 /**
@@ -35,7 +35,7 @@ export const useOnDragLeave = (props: SvgCanvasSubHooksProps) => {
 					prevState.items,
 					(item: Diagram) => {
 						// Check if this item can have connect points
-						if (item.id === e.dropTargetItem.id && isConnectableData(item)) {
+						if (item.id === e.dropTargetItem.id && isConnectableState(item)) {
 							// Hide connect points when ConnectPoint drag leaves
 							return {
 								...item,

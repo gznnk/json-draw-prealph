@@ -1,6 +1,11 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
+// Import types.
 import type { Bounds } from "../../types/core/Bounds";
+import type { Diagram } from "../../types/state/catalog/Diagram";
+
+// Import constants.
 import { CANVAS_GRID_SIZE } from "../SvgCanvasConstants";
+
+// Import utils.
 import { calcDiagramsBoundingBox } from "../../utils/math/geometry/calcDiagramsBoundingBox";
 
 /**

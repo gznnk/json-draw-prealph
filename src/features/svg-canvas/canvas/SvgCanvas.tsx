@@ -10,20 +10,21 @@ import React, {
 } from "react";
 
 // Import types.
-import { DiagramRegistry } from "../registry";
 import type { SvgViewport } from "../types/core/SvgViewport";
-import { newEventId } from "../utils/core/newEventId";
-import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
 import { InteractionState } from "./types/InteractionState";
+import type { SvgCanvasProps } from "./types/SvgCanvasProps";
+import type { SvgCanvasRef } from "./types/SvgCanvasRef";
+
+// Import constants.
+import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
 
 // Import components.
 import { GridBackground } from "../components/auxiliary/GridBackground";
 import { GridPattern } from "../components/auxiliary/GridPattern";
 import { MiniMap } from "../components/auxiliary/MiniMap";
-import { ZoomControls } from "../components/auxiliary/ZoomControls";
-import { getNextZoomLevel, getPreviousZoomLevel, getResetZoomLevel } from "./utils/zoomLevels";
 import { PointerCaptureElement } from "../components/auxiliary/PointerCaptureElement";
 import { PreviewConnectLine } from "../components/auxiliary/PreviewConnectLine";
+import { ZoomControls } from "../components/auxiliary/ZoomControls";
 import { TextEditor } from "../components/core/Textable";
 import { CanvasMenu } from "../components/menus/CanvasMenu";
 import { ContextMenu, useContextMenu } from "../components/menus/ContextMenu";
@@ -32,9 +33,22 @@ import UserMenu from "../components/menus/UserMenu/UserMenu";
 import { FlashConnectLine } from "../components/shapes/ConnectLine";
 import { Group } from "../components/shapes/Group";
 
-// Imports related to this component.
+// Import registry.
+import { DiagramRegistry } from "../registry";
+import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
+
+// Import utils.
+import { newEventId } from "../utils/core/newEventId";
+import {
+	getNextZoomLevel,
+	getPreviousZoomLevel,
+	getResetZoomLevel,
+} from "./utils/zoomLevels";
+
+// Import hooks.
 import { useShortcutKey } from "./hooks/keyboard/useShortcutKey";
-import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
+
+// Import local module files.
 import {
 	Container,
 	HTMLElementsContainer,
@@ -43,8 +57,6 @@ import {
 	Viewport,
 	ViewportOverlay,
 } from "./SvgCanvasStyled";
-import type { SvgCanvasProps } from "./types/SvgCanvasProps";
-import type { SvgCanvasRef } from "./types/SvgCanvasRef";
 
 // Import context.
 import { EventBusProvider } from "../context/EventBusContext";

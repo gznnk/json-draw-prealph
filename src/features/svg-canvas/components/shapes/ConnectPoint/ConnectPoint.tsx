@@ -8,6 +8,7 @@ import type { PathPointData } from "../../../types/data/shapes/PathPointData";
 import type { DiagramDragDropEvent } from "../../../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
+import type { EventType } from "../../../types/events/EventType";
 import type { ConnectPointProps } from "../../../types/props/shapes/ConnectPointProps";
 
 // Import hooks
@@ -25,11 +26,10 @@ import { getLineDirection } from "../../../utils/shapes/connectPoint/getLineDire
 
 // Import constants.
 import { DEFAULT_CONNECT_LINE_DATA } from "../../../constants/DefaultData";
+import { EVENT_NAME_CONNECTION } from "../../../constants/EventNames";
 
 // Import local module files.
-import { EVENT_NAME_CONNECTION } from "../../../constants/EventNames";
 import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
-import type { EventType } from "../../../types/events/EventType";
 
 /**
  * Connect point component

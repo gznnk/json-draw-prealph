@@ -10,7 +10,7 @@ import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
+import { isSelectableState } from "../../../utils/validation/isSelectableState";
 
 // Import hooks.
 import { useDataChange } from "../history/useDataChange";
@@ -44,11 +44,11 @@ export const useOnAddDiagram = (props: SvgCanvasSubHooksProps) => {
 
 			// Call the function to add a new item to the canvas.
 			setCanvasState((prevState) => {
-				let newState = {
+				const newState = {
 					...prevState,
 					items: [
 						...prevState.items.map((i) => {
-							if (isSelectableData(i) && isSelectableData(event.item)) {
+							if (isSelectableState(i) && isSelectableState(event.item)) {
 								return {
 									...i,
 									// If the new item is selected, unselect other items.

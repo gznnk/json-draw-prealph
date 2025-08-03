@@ -1,5 +1,9 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
-import { isItemableData } from "../../utils/validation/isItemableData";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
+
+// Import utils.
+import { isItemableState } from "../../utils/validation/isItemableState";
+import { isSelectableState } from "../../utils/validation/isSelectableState";
 
 /**
  * Ungroup selected groups.
@@ -12,7 +16,11 @@ export const ungroupSelectedGroupsRecursive = (items: Diagram[]) => {
 	const ungroupedItems: Diagram[] = [];
 
 	for (const item of items) {
-		if (item.type === "Group" && isItemableData(item)) {
+		if (
+			item.type === "Group" &&
+			isItemableState(item) &&
+			isSelectableState(item)
+		) {
 			if (item.isSelected) {
 				for (const groupItem of item.items) {
 					ungroupedItems.push(groupItem);
@@ -33,7 +41,7 @@ export const ungroupSelectedGroupsRecursive = (items: Diagram[]) => {
 	const cleanedItems = ungroupedItems.filter((item) => {
 		if (
 			item.type === "Group" &&
-			isItemableData(item) &&
+			isItemableState(item) &&
 			item.items.length === 0
 		) {
 			return false;

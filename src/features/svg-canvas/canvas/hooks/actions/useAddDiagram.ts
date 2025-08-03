@@ -7,7 +7,7 @@ import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
+import { isSelectableState } from "../../../utils/validation/isSelectableState";
 
 import { clearSelectionRecursively } from "../../utils/clearSelectionRecursively";
 
@@ -37,7 +37,7 @@ export const useAddDiagram = (props: SvgCanvasSubHooksProps) => {
 		// Call the function to add a new item to the canvas.
 		setCanvasState((prevState) => {
 			let newItems = prevState.items;
-			if (isSelectableData(e.item) && e.item.isSelected) {
+			if (isSelectableState(e.item) && e.item.isSelected) {
 				newItems = clearSelectionRecursively(prevState.items);
 			}
 			const newState = {

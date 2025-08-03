@@ -1,5 +1,8 @@
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import { isItemableData } from "../../validation/isItemableData";
+// Import types.
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+
+// Import utils.
+import { isItemableState } from "../../validation/isItemableState";
 
 /**
  * Recursively retrieves a shape with the specified ID, including shapes in nested groups
@@ -16,7 +19,7 @@ export const getChildDiagramById = (
 		if (diagram.id === id) {
 			return diagram;
 		}
-		if (isItemableData<Diagram>(diagram)) {
+		if (isItemableState<Diagram>(diagram)) {
 			const ret = getChildDiagramById(diagram.items || [], id);
 			if (ret) {
 				return ret;

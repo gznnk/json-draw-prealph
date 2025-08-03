@@ -1,15 +1,14 @@
 // Import React.
 import { useCallback, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
+// Import types.
 import type { StackOrderChangeEvent } from "../../../types/events/StackOrderChangeEvent";
-import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
+import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import functions related to SvgCanvas.
-import { isItemableData } from "../../../utils/validation/isItemableData";
-
+// Import utils.
+import { isItemableState } from "../../../utils/validation/isItemableState";
 
 // Import hooks.
 import { useDataChange } from "../history/useDataChange";
@@ -70,7 +69,7 @@ export const useStackOrderChange = (props: SvgCanvasSubHooksProps) => {
 			// Recursively search for the item with matching id and reorder the parent's items array
 			const updateOrderRecursive = (items: Diagram[]): Diagram[] => {
 				return items.map((item) => {
-					if (isItemableData(item)) {
+					if (isItemableState(item)) {
 						// Check if this group contains the target item
 						if (item.items?.some((child) => child.id === e.id)) {
 							return {

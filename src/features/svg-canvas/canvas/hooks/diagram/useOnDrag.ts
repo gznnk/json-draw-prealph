@@ -1,9 +1,9 @@
 // Import React.
 import { useCallback, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
+// Import types.
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
@@ -11,17 +11,17 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 // Import utils.
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
+import { isItemableState } from "../../../utils/validation/isItemableState";
+import { isTransformativeState } from "../../../utils/validation/isTransformativeState";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createItemMap } from "../../utils/createItemMap";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
+import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
+import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
 
 // Import hooks.
 import { useDataChange } from "../history/useDataChange";
-import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
-import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
 
 /**
  * Custom hook to handle drag events on the canvas.
@@ -100,7 +100,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 						} as Diagram;
 
 						// Hide transform controls during drag for transformative items
-						if (isTransformativeData(newItem) && isDragging) {
+						if (isTransformativeState(newItem) && isDragging) {
 							newItem.showTransformControls = false;
 						}
 
@@ -111,7 +111,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 						movedDiagrams.push(newItem);
 
 						// If the item has children, move them recursively
-						if (isItemableData(newItem)) {
+						if (isItemableState(newItem)) {
 							newItem.items = applyFunctionRecursively(
 								newItem.items,
 								(childItem) => {
@@ -126,7 +126,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 										} as Diagram;
 
 										// Hide transform controls during drag for transformative items
-										if (isTransformativeData(newChildItem) && isDragging) {
+										if (isTransformativeState(newChildItem) && isDragging) {
 											newChildItem.showTransformControls = false;
 										}
 
@@ -145,7 +145,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 
 						return newItem;
 					}
-					if (isItemableData(item)) {
+					if (isItemableState(item)) {
 						// If the item is not selected, recursively move its children
 						item.items = moveRecursively(item.items);
 					}
@@ -193,9 +193,9 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 			if (e.eventType === "End") {
 				// Restore showTransformControls from initial state for transformative items
 				newState.items = applyFunctionRecursively(newState.items, (item) => {
-					if (selectedIds.has(item.id) && isTransformativeData(item)) {
+					if (selectedIds.has(item.id) && isTransformativeState(item)) {
 						const initialItem = initialItems.get(item.id);
-						if (initialItem && isTransformativeData(initialItem)) {
+						if (initialItem && isTransformativeState(initialItem)) {
 							return {
 								...item,
 								showTransformControls: initialItem.showTransformControls,

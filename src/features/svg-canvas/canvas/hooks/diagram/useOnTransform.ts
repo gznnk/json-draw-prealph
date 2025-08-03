@@ -1,17 +1,18 @@
 // Import React.
 import { useCallback, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
+// Import types.
 import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
 import type { EventType } from "../../../types/events/EventType";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { GroupState } from "../../../types/state/shapes/GroupState";
 import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import functions related to SvgCanvas.
+// Import utils.
 import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
-import { isConnectableData } from "../../../utils/validation/isConnectableData";
+import { isConnectableState } from "../../../utils/validation/isConnectableState";
 import { createItemMap } from "../../utils/createItemMap";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { updateOutlineOfGroup } from "../../utils/updateOutlineOfGroup";
@@ -19,13 +20,12 @@ import { updateOutlineOfGroup } from "../../utils/updateOutlineOfGroup";
 // Import hooks.
 import { useDataChange } from "../history/useDataChange";
 
-// Import utility functions for transformation.
-import type { GroupData } from "../../../types/data/shapes/GroupData";
+// Import utils.
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { rotatePoint } from "../../../utils/math/points/rotatePoint";
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
+import { isItemableState } from "../../../utils/validation/isItemableState";
+import { isTransformativeState } from "../../../utils/validation/isTransformativeState";
 import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
 
 /**
@@ -105,7 +105,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 			);
 
 			let newItem: Diagram;
-			if (isTransformativeData(initialItem)) {
+			if (isTransformativeState(initialItem)) {
 				const rotationDiff = e.endShape.rotation - e.startShape.rotation;
 				const newRotation = initialItem.rotation + rotationDiff;
 				newItem = {
@@ -118,7 +118,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 					scaleX: e.endShape.scaleX,
 					scaleY: e.endShape.scaleY,
 					isTransforming: getIsTransformingState(e.eventType),
-					items: isItemableData(initialItem)
+					items: isItemableState(initialItem)
 						? transformRecursively(
 								initialItem.items ?? [],
 								e,
@@ -134,7 +134,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 				newItem = updateDiagramConnectPoints(newItem);
 
 				// If the item is connectable, add it to the transformed diagrams.
-				if (isConnectableData(newItem)) {
+				if (isConnectableState(newItem)) {
 					transformedDiagrams.push(newItem);
 				}
 			} else {
@@ -146,7 +146,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 
 				// Update the connect points of the transformed item.
 				updateDiagramConnectPoints(newItem);
-				if (isConnectableData(newItem)) {
+				if (isConnectableState(newItem)) {
 					transformedDiagrams.push(newItem);
 				}
 			}
@@ -174,12 +174,12 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 					} as Diagram;
 
 					// Update isTransforming flag if it's transformative data
-					if (isTransformativeData(newItem)) {
+					if (isTransformativeState(newItem)) {
 						newItem.isTransforming = getIsTransformingState(e.eventType);
 					}
 
 					// Transform its children recursively.
-					if (isItemableData(newItem)) {
+					if (isItemableState(newItem)) {
 						newItem.items = transformRecursively(
 							newItem.items ?? [],
 							e,
@@ -192,7 +192,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 
 					// Update the connect points of the transformed item.
 					newItem = updateDiagramConnectPoints(newItem);
-					if (isConnectableData(newItem)) {
+					if (isConnectableState(newItem)) {
 						transformedDiagrams.push(newItem);
 					}
 
@@ -221,7 +221,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 					return transformedChild;
 				}
 				// If the item has children, recursively transform them.
-				if (isItemableData(item)) {
+				if (isItemableState(item)) {
 					return {
 						...item,
 						items: transformRecursively(
@@ -291,7 +291,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 								...prevState.multiSelectGroup,
 								// Update the multi-select group with the new shape.
 								...e.endShape,
-							} as GroupData)
+							} as GroupState)
 						: undefined,
 				} as SvgCanvasState;
 

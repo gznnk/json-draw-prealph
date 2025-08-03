@@ -2,15 +2,15 @@
 import type React from "react";
 import { memo, useCallback, useRef, useState } from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../../types/data/catalog/Diagram";
+// Import types.
 import type { PathPointData } from "../../../../types/data/shapes/PathPointData";
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointerEvent";
+import type { Diagram } from "../../../../types/state/catalog/Diagram";
 
-// Import functions related to SvgCanvas.
+// Import utils.
 import { newId } from "../../../../utils/shapes/common/newId";
 
 // Imports related to this component.

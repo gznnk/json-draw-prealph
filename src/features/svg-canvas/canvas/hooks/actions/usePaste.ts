@@ -3,20 +3,20 @@ import { useCallback, useRef } from "react";
 
 // Import types.
 import type { Shape } from "../../../types/core/Shape";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
-import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
-import type { GroupData } from "../../../types/data/shapes/GroupData";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { ConnectLineState } from "../../../types/state/shapes/ConnectLineState";
+import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
+import type { GroupState } from "../../../types/state/shapes/GroupState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
 import { getDiagramById } from "../../../utils/core/getDiagramById";
 import { newId } from "../../../utils/shapes/common/newId";
-import { isConnectableData } from "../../../utils/validation/isConnectableData";
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
-import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
+import { isConnectableState } from "../../../utils/validation/isConnectableState";
+import { isItemableState } from "../../../utils/validation/isItemableState";
+import { isSelectableState } from "../../../utils/validation/isSelectableState";
 import { clearSelectionRecursively } from "../../utils/clearSelectionRecursively";
+import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 
 /**
  * Offset amount when pasting shapes
@@ -54,12 +54,12 @@ const applyOffsetToItem = (item: Diagram): Diagram => {
 	}
 
 	// Also apply offset to connection points if present
-	if (isConnectableData(newItem) && newItem.connectPoints) {
+	if (isConnectableState(newItem) && newItem.connectPoints) {
 		newItem.connectPoints = newItem.connectPoints.map((connectPoint) => ({
 			...connectPoint,
 			x: applyOffset(connectPoint.x),
 			y: applyOffset(connectPoint.y),
-		})) as ConnectPointData[];
+		})) as ConnectPointState[];
 	}
 
 	return newItem;
@@ -80,7 +80,7 @@ const setSelectionState = (
 ): Diagram => {
 	const newItem = { ...item };
 
-	if (isSelectableData(newItem)) {
+	if (isSelectableState(newItem)) {
 		if (isMultiSelect) {
 			// For multiple selection mode
 			if (isTopLevel) {
@@ -125,7 +125,7 @@ const assignNewIds = (item: Diagram, idMap?: IdMap): Diagram => {
 	};
 
 	// Assign new IDs to connection points if present
-	if (isConnectableData(newItem) && newItem.connectPoints) {
+	if (isConnectableState(newItem) && newItem.connectPoints) {
 		newItem.connectPoints = newItem.connectPoints.map((connectPoint) => {
 			const connectPointNewId = newId();
 
@@ -138,7 +138,7 @@ const assignNewIds = (item: Diagram, idMap?: IdMap): Diagram => {
 				...connectPoint,
 				id: connectPointNewId,
 			};
-		}) as ConnectPointData[];
+		}) as ConnectPointState[];
 	}
 
 	return newItem;
@@ -169,7 +169,7 @@ const processDiagramForPasteRecursively = (
 	newItem = setSelectionState(newItem, isTopLevel, isMultiSelect);
 
 	// For groups and other container items, recursively process children
-	if (isItemableData(newItem)) {
+	if (isItemableState(newItem)) {
 		newItem.items = newItem.items.map((childItem) =>
 			// Child items are never top level
 			processDiagramForPasteRecursively(childItem, false, isMultiSelect, idMap),
@@ -189,10 +189,10 @@ const processDiagramForPasteRecursively = (
  * @returns Updated connection line or null if invalid connections
  */
 const processConnectLineForPaste = (
-	connectLine: ConnectLineData,
+	connectLine: ConnectLineState,
 	idMap: IdMap,
 	items: Diagram[],
-): ConnectLineData | null => {
+): ConnectLineState | null => {
 	// Check if both connection endpoints are included in pasted items
 	const newStartOwnerId = idMap[connectLine.startOwnerId];
 	const newEndOwnerId = idMap[connectLine.endOwnerId];
@@ -215,7 +215,7 @@ const processConnectLineForPaste = (
 	const newConnectLineId = newId();
 
 	// Create new connection line object
-	const newConnectLine: ConnectLineData = {
+	const newConnectLine: ConnectLineState = {
 		...connectLine,
 		id: newConnectLineId,
 		x: applyOffset(connectLine.x),
@@ -288,7 +288,7 @@ export const usePaste = (props: SvgCanvasSubHooksProps) => {
 					// Separate connection lines from normal shapes
 					const connectLines = newItems.filter(
 						(item) => item.type === "ConnectLine",
-					) as ConnectLineData[];
+					) as ConnectLineState[];
 					const normalItems = newItems.filter(
 						(item) => item.type !== "ConnectLine",
 					);
@@ -329,14 +329,14 @@ export const usePaste = (props: SvgCanvasSubHooksProps) => {
 										...pastedNormalItems,
 									]),
 								)
-								.filter((line): line is ConnectLineData => line !== null);
+								.filter((line): line is ConnectLineState => line !== null);
 
 							// Add processed connection lines
 							allItems = [...allItems, ...pastedConnectLines];
 						}
 
 						// Set multiSelectGroup for multi-select mode
-						let multiSelectGroup: GroupData | undefined = undefined;
+						let multiSelectGroup: GroupState | undefined = undefined;
 						if (isMultiSelect) {
 							// Create multi-select group using the utility function
 							multiSelectGroup = createMultiSelectGroup(
@@ -346,7 +346,7 @@ export const usePaste = (props: SvgCanvasSubHooksProps) => {
 
 							// Hide transform controls for all items in multi-select mode
 							allItems = allItems.map((item) => {
-								if (isSelectableData(item) && item.isSelected) {
+								if (isSelectableState(item) && item.isSelected) {
 									return {
 										...item,
 										showTransformControls: false,

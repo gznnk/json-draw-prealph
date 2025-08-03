@@ -8,8 +8,8 @@ import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { GroupProps } from "../../../types/props/shapes/GroupProps";
 
 // Import components.
-import { PositionLabel } from "../../core/PositionLabel";
 import { Outline } from "../../core/Outline";
+import { PositionLabel } from "../../core/PositionLabel";
 import { Transformative } from "../../core/Transformative";
 
 /**

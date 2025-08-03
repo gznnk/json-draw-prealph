@@ -1,24 +1,24 @@
 // Import types.
-import type { GroupData } from "../../types/data/shapes/GroupData";
-import type { PathData } from "../../types/data/shapes/PathData";
 import type { TextEditorState } from "../../components/core/Textable";
+import type { GroupState } from "../../types/state/shapes/GroupState";
+import type { PathState } from "../../types/state/shapes/PathState";
+import type { AreaSelectionState } from "./AreaSelectionState";
 import type { GrabScrollState } from "./GrabScrollState";
 import type { InteractionState } from "./InteractionState";
 import type { SvgCanvasData } from "./SvgCanvasData";
 import type { SvgCanvasHistory } from "./SvgCanvasHistory";
-import type { AreaSelectionState } from "./AreaSelectionState";
 
 /**
  * Type for the state of the SvgCanvas.
  */
 export type SvgCanvasState = {
 	zoom: number;
-	multiSelectGroup?: GroupData;
+	multiSelectGroup?: GroupState;
 	history: SvgCanvasHistory[];
 	historyIndex: number;
 	lastHistoryEventId: string;
 	textEditorState: TextEditorState;
-	previewConnectLineState?: PathData;
+	previewConnectLineState?: PathState;
 	grabScrollState?: GrabScrollState;
 	interactionState: InteractionState;
 	areaSelectionState: AreaSelectionState;

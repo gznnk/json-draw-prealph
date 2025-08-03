@@ -1,5 +1,5 @@
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 
 // Import utils.
 import { isSvgData } from "./isSvgData";
@@ -11,10 +11,10 @@ import { isSvgData } from "./isSvgData";
  * @returns A Blob representing the svg or undefined if not valid
  */
 export const svgToBlob = (data: Diagram): Blob | undefined => {
-    if (isSvgData(data)) {
-        return new Blob([data.svgText], {
-            type: "image/svg+xml",
-        });
-    }
-    return undefined;
+	if (isSvgData(data)) {
+		return new Blob([data.svgText], {
+			type: "image/svg+xml",
+		});
+	}
+	return undefined;
 };

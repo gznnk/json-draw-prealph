@@ -1,9 +1,15 @@
+// Import React.
 import { useCallback } from "react";
+
+// Import constants.
 import { ADD_NEW_DIAGRAM_EVENT_NAME } from "../constants/EventNames";
-import type { Diagram } from "../types/data/catalog/Diagram";
+import type { Diagram } from "../types/state/catalog/Diagram";
+
+// Import types.
 import type { AddDiagramEvent } from "../types/events/AddDiagramEvent";
 import { newEventId } from "../utils/core/newEventId";
-// Import context.
+
+// Import shared module files.
 import type { EventBus } from "../../../shared/event-bus/EventBus";
 
 /**

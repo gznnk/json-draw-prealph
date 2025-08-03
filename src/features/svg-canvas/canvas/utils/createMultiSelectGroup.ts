@@ -1,24 +1,24 @@
-// Import types related to SvgCanvas.
-import type { GroupData } from "../../types/data/shapes/GroupData";
-import type { Diagram } from "../../types/data/catalog/Diagram";
-
-// Import components related to SvgCanvas.
-import { calcUnrotatedGroupBoundingBox } from "../../utils/shapes/group/calcUnrotatedGroupBoundingBox";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
+import type { GroupState } from "../../types/state/shapes/GroupState";
 
 // Import constants.
 import { MULTI_SELECT_GROUP } from "../SvgCanvasConstants";
+
+// Import utils.
+import { calcUnrotatedGroupBoundingBox } from "../../utils/shapes/group/calcUnrotatedGroupBoundingBox";
 
 /**
  * Creates a multi-select group from a list of selected items.
  *
  * @param selectedItems - The list of selected items to group
  * @param previousKeepProportion - The previous keepProportion setting to preserve
- * @returns A GroupData object representing the multi-select group
+ * @returns A GroupState object representing the multi-select group
  */
 export const createMultiSelectGroup = (
 	selectedItems: Diagram[],
 	previousKeepProportion = true,
-): GroupData => {
+): GroupState => {
 	const boundingBox = calcUnrotatedGroupBoundingBox(selectedItems);
 
 	return {
@@ -35,5 +35,5 @@ export const createMultiSelectGroup = (
 		showTransformControls: true,
 		showOutline: true,
 		items: [],
-	} as GroupData;
+	} as GroupState;
 };

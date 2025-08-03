@@ -1,12 +1,12 @@
 // Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../core/CreateDiagramProps";
-import type { WebSearchNodeData } from "../../data/nodes/WebSearchNodeData";
+import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";
+import type { WebSearchNodeState } from "../../state/nodes/WebSearchNodeState";
 
 /**
  * Type of the WebSearchNode component props.
  */
 export type WebSearchNodeProps = CreateDiagramProps<
-	WebSearchNodeData,
+	WebSearchNodeState,
 	{
 		selectable: true;
 		transformative: true;

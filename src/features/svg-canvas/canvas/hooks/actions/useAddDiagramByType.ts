@@ -3,14 +3,14 @@ import { useCallback, useRef } from "react";
 
 // Import types.
 import type { DiagramType } from "../../../types/core/DiagramType";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { AddDiagramByTypeEvent } from "../../../types/events/AddDiagramByTypeEvent";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
 import { DiagramRegistry } from "../../../registry";
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
-import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
+import { isSelectableState } from "../../../utils/validation/isSelectableState";
+import { isTransformativeState } from "../../../utils/validation/isTransformativeState";
 
 // Import hooks.
 import { useAddDiagram } from "./useAddDiagram";
@@ -63,10 +63,10 @@ export const useAddDiagramByType = (props: SvgCanvasSubHooksProps) => {
 			return;
 		}
 
-		if (e.isSelected && isSelectableData(data)) {
+		if (e.isSelected && isSelectableState(data)) {
 			data.isSelected = true;
 			data.showOutline = true;
-			if (isTransformativeData(data)) {
+			if (isTransformativeState(data)) {
 				data.showTransformControls = true;
 			}
 		}

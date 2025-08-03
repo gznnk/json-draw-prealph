@@ -3,11 +3,11 @@ import { useEffect, useRef } from "react";
 
 // Import types.
 import type { Shape } from "../../../types/core/Shape";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { ConnectableData } from "../../../types/data/shapes/ConnectableData";
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
 import type { PathPointData } from "../../../types/data/shapes/PathPointData";
 import type { ConnectNodesEvent } from "../../../types/events/ConnectNodesEvent";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import constants.

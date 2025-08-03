@@ -1,12 +1,12 @@
 // Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../core/CreateDiagramProps";
-import type { PathData } from "../../data/shapes/PathData";
+import type { CreateDiagramProps } from "./CreateDiagramProps";
+import type { PathState } from "../../state/shapes/PathState";
 
 /**
  * Props for Path component
  */
 export type PathProps = CreateDiagramProps<
-	PathData,
+	PathState,
 	{
 		selectable: true;
 		transformative: true;
@@ -19,6 +19,4 @@ export type PathProps = CreateDiagramProps<
 	rightAngleSegmentDrag?: boolean;
 	newVertexEnabled?: boolean;
 	fixBothEnds?: boolean;
-	startArrowHead?: string;
-	endArrowHead?: string;
 };

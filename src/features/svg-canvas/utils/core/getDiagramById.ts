@@ -1,5 +1,8 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
-import { isItemableData } from "../validation/isItemableData";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
+
+// Import utils.
+import { isItemableState } from "../validation/isItemableState";
 
 /**
  * Get the diagram by ID from the list of diagrams.
@@ -17,7 +20,7 @@ export const getDiagramById = (
 			return diagram;
 		}
 		// Recursively search if the diagram has items.
-		if (isItemableData(diagram)) {
+		if (isItemableState(diagram)) {
 			const ret = getDiagramById(diagram.items || [], id);
 			if (ret) {
 				return ret;

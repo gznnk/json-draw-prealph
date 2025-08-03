@@ -1,19 +1,20 @@
-import type { ConnectPointData } from "../types/data/shapes/ConnectPointData";
-import type { ConnectLineData } from "../types/data/shapes/ConnectLineData";
-import type { ConnectableData } from "../types/data/shapes/ConnectableData";
-import type { Diagram } from "../types/data/catalog/Diagram";
+// Import types.
 import type { DiagramBaseData } from "../types/data/core/DiagramBaseData";
 import type { FillableData } from "../types/data/core/FillableData";
-import type { StrokableData } from "../types/data/core/StrokableData";
 import type { ItemableData } from "../types/data/core/ItemableData";
-import type { SelectableData } from "../types/data/core/SelectableData";
-import type { TransformativeData } from "../types/data/core/TransformativeData";
-import type { TextableData } from "../types/data/core/TextableData";
-import type { RectangleData } from "../types/data/shapes/RectangleData";
+import type { StrokableData } from "../types/data/core/StrokableData";
+import type { ConnectLineData } from "../types/data/shapes/ConnectLineData";
 import type { EllipseData } from "../types/data/shapes/EllipseData";
 import type { ImageData } from "../types/data/shapes/ImageData";
-import type { SvgData } from "../types/data/shapes/SvgData";
 import type { PathData } from "../types/data/shapes/PathData";
+import type { RectangleData } from "../types/data/shapes/RectangleData";
+import type { SvgData } from "../types/data/shapes/SvgData";
+import type { Diagram } from "../types/state/catalog/Diagram";
+import type { SelectableState } from "../types/state/core/SelectableState";
+import type { TextableState } from "../types/state/core/TextableState";
+import type { TransformativeState } from "../types/state/core/TransformativeState";
+import type { ConnectPointState } from "../types/state/shapes/ConnectPointState";
+import type { ConnectableState } from "../types/state/shapes/ConnectableState";
 
 /**
  * Default diagram base data.
@@ -30,8 +31,9 @@ export const DEFAULT_DIAGRAM_BASE_DATA = {
  */
 export const DEFAULT_SELECTABLE_DATA = {
 	isSelected: false,
+	isAncestorSelected: false,
 	showOutline: false,
-} as const satisfies SelectableData;
+} as const satisfies SelectableState;
 
 /**
  * Default transformative data.
@@ -47,7 +49,7 @@ export const DEFAULT_TRANSFORMATIVE_DATA = {
 	keepProportion: false,
 	showTransformControls: false,
 	isTransforming: false,
-} as const satisfies TransformativeData;
+} as const satisfies TransformativeState;
 
 /**
  * Default itemable data.
@@ -61,8 +63,8 @@ export const DEFAULT_ITEMABLE_DATA = {
  */
 export const DEFAULT_CONNECTABLE_DATA = {
 	showConnectPoints: false,
-	connectPoints: [] as ConnectPointData[],
-} as const satisfies ConnectableData;
+	connectPoints: [] as ConnectPointState[],
+} as const satisfies ConnectableState;
 
 /**
  * Default strokable data.
@@ -92,7 +94,7 @@ export const DEFAULT_TEXTABLE_DATA = {
 	textAlign: "center",
 	verticalAlign: "center",
 	isTextEditing: false,
-} as const satisfies TextableData;
+} as const satisfies TextableState;
 
 /**
  * Default rectangle data.

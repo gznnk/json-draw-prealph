@@ -1,9 +1,9 @@
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../../types/data/catalog/Diagram";
+// Import types.
+import type { Diagram } from "../../../../types/state/catalog/Diagram";
 
 // Import utils.
-import { isItemableData } from "../../../../utils/validation/isItemableData";
-import { isTextableData } from "../../../../utils/validation/isTextableData";
+import { isItemableState } from "../../../../utils/validation/isItemableState";
+import { isTextableState } from "../../../../utils/validation/isTextableState";
 
 /**
  * Recursively searches through diagram items to find the item currently in text editing mode.
@@ -14,10 +14,10 @@ import { isTextableData } from "../../../../utils/validation/isTextableData";
  */
 export const getTextEditingItem = (items: Diagram[]): Diagram | undefined => {
 	for (const item of items) {
-		if (isTextableData(item) && item.isTextEditing) {
+		if (isTextableState(item) && item.isTextEditing) {
 			return item;
 		}
-		if (isItemableData(item)) {
+		if (isItemableState(item)) {
 			const childItem = getTextEditingItem(item.items);
 			if (childItem) {
 				return childItem;

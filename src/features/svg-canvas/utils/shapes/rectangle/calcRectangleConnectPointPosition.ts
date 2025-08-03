@@ -1,12 +1,12 @@
 // Import types.
 import type { RectangleVertices } from "../../../types/core/RectangleVertices";
 import type { Shape } from "../../../types/core/Shape";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
+import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 
 // Import utils.
 import { calcRectangleVertices } from "../../../utils/math/geometry/calcRectangleVertices";
-import { isConnectableData } from "../../../utils/validation/isConnectableData";
+import { isConnectableState } from "../../validation/isConnectableState";
 
 /**
  * Calculate the position of the connection points of the rectangle.
@@ -16,14 +16,14 @@ import { isConnectableData } from "../../../utils/validation/isConnectableData";
  */
 export const calcRectangleConnectPointPosition = (
 	diagram: Diagram,
-): ConnectPointData[] => {
-	if (!isConnectableData(diagram)) return []; // Type guard.
+): ConnectPointState[] => {
+	if (!isConnectableState(diagram)) return []; // Type guard.
 
 	// Calculate the vertices of the rectangle.
 	const vertices = calcRectangleVertices(diagram as Shape);
 
 	// Create connection point move data.
-	const newConnectPoints: ConnectPointData[] = [];
+	const newConnectPoints: ConnectPointState[] = [];
 	for (const connectPointData of diagram.connectPoints) {
 		const vertex = (vertices as RectangleVertices)[
 			connectPointData.name as keyof RectangleVertices

@@ -1,17 +1,17 @@
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { GroupData } from "../../../types/data/shapes/GroupData";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { GroupState } from "../../../types/state/shapes/GroupState";
 
 // Import utils.
-import { calcUnrotatedGroupBoundingBox } from "../group/calcUnrotatedGroupBoundingBox";
 import { nanToZero } from "../../math/common/nanToZero";
 import { newId } from "../common/newId";
+import { calcUnrotatedGroupBoundingBox } from "../group/calcUnrotatedGroupBoundingBox";
 
 // Import conversion functions.
-import { rectElementToDiagram } from "./rectElementToDiagram";
-import { ellipseElementToDiagram } from "./ellipseElementToDiagram";
 import { circleElementToDiagram } from "./circleElementToDiagram";
+import { ellipseElementToDiagram } from "./ellipseElementToDiagram";
 import { lineElementToDiagram } from "./lineElementToDiagram";
+import { rectElementToDiagram } from "./rectElementToDiagram";
 
 /**
  * SVG data string to Diagram data.
@@ -19,7 +19,7 @@ import { lineElementToDiagram } from "./lineElementToDiagram";
  * @param data - SVG data string
  * @returns Converted diagram data
  */
-export const svgDataToDiagram = (data: string): GroupData => {
+export const svgDataToDiagram = (data: string): GroupState => {
 	const parser = new DOMParser();
 	const svgDoc = parser.parseFromString(data, "image/svg+xml");
 	const svgElement = svgDoc.documentElement;
@@ -61,9 +61,9 @@ export const svgDataToDiagram = (data: string): GroupData => {
 		isSelected: false,
 		showOutline: false,
 		items: newData,
-	} as GroupData;
+	} as GroupState;
 
-	console.log("svgDataToDiagram", ret);
+	// console.log("svgDataToDiagram", ret);
 
 	return ret;
 };

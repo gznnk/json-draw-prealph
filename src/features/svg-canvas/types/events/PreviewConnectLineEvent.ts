@@ -1,4 +1,5 @@
-import type { PathData } from "../data/shapes/PathData";
+// Import types.
+import type { PathState } from "../state/shapes/PathState";
 import type { EventType } from "./EventType";
 
 /**
@@ -14,5 +15,5 @@ export type PreviewConnectLineEvent = {
 	 * The path data for the preview connection line.
 	 * When undefined, the preview line should be hidden.
 	 */
-	pathData?: PathData;
+	pathData?: PathState;
 };

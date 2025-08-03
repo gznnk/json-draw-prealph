@@ -6,7 +6,7 @@ import { memo, useEffect, useRef } from "react";
 import { renderMarkdown } from "../../../../../../shared/markdown";
 
 // Import types.
-import type { TextableData } from "../../../../types/data/core/TextableData";
+import type { TextableState } from "../../../../types/state/core/TextableState";
 
 // Import local module files.
 import { ForeignObjectElement, Text, TextWrapper } from "./TextableStyled";
@@ -14,7 +14,7 @@ import { ForeignObjectElement, Text, TextWrapper } from "./TextableStyled";
 /**
  * Props for rendering editable text inside the SVG shape.
  */
-type TextableProps = TextableData & {
+type TextableProps = TextableState & {
 	x: number;
 	y: number;
 	width: number;
@@ -54,6 +54,7 @@ const TextableComponent: React.FC<TextableProps> = ({
 
 	if (!text) return null;
 	if (isTextEditing) return null;
+
 	return (
 		<ForeignObjectElement
 			x={x}

@@ -1,5 +1,8 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
-import { isSelectableData } from "../../utils/validation/isSelectableData";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
+
+// Import utils.
+import { isSelectableState } from "../../utils/validation/isSelectableState";
 import { applyFunctionRecursively } from "./applyFunctionRecursively";
 
 /**
@@ -15,12 +18,12 @@ import { applyFunctionRecursively } from "./applyFunctionRecursively";
 export const updateOutlineBySelection = (items: Diagram[]): Diagram[] => {
 	return applyFunctionRecursively(items, (item, ancestors) => {
 		// Only process selectable items
-		if (!isSelectableData(item)) {
+		if (!isSelectableState(item)) {
 			return item;
 		}
 		// Determine if any ancestor is selected
 		const isAncestorSelected = ancestors.some(
-			(ancestor) => isSelectableData(ancestor) && ancestor.isSelected,
+			(ancestor) => isSelectableState(ancestor) && ancestor.isSelected,
 		);
 		// Outline should be shown if the item or any ancestor is selected
 		const shouldShowOutline = item.isSelected || isAncestorSelected;

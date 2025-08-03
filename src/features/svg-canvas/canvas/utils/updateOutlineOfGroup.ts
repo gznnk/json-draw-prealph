@@ -1,6 +1,9 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
+
+// Import utils.
 import { calcGroupOrientedBox } from "../../utils/shapes/group/calcGroupOrientedBox";
-import { isItemableData } from "../../utils/validation/isItemableData";
+import { isItemableState } from "../../utils/validation/isItemableState";
 
 /**
  * Update the outline of a group and its child groups recursively.
@@ -10,7 +13,7 @@ import { isItemableData } from "../../utils/validation/isItemableData";
  * @returns {Diagram} - The updated group diagram with outline updated.
  */
 export const updateOutlineOfGroup = (group: Diagram): Diagram => {
-	if (!isItemableData(group)) {
+	if (!isItemableState(group)) {
 		return group;
 	}
 

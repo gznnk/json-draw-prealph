@@ -1,4 +1,5 @@
-import type { Diagram } from "../../../types/data/catalog/Diagram";
+// Import types.
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 
 /**
  * Props for MiniMap component

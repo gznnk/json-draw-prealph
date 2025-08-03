@@ -1,23 +1,24 @@
 // Import React.
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// Import types related to SvgCanvas.
+// Import types.
 import type { SvgCanvasProps } from "../../../../canvas/types/SvgCanvasProps";
-import type { Diagram } from "../../../../types/data/catalog/Diagram";
 import type { FillableData } from "../../../../types/data/core/FillableData";
 import type { StrokableData } from "../../../../types/data/core/StrokableData";
 import type { TextableData } from "../../../../types/data/core/TextableData";
 import type { RectangleData } from "../../../../types/data/shapes/RectangleData";
 import type { DiagramStyleChangeEvent } from "../../../../types/events/DiagramStyleChangeEvent";
+import type { Diagram } from "../../../../types/state/catalog/Diagram";
 
-// Import functions related to SvgCanvas.
+// Import utils.
 import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams";
 import { newEventId } from "../../../../utils/core/newEventId";
-import { isItemableData } from "../../../../utils/validation/isItemableData";
-import { isTextableData } from "../../../../utils/validation/isTextableData";
-import { isTransformativeData } from "../../../../utils/validation/isTransformativeData";
+import { isItemableState } from "../../../../utils/validation/isItemableState";
+import { isTextableState } from "../../../../utils/validation/isTextableState";
+import { isTransformativeState } from "../../../../utils/validation/isTransformativeState";
 
 // Imports related to this component.
+import { InteractionState } from "../../../../canvas/types/InteractionState";
 import {
 	findFirstBorderRadiusRecursive,
 	findFirstFillableRecursive,
@@ -29,7 +30,6 @@ import type {
 	DiagramMenuStateMap,
 	DiagramMenuType,
 } from "./DiagramMenuTypes";
-import { InteractionState } from "../../../../canvas/types/InteractionState";
 
 export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 	// Extract properties from canvasProps.
@@ -154,7 +154,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				menuStateMap.FontColor = "Active";
 			}
 
-			if (isTextableData(firstTextableItem)) {
+			if (isTextableState(firstTextableItem)) {
 				if (firstTextableItem.fontWeight === "bold") {
 					menuStateMap.Bold = "Active";
 				}
@@ -195,7 +195,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 			menuStateMap.KeepAspectRatio = multiSelectGroup.keepProportion
 				? "Active"
 				: "Show";
-		} else if (isTransformativeData(singleSelectedItem)) {
+		} else if (isTransformativeState(singleSelectedItem)) {
 			menuStateMap.KeepAspectRatio = singleSelectedItem.keepProportion
 				? "Active"
 				: "Show";
@@ -234,7 +234,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 			} as DiagramMenuProps;
 		} else {
 			// When a single item is selected, use the properties of the selected item.
-			if (isTransformativeData(singleSelectedItem)) {
+			if (isTransformativeState(singleSelectedItem)) {
 				diagramMenuProps = {
 					x: singleSelectedItem.x * zoom,
 					y: singleSelectedItem.y * zoom,
@@ -279,7 +279,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				endDiagram: newItem,
 			});
 
-			if (recursively && isItemableData(newItem)) {
+			if (recursively && isItemableState(newItem)) {
 				// Check if the item has children and recursively change their properties.
 				changeItems(newItem.items, data, recursively, eventId);
 			}
@@ -300,7 +300,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				...styleData,
 			});
 
-			if (recursively && isItemableData(item)) {
+			if (recursively && isItemableState(item)) {
 				// Check if the item has children and recursively change their properties.
 				changeItemsStyle(item.items, styleData, recursively, eventId);
 			}

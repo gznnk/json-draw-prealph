@@ -1,6 +1,6 @@
 // Import types.
-import type { PathData } from "../../../types/data/shapes/PathData";
-import type { PathPointData } from "../../../types/data/shapes/PathPointData";
+import type { PathPointState } from "../../../types/state/shapes/PathPointState";
+import type { PathState } from "../../../types/state/shapes/PathState";
 
 // Import utils.
 import { newId } from "../common/newId";
@@ -9,12 +9,12 @@ import { newId } from "../common/newId";
 import { DEFAULT_PATH_DATA } from "../../../constants/DefaultData";
 
 /**
- * Converts an SVG Line element to a Path diagram data structure.
+ * Converts an SVG Line element to a Path diagram state structure.
  *
  * @param element - The SVG Line element to convert
- * @returns The converted Path diagram data
+ * @returns The converted Path diagram state
  */
-export const lineElementToDiagram = (element: SVGLineElement): PathData => {
+export const lineElementToDiagram = (element: SVGLineElement): PathState => {
 	const x1 = Number(element.getAttribute("x1"));
 	const y1 = Number(element.getAttribute("y1"));
 	const x2 = Number(element.getAttribute("x2"));
@@ -45,15 +45,13 @@ export const lineElementToDiagram = (element: SVGLineElement): PathData => {
 				type: "PathPoint",
 				x: x1,
 				y: y1,
-				hidden: false,
 			},
 			{
 				id: newId(),
 				type: "PathPoint",
 				x: x2,
 				y: y2,
-				hidden: false,
 			},
-		] as PathPointData[],
-	} as PathData;
+		] as PathPointState[],
+	} as PathState;
 };

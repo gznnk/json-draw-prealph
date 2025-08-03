@@ -24,7 +24,10 @@
       "mcp__serena__list_dir",
       "mcp__serena__create_text_file",
       "mcp__serena__insert_before_symbol",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "mcp__serena__list_dir",
+      "mcp__serena__create_text_file",
+      "Bash(find:*)"
     ],
     "deny": []
   },

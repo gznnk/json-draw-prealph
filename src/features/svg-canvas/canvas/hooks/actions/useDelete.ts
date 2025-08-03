@@ -8,8 +8,8 @@ import type { SvgCanvasState } from "../../types/SvgCanvasState";
 
 // Import utils.
 import { newEventId } from "../../../utils/core/newEventId";
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
+import { isItemableState } from "../../../utils/validation/isItemableState";
+import { isSelectableState } from "../../../utils/validation/isSelectableState";
 import { useDataChange } from "../history/useDataChange";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
@@ -39,7 +39,7 @@ export const useDelete = (props: SvgCanvasSubHooksProps) => {
 			const deletedItemIds = new Set<string>();
 
 			let items = applyFunctionRecursively(prevState.items, (item) => {
-				if (!isSelectableData(item)) {
+				if (!isSelectableState(item)) {
 					return item;
 				}
 
@@ -48,10 +48,10 @@ export const useDelete = (props: SvgCanvasSubHooksProps) => {
 					deletedItemIds.add(item.id);
 				}
 
-				if (isItemableData(item)) {
+				if (isItemableState(item)) {
 					// Collect deleted child item IDs and filter them
 					const filteredItems = item.items?.filter((childItem) => {
-						if (isSelectableData(childItem) && childItem.isSelected) {
+						if (isSelectableState(childItem) && childItem.isSelected) {
 							deletedItemIds.add(childItem.id);
 							return false;
 						}
@@ -65,7 +65,7 @@ export const useDelete = (props: SvgCanvasSubHooksProps) => {
 				}
 				return item;
 			}).filter((item) => {
-				if (isSelectableData(item) && item.isSelected) {
+				if (isSelectableState(item) && item.isSelected) {
 					deletedItemIds.add(item.id);
 					return false;
 				}

@@ -1,8 +1,8 @@
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 
 // Import utils.
-import { isImageData } from "../../../utils/validation/isImageData";
+import { isImageState } from "../../../utils/validation/isImageState";
 
 /**
  * Converts image data to a Blob.
@@ -11,7 +11,7 @@ import { isImageData } from "../../../utils/validation/isImageData";
  * @returns A Blob representing the image or undefined if not valid
  */
 export const imageToBlob = (data: Diagram): Blob | undefined => {
-	if (!isImageData(data)) return undefined;
+	if (!isImageState(data)) return undefined;
 
 	// 1. base64 → binary string
 	const binary = atob(data.base64Data.replace(/\s/g, ""));

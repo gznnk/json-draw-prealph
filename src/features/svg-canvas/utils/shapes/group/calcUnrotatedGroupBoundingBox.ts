@@ -1,8 +1,8 @@
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 
 // Import utils.
-import { isItemableData } from "../../validation/isItemableData";
+import { isItemableState } from "../../validation/isItemableState";
 import { calcDiagramBoundingBoxInUnrotatedGroup } from "./calcDiagramBoundingBoxInUnrotatedGroup";
 
 /**
@@ -29,7 +29,7 @@ export const calcUnrotatedGroupBoundingBox = (
 	let right = Number.NEGATIVE_INFINITY;
 	for (const item of items) {
 		// Exclude ConnectPoint from shape calculations
-		const itemItems = isItemableData<Diagram>(item)
+		const itemItems = isItemableState<Diagram>(item)
 			? (item.items ?? []).filter((i) => i.type !== "ConnectPoint")
 			: [];
 		if (itemItems.length > 0) {

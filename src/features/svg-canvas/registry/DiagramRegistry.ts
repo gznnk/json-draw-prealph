@@ -1,6 +1,7 @@
+// Import types.
 import type { DiagramType } from "../types/core/DiagramType";
-import type { Diagram } from "../types/data/catalog/Diagram";
-import type { ConnectPointData } from "../types/data/shapes/ConnectPointData";
+import type { Diagram } from "../types/state/catalog/Diagram";
+import type { ConnectPointState } from "../types/state/shapes/ConnectPointState";
 import type { DiagramDefinition } from "./DiagramDefinition";
 
 /**
@@ -59,9 +60,10 @@ class DiagramRegistryClass {
 	 */
 	getConnectPointCalculator(
 		type: DiagramType,
-	): ((diagram: Diagram) => ConnectPointData[]) | undefined {
+	): ((diagram: Diagram) => ConnectPointState[]) | undefined {
 		return this.definitions.get(type)?.connectPointCalculator;
 	}
+
 	/**
 	 * Get the create function for a diagram type.
 	 *
@@ -73,6 +75,7 @@ class DiagramRegistryClass {
 	): ((props: { x: number; y: number }) => Diagram | undefined) | undefined {
 		return this.definitions.get(type)?.createFunction;
 	}
+
 	/**
 	 * Get the export function for a diagram type.
 	 *

@@ -1,7 +1,8 @@
-import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
+// Import types.
+import type { Shape } from "../../../types/core/Shape";
 import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";
 import type { PreviewConnectLineEvent } from "../../../types/events/PreviewConnectLineEvent";
-import type { Shape } from "../../../types/core/Shape";
+import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
 
 /**
  * Props for ConnectPoints component
@@ -12,7 +13,7 @@ export type ConnectPointsProps = {
 	/** Owner shape properties */
 	ownerShape: Shape;
 	/** Array of connect points to render */
-	connectPoints: ConnectPointData[];
+	connectPoints: ConnectPointState[];
 	/** Whether to show all connect points */
 	showConnectPoints: boolean;
 	/** Whether to render connect points at all */

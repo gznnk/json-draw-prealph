@@ -1,11 +1,11 @@
-import type { DiagramBaseProps } from "./DiagramBaseProps";
-import type { SelectableProps } from "./SelectableProps";
-import type { TransformativeProps } from "./TransformativeProps";
-import type { ItemableProps } from "./ItemableProps";
-import type { ConnectableProps } from "./ConnectableProps";
-import type { TextableProps } from "./TextableProps";
-import type { ExecutableProps } from "./ExecutableProps";
-import type { FileDroppableProps } from "./FileDroppableProps";
+import type { DiagramBaseProps } from "../core/DiagramBaseProps";
+import type { SelectableProps } from "../core/SelectableProps";
+import type { TransformativeProps } from "../core/TransformativeProps";
+import type { ItemableProps } from "../core/ItemableProps";
+import type { ConnectableProps } from "../core/ConnectableProps";
+import type { TextableProps } from "../core/TextableProps";
+import type { ExecutableProps } from "../core/ExecutableProps";
+import type { FileDroppableProps } from "../core/FileDroppableProps";
 
 /**
  * Options for diagram properties creation.

@@ -1,13 +1,13 @@
 // Import React.
 import { useCallback, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { DiagramTextChangeEvent } from "../../../types/events/DiagramTextChangeEvent";
-import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+// Import types.
 import type { TextEditorState } from "../../../components/core/Textable/TextEditor/TextEditorTypes";
+import type { DiagramTextChangeEvent } from "../../../types/events/DiagramTextChangeEvent";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import functions related to SvgCanvas.
+// Import utils.
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
 // Import hooks.
@@ -67,7 +67,7 @@ export const useOnTextChange = (props: SvgCanvasSubHooksProps) => {
 			const isTextEditing = e.eventType !== "End";
 
 			// Create a new state with the updated text.
-			let newState = {
+			const newState = {
 				...prevState,
 				items: applyFunctionRecursively(prevState.items, (item) =>
 					item.id === e.id ? { ...item, text: e.text, isTextEditing } : item,
