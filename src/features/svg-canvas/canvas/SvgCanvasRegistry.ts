@@ -50,15 +50,15 @@ import { calcEllipseConnectPointPosition } from "../utils/shapes/ellipse/calcEll
 import { calcRectangleConnectPointPosition } from "../utils/shapes/rectangle/calcRectangleConnectPointPosition";
 
 // Import create functions
-import { createAgentNodeData } from "../utils/nodes/agentNode/createAgentNodeData";
-import { createHubNodeData } from "../utils/nodes/hubNode/createHubNodeData";
-import { createImageGenNodeData } from "../utils/nodes/imageGenNode/createImageGenNodeData";
-import { createLLMNodeData } from "../utils/nodes/llmNodeData/createLLMNodeData";
-import { createPageDesignNodeData } from "../utils/nodes/pageDesignNode/createPageDesignNodeData";
-import { createSvgToDiagramNodeData } from "../utils/nodes/svgToDiagramNode/createSvgToDiagramNodeData";
-import { createTextAreaNodeData } from "../utils/nodes/textAreaNode/createTextAreaNodeData";
-import { createVectorStoreNodeData } from "../utils/nodes/vectorStoreNode/createVectorStoreNodeData";
-import { createWebSearchNodeData } from "../utils/nodes/webSearchNode/createWebSearchNodeData";
+import { createAgentNodeState } from "../utils/nodes/agentNode/createAgentNodeState";
+import { createHubNodeState } from "../utils/nodes/hubNode/createHubNodeState";
+import { createImageGenNodeState } from "../utils/nodes/imageGenNode/createImageGenNodeState";
+import { createLLMNodeState } from "../utils/nodes/llmNodeData/createLLMNodeState";
+import { createPageDesignNodeState } from "../utils/nodes/pageDesignNode/createPageDesignNodeState";
+import { createSvgToDiagramNodeState } from "../utils/nodes/svgToDiagramNode/createSvgToDiagramNodeState";
+import { createTextAreaNodeState } from "../utils/nodes/textAreaNode/createTextAreaNodeState";
+import { createVectorStoreNodeState } from "../utils/nodes/vectorStoreNode/createVectorStoreNodeState";
+import { createWebSearchNodeState } from "../utils/nodes/webSearchNode/createWebSearchNodeState";
 import { createEllipseState } from "../utils/shapes/ellipse/createEllipseState";
 import { createImageState } from "../utils/shapes/image/createImageState";
 import { createPathState } from "../utils/shapes/path/createPathState";
@@ -193,7 +193,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		component: AgentNode,
 		minimapComponent: AgentNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
-		createFunction: createAgentNodeData,
+		createFunction: createAgentNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: agentNodeStateToData as StateToDataMapper,
 	});
@@ -203,7 +203,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		component: HubNode,
 		minimapComponent: HubNodeMinimap,
 		connectPointCalculator: calcEllipseConnectPointPosition,
-		createFunction: createHubNodeData,
+		createFunction: createHubNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: hubNodeStateToData as StateToDataMapper,
 	});
@@ -213,7 +213,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		component: ImageGenNode,
 		minimapComponent: ImageGenNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
-		createFunction: createImageGenNodeData,
+		createFunction: createImageGenNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: imageGenNodeStateToData as StateToDataMapper,
 	});
@@ -223,7 +223,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		component: LLMNode,
 		minimapComponent: LLMNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
-		createFunction: createLLMNodeData,
+		createFunction: createLLMNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: llmNodeStateToData as StateToDataMapper,
 	});
@@ -233,7 +233,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		component: PageDesignNode,
 		minimapComponent: PageDesignNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
-		createFunction: createPageDesignNodeData,
+		createFunction: createPageDesignNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: pageDesignNodeStateToData as StateToDataMapper,
 	});
@@ -243,7 +243,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		component: SvgToDiagramNode,
 		minimapComponent: SvgToDiagramNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
-		createFunction: createSvgToDiagramNodeData,
+		createFunction: createSvgToDiagramNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: svgToDiagramNodeStateToData as StateToDataMapper,
 	});
@@ -253,7 +253,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		component: TextAreaNode,
 		minimapComponent: TextAreaNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
-		createFunction: createTextAreaNodeData,
+		createFunction: createTextAreaNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: textAreaNodeStateToData as StateToDataMapper,
 	});
@@ -263,7 +263,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		component: VectorStoreNode,
 		minimapComponent: VectorStoreNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
-		createFunction: createVectorStoreNodeData,
+		createFunction: createVectorStoreNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: vectorStoreNodeStateToData as StateToDataMapper,
 	});
@@ -273,7 +273,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		component: WebSearchNode,
 		minimapComponent: WebSearchNodeMinimap,
 		connectPointCalculator: calcRectangleConnectPointPosition,
-		createFunction: createWebSearchNodeData,
+		createFunction: createWebSearchNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: webSearchNodeStateToData as StateToDataMapper,
 	});

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useAddDiagramWithBus } from "../../hooks/useAddDiagramWithBus";
-import { createTextAreaNodeData } from "../../utils/nodes/textAreaNode/createTextAreaNodeData";
+import { createTextAreaNodeState } from "../../utils/nodes/textAreaNode/createTextAreaNodeState";
 import type {
 	FunctionCallHandler,
 	FunctionCallInfo,
@@ -20,7 +20,7 @@ export const useAddTextNodeTool = (eventBus: EventBus): FunctionCallHandler => {
 		(functionCall: FunctionCallInfo) => {
 			const args = functionCall.arguments as { x: number; y: number };
 			if (typeof args.x === "number" && typeof args.y === "number") {
-				const data = createTextAreaNodeData({ x: args.x, y: args.y });
+				const data = createTextAreaNodeState({ x: args.x, y: args.y });
 				addDiagram(data);
 				return {
 					id: data.id,
