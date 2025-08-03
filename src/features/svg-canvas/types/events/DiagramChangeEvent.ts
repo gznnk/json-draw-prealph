@@ -1,4 +1,4 @@
-import type { EventType } from "./EventType";
+import type { EventPhase } from "./EventPhase";
 import type { DiagramChangeData } from "./DiagramChangeData";
 import type { DiagramChangeEventType } from "./DiagramChangeEventType";
 
@@ -7,7 +7,7 @@ import type { DiagramChangeEventType } from "./DiagramChangeEventType";
  */
 export type DiagramChangeEvent = {
 	eventId: string;
-	eventType: EventType;
+	eventPhase: EventPhase;
 	changeType: DiagramChangeEventType;
 	id: string;
 	startDiagram: DiagramChangeData;

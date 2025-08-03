@@ -1,4 +1,4 @@
-import type { EventType } from "./EventType";
+import type { EventPhase } from "./EventPhase";
 import type { ExecuteResult } from "./ExecuteResult";
 
 /**
@@ -6,7 +6,7 @@ import type { ExecuteResult } from "./ExecuteResult";
  */
 export type ExecuteEvent = {
 	eventId: string;
-	eventType: EventType;
+	eventPhase: EventPhase;
 	id: string;
 	data: ExecuteResult;
 };

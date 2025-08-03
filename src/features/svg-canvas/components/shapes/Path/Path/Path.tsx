@@ -168,7 +168,7 @@ const PathComponent: React.FC<PathProps> = ({
 		}
 
 		// Processing at drag start
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			startItems.current = items;
 
 			const startDiagram = {
@@ -179,7 +179,7 @@ const PathComponent: React.FC<PathProps> = ({
 
 			onDiagramChange?.({
 				eventId: e.eventId,
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				changeType: "Drag",
 				id,
 				startDiagram,
@@ -200,7 +200,7 @@ const PathComponent: React.FC<PathProps> = ({
 
 		onDiagramChange?.({
 			eventId: e.eventId,
-			eventType: e.eventType,
+			eventPhase: e.eventPhase,
 			changeType: "Drag",
 			id,
 			startDiagram: {
@@ -219,13 +219,13 @@ const PathComponent: React.FC<PathProps> = ({
 	 * Vertex drag event handler
 	 */
 	const handlePathPointDrag = useCallback((e: DiagramDragEvent) => {
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			setIsPathPointDragging(true);
 		}
 
 		refBus.current.onDrag?.(e);
 
-		if (e.eventType === "End") {
+		if (e.eventPhase === "Ended") {
 			setIsPathPointDragging(false);
 		}
 	}, []);
@@ -237,7 +237,7 @@ const PathComponent: React.FC<PathProps> = ({
 			if (!isItemableState<DiagramBaseData>(e.endDiagram)) return; // Type guard with DiagramBaseData
 
 			const { rotation, scaleX, scaleY, onDiagramChange } = refBus.current;
-			if (e.eventType === "End") {
+			if (e.eventPhase === "Ended") {
 				// Calculate new shape of Path's bounding box when new vertex and line segment dragging is completed
 				const newShape = calcOrientedShapeFromPoints(
 					(e.endDiagram.items ?? []).map((p) => ({ x: p.x, y: p.y })),

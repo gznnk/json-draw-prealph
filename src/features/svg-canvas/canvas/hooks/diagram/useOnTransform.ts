@@ -3,7 +3,7 @@ import { useCallback, useRef } from "react";
 
 // Import types.
 import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
-import type { EventType } from "../../../types/events/EventType";
+import type { EventPhase } from "../../../types/events/EventPhase";
 import type { Diagram } from "../../../types/state/catalog/Diagram";
 import type { GroupState } from "../../../types/state/shapes/GroupState";
 import { InteractionState } from "../../types/InteractionState";
@@ -32,8 +32,8 @@ import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoin
  * Determines if an item should be in transforming state based on event type.
  * Pure function for consistent state management.
  */
-const getIsTransformingState = (eventType: EventType): boolean => {
-	return eventType === "Start" || eventType === "InProgress";
+const getIsTransformingState = (eventPhase: EventPhase): boolean => {
+	return eventPhase === "Started" || eventPhase === "InProgress";
 };
 
 /**
@@ -117,7 +117,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 					rotation: newRotation,
 					scaleX: e.endShape.scaleX,
 					scaleY: e.endShape.scaleY,
-					isTransforming: getIsTransformingState(e.eventType),
+					isTransforming: getIsTransformingState(e.eventPhase),
 					items: isItemableState(initialItem)
 						? transformRecursively(
 								initialItem.items ?? [],
@@ -175,7 +175,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 
 					// Update isTransforming flag if it's transformative data
 					if (isTransformativeState(newItem)) {
-						newItem.isTransforming = getIsTransformingState(e.eventType);
+						newItem.isTransforming = getIsTransformingState(e.eventPhase);
 					}
 
 					// Transform its children recursively.
@@ -252,7 +252,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 			// Update the canvas state based on the transform event.
 			setCanvasState((prevState) => {
 				// Store the canvas state and initial child items at the start of transform
-				if (e.eventType === "Start") {
+				if (e.eventPhase === "Started") {
 					// Store the current canvas state for connect line updates
 					startCanvasState.current = prevState;
 
@@ -283,7 +283,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 						topLevelGroupIds,
 					),
 					interactionState:
-						e.eventType === "Start" || e.eventType === "InProgress"
+						e.eventPhase === "Started" || e.eventPhase === "InProgress"
 							? InteractionState.Transforming
 							: InteractionState.Idle,
 					multiSelectGroup: prevState.multiSelectGroup
@@ -316,13 +316,13 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 					return item;
 				});
 
-				if (isHistoryEvent(e.eventType)) {
+				if (isHistoryEvent(e.eventPhase)) {
 					// Set the history event ID and notify the data change.
 					onDataChange(e.eventId, newState);
 				}
 
 				// Clean up the stored items at the end of transform
-				if (e.eventType === "End") {
+				if (e.eventPhase === "Ended") {
 					startCanvasState.current = undefined;
 					initialItemsMap.current.clear();
 					multiSelectedItemIds.current.clear();

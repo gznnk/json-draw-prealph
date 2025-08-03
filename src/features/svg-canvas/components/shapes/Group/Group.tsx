@@ -73,7 +73,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			// TODO: Check if this logic is necessary
 			// When group is selected, operations that come here are equivalent to drag operations, so convert to drag event and propagate
 			const dragEvent = {
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				id,
 				startX: e.startDiagram.x,
 				startY: e.startDiagram.y,

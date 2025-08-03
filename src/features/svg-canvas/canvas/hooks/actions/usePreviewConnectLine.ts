@@ -31,7 +31,7 @@ export const usePreviewConnectLine = (props: SvgCanvasSubHooksProps) => {
 			};
 
 			// Clear all selections when connection preview starts
-			if (e.eventType === "Start") {
+			if (e.eventPhase === "Started") {
 				newState.items = clearSelectionRecursively(prevState.items);
 				newState.multiSelectGroup = undefined;
 			}

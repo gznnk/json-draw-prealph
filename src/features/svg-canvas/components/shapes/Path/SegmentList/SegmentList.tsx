@@ -98,7 +98,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 		} = refBus.current;
 
 		// Process the drag start event.
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			// Store the items at the start of the segment drag.
 			startItems.current = items;
 
@@ -142,7 +142,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 
 				onDiagramChange?.({
 					eventId: e.eventId,
-					eventType: e.eventType,
+					eventPhase: e.eventPhase,
 					changeType: "Transform",
 					id,
 					startDiagram: {
@@ -168,7 +168,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 		const newEndX = startSegment.current.endX + dx;
 		const newEndY = startSegment.current.endY + dy;
 
-		if (e.eventType === "InProgress") {
+		if (e.eventPhase === "InProgress") {
 			setDraggingSegment({
 				...draggingSegment,
 				startX: newStartX,
@@ -179,7 +179,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 
 			onDiagramChange?.({
 				eventId: e.eventId,
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				changeType: "Transform",
 				id,
 				startDiagram: {
@@ -199,10 +199,10 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 			});
 		}
 
-		if (e.eventType === "End") {
+		if (e.eventPhase === "Ended") {
 			onDiagramChange?.({
 				eventId: e.eventId,
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				changeType: "Transform",
 				id,
 				startDiagram: {

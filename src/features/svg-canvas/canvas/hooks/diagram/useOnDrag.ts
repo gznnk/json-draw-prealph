@@ -56,10 +56,10 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 		setCanvasState((prevState) => {
 			// Check if currently dragging
 			const isDragging =
-				e.eventType === "Start" || e.eventType === "InProgress";
+				e.eventPhase === "Started" || e.eventPhase === "InProgress";
 
 			// Store the current canvas state for connect line updates on drag start
-			if (e.eventType === "Start") {
+			if (e.eventPhase === "Started") {
 				startCanvasState.current = prevState;
 
 				// Store selected item IDs for performance
@@ -158,7 +158,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				...prevState,
 				items: moveRecursively(prevState.items),
 				interactionState:
-					e.eventType === "Start" || e.eventType === "InProgress"
+					e.eventPhase === "Started" || e.eventPhase === "InProgress"
 						? InteractionState.Dragging
 						: InteractionState.Idle,
 			};
@@ -184,13 +184,13 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				startCanvasState.current,
 			);
 
-			if (isHistoryEvent(e.eventType)) {
+			if (isHistoryEvent(e.eventPhase)) {
 				// Set the history event ID and notify the data change.
 				onDataChange(e.eventId, newState);
 			}
 
 			// If the drag event is ended
-			if (e.eventType === "End") {
+			if (e.eventPhase === "Ended") {
 				// Restore showTransformControls from initial state for transformative items
 				newState.items = applyFunctionRecursively(newState.items, (item) => {
 					if (selectedIds.has(item.id) && isTransformativeState(item)) {

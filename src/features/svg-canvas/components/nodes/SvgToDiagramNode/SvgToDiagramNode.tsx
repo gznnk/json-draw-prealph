@@ -32,7 +32,7 @@ const SvgToDiagramNodeComponent: React.FC<SvgToDiagramNodeProps> = (props) => {
 	useExecutionChain({
 		id: props.id,
 		onPropagation: (e) => {
-			if (e.eventType !== "Instant" && e.eventType !== "End") return;
+			if (e.eventPhase !== "Instant" && e.eventPhase !== "Ended") return;
 
 			const data = e.data.text
 				.replace("```svg", "")

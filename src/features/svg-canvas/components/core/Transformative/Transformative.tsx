@@ -7,7 +7,7 @@ import type { DiagramType } from "../../../types/core/DiagramType";
 import type { Point } from "../../../types/core/Point";
 import type { TransformationType } from "../../../types/core/TransformationType";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
-import type { EventType } from "../../../types/events/EventType";
+import type { EventPhase } from "../../../types/events/EventPhase";
 import type { TransformativeProps } from "../../../types/props/core/TransformativeProps";
 import type { TransformativeState } from "../../../types/state/core/TransformativeState";
 
@@ -137,7 +137,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		onTransform?.({
 			eventId: e.eventId,
-			eventType: "Start",
+			eventPhase: "Started",
 			transformationType: "Resize",
 			id,
 			startShape: startShape.current,
@@ -159,7 +159,7 @@ const TransformativeComponent: React.FC<Props> = ({
 	) => {
 		const event = {
 			eventId: e.eventId,
-			eventType: e.eventType,
+			eventPhase: e.eventPhase,
 			transformationType: "Resize" as TransformationType,
 			id,
 			startShape: {
@@ -185,10 +185,10 @@ const TransformativeComponent: React.FC<Props> = ({
 		onTransform?.(event);
 	};
 
-	const setResizingByEvent = (eventType: EventType) => {
-		if (eventType === "Start") {
+	const setResizingByEvent = (eventPhase: EventPhase) => {
+		if (eventPhase === "Started") {
 			setIsResizing(true);
-		} else if (eventType === "End") {
+		} else if (eventPhase === "Ended") {
 			setIsResizing(false);
 		}
 	};
@@ -268,9 +268,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -324,9 +324,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -379,9 +379,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -434,9 +434,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -489,9 +489,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcWidthWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -549,9 +549,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -609,9 +609,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -669,9 +669,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcWidthWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -771,7 +771,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			vertices,
 		} = refBus.current;
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			setIsRotating(true);
 
 			startShape.current = {
@@ -788,7 +788,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 			onTransform?.({
 				eventId: e.eventId,
-				eventType: "Start",
+				eventPhase: "Started",
 				transformationType: "Rotation",
 				id,
 				startShape: startShape.current,
@@ -810,7 +810,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			Math.round(radiansToDegrees(radian - rotatePointRadian) + 360) % 360;
 		const event = {
 			eventId: e.eventId,
-			eventType: e.eventType,
+			eventPhase: e.eventPhase,
 			transformationType: "Rotation" as TransformationType,
 			id,
 			startShape: {
@@ -833,7 +833,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		onTransform?.(event);
 
-		if (e.eventType === "End") setIsRotating(false);
+		if (e.eventPhase === "Ended") setIsRotating(false);
 	}, []);
 
 	const dragFunctionRotationPoint = useCallback((rx: number, ry: number) => {

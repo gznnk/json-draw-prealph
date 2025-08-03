@@ -27,7 +27,8 @@
       "Bash(npx eslint:*)",
       "mcp__serena__list_dir",
       "mcp__serena__create_text_file",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git mv:*)"
     ],
     "deny": []
   },

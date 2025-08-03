@@ -119,7 +119,7 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 				multiSelectGroup,
 			};
 
-			if (isHistoryEvent(e.eventType)) {
+			if (isHistoryEvent(e.eventPhase)) {
 				// Set the history event ID and notify the data change.
 				onDataChange(e.eventId, newState);
 			}

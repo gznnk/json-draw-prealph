@@ -1,11 +1,11 @@
-import type { EventType } from "./EventType";
+import type { EventPhase } from "./EventPhase";
 
 /**
  * Event fired when text content is changed on a diagram
  */
 export type DiagramTextChangeEvent = {
 	eventId: string;
-	eventType: EventType;
+	eventPhase: EventPhase;
 	id: string;
 	text: string;
 };

@@ -28,7 +28,7 @@ const HubNodeComponent: React.FC<HubNodeProps> = (props) => {
 			props.onExecute?.({
 				id: props.id,
 				eventId: e.eventId,
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				data: {
 					text: e.data.text,
 				},

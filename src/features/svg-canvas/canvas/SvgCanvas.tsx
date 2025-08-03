@@ -234,7 +234,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 						onAreaSelection({
 							eventId: newEventId(),
-							eventType: "Start",
+							eventPhase: "Started",
 							clientX: e.clientX,
 							clientY: e.clientY,
 						});
@@ -398,7 +398,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				) {
 					onAreaSelection({
 						eventId: newEventId(),
-						eventType: "InProgress",
+						eventPhase: "InProgress",
 						clientX: e.clientX,
 						clientY: e.clientY,
 					});
@@ -430,7 +430,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 					onAreaSelection({
 						eventId: newEventId(),
-						eventType: "End",
+						eventPhase: "Ended",
 						clientX: e.clientX,
 						clientY: e.clientY,
 					});

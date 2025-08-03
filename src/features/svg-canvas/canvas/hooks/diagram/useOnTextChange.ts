@@ -36,7 +36,7 @@ export const useOnTextChange = (props: SvgCanvasSubHooksProps) => {
 
 		setCanvasState((prevState) => {
 			// Handle text editing initiation
-			if (e.eventType === "Start") {
+			if (e.eventPhase === "Started") {
 				let targetItem: Diagram | undefined = undefined;
 
 				const newState = {
@@ -64,7 +64,7 @@ export const useOnTextChange = (props: SvgCanvasSubHooksProps) => {
 			}
 
 			// Handle text content changes
-			const isTextEditing = e.eventType !== "End";
+			const isTextEditing = e.eventPhase !== "Ended";
 
 			// Create a new state with the updated text.
 			const newState = {
@@ -80,7 +80,7 @@ export const useOnTextChange = (props: SvgCanvasSubHooksProps) => {
 			};
 
 			// Notify about data change.
-			if (e.eventType === "End") {
+			if (e.eventPhase === "Ended") {
 				onDataChange(e.eventId, newState);
 			}
 

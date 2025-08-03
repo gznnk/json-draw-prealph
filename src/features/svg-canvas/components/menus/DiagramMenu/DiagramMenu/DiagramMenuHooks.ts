@@ -272,7 +272,7 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 			} // Trigger the change event.
 			canvasProps.onDiagramChange?.({
 				eventId,
-				eventType: "Instant", // TODO: Not saved to history
+				eventPhase: "Instant", // TODO: Not saved to history
 				changeType: "Appearance",
 				id: item.id,
 				startDiagram: item,

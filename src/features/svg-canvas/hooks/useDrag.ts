@@ -8,7 +8,7 @@ import type { Point } from "../types/core/Point";
 import type { DiagramDragDropEvent } from "../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../types/events/DiagramPointerEvent";
-import type { EventType } from "../types/events/EventType";
+import type { EventPhase } from "../types/events/EventPhase";
 import type { SvgCanvasScrollEvent } from "../types/events/SvgCanvasScrollEvent";
 
 // Import utils.
@@ -33,7 +33,7 @@ import type { DoStartEdgeScrollArgs } from "./useAutoEdgeScroll";
  */
 type BroadcastDragEvent = {
 	eventId: string;
-	eventType: EventType;
+	eventPhase: EventPhase;
 	id: string;
 	type: DiagramType;
 	startX: number;
@@ -210,7 +210,7 @@ export const useDrag = (props: DragProps) => {
 		// dispatch dragging event
 		const dragEvent = {
 			eventId: newEventId(),
-			eventType: "InProgress",
+			eventPhase: "InProgress",
 			id,
 			startX: startX.current,
 			startY: startY.current,
@@ -253,7 +253,7 @@ export const useDrag = (props: DragProps) => {
 		// Create event information during dragging
 		const dragEvent = {
 			eventId,
-			eventType: "InProgress",
+			eventPhase: "InProgress",
 			id,
 			startX: startX.current,
 			startY: startY.current,
@@ -268,7 +268,7 @@ export const useDrag = (props: DragProps) => {
 		// Create broadcast drag event information
 		const broadcastDragEvent = {
 			eventId,
-			eventType: "InProgress",
+			eventPhase: "InProgress",
 			id,
 			type: type,
 			startX: startX.current,
@@ -286,7 +286,7 @@ export const useDrag = (props: DragProps) => {
 			// Start dragging when not dragging and pointer movement exceeds a certain threshold
 			onDrag?.({
 				...dragEvent,
-				eventType: "Start",
+				eventPhase: "Started",
 			});
 
 			// Fire dragging event for handling by shapes without parent-child relationship
@@ -294,7 +294,7 @@ export const useDrag = (props: DragProps) => {
 				new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
 					detail: {
 						...broadcastDragEvent,
-						eventType: "Start",
+						eventPhase: "Started",
 					},
 				}),
 			);
@@ -351,7 +351,7 @@ export const useDrag = (props: DragProps) => {
 			// Fire drag end event if dragging was in progress
 			onDrag?.({
 				eventId,
-				eventType: "End",
+				eventPhase: "Ended",
 				id,
 				startX: startX.current,
 				startY: startY.current,
@@ -367,7 +367,7 @@ export const useDrag = (props: DragProps) => {
 				new CustomEvent(EVENT_NAME_BROADCAST_DRAG, {
 					detail: {
 						eventId,
-						eventType: "End",
+						eventPhase: "Ended",
 						id,
 						type: type,
 						startX: startX.current,
@@ -423,7 +423,7 @@ export const useDrag = (props: DragProps) => {
 			// For keyboard operations, treat the shape's center as the cursor position
 			const dragEvent = {
 				eventId,
-				eventType: "InProgress",
+				eventPhase: "InProgress",
 				id,
 				startX: startX.current,
 				startY: startY.current,
@@ -441,7 +441,7 @@ export const useDrag = (props: DragProps) => {
 
 				onDrag?.({
 					...dragEvent,
-					eventType: "Start",
+					eventPhase: "Started",
 				});
 
 				isArrowDragging.current = true;
@@ -471,7 +471,7 @@ export const useDrag = (props: DragProps) => {
 					// Fire drag end event to notify SvgCanvas side of coordinate update and update coordinates
 					onDrag?.({
 						eventId,
-						eventType: "End",
+						eventPhase: "Ended",
 						id,
 						startX: x,
 						startY: y,
@@ -504,7 +504,7 @@ export const useDrag = (props: DragProps) => {
 		// Create event information for arrow key movement completion
 		const dragEvent = {
 			eventId: newEventId(),
-			eventType: "End",
+			eventPhase: "Ended",
 			id,
 			startX: startX.current,
 			startY: startY.current,
@@ -523,7 +523,7 @@ export const useDrag = (props: DragProps) => {
 				onDrag?.(dragEvent);
 				onDrag?.({
 					...dragEvent,
-					eventType: "Start",
+					eventPhase: "Started",
 				});
 			}
 			if (
@@ -573,7 +573,7 @@ export const useDrag = (props: DragProps) => {
 						customEvent.detail.clientY,
 					)
 				) {
-					if (customEvent.detail.eventType === "End") {
+					if (customEvent.detail.eventPhase === "Ended") {
 						onDrop?.(dragDropEvent);
 					} else {
 						if (!dragEntered.current) {
@@ -630,7 +630,7 @@ export const useDrag = (props: DragProps) => {
 
 			onDrag?.({
 				eventId: newEventId(),
-				eventType: "InProgress",
+				eventPhase: "InProgress",
 				id,
 				startX: startX.current,
 				startY: startY.current,

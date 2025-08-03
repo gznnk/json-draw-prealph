@@ -290,10 +290,10 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	const onAreaSelection = useCallback(
 		(event: AreaSelectionEvent) => {
 			const { canvasState, setCanvasState } = refBus.current.props;
-			const { eventType, clientX, clientY } = event;
+			const { eventPhase, clientX, clientY } = event;
 
-			switch (eventType) {
-				case "Start": {
+			switch (eventPhase) {
+				case "Started": {
 					const { canvasRef } = refBus.current.props;
 					const { x, y } = clientToCanvasCoords(
 						clientX,
@@ -372,7 +372,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					break;
 				}
 
-				case "End": {
+				case "Ended": {
 					// If area selection is not active, do nothing
 					if (canvasState.interactionState !== InteractionState.AreaSelection) {
 						return;

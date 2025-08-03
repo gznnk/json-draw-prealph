@@ -50,7 +50,7 @@ export const useText = (props: UseTextProps): UseTextReturn => {
 		}
 
 		const textChangeEvent: DiagramTextChangeEvent = {
-			eventType: "Start",
+			eventPhase: "Started",
 			id,
 			text: "",
 			eventId: newEventId(),

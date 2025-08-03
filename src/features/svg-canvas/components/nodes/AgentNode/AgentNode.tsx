@@ -25,13 +25,13 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
-			if (e.eventType !== "Instant" && e.eventType !== "End") return;
+			if (e.eventPhase !== "Instant" && e.eventPhase !== "Ended") return;
 
 			setIsProcessing(true);
 			props.onExecute?.({
 				id: props.id,
 				eventId: e.eventId,
-				eventType: "Start",
+				eventPhase: "Started",
 				data: { text: "" },
 			});
 
@@ -45,7 +45,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 				props.onExecute?.({
 					id: props.id,
 					eventId: e.eventId,
-					eventType: "End",
+					eventPhase: "Ended",
 					data: {
 						text: typeof result?.content === "string" ? result.content : "",
 					},
@@ -56,7 +56,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 				props.onExecute?.({
 					id: props.id,
 					eventId: e.eventId,
-					eventType: "End",
+					eventPhase: "Ended",
 					data: { text: "Error generating workflow." },
 				});
 			} finally {

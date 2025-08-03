@@ -78,7 +78,7 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 	const handleNewVertexDrag = useCallback((e: DiagramDragEvent) => {
 		const { id, items, onDiagramChange, newVertexList } = refBus.current;
 		// Processing at drag start
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			// Store the items of owner Path component at the start of the new vertex drag.
 			startItems.current = items;
 
@@ -99,7 +99,7 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 			// Notify path change
 			onDiagramChange?.({
 				eventId: e.eventId,
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				changeType: "Transform",
 				id,
 				startDiagram: {
@@ -112,14 +112,14 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 		}
 
 		// Processing during drag
-		if (e.eventType === "InProgress") {
+		if (e.eventPhase === "InProgress") {
 			// Update the position of the new vertex being dragged
 			setDraggingNewVertex({ id: e.id, x: e.endX, y: e.endY });
 
 			// Notify path vertex position change due to new vertex drag
 			onDiagramChange?.({
 				eventId: e.eventId,
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				changeType: "Transform",
 				id,
 				startDiagram: {
@@ -133,14 +133,14 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 			});
 		}
 		// Processing at drag completion
-		if (e.eventType === "End") {
+		if (e.eventPhase === "Ended") {
 			// Clear the new vertex being dragged
 			setDraggingNewVertex(undefined);
 
 			// Notify path data change due to new vertex drag completion
 			onDiagramChange?.({
 				eventId: e.eventId,
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				changeType: "Transform",
 				id,
 				startDiagram: {
