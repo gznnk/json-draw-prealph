@@ -1,5 +1,5 @@
 // Import types.
-import type { Diagram } from "../../types/state/catalog/Diagram";
+import type { DiagramData } from "../../types/data/catalog/DiagramData";
 
 /**
  * Type for the data of the SvgCanvas.
@@ -8,5 +8,5 @@ export type SvgCanvasData = {
 	id: string;
 	minX: number;
 	minY: number;
-	items: Diagram[];
+	items: DiagramData[];
 };

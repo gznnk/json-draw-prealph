@@ -1,6 +1,9 @@
 // Import registry
 import { DiagramRegistry } from "../registry";
-import type { StateToDataMapper } from "../registry/DiagramDefinition";
+import type {
+	DataToStateMapper,
+	StateToDataMapper,
+} from "../registry/DiagramDefinition";
 
 // Import shape components and their functions
 import { ConnectLine } from "../components/shapes/ConnectLine";
@@ -69,15 +72,6 @@ import { imageToBlob } from "../utils/shapes/image/imageToBlob";
 import { svgToBlob } from "../utils/shapes/svg/svgToBlob";
 
 // Import state to data mapping functions
-import { connectLineStateToData } from "../utils/shapes/connectLine/mapConnectLineStateToData";
-import { connectPointStateToData } from "../utils/shapes/connectPoint/mapConnectPointStateToData";
-import { ellipseStateToData } from "../utils/shapes/ellipse/mapEllipseStateToData";
-import { groupStateToData } from "../utils/shapes/group/mapGroupStateToData";
-import { imageStateToData } from "../utils/shapes/image/mapImageStateToData";
-import { pathStateToData } from "../utils/shapes/path/mapPathStateToData";
-import { pathPointStateToData } from "../utils/shapes/path/mapPathPointStateToData";
-import { rectangleStateToData } from "../utils/shapes/rectangle/mapRectangleStateToData";
-import { svgStateToData } from "../utils/shapes/svg/mapSvgStateToData";
 import { agentNodeStateToData } from "../utils/nodes/agentNode/mapAgentNodeStateToData";
 import { hubNodeStateToData } from "../utils/nodes/hubNode/mapHubNodeStateToData";
 import { imageGenNodeStateToData } from "../utils/nodes/imageGenNode/mapImageGenNodeStateToData";
@@ -87,6 +81,35 @@ import { svgToDiagramNodeStateToData } from "../utils/nodes/svgToDiagramNode/map
 import { textAreaNodeStateToData } from "../utils/nodes/textAreaNode/mapTextAreaNodeStateToData";
 import { vectorStoreNodeStateToData } from "../utils/nodes/vectorStoreNode/mapVectorStoreNodeStateToData";
 import { webSearchNodeStateToData } from "../utils/nodes/webSearchNode/mapWebSearchNodeStateToData";
+import { connectLineStateToData } from "../utils/shapes/connectLine/mapConnectLineStateToData";
+import { connectPointStateToData } from "../utils/shapes/connectPoint/mapConnectPointStateToData";
+import { ellipseStateToData } from "../utils/shapes/ellipse/mapEllipseStateToData";
+import { groupStateToData } from "../utils/shapes/group/mapGroupStateToData";
+import { imageStateToData } from "../utils/shapes/image/mapImageStateToData";
+import { pathPointStateToData } from "../utils/shapes/path/mapPathPointStateToData";
+import { pathStateToData } from "../utils/shapes/path/mapPathStateToData";
+import { rectangleStateToData } from "../utils/shapes/rectangle/mapRectangleStateToData";
+import { svgStateToData } from "../utils/shapes/svg/mapSvgStateToData";
+
+// Import data to state mapping functions
+import { mapAgentNodeDataToState } from "../utils/nodes/agentNode/mapAgentNodeDataToState";
+import { mapHubNodeDataToState } from "../utils/nodes/hubNode/mapHubNodeDataToState";
+import { mapImageGenNodeDataToState } from "../utils/nodes/imageGenNode/mapImageGenNodeDataToState";
+import { mapLLMNodeDataToState } from "../utils/nodes/llmNodeData/mapLLMNodeDataToState";
+import { mapPageDesignNodeDataToState } from "../utils/nodes/pageDesignNode/mapPageDesignNodeDataToState";
+import { mapSvgToDiagramNodeDataToState } from "../utils/nodes/svgToDiagramNode/mapSvgToDiagramNodeDataToState";
+import { mapTextAreaNodeDataToState } from "../utils/nodes/textAreaNode/mapTextAreaNodeDataToState";
+import { mapVectorStoreNodeDataToState } from "../utils/nodes/vectorStoreNode/mapVectorStoreNodeDataToState";
+import { mapWebSearchNodeDataToState } from "../utils/nodes/webSearchNode/mapWebSearchNodeDataToState";
+import { mapConnectLineDataToState } from "../utils/shapes/connectLine/mapConnectLineDataToState";
+import { mapConnectPointDataToState } from "../utils/shapes/connectPoint/mapConnectPointDataToState";
+import { mapEllipseDataToState } from "../utils/shapes/ellipse/mapEllipseDataToState";
+import { mapGroupDataToState } from "../utils/shapes/group/mapGroupDataToState";
+import { mapImageDataToState } from "../utils/shapes/image/mapImageDataToState";
+import { mapPathDataToState } from "../utils/shapes/path/mapPathDataToState";
+import { mapPathPointDataToState } from "../utils/shapes/path/mapPathPointDataToState";
+import { mapRectangleDataToState } from "../utils/shapes/rectangle/mapRectangleDataToState";
+import { mapSvgDataToState } from "../utils/shapes/svg/mapSvgDataToState";
 
 /**
  * Initialize all diagram registrations for the SvgCanvas.
@@ -105,6 +128,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createRectangleState,
 		exportFunction: undefined,
 		stateToDataMapper: rectangleStateToData as StateToDataMapper,
+		dataToStateMapper: mapRectangleDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -115,6 +139,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createEllipseState,
 		exportFunction: undefined,
 		stateToDataMapper: ellipseStateToData as StateToDataMapper,
+		dataToStateMapper: mapEllipseDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -125,6 +150,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createImageState,
 		exportFunction: imageToBlob,
 		stateToDataMapper: imageStateToData as StateToDataMapper,
+		dataToStateMapper: mapImageDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -135,6 +161,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createPathState,
 		exportFunction: undefined,
 		stateToDataMapper: pathStateToData as StateToDataMapper,
+		dataToStateMapper: mapPathDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -145,6 +172,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: () => undefined,
 		exportFunction: undefined,
 		stateToDataMapper: pathPointStateToData as StateToDataMapper,
+		dataToStateMapper: mapPathPointDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -155,6 +183,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: () => undefined,
 		exportFunction: svgToBlob,
 		stateToDataMapper: svgStateToData as StateToDataMapper,
+		dataToStateMapper: mapSvgDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -165,6 +194,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: () => undefined,
 		exportFunction: undefined,
 		stateToDataMapper: connectLineStateToData as StateToDataMapper,
+		dataToStateMapper: mapConnectLineDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -175,6 +205,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: () => undefined,
 		exportFunction: undefined,
 		stateToDataMapper: connectPointStateToData as StateToDataMapper,
+		dataToStateMapper: mapConnectPointDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -185,6 +216,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: () => undefined,
 		exportFunction: undefined,
 		stateToDataMapper: groupStateToData as StateToDataMapper,
+		dataToStateMapper: mapGroupDataToState as DataToStateMapper,
 	});
 
 	// Register node diagrams
@@ -196,6 +228,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createAgentNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: agentNodeStateToData as StateToDataMapper,
+		dataToStateMapper: mapAgentNodeDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -206,6 +239,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createHubNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: hubNodeStateToData as StateToDataMapper,
+		dataToStateMapper: mapHubNodeDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -216,6 +250,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createImageGenNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: imageGenNodeStateToData as StateToDataMapper,
+		dataToStateMapper: mapImageGenNodeDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -226,6 +261,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createLLMNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: llmNodeStateToData as StateToDataMapper,
+		dataToStateMapper: mapLLMNodeDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -236,6 +272,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createPageDesignNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: pageDesignNodeStateToData as StateToDataMapper,
+		dataToStateMapper: mapPageDesignNodeDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -246,6 +283,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createSvgToDiagramNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: svgToDiagramNodeStateToData as StateToDataMapper,
+		dataToStateMapper: mapSvgToDiagramNodeDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -256,6 +294,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createTextAreaNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: textAreaNodeStateToData as StateToDataMapper,
+		dataToStateMapper: mapTextAreaNodeDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -266,6 +305,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createVectorStoreNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: vectorStoreNodeStateToData as StateToDataMapper,
+		dataToStateMapper: mapVectorStoreNodeDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({
@@ -276,5 +316,6 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		createFunction: createWebSearchNodeState,
 		exportFunction: undefined,
 		stateToDataMapper: webSearchNodeStateToData as StateToDataMapper,
+		dataToStateMapper: mapWebSearchNodeDataToState as DataToStateMapper,
 	});
 };

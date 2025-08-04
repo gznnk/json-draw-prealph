@@ -4,10 +4,12 @@ import { useRef, useState, type RefObject } from "react";
 // Import types related to SvgCanvas.
 import type { TextEditorState } from "../components/core/Textable";
 import type { Diagram } from "../types/state/catalog/Diagram";
+import type { DiagramData } from "../types/data/catalog/DiagramData";
 
 // Import functions related to SvgCanvas.
 import { deepCopy } from "../utils/core/deepCopy";
 import { calcCanvasBounds } from "./utils/calcCanvasBounds";
+import { svgCanvasDataToState } from "./utils/svgCanvasDataToState";
 
 // Import EventBus.
 import { EventBus } from "../../../shared/event-bus/EventBus";
@@ -62,7 +64,7 @@ type SvgCanvasHooksProps = {
 	id: string;
 	minX: number;
 	minY: number;
-	items: Diagram[];
+	items: DiagramData[];
 	zoom: number;
 	canvasRef: RefObject<SvgCanvasRef | null>;
 	onDataChange?: (data: SvgCanvasData) => void;
@@ -78,13 +80,21 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Create EventBus instance for canvas-wide event communication
 	const eventBusRef = useRef(new EventBus());
 
+	// Convert props.items from DiagramData[] to Diagram[] format
+	const stateItems: Diagram[] = svgCanvasDataToState({
+		id: props.id,
+		minX: props.minX,
+		minY: props.minY,
+		items: props.items,
+	});
+
 	// Calculate the initial bounds of the canvas.
 	let initialBounds = {
 		minX: props.minX,
 		minY: props.minY,
 	};
-	if (props.items.length > 0) {
-		const optimalBounds = calcCanvasBounds(props.items);
+	if (stateItems.length > 0) {
+		const optimalBounds = calcCanvasBounds(stateItems);
 		initialBounds = {
 			minX: optimalBounds.x,
 			minY: optimalBounds.y,
@@ -95,13 +105,13 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
 		...initialBounds,
 		id: props.id,
-		items: props.items,
+		items: stateItems,
 		zoom: props.zoom,
 		history: [
 			{
 				...initialBounds,
 				id: props.id,
-				items: deepCopy(props.items),
+				items: deepCopy(stateItems),
 			},
 		],
 		historyIndex: 0,

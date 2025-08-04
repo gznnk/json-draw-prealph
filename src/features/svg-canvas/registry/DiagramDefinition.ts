@@ -11,6 +11,12 @@ import type { ConnectPointState } from "../types/state/shapes/ConnectPointState"
 export type StateToDataMapper = (state: Diagram) => DiagramData;
 
 /**
+ * Type for data to state mapper function.
+ * Used to convert specific diagram data to their corresponding state format.
+ */
+export type DataToStateMapper = (data: DiagramData) => Diagram;
+
+/**
  * Definition of a diagram that includes all necessary functions and components.
  * This interface unifies component, calculator, creator, and exporter definitions.
  */
@@ -37,4 +43,7 @@ export type DiagramDefinition = {
 
 	/** Function to map state to data format for serialization */
 	stateToDataMapper: StateToDataMapper;
+
+	/** Function to map data to state format for deserialization */
+	dataToStateMapper: DataToStateMapper;
 };
