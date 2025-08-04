@@ -8,7 +8,6 @@ import type { DiagramData } from "../types/data/catalog/DiagramData";
 
 // Import functions related to SvgCanvas.
 import { deepCopy } from "../utils/core/deepCopy";
-import { calcCanvasBounds } from "./utils/calcCanvasBounds";
 import { mapDiagramDataToState } from "./utils/mapDiagramDataToState";
 import { applyFunctionRecursively } from "./utils/applyFunctionRecursively";
 
@@ -82,31 +81,24 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const eventBusRef = useRef(new EventBus());
 
 	// Convert props.items from DiagramData[] to Diagram[] format
-	const stateItems: Diagram[] = applyFunctionRecursively(props.items, mapDiagramDataToState);
-
-	// Calculate the initial bounds of the canvas.
-	let initialBounds = {
-		minX: props.minX,
-		minY: props.minY,
-	};
-	if (stateItems.length > 0) {
-		const optimalBounds = calcCanvasBounds(stateItems);
-		initialBounds = {
-			minX: optimalBounds.x,
-			minY: optimalBounds.y,
-		};
-	}
+	const stateItems: Diagram[] = applyFunctionRecursively(
+		props.items,
+		mapDiagramDataToState,
+	);
 
 	// The state of the canvas.
 	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
-		...initialBounds,
 		id: props.id,
-		items: stateItems,
+		minX: props.minX,
+		minY: props.minY,
 		zoom: props.zoom,
+		items: stateItems,
 		history: [
 			{
-				...initialBounds,
 				id: props.id,
+				minX: props.minX,
+				minY: props.minY,
+				zoom: props.zoom,
 				items: deepCopy(stateItems),
 			},
 		],

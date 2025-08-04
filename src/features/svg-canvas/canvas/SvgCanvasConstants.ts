@@ -4,12 +4,6 @@
 export const MAX_HISTORY_SIZE = 20;
 
 /**
- * The grid size used for canvas bounds calculations and expansion.
- */
-export const CANVAS_GRID_SIZE = 100;
-
-
-/**
  * Id of the group for multi-select elements.
  */
 export const MULTI_SELECT_GROUP = "MultiSelectGroup";

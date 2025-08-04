@@ -42,6 +42,7 @@ const App = (): ReactElement => {
 							items: [],
 							minX: 0,
 							minY: 0,
+							zoom: 1,
 						},
 					});
 				}

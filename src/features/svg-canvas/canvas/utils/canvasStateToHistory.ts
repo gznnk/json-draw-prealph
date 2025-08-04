@@ -19,6 +19,7 @@ export const canvasStateToHistory = (
 		id: copiedState.id,
 		minX: copiedState.minX,
 		minY: copiedState.minY,
+		zoom: copiedState.zoom,
 		items: copiedState.items,
 	} as const satisfies SvgCanvasHistory;
 };

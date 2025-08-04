@@ -20,6 +20,7 @@ export const svgCanvasStateToData = (state: SvgCanvasState): SvgCanvasData => {
 		id: state.id,
 		minX: state.minX,
 		minY: state.minY,
+		zoom: state.zoom,
 		items: applyFunctionRecursively(state.items, (item) => {
 			const stateToDataMapper = DiagramRegistry.getStateToDataMapper(item.type);
 			if (stateToDataMapper) {
