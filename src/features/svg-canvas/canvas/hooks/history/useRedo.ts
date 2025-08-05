@@ -6,7 +6,6 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 
 // Import functions related to SvgCanvas.
 import { diagramDataListToDiagramList } from "../../utils/diagramDataListToDiagramList";
-import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 
 /**
  * Custom hook to handle redo events on the canvas.
@@ -42,7 +41,7 @@ export const useRedo = (props: SvgCanvasSubHooksProps) => {
 			ret.items = diagramDataListToDiagramList(nextHistory.items);
 
 			// Notify the data change directly (no new history entry needed for redo).
-			onDataChange?.(svgCanvasStateToData(ret));
+			onDataChange?.(nextHistory);
 
 			return ret;
 		});
