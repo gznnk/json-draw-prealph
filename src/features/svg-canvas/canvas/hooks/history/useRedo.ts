@@ -5,7 +5,7 @@ import { useCallback, useRef } from "react";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import functions related to SvgCanvas.
-import { clearSelectionRecursively } from "../../utils/clearSelectionRecursively";
+import { diagramDataListToDiagramList } from "../../utils/diagramDataListToDiagramList";
 import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 
 /**
@@ -38,8 +38,8 @@ export const useRedo = (props: SvgCanvasSubHooksProps) => {
 				historyIndex: nextIndex,
 			};
 
-			// Clear the selected items.
-			ret.items = clearSelectionRecursively(ret.items);
+			// Convert items to proper state format with selection cleared
+			ret.items = diagramDataListToDiagramList(nextHistory.items);
 
 			// Notify the data change directly (no new history entry needed for redo).
 			onDataChange?.(svgCanvasStateToData(ret));
