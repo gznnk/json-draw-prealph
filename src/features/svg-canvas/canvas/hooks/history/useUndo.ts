@@ -6,7 +6,6 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 
 // Import utils.
 import { diagramDataListToDiagramList } from "../../utils/diagramDataListToDiagramList";
-import { svgCanvasStateToData } from "../../utils/svgCanvasStateToData";
 
 /**
  * Custom hook to handle undo events on the canvas.
@@ -41,8 +40,8 @@ export const useUndo = (props: SvgCanvasSubHooksProps) => {
 			// Convert items to proper state format with selection cleared
 			ret.items = diagramDataListToDiagramList(prevHistory.items);
 
-			// Notify the data change directly (no new history entry needed for undo).
-			onDataChange?.(svgCanvasStateToData(ret));
+                        // Notify the data change directly (no new history entry needed for undo).
+                        onDataChange?.(prevHistory);
 
 			return ret;
 		});
