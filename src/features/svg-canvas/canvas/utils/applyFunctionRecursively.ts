@@ -1,5 +1,8 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
-import { isItemableData } from "../../utils/validation/isItemableData";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
+
+// Import utils.
+import { isItemableState } from "../../utils/validation/isItemableState";
 
 /**
  * Apply a function recursively to a list of items.
@@ -25,7 +28,7 @@ export const applyFunctionRecursively = (
 			// If the item reference has changed, mark it as changed.
 			isItemChanged = true;
 		}
-		if (isItemableData(item) && isItemableData(newItem)) {
+		if (isItemableState(item) && isItemableState(newItem)) {
 			const newGroupItems = applyFunctionRecursively(
 				item.items ?? [],
 				updateFunction,

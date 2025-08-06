@@ -1,7 +1,6 @@
 // Import utils.
-import { createRectangleData } from "../../../utils/shapes/rectangle/createRectangleData";
-import { createEllipseData } from "../../../utils/shapes/ellipse/createEllipseData";
-import { createSvgData } from "../../../utils/shapes/svg/createSvgData";
+import { createRectangleState } from "../../../utils/shapes/rectangle/createRectangleState";
+import { createEllipseState } from "../../../utils/shapes/ellipse/createEllipseState";
 
 /**
  * Creates a rectangle shape for page design with specified properties.
@@ -25,9 +24,13 @@ export const createPageDesignRectangle = ({
 	strokeWidth?: number;
 	rx?: number;
 }) => {
-	return createRectangleData({
-		x,
-		y,
+	// Convert top-left coordinates to center coordinates
+	const centerX = x + width / 2;
+	const centerY = y + height / 2;
+
+	return createRectangleState({
+		x: centerX,
+		y: centerY,
 		width,
 		height,
 		radius: rx,
@@ -57,9 +60,14 @@ export const createPageDesignCircle = ({
 	stroke?: string;
 	strokeWidth?: number;
 }) => {
-	return createEllipseData({
-		x: cx,
-		y: cy,
+	// Convert top-left coordinates to center coordinates
+	// cx, cy are now top-left coordinates of the circle's bounding box
+	const centerX = cx + r;
+	const centerY = cy + r;
+
+	return createEllipseState({
+		x: centerX,
+		y: centerY,
 		width: r * 2,
 		height: r * 2,
 		fill,
@@ -71,37 +79,50 @@ export const createPageDesignCircle = ({
 };
 
 /**
- * Creates an SVG text element for page design.
+ * Creates a text element for page design using a transparent rectangle with text.
  */
 export const createPageDesignText = ({
 	x,
 	y,
+	width,
+	height,
 	text,
 	fontSize,
 	fill,
 	fontFamily = "Segoe UI",
+	textAlign = "center",
+	verticalAlign = "center",
 }: {
 	x: number;
 	y: number;
+	width: number;
+	height: number;
 	text: string;
 	fontSize: number;
 	fill: string;
 	fontFamily?: string;
+	textAlign?: "left" | "center" | "right";
+	verticalAlign?: "top" | "center" | "bottom";
 }) => {
-	// Create a simple SVG text element
-	const svgContent = `
-		<svg xmlns="http://www.w3.org/2000/svg" width="200" height="50" viewBox="0 0 200 50">
-			<text x="10" y="${fontSize + 5}" font-family="${fontFamily}" font-size="${fontSize}" fill="${fill}">
-				${text}
-			</text>
-		</svg>
-	`.trim();
-
-	return createSvgData({
-		x,
-		y,
-		width: 200,
-		height: 50,
-		svgText: svgContent,
+	// Convert top-left coordinates to center coordinates
+	const centerX = x + width / 2;
+	const centerY = y + height / 2;
+	
+	return createRectangleState({
+		x: centerX,
+		y: centerY,
+		width,
+		height,
+		radius: 0,
+		fill: "transparent", // Transparent background for text-only elements
+		stroke: "transparent",
+		strokeWidth: "0px",
+		text,
+		textType: "textarea",
+		fontSize: fontSize,
+		fontFamily,
+		fontColor: fill,
+		textAlign,
+		verticalAlign,
 	});
-};
+};;

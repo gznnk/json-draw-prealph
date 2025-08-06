@@ -1,9 +1,9 @@
-import { getAncestorItemsById } from "../getAncestorItemsById";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { SvgCanvasState } from "../../types/SvgCanvasState";
-import { InteractionState } from "../../types/InteractionState";
-import type { GroupData } from "../../../types/data/shapes/GroupData";
 import type { DiagramType } from "../../../types/core/DiagramType";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { GroupState } from "../../../types/state/shapes/GroupState";
+import { InteractionState } from "../../types/InteractionState";
+import type { SvgCanvasState } from "../../types/SvgCanvasState";
+import { getAncestorItemsById } from "../getAncestorItemsById";
 
 /**
  * Create a mock diagram item for testing
@@ -27,7 +27,7 @@ const createMockDiagram = (
  * @param items - The items contained in the group
  * @returns Mock group data
  */
-const createMockGroup = (id: string, items: Diagram[]): GroupData => ({
+const createMockGroup = (id: string, items: Diagram[]): GroupState => ({
 	id,
 	type: "Group",
 	x: 100,

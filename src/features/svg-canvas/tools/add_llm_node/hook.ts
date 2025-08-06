@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useAddDiagramWithBus } from "../../hooks/useAddDiagramWithBus";
-import { createLLMNodeData } from "../../utils/nodes/llmNodeData/createLLMNodeData";
+import { createLLMNodeState } from "../../utils/nodes/llmNodeData/createLLMNodeState";
 import type {
 	FunctionCallHandler,
 	FunctionCallInfo,
@@ -21,7 +21,7 @@ export const useAddLLMNodeTool = (eventBus: EventBus): FunctionCallHandler => {
 				typeof args.y === "number" &&
 				typeof args.instructions === "string"
 			) {
-				const data = createLLMNodeData({
+				const data = createLLMNodeState({
 					x: args.x,
 					y: args.y,
 					text: args.instructions,

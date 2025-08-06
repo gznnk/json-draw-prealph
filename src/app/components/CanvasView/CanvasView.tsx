@@ -22,14 +22,14 @@ const CanvasViewComponent = ({
 
 	// Extract canvas data from the content
 	const canvasId = id || content.id;
-	const { items, minX, minY } = content;
+	const { items, minX, minY, zoom } = content;
 	// Initialize required state with the useSvgCanvas hook
 	const { canvasProps } = useSvgCanvas({
 		id: canvasId,
-		items,
 		minX: minX || 0,
 		minY: minY || 0,
-		zoom: 1,
+		zoom: zoom || 1,
+		items,
 		canvasRef,
 		onDataChange,
 	});

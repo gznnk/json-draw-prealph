@@ -54,7 +54,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 			}
 			onTextChange?.({
 				eventId: newEventId(),
-				eventType: "Start",
+				eventPhase: "Started",
 				id,
 				text: text,
 			});
@@ -71,7 +71,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		onTextChange?.({
 			eventId: newEventId(),
-			eventType: "InProgress",
+			eventPhase: "InProgress",
 			id,
 			text: e.target.value,
 		});
@@ -83,7 +83,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	const handleTextAreaBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
 		onTextChange?.({
 			eventId: newEventId(),
-			eventType: "End",
+			eventPhase: "Ended",
 			id,
 			text: e.target.value,
 		});
@@ -95,7 +95,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		onTextChange?.({
 			eventId: newEventId(),
-			eventType: "InProgress",
+			eventPhase: "InProgress",
 			id,
 			text: e.target.value,
 		});
@@ -107,7 +107,7 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
 		onTextChange?.({
 			eventId: newEventId(),
-			eventType: "End",
+			eventPhase: "Ended",
 			id,
 			text: e.target.value,
 		});

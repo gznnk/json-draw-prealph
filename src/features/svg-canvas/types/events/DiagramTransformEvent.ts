@@ -1,4 +1,4 @@
-import type { EventType } from "./EventType";
+import type { EventPhase } from "./EventPhase";
 import type { Shape } from "../core/Shape";
 import type { TransformationType } from "../core/TransformationType";
 
@@ -9,7 +9,7 @@ import type { TransformationType } from "../core/TransformationType";
 export type DiagramTransformEvent = {
 	eventId: string;
 	id: string;
-	eventType: EventType;
+	eventPhase: EventPhase;
 	transformationType: TransformationType;
 	startShape: Shape;
 	endShape: Shape;

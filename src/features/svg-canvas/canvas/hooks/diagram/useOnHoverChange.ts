@@ -2,12 +2,12 @@
 import { useCallback, useRef } from "react";
 
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import utilities.
-import { isConnectableData } from "../../../utils/validation/isConnectableData";
+// Import utils.
+import { isConnectableState } from "../../../utils/validation/isConnectableState";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
 /**
@@ -33,7 +33,7 @@ export const useOnHoverChange = (props: SvgCanvasSubHooksProps) => {
 				prevState.items,
 				(item: Diagram) => {
 					// Check if this item's ID matches the hovered element
-					if (item.id === e.id && isConnectableData(item)) {
+					if (item.id === e.id && isConnectableState(item)) {
 						// Update showConnectPoints based on hover state
 						return {
 							...item,

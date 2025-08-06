@@ -1,6 +1,9 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
-import { isItemableData } from "../../utils/validation/isItemableData";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
 import type { SvgCanvasState } from "../types/SvgCanvasState";
+
+// Import utils.
+import { isItemableState } from "../../utils/validation/isItemableState";
 
 /**
  * Retrieves all ancestor items (groups) that contain the specified item.
@@ -34,7 +37,7 @@ const getAncestorItemsByIdInternal = (
 	}
 	const ancestors: Diagram[] = [];
 	for (const canvasItem of items) {
-		if (canvasItem.type === "Group" && isItemableData(canvasItem)) {
+		if (canvasItem.type === "Group" && isItemableState(canvasItem)) {
 			// Check if the item is directly contained in this group
 			if (canvasItem.items.some((groupItem) => groupItem.id === id)) {
 				ancestors.push(canvasItem);

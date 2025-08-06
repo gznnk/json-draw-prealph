@@ -1,17 +1,17 @@
-import { createEllipseData } from "../ellipse/createEllipseData";
+import { createEllipseState } from "../ellipse/createEllipseState";
 
 // Import types.
-import type { EllipseData } from "../../../types/data/shapes/EllipseData";
+import type { EllipseState } from "../../../types/state/shapes/EllipseState";
 
 /**
- * Converts an SVG Circle element to an Ellipse diagram data structure.
+ * Converts an SVG Circle element to an Ellipse diagram state structure.
  *
  * @param element - The SVG Circle element to convert
- * @returns The converted Ellipse diagram data
+ * @returns The converted Ellipse diagram state
  */
 export const circleElementToDiagram = (
 	element: SVGCircleElement,
-): EllipseData => {
+): EllipseState => {
 	const cx = Number(element.getAttribute("cx"));
 	const cy = Number(element.getAttribute("cy"));
 	const r = Number(element.getAttribute("r"));
@@ -20,7 +20,7 @@ export const circleElementToDiagram = (
 		throw new Error("Unsupported SVGCircleElement attribute was found.");
 	}
 
-	return createEllipseData({
+	return createEllipseState({
 		x: cx,
 		y: cy,
 		width: r * 2,

@@ -14,7 +14,7 @@ import { Picture } from "../../icons/Picture";
 import { Rectangle } from "../../shapes/Rectangle";
 
 // Import constants.
-import { DEFAULT_RECTANGLE_DATA } from "../../../constants/DefaultData";
+import { DefaultRectangleState } from "../../../constants/state/shapes/DefaultRectangleState";
 
 // Import hooks.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
@@ -22,7 +22,7 @@ import { useExecutionChain } from "../../../hooks/useExecutionChain";
 // Import utils.
 import { useAddDiagram } from "../../../hooks/useAddDiagram";
 import { newEventId } from "../../../utils/core/newEventId";
-import { createImageData } from "../../../utils/shapes/image/createImageData";
+import { createImageState } from "../../../utils/shapes/image/createImageState";
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 
 /**
@@ -48,7 +48,7 @@ const ImageGenNodeComponent: React.FC<ImageGenNodeProps> = (props) => {
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
-			if (e.eventType !== "Instant" && e.eventType !== "End") return;
+			if (e.eventPhase !== "Instant" && e.eventPhase !== "Ended") return;
 
 			const processId = newEventId();
 			setProcessIdList((prev) => [...prev, processId]);
@@ -71,11 +71,11 @@ const ImageGenNodeComponent: React.FC<ImageGenNodeProps> = (props) => {
 					props.onExecute?.({
 						id: props.id,
 						eventId,
-						eventType: e.eventType,
+						eventPhase: e.eventPhase,
 						data: { text: base64Image },
 					});
 					addDiagram(
-						createImageData({
+						createImageState({
 							x: props.x,
 							y: props.y,
 							width: 512,
@@ -113,7 +113,7 @@ const ImageGenNodeComponent: React.FC<ImageGenNodeProps> = (props) => {
 				/>
 			</IconContainer>
 			<Rectangle
-				{...DEFAULT_RECTANGLE_DATA}
+				{...DefaultRectangleState}
 				{...props}
 				isTransparent
 				isTextEditing={false}

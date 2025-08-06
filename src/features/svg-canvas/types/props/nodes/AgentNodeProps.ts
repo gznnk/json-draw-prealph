@@ -1,12 +1,12 @@
 // Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../core/CreateDiagramProps";
-import type { AgentNodeData } from "../../data/nodes/AgentNodeData";
+import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";
+import type { AgentNodeState } from "../../state/nodes/AgentNodeState";
 
 /**
  * Type of the AgentNode component props.
  */
 export type AgentNodeProps = CreateDiagramProps<
-	AgentNodeData,
+	AgentNodeState,
 	{
 		selectable: true;
 		transformative: true;

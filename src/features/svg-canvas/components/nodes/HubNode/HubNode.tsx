@@ -8,7 +8,7 @@ import { Hub } from "../../icons/Hub";
 import { IconContainer } from "../../core/IconContainer";
 
 // Import constants.
-import { DEFAULT_ELLIPSE_DATA } from "../../../constants/DefaultData";
+import { DefaultEllipseState } from "../../../constants/state/shapes/DefaultEllipseState";
 
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
@@ -28,7 +28,7 @@ const HubNodeComponent: React.FC<HubNodeProps> = (props) => {
 			props.onExecute?.({
 				id: props.id,
 				eventId: e.eventId,
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				data: {
 					text: e.data.text,
 				},
@@ -51,7 +51,7 @@ const HubNodeComponent: React.FC<HubNodeProps> = (props) => {
 				<Hub width={props.width} height={props.height} animation={isFlashing} />
 			</IconContainer>
 			<Ellipse
-				{...DEFAULT_ELLIPSE_DATA}
+				{...DefaultEllipseState}
 				{...props}
 				isTransparent
 				isTextEditing={false}

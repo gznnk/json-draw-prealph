@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useAddDiagramWithBus } from "../../hooks/useAddDiagramWithBus";
-import { createSvgToDiagramNodeData } from "../../utils/nodes/svgToDiagramNode/createSvgToDiagramNodeData";
+import { createSvgToDiagramNodeState } from "../../utils/nodes/svgToDiagramNode/createSvgToDiagramNodeState";
 import type {
 	FunctionCallHandler,
 	FunctionCallInfo,
@@ -15,7 +15,7 @@ export const useAddSvgToCanvasNodeTool = (
 		(functionCall: FunctionCallInfo) => {
 			const args = functionCall.arguments as { x: number; y: number };
 			if (typeof args.x === "number" && typeof args.y === "number") {
-				const data = createSvgToDiagramNodeData({ x: args.x, y: args.y });
+				const data = createSvgToDiagramNodeState({ x: args.x, y: args.y });
 				addDiagram(data);
 				return {
 					id: data.id,

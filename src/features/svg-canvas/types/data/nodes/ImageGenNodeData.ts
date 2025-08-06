@@ -5,7 +5,6 @@ import type { CreateDataType } from "../shapes/CreateDataType";
  * Type of the ImageGenNode data.
  */
 export type ImageGenNodeData = CreateDataType<{
-	selectable: true;
 	transformative: true;
 	connectable: true;
 }>;

@@ -1,6 +1,11 @@
+// Import registry.
 import { DiagramRegistry } from "../../registry";
-import type { Diagram } from "../../types/data/catalog/Diagram";
-import { isConnectableData } from "../../utils/validation/isConnectableData";
+
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
+
+// Import utils.
+import { isConnectableState } from "../../utils/validation/isConnectableState";
 
 /**
  * Update the connect points of a diagram item.
@@ -8,7 +13,7 @@ import { isConnectableData } from "../../utils/validation/isConnectableData";
  * @returns Updated diagram item with new connect points.
  */
 export const updateDiagramConnectPoints = (item: Diagram): Diagram => {
-	if (isConnectableData(item)) {
+	if (isConnectableState(item)) {
 		const calculator = DiagramRegistry.getConnectPointCalculator(item.type);
 		if (calculator) {
 			return {

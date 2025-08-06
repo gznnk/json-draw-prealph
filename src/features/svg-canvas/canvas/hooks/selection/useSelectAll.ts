@@ -1,17 +1,15 @@
 // Import React.
 import { useCallback, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
+// Import types.
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import functions related to SvgCanvas.
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
-
-// Imports related to this component.
-import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
+// Import utils.
+import { isItemableState } from "../../../utils/validation/isItemableState";
+import { isSelectableState } from "../../../utils/validation/isSelectableState";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
-import { isItemableData } from "../../../utils/validation/isItemableData";
+import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 
 /**
  * Custom hook to handle select all events on the canvas.
@@ -30,7 +28,7 @@ export const useSelectAll = (props: SvgCanvasSubHooksProps) => {
 
 		setCanvasState((prevState) => {
 			const items = prevState.items.map((item) => {
-				if (!isSelectableData(item)) {
+				if (!isSelectableState(item)) {
 					// Ignore non-selectable items.
 					return item;
 				}
@@ -41,11 +39,11 @@ export const useSelectAll = (props: SvgCanvasSubHooksProps) => {
 					};
 				}
 
-				if (isItemableData(item)) {
+				if (isItemableState(item)) {
 					return {
 						...item,
 						items: applyFunctionRecursively(item.items, (childItem) => {
-							if (!isSelectableData(childItem)) {
+							if (!isSelectableState(childItem)) {
 								// Ignore non-selectable child items.
 								return childItem;
 							}

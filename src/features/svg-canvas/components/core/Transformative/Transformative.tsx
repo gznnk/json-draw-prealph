@@ -3,13 +3,13 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
-import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramType } from "../../../types/core/DiagramType";
-import type { EventType } from "../../../types/events/EventType";
 import type { Point } from "../../../types/core/Point";
 import type { TransformationType } from "../../../types/core/TransformationType";
-import type { TransformativeData } from "../../../types/data/core/TransformativeData";
+import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+import type { EventPhase } from "../../../types/events/EventPhase";
 import type { TransformativeProps } from "../../../types/props/core/TransformativeProps";
+import type { TransformativeState } from "../../../types/state/core/TransformativeState";
 
 // Import components.
 import { BottomLabel } from "../BottomLabel";
@@ -18,18 +18,18 @@ import { DragPoint } from "../DragPoint";
 import { RotatePoint } from "../RotatePoint";
 
 // Import utils.
-import { affineTransformation } from "../../../utils/math/transform/affineTransformation";
-import { calcClosestCircleIntersection } from "../../../utils/math/points/calcClosestCircleIntersection";
-import { calcRadians } from "../../../utils/math/points/calcRadians";
-import { calcRectangleVertices } from "../../../utils/math/geometry/calcRectangleVertices";
-import { createLinearX2yFunction } from "../../../utils/math/geometry/createLinearX2yFunction";
-import { createLinearY2xFunction } from "../../../utils/math/geometry/createLinearY2xFunction";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
-import { getCursorFromAngle } from "../../../utils/shapes/common/getCursorFromAngle";
-import { inverseAffineTransformation } from "../../../utils/math/transform/inverseAffineTransformation";
 import { nanToZero } from "../../../utils/math/common/nanToZero";
 import { radiansToDegrees } from "../../../utils/math/common/radiansToDegrees";
 import { signNonZero } from "../../../utils/math/common/signNonZero";
+import { calcRectangleVertices } from "../../../utils/math/geometry/calcRectangleVertices";
+import { createLinearX2yFunction } from "../../../utils/math/geometry/createLinearX2yFunction";
+import { createLinearY2xFunction } from "../../../utils/math/geometry/createLinearY2xFunction";
+import { calcClosestCircleIntersection } from "../../../utils/math/points/calcClosestCircleIntersection";
+import { calcRadians } from "../../../utils/math/points/calcRadians";
+import { affineTransformation } from "../../../utils/math/transform/affineTransformation";
+import { inverseAffineTransformation } from "../../../utils/math/transform/inverseAffineTransformation";
+import { getCursorFromAngle } from "../../../utils/shapes/common/getCursorFromAngle";
 
 // Import local module files.
 import { ROTATE_POINT_MARGIN } from "./TransformativeConstants";
@@ -38,7 +38,7 @@ import { ROTATE_POINT_MARGIN } from "./TransformativeConstants";
  * Props for the Transformative component.
  * Combines transformation data, selection state, and transformation event handlers.
  */
-type Props = TransformativeData &
+type Props = TransformativeState &
 	TransformativeProps & {
 		id: string;
 		type: DiagramType;
@@ -137,7 +137,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		onTransform?.({
 			eventId: e.eventId,
-			eventType: "Start",
+			eventPhase: "Started",
 			transformationType: "Resize",
 			id,
 			startShape: startShape.current,
@@ -159,7 +159,7 @@ const TransformativeComponent: React.FC<Props> = ({
 	) => {
 		const event = {
 			eventId: e.eventId,
-			eventType: e.eventType,
+			eventPhase: e.eventPhase,
 			transformationType: "Resize" as TransformationType,
 			id,
 			startShape: {
@@ -185,10 +185,10 @@ const TransformativeComponent: React.FC<Props> = ({
 		onTransform?.(event);
 	};
 
-	const setResizingByEvent = (eventType: EventType) => {
-		if (eventType === "Start") {
+	const setResizingByEvent = (eventPhase: EventPhase) => {
+		if (eventPhase === "Started") {
 			setIsResizing(true);
-		} else if (eventType === "End") {
+		} else if (eventPhase === "Ended") {
 			setIsResizing(false);
 		}
 	};
@@ -268,9 +268,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -324,9 +324,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -379,9 +379,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -434,9 +434,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -489,9 +489,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcWidthWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -530,9 +530,9 @@ const TransformativeComponent: React.FC<Props> = ({
 						startShape.current.topCenterPoint,
 					)(x, y)
 				: createLinearX2yFunction(
-					startShape.current.bottomCenterPoint,
-					startShape.current.topCenterPoint,
-				)(x),
+						startShape.current.bottomCenterPoint,
+						startShape.current.topCenterPoint,
+					)(x),
 		[],
 	);
 	// --- TopCenter End --- //
@@ -549,9 +549,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -586,9 +586,9 @@ const TransformativeComponent: React.FC<Props> = ({
 		(x: number, y: number) =>
 			!refBus.current.isSwapped
 				? createLinearX2yFunction(
-					startShape.current.leftCenterPoint,
-					startShape.current.rightCenterPoint,
-				)(x)
+						startShape.current.leftCenterPoint,
+						startShape.current.rightCenterPoint,
+					)(x)
 				: createLinearY2xFunction(
 						startShape.current.leftCenterPoint,
 						startShape.current.rightCenterPoint,
@@ -609,9 +609,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcHeightWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -646,9 +646,9 @@ const TransformativeComponent: React.FC<Props> = ({
 		(x: number, y: number) =>
 			!refBus.current.isSwapped
 				? createLinearX2yFunction(
-					startShape.current.leftCenterPoint,
-					startShape.current.rightCenterPoint,
-				)(x)
+						startShape.current.leftCenterPoint,
+						startShape.current.rightCenterPoint,
+					)(x)
 				: createLinearY2xFunction(
 						startShape.current.leftCenterPoint,
 						startShape.current.rightCenterPoint,
@@ -669,9 +669,9 @@ const TransformativeComponent: React.FC<Props> = ({
 			calcWidthWithAspectRatio,
 		} = refBus.current;
 
-		setResizingByEvent(e.eventType);
+		setResizingByEvent(e.eventPhase);
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			return triggerTransformStart(e);
 		}
 
@@ -710,9 +710,9 @@ const TransformativeComponent: React.FC<Props> = ({
 						startShape.current.topCenterPoint,
 					)(x, y)
 				: createLinearX2yFunction(
-					startShape.current.bottomCenterPoint,
-					startShape.current.topCenterPoint,
-				)(x),
+						startShape.current.bottomCenterPoint,
+						startShape.current.topCenterPoint,
+					)(x),
 		[],
 	);
 	// --- BottomCenter End --- //
@@ -771,7 +771,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			vertices,
 		} = refBus.current;
 
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			setIsRotating(true);
 
 			startShape.current = {
@@ -788,7 +788,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 			onTransform?.({
 				eventId: e.eventId,
-				eventType: "Start",
+				eventPhase: "Started",
 				transformationType: "Rotation",
 				id,
 				startShape: startShape.current,
@@ -810,7 +810,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			Math.round(radiansToDegrees(radian - rotatePointRadian) + 360) % 360;
 		const event = {
 			eventId: e.eventId,
-			eventType: e.eventType,
+			eventPhase: e.eventPhase,
 			transformationType: "Rotation" as TransformationType,
 			id,
 			startShape: {
@@ -833,7 +833,7 @@ const TransformativeComponent: React.FC<Props> = ({
 
 		onTransform?.(event);
 
-		if (e.eventType === "End") setIsRotating(false);
+		if (e.eventPhase === "Ended") setIsRotating(false);
 	}, []);
 
 	const dragFunctionRotationPoint = useCallback((rx: number, ry: number) => {

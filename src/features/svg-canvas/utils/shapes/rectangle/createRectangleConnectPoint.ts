@@ -1,6 +1,6 @@
 // Import types.
 import type { RectangleVertices } from "../../../types/core/RectangleVertices";
-import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
+import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
 
 // Import utils.
 import { calcRectangleVertices } from "../../../utils/math/geometry/calcRectangleVertices";
@@ -28,7 +28,7 @@ export const createRectangleConnectPoint = ({
 	rotation: number;
 	scaleX: number;
 	scaleY: number;
-}): ConnectPointData[] => {
+}): ConnectPointState[] => {
 	const vertices = calcRectangleVertices({
 		x,
 		y,
@@ -39,7 +39,7 @@ export const createRectangleConnectPoint = ({
 		scaleY,
 	});
 
-	const connectPoints: ConnectPointData[] = [];
+	const connectPoints: ConnectPointState[] = [];
 	for (const key of Object.keys(vertices)) {
 		const point = vertices[key as keyof RectangleVertices];
 		connectPoints.push({

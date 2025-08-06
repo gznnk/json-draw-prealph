@@ -8,8 +8,8 @@ import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { GroupProps } from "../../../types/props/shapes/GroupProps";
 
 // Import components.
-import { PositionLabel } from "../../core/PositionLabel";
 import { Outline } from "../../core/Outline";
+import { PositionLabel } from "../../core/PositionLabel";
 import { Transformative } from "../../core/Transformative";
 
 /**
@@ -73,7 +73,7 @@ const GroupComponent: React.FC<GroupProps> = ({
 			// TODO: Check if this logic is necessary
 			// When group is selected, operations that come here are equivalent to drag operations, so convert to drag event and propagate
 			const dragEvent = {
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				id,
 				startX: e.startDiagram.x,
 				startY: e.startDiagram.y,

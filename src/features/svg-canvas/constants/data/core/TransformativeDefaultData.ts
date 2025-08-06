@@ -1,0 +1,16 @@
+import type { TransformativeData } from "../../../types/data/core/TransformativeData";
+
+/**
+ * Default transformative data template.
+ * Used for State to Data conversion mapping.
+ */
+export const TransformativeDefaultData = {
+	x: 50,
+	y: 50,
+	width: 100,
+	height: 100,
+	rotation: 0,
+	scaleX: 1,
+	scaleY: 1,
+	keepProportion: false,
+} as const satisfies TransformativeData;

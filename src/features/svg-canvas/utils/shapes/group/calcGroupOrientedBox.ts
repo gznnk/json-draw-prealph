@@ -1,6 +1,6 @@
 // Import types.
 import type { Bounds } from "../../../types/core/Bounds";
-import type { GroupData } from "../../../types/data/shapes/GroupData";
+import type { GroupState } from "../../../types/state/shapes/GroupState";
 
 // Import utils.
 import { degreesToRadians } from "../../math/common/degreesToRadians";
@@ -15,7 +15,7 @@ import { calcUnrotatedGroupBoundingBox } from "./calcUnrotatedGroupBoundingBox";
  * @param group - The group data containing items, position, and rotation
  * @returns The oriented bounding box with center position and original dimensions
  */
-export const calcGroupOrientedBox = (group: GroupData): Bounds => {
+export const calcGroupOrientedBox = (group: GroupState): Bounds => {
 	const { items, x, y, rotation } = group;
 	const radians = degreesToRadians(rotation);
 

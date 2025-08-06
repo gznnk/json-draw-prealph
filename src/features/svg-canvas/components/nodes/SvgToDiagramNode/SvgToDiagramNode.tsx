@@ -3,8 +3,8 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
 import type { SvgToDiagramNodeProps } from "../../../types/props/nodes/SvgToDiagramNodeProps";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 
 // Import components.
 import { IconContainer } from "../../core/IconContainer";
@@ -12,14 +12,14 @@ import { Gachapon } from "../../icons/Gachapon";
 import { Rectangle } from "../../shapes/Rectangle";
 
 // Import constants.
-import { DEFAULT_RECTANGLE_DATA } from "../../../constants/DefaultData";
+import { DefaultRectangleState } from "../../../constants/state/shapes/DefaultRectangleState";
 
 // Import hooks.
 import { useAddDiagram } from "../../../hooks/useAddDiagram";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Import utils.
-import { createSvgDataFromText } from "../../../utils/shapes/svg/createSvgDataFromText";
+import { createSvgStateFromText } from "../../../utils/shapes/svg/createSvgStateFromText";
 
 /**
  * SvgToDiagramNode component.
@@ -32,14 +32,14 @@ const SvgToDiagramNodeComponent: React.FC<SvgToDiagramNodeProps> = (props) => {
 	useExecutionChain({
 		id: props.id,
 		onPropagation: (e) => {
-			if (e.eventType !== "Instant" && e.eventType !== "End") return;
+			if (e.eventPhase !== "Instant" && e.eventPhase !== "Ended") return;
 
 			const data = e.data.text
 				.replace("```svg", "")
 				.replace("```xml", "")
 				.replace("```", "");
 
-			const svgData = createSvgDataFromText(data);
+			const svgData = createSvgStateFromText(data);
 			if (!svgData) return;
 
 			svgData.x = props.x + (Math.random() - 0.5) * 300;
@@ -64,7 +64,7 @@ const SvgToDiagramNodeComponent: React.FC<SvgToDiagramNodeProps> = (props) => {
 				<Gachapon width={props.width} height={props.height} />
 			</IconContainer>
 			<Rectangle
-				{...DEFAULT_RECTANGLE_DATA}
+				{...DefaultRectangleState}
 				{...props}
 				isTransparent
 				isTextEditEnabled={false}

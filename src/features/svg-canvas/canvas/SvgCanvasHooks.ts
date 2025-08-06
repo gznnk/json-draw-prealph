@@ -3,30 +3,29 @@ import { useRef, useState, type RefObject } from "react";
 
 // Import types related to SvgCanvas.
 import type { TextEditorState } from "../components/core/Textable";
-import type { Diagram } from "../types/data/catalog/Diagram";
-
-// Import functions related to SvgCanvas.
-import { deepCopy } from "../utils/core/deepCopy";
-import { calcCanvasBounds } from "./utils/calcCanvasBounds";
-
-// Import EventBus.
-import { EventBus } from "../../../shared/event-bus/EventBus";
-
-// Imports related to this component.
+import type { DiagramData } from "../types/data/catalog/DiagramData";
+import type { Diagram } from "../types/state/catalog/Diagram";
 import { InteractionState } from "./types/InteractionState";
 import type { SvgCanvasData } from "./types/SvgCanvasData";
 import type { SvgCanvasRef } from "./types/SvgCanvasRef";
 import type { SvgCanvasState } from "./types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "./types/SvgCanvasSubHooksProps";
 
+// Import utils.
+import { deepCopy } from "../utils/core/deepCopy";
+import { diagramDataListToDiagramList } from "./utils/diagramDataListToDiagramList";
+
+// Import shared modules.
+import { EventBus } from "../../../shared/event-bus/EventBus";
+
 // Import canvas custom hooks.
+import { useAddDiagramByType } from "./hooks/actions/useAddDiagramByType";
 import { useConstraintChange } from "./hooks/actions/useConstraintChange";
 import { useCopy } from "./hooks/actions/useCopy";
 import { useDelete } from "./hooks/actions/useDelete";
 import { useDiagramChange } from "./hooks/actions/useDiagramChange";
 import { useExport } from "./hooks/actions/useExport";
 import { useGroup } from "./hooks/actions/useGroup";
-import { useAddDiagramByType } from "./hooks/actions/useAddDiagramByType";
 import { usePaste } from "./hooks/actions/usePaste";
 import { usePreviewConnectLine } from "./hooks/actions/usePreviewConnectLine";
 import { useStackOrderChange } from "./hooks/actions/useStackOrderChange";
@@ -62,7 +61,7 @@ type SvgCanvasHooksProps = {
 	id: string;
 	minX: number;
 	minY: number;
-	items: Diagram[];
+	items: DiagramData[];
 	zoom: number;
 	canvasRef: RefObject<SvgCanvasRef | null>;
 	onDataChange?: (data: SvgCanvasData) => void;
@@ -78,30 +77,23 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Create EventBus instance for canvas-wide event communication
 	const eventBusRef = useRef(new EventBus());
 
-	// Calculate the initial bounds of the canvas.
-	let initialBounds = {
-		minX: props.minX,
-		minY: props.minY,
-	};
-	if (props.items.length > 0) {
-		const optimalBounds = calcCanvasBounds(props.items);
-		initialBounds = {
-			minX: optimalBounds.x,
-			minY: optimalBounds.y,
-		};
-	}
+	// Convert props.items from DiagramData[] to Diagram[] format
+	const stateItems: Diagram[] = diagramDataListToDiagramList(props.items);
 
 	// The state of the canvas.
 	const [canvasState, setCanvasState] = useState<SvgCanvasState>({
-		...initialBounds,
 		id: props.id,
-		items: props.items,
+		minX: props.minX,
+		minY: props.minY,
 		zoom: props.zoom,
+		items: stateItems,
 		history: [
 			{
-				...initialBounds,
 				id: props.id,
-				items: deepCopy(props.items),
+				minX: props.minX,
+				minY: props.minY,
+				zoom: props.zoom,
+				items: deepCopy(stateItems),
 			},
 		],
 		historyIndex: 0,

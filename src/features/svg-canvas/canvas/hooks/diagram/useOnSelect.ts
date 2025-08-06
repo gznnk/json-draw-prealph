@@ -2,16 +2,16 @@
 import { useCallback, useRef } from "react";
 
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { GroupData } from "../../../types/data/shapes/GroupData";
 import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEvent";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { GroupState } from "../../../types/state/shapes/GroupState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
 import { getDiagramById } from "../../../utils/core/getDiagramById";
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
+import { isItemableState } from "../../../utils/validation/isItemableState";
+import { isSelectableState } from "../../../utils/validation/isSelectableState";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 import { getAncestorItemsById } from "../../utils/getAncestorItemsById";
@@ -44,7 +44,7 @@ export const useOnSelect = (
 			// Check the selection state of the item triggering the event.
 			const eventTriggeredItem = getDiagramById(prevState.items, e.id);
 			const isEventTriggeredItemSelected =
-				isSelectableData(eventTriggeredItem) && eventTriggeredItem.isSelected;
+				isSelectableState(eventTriggeredItem) && eventTriggeredItem.isSelected;
 			// Get the ancestors of the selected item.
 			const ancestorsOfSelectingItem = getAncestorItemsById(e.id, prevState);
 
@@ -52,7 +52,7 @@ export const useOnSelect = (
 			const isGroupedItemSelection = ancestorsOfSelectingItem.length > 0;
 			// Find the index of the first ancestor that is selected.
 			const selectedAncestorIdx = ancestorsOfSelectingItem.findIndex(
-				(ancestor) => isSelectableData(ancestor) && ancestor.isSelected,
+				(ancestor) => isSelectableState(ancestor) && ancestor.isSelected,
 			);
 			// Check if the selected ancestor is selected.
 			const isAncestorSelected = selectedAncestorIdx >= 0;
@@ -135,10 +135,10 @@ export const useOnSelect = (
 					// Check if any of the already selected items belong to the same group as the currently selected item.
 					const isSelectedItemExistsInSameGroup = ancestorsOfSelectingItem.some(
 						(ancestor) =>
-							isItemableData(ancestor) &&
+							isItemableState(ancestor) &&
 							ancestor.items.some((item) => item.id === e.id) &&
 							ancestor.items.some(
-								(item) => isSelectableData(item) && item.isSelected,
+								(item) => isSelectableState(item) && item.isSelected,
 							),
 					);
 					if (isSelectedItemExistsInSameGroup) {
@@ -161,7 +161,7 @@ export const useOnSelect = (
 						const commonAncestorOfSelectedItemIdx =
 							reversedAncestorsOfSelectingItem.findIndex(
 								(ancestor) =>
-									isItemableData(ancestor) &&
+									isItemableState(ancestor) &&
 									getSelectedDiagrams(ancestor.items).length > 0,
 							);
 						if (0 <= commonAncestorOfSelectedItemIdx) {
@@ -204,7 +204,7 @@ export const useOnSelect = (
 
 			// Update the selected state of the items.
 			let items = applyFunctionRecursively(prevState.items, (item) => {
-				if (!isSelectableData(item)) {
+				if (!isSelectableState(item)) {
 					// Skip if the item is not selectable.
 					return item;
 				}
@@ -252,7 +252,7 @@ export const useOnSelect = (
 			const selectedItems = getSelectedDiagrams(items);
 
 			// When multiple items are selected, create a dummy group to manage the selected items.
-			let multiSelectGroup: GroupData | undefined = undefined;
+			let multiSelectGroup: GroupState | undefined = undefined;
 			if (1 < selectedItems.length) {
 				if (selectedItems.some((item) => item.type === "ConnectLine")) {
 					// If the selected items include a connection line, keep their selection state unchanged to prevent grouping.
@@ -268,7 +268,7 @@ export const useOnSelect = (
 				const processMultiSelectionLogic = (items: Diagram[]): Diagram[] => {
 					const processItem = (item: Diagram): Diagram => {
 						// First, recursively process all nested items (bottom-up approach)
-						if (isItemableData(item)) {
+						if (isItemableState(item) && isSelectableState(item)) {
 							const updatedItems = item.items.map(processItem);
 
 							// After processing children, check if this group should be selected
@@ -276,12 +276,12 @@ export const useOnSelect = (
 								!item.isSelected && // Only process groups that are not already selected
 								updatedItems.length > 0 && // Ensure the group has children
 								updatedItems.every(
-									(child) => isSelectableData(child) && child.isSelected,
+									(child) => isSelectableState(child) && child.isSelected,
 								)
 							) {
 								// Deselect all children when the group is selected
 								const deselectedItems = updatedItems.map((child) => {
-									if (isSelectableData(child)) {
+									if (isSelectableState(child)) {
 										return {
 											...child,
 											isSelected: false,

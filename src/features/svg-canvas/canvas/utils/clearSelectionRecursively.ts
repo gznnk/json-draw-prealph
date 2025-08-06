@@ -1,6 +1,9 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
-import { isSelectableData } from "../../utils/validation/isSelectableData";
-import { isTransformativeData } from "../../utils/validation/isTransformativeData";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
+
+// Import utils.
+import { isSelectableState } from "../../utils/validation/isSelectableState";
+import { isTransformativeState } from "../../utils/validation/isTransformativeState";
 import { applyFunctionRecursively } from "./applyFunctionRecursively";
 
 /**
@@ -11,7 +14,7 @@ import { applyFunctionRecursively } from "./applyFunctionRecursively";
  */
 export const clearSelectionRecursively = (items: Diagram[]): Diagram[] => {
 	return applyFunctionRecursively(items, (item) => {
-		if (isSelectableData(item) && isTransformativeData(item)) {
+		if (isSelectableState(item) && isTransformativeState(item)) {
 			return {
 				...item,
 				isSelected: false,
@@ -21,7 +24,7 @@ export const clearSelectionRecursively = (items: Diagram[]): Diagram[] => {
 			};
 		}
 
-		if (isSelectableData(item)) {
+		if (isSelectableState(item)) {
 			return {
 				...item,
 				isSelected: false,

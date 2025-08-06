@@ -13,14 +13,12 @@ import { IconContainer } from "../../core/IconContainer";
 import { CPU_1 } from "../../icons/CPU_1";
 import { Rectangle } from "../../shapes/Rectangle";
 
-// Import hooks related to SvgCanvas.
+// Import hooks.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
-// Import functions related to SvgCanvas.
-import { newEventId } from "../../../utils/core/newEventId";
-
-// Import utilities.
+// Import utils.
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
+import { newEventId } from "../../../utils/core/newEventId";
 
 // Import related to this component.
 import { RectangleWrapper } from "./LLMNodeStyled";
@@ -52,7 +50,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
-			if (e.eventType !== "Instant" && e.eventType !== "End") return;
+			if (e.eventPhase !== "Instant" && e.eventPhase !== "Ended") return;
 
 			const processId = newEventId();
 			setProcessIdList((prev) => [...prev, processId]);
@@ -76,7 +74,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				props.onExecute?.({
 					id: props.id,
 					eventId,
-					eventType: "Start",
+					eventPhase: "Started",
 					data: {
 						text: "",
 					},
@@ -90,7 +88,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 						props.onExecute?.({
 							id: props.id,
 							eventId,
-							eventType: "InProgress",
+							eventPhase: "InProgress",
 							data: {
 								text: fullOutput,
 							},
@@ -101,7 +99,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 						props.onExecute?.({
 							id: props.id,
 							eventId,
-							eventType: "End",
+							eventPhase: "Ended",
 							data: {
 								text: fullOutput,
 							},

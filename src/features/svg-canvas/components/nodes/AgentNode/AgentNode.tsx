@@ -5,7 +5,7 @@ import { memo, useState } from "react";
 import { IconContainer } from "../../core/IconContainer";
 import { Agent } from "../../icons/Agent";
 import { Rectangle } from "../../shapes/Rectangle";
-import { DEFAULT_RECTANGLE_DATA } from "../../../constants/DefaultData";
+import { DefaultRectangleState } from "../../../constants/state/shapes/DefaultRectangleState";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 import type { AgentNodeProps } from "../../../types/props/nodes/AgentNodeProps";
 import { useEventBus } from "../../../context/EventBusContext";
@@ -25,13 +25,13 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
-			if (e.eventType !== "Instant" && e.eventType !== "End") return;
+			if (e.eventPhase !== "Instant" && e.eventPhase !== "Ended") return;
 
 			setIsProcessing(true);
 			props.onExecute?.({
 				id: props.id,
 				eventId: e.eventId,
-				eventType: "Start",
+				eventPhase: "Started",
 				data: { text: "" },
 			});
 
@@ -45,7 +45,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 				props.onExecute?.({
 					id: props.id,
 					eventId: e.eventId,
-					eventType: "End",
+					eventPhase: "Ended",
 					data: {
 						text: typeof result?.content === "string" ? result.content : "",
 					},
@@ -56,7 +56,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 				props.onExecute?.({
 					id: props.id,
 					eventId: e.eventId,
-					eventType: "End",
+					eventPhase: "Ended",
 					data: { text: "Error generating workflow." },
 				});
 			} finally {
@@ -83,7 +83,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 				/>
 			</IconContainer>
 			<Rectangle
-				{...DEFAULT_RECTANGLE_DATA}
+				{...DefaultRectangleState}
 				{...props}
 				isTransparent
 				isTextEditing={false}

@@ -1,11 +1,11 @@
-import type { EventType } from "./EventType";
+import type { EventPhase } from "./EventPhase";
 
 /**
  * Event fired during area selection operations
  */
 export type AreaSelectionEvent = {
 	eventId: string;
-	eventType: EventType;
+	eventPhase: EventPhase;
 	clientX: number;
 	clientY: number;
 };

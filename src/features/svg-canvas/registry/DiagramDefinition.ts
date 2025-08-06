@@ -1,6 +1,20 @@
+// Import types.
 import type { DiagramType } from "../types/core/DiagramType";
-import type { Diagram } from "../types/data/catalog/Diagram";
-import type { ConnectPointData } from "../types/data/shapes/ConnectPointData";
+import type { Diagram } from "../types/state/catalog/Diagram";
+import type { DiagramData } from "../types/data/catalog/DiagramData";
+import type { ConnectPointState } from "../types/state/shapes/ConnectPointState";
+
+/**
+ * Type for state to data mapper function.
+ * Used to convert specific diagram states to their corresponding data format.
+ */
+export type StateToDataMapper = (state: Diagram) => DiagramData;
+
+/**
+ * Type for data to state mapper function.
+ * Used to convert specific diagram data to their corresponding state format.
+ */
+export type DataToStateMapper = (data: DiagramData) => Diagram;
 
 /**
  * Definition of a diagram that includes all necessary functions and components.
@@ -19,9 +33,17 @@ export type DiagramDefinition = {
 	minimapComponent: React.FC<any>;
 
 	/** Function to calculate connect point positions for the diagram */
-	connectPointCalculator: (diagram: Diagram) => ConnectPointData[];
+	connectPointCalculator: (diagram: Diagram) => ConnectPointState[];
+
 	/** Function to create a new instance of the diagram */
 	createFunction: (props: { x: number; y: number }) => Diagram | undefined;
+
 	/** Function to export the diagram to external format */
 	exportFunction: ((diagram: Diagram) => Blob | undefined) | undefined;
+
+	/** Function to map state to data format for serialization */
+	stateToDataMapper: StateToDataMapper;
+
+	/** Function to map data to state format for deserialization */
+	dataToStateMapper: DataToStateMapper;
 };

@@ -10,7 +10,7 @@ import { IconContainer } from "../../core/IconContainer";
 import { Rectangle } from "../../shapes/Rectangle";
 
 // Import constants.
-import { DEFAULT_RECTANGLE_DATA } from "../../../constants/DefaultData";
+import { DefaultRectangleState } from "../../../constants/state/shapes/DefaultRectangleState";
 
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
@@ -47,7 +47,7 @@ const WebSearchNodeComponent: React.FC<WebSearchNodeProps> = (props) => {
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
-			if (e.eventType !== "Instant" && e.eventType !== "End") return;
+			if (e.eventPhase !== "Instant" && e.eventPhase !== "Ended") return;
 
 			const processId = newEventId();
 			setProcessIdList((prev) => [...prev, processId]);
@@ -73,7 +73,7 @@ const WebSearchNodeComponent: React.FC<WebSearchNodeProps> = (props) => {
 				props.onExecute?.({
 					id: props.id,
 					eventId,
-					eventType: "Start",
+					eventPhase: "Started",
 					data: {
 						text: "",
 					},
@@ -87,7 +87,7 @@ const WebSearchNodeComponent: React.FC<WebSearchNodeProps> = (props) => {
 						props.onExecute?.({
 							id: props.id,
 							eventId,
-							eventType: "InProgress",
+							eventPhase: "InProgress",
 							data: {
 								text: fullOutput,
 							},
@@ -98,7 +98,7 @@ const WebSearchNodeComponent: React.FC<WebSearchNodeProps> = (props) => {
 						props.onExecute?.({
 							id: props.id,
 							eventId,
-							eventType: "End",
+							eventPhase: "Ended",
 							data: {
 								text: fullOutput,
 							},
@@ -132,7 +132,7 @@ const WebSearchNodeComponent: React.FC<WebSearchNodeProps> = (props) => {
 				/>
 			</IconContainer>
 			<Rectangle
-				{...DEFAULT_RECTANGLE_DATA}
+				{...DefaultRectangleState}
 				{...props}
 				isTransparent
 				isTextEditing={false}

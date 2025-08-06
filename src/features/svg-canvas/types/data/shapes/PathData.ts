@@ -6,7 +6,6 @@ import type { ArrowHeadType } from "../../core/ArrowHeadType";
  * Contains properties for styling path elements and optional arrow heads at endpoints.
  */
 export type PathData = CreateDataType<{
-	selectable: true;
 	transformative: true;
 	itemable: true;
 	strokable: true;

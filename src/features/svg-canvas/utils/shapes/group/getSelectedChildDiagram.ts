@@ -1,6 +1,9 @@
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import { isItemableData } from "../../validation/isItemableData";
-import { isSelectableData } from "../../validation/isSelectableData";
+// Import types.
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+
+// Import utils.
+import { isItemableState } from "../../validation/isItemableState";
+import { isSelectableState } from "../../validation/isSelectableState";
 
 /**
  * Recursively retrieves selected shapes within a group, including shapes in nested groups
@@ -12,10 +15,10 @@ export const getSelectedChildDiagram = (
 	diagrams: Diagram[],
 ): Diagram | undefined => {
 	for (const diagram of diagrams) {
-		if (isSelectableData(diagram) && diagram.isSelected) {
+		if (isSelectableState(diagram) && diagram.isSelected) {
 			return diagram;
 		}
-		if (isItemableData<Diagram>(diagram)) {
+		if (isItemableState<Diagram>(diagram)) {
 			const ret = getSelectedChildDiagram(diagram.items || []);
 			if (ret) {
 				return ret;

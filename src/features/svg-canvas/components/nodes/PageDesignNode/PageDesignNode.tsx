@@ -11,7 +11,7 @@ import { PageDesign } from "../../icons/PageDesign";
 import { Rectangle } from "../../shapes/Rectangle";
 
 // Import constants.
-import { DEFAULT_RECTANGLE_DATA } from "../../../constants/DefaultData";
+import { DefaultRectangleState } from "../../../constants/state/shapes/DefaultRectangleState";
 
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
@@ -63,7 +63,7 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
-			if (e.eventType !== "Instant" && e.eventType !== "End") return;
+			if (e.eventPhase !== "Instant" && e.eventPhase !== "Ended") return;
 
 			const processId = newEventId();
 			setProcessIdList((prev) => [...prev, processId]);
@@ -93,7 +93,7 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 				props.onExecute?.({
 					id: props.id,
 					eventId,
-					eventType: "Start",
+					eventPhase: "Started",
 					data: {
 						text: "",
 					},
@@ -120,7 +120,7 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 							props.onExecute?.({
 								id: props.id,
 								eventId,
-								eventType: "InProgress",
+								eventPhase: "InProgress",
 								data: {
 									text: fullOutput,
 								},
@@ -131,7 +131,7 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 							props.onExecute?.({
 								id: props.id,
 								eventId,
-								eventType: "End",
+								eventPhase: "Ended",
 								data: {
 									text: fullOutput,
 								},
@@ -198,10 +198,14 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 								const textElement = createPageDesignText({
 									x: functionCallArguments.x,
 									y: functionCallArguments.y,
+									width: functionCallArguments.width,
+									height: functionCallArguments.height,
 									text: functionCallArguments.text,
 									fontSize: functionCallArguments.fontSize,
 									fill: functionCallArguments.fill,
 									fontFamily: functionCallArguments.fontFamily || "Segoe UI",
+									textAlign: functionCallArguments.textAlign || "center",
+									verticalAlign: functionCallArguments.verticalAlign || "center",
 								});
 								addDiagram(textElement);
 								input.push(event.item);
@@ -210,7 +214,9 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 									call_id: event.item.call_id,
 									output: JSON.stringify({
 										id: textElement.id,
-										type: "Svg",
+										type: "Rectangle",
+										width: textElement.width,
+										height: textElement.height,
 										text: functionCallArguments.text,
 									}),
 								});
@@ -253,7 +259,7 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 				/>
 			</IconContainer>
 			<Rectangle
-				{...DEFAULT_RECTANGLE_DATA}
+				{...DefaultRectangleState}
 				{...props}
 				isTransparent
 				isTextEditing={false}

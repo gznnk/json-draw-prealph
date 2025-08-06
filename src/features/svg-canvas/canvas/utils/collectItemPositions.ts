@@ -1,8 +1,8 @@
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../types/data/catalog/Diagram";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
 
-// Import validation functions.
-import { isItemableData } from "../../utils/validation/isItemableData";
+// Import utils.
+import { isItemableState } from "../../utils/validation/isItemableState";
 
 /**
  * Recursively creates a map of item IDs to their position {x, y}.
@@ -27,7 +27,7 @@ const storeItemPositions = (
 ): void => {
 	for (const item of items) {
 		positionMap.set(item.id, { x: item.x, y: item.y });
-		if (isItemableData(item)) {
+		if (isItemableState(item)) {
 			storeItemPositions(item.items, positionMap);
 		}
 	}

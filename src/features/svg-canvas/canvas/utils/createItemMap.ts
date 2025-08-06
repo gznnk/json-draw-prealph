@@ -1,8 +1,8 @@
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../types/data/catalog/Diagram";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
 
-// Import validation functions.
-import { isItemableData } from "../../utils/validation/isItemableData";
+// Import utils.
+import { isItemableState } from "../../utils/validation/isItemableState";
 
 /**
  * Recursively creates a map of item IDs to their Diagram objects.
@@ -19,7 +19,7 @@ export const createItemMap = (items: Diagram[]): Map<string, Diagram> => {
 	const storeItems = (itemsToProcess: Diagram[]) => {
 		for (const item of itemsToProcess) {
 			itemMap.set(item.id, item);
-			if (isItemableData(item)) {
+			if (isItemableState(item)) {
 				storeItems(item.items);
 			}
 		}

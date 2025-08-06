@@ -1,10 +1,10 @@
 // Import types.
-import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
 import type { EllipseVertices } from "../../../types/core/EllipseVertices";
+import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
 
 // Import utils.
-import { calcEllipseVertices } from "../../math/geometry/calcEllipseVertices";
 import { newId } from "../../../utils/shapes/common/newId";
+import { calcEllipseVertices } from "../../math/geometry/calcEllipseVertices";
 
 /**
  * Create connection points for the ellipse.
@@ -28,7 +28,7 @@ export const createEllipseConnectPoint = ({
 	rotation: number;
 	scaleX: number;
 	scaleY: number;
-}): ConnectPointData[] => {
+}): ConnectPointState[] => {
 	const vertices = calcEllipseVertices({
 		x,
 		y,
@@ -39,7 +39,7 @@ export const createEllipseConnectPoint = ({
 		scaleY,
 	});
 
-	const connectPoints: ConnectPointData[] = [];
+	const connectPoints: ConnectPointState[] = [];
 	for (const key of Object.keys(vertices)) {
 		const point = vertices[key as keyof EllipseVertices];
 		connectPoints.push({

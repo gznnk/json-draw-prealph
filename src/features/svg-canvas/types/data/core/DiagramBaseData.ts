@@ -1,4 +1,4 @@
-// Import base types.
+// Import types.
 import type { DiagramType } from "../../core/DiagramType";
 
 /**
@@ -10,5 +10,4 @@ export type DiagramBaseData = {
 	type: DiagramType;
 	x: number;
 	y: number;
-	isDragging?: boolean;
 };

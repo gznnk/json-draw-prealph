@@ -2,15 +2,15 @@
 import type React from "react";
 import { memo, useCallback, useRef, useState } from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../../types/data/catalog/Diagram";
+// Import types.
 import type { PathPointData } from "../../../../types/data/shapes/PathPointData";
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
 import type { DiagramPointerEvent } from "../../../../types/events/DiagramPointerEvent";
+import type { Diagram } from "../../../../types/state/catalog/Diagram";
 
-// Import functions related to SvgCanvas.
+// Import utils.
 import { newId } from "../../../../utils/shapes/common/newId";
 
 // Imports related to this component.
@@ -98,7 +98,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 		} = refBus.current;
 
 		// Process the drag start event.
-		if (e.eventType === "Start") {
+		if (e.eventPhase === "Started") {
 			// Store the items at the start of the segment drag.
 			startItems.current = items;
 
@@ -142,7 +142,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 
 				onDiagramChange?.({
 					eventId: e.eventId,
-					eventType: e.eventType,
+					eventPhase: e.eventPhase,
 					changeType: "Transform",
 					id,
 					startDiagram: {
@@ -168,7 +168,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 		const newEndX = startSegment.current.endX + dx;
 		const newEndY = startSegment.current.endY + dy;
 
-		if (e.eventType === "InProgress") {
+		if (e.eventPhase === "InProgress") {
 			setDraggingSegment({
 				...draggingSegment,
 				startX: newStartX,
@@ -179,7 +179,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 
 			onDiagramChange?.({
 				eventId: e.eventId,
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				changeType: "Transform",
 				id,
 				startDiagram: {
@@ -199,10 +199,10 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 			});
 		}
 
-		if (e.eventType === "End") {
+		if (e.eventPhase === "Ended") {
 			onDiagramChange?.({
 				eventId: e.eventId,
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				changeType: "Transform",
 				id,
 				startDiagram: {

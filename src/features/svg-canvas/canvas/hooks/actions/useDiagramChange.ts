@@ -1,25 +1,24 @@
 // Import React.
 import { useCallback, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { GroupData } from "../../../types/data/shapes/GroupData";
+// Import types.
 import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEvent";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { GroupState } from "../../../types/state/shapes/GroupState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import functions related to SvgCanvas.
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
+// Import constants.
+import { MULTI_SELECT_GROUP } from "../../SvgCanvasConstants";
+
+// Import utils.
+import { isItemableState } from "../../../utils/validation/isItemableState";
+import { isSelectableState } from "../../../utils/validation/isSelectableState";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
 
 // Import hooks.
 import { useDataChange } from "../history/useDataChange";
-
-// Imports related to this component.
-import { MULTI_SELECT_GROUP } from "../../SvgCanvasConstants";
-import type { SvgCanvasState } from "../../types/SvgCanvasState";
 
 /**
  * Custom hook to handle diagram change events on the canvas.
@@ -45,7 +44,7 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 
 		setCanvasState((prevState) => {
 			let items = prevState.items;
-			let multiSelectGroup: GroupData | undefined = prevState.multiSelectGroup;
+			let multiSelectGroup: GroupState | undefined = prevState.multiSelectGroup;
 
 			if (e.id === MULTI_SELECT_GROUP) {
 				// The case of multi-select group change.
@@ -54,11 +53,11 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 				multiSelectGroup = {
 					...multiSelectGroup,
 					...e.endDiagram,
-				} as GroupData;
+				} as GroupState;
 
 				// Propagate the multi-select group changes to the original diagrams.
 				items = applyFunctionRecursively(prevState.items, (item) => {
-					if (!isItemableData<Diagram>(e.endDiagram)) return item; // Type guard with Diagram type
+					if (!isItemableState<Diagram>(e.endDiagram)) return item; // Type guard with Diagram type
 
 					// Find the corresponding change data in the multi-select group.
 					const changedItem = (e.endDiagram.items ?? []).find(
@@ -71,7 +70,7 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 					// Prepare the new item with the original properties.
 					let newItem = { ...item };
 
-					if (isSelectableData(changedItem)) {
+					if (isSelectableState(changedItem)) {
 						// Remove the isSelected property that is not needed for the update.
 						const { isSelected: _isSelected, ...updateItem } = changedItem;
 
@@ -114,13 +113,13 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 			items = updateOutlineOfAllGroups(items);
 
 			// Create a new state with the updated items and multi-select group.
-			let newState = {
+			const newState = {
 				...prevState,
 				items,
 				multiSelectGroup,
-			} as SvgCanvasState;
+			};
 
-			if (isHistoryEvent(e.eventType)) {
+			if (isHistoryEvent(e.eventPhase)) {
 				// Set the history event ID and notify the data change.
 				onDataChange(e.eventId, newState);
 			}

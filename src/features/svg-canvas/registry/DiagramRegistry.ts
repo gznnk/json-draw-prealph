@@ -1,7 +1,8 @@
+// Import types.
 import type { DiagramType } from "../types/core/DiagramType";
-import type { Diagram } from "../types/data/catalog/Diagram";
-import type { ConnectPointData } from "../types/data/shapes/ConnectPointData";
-import type { DiagramDefinition } from "./DiagramDefinition";
+import type { Diagram } from "../types/state/catalog/Diagram";
+import type { ConnectPointState } from "../types/state/shapes/ConnectPointState";
+import type { DiagramDefinition, StateToDataMapper, DataToStateMapper } from "./DiagramDefinition";
 
 /**
  * Registry for managing diagram definitions.
@@ -59,9 +60,10 @@ class DiagramRegistryClass {
 	 */
 	getConnectPointCalculator(
 		type: DiagramType,
-	): ((diagram: Diagram) => ConnectPointData[]) | undefined {
+	): ((diagram: Diagram) => ConnectPointState[]) | undefined {
 		return this.definitions.get(type)?.connectPointCalculator;
 	}
+
 	/**
 	 * Get the create function for a diagram type.
 	 *
@@ -73,6 +75,7 @@ class DiagramRegistryClass {
 	): ((props: { x: number; y: number }) => Diagram | undefined) | undefined {
 		return this.definitions.get(type)?.createFunction;
 	}
+
 	/**
 	 * Get the export function for a diagram type.
 	 *
@@ -83,6 +86,26 @@ class DiagramRegistryClass {
 		type: DiagramType,
 	): (((diagram: Diagram) => Blob | undefined) | undefined) | undefined {
 		return this.definitions.get(type)?.exportFunction;
+	}
+
+	/**
+	 * Get the state to data mapper function for a diagram type.
+	 *
+	 * @param type - The diagram type
+	 * @returns The state to data mapper function or undefined if not found
+	 */
+	getStateToDataMapper(type: DiagramType): StateToDataMapper | undefined {
+		return this.definitions.get(type)?.stateToDataMapper;
+	}
+
+	/**
+	 * Get the data to state mapper function for a diagram type.
+	 *
+	 * @param type - The diagram type
+	 * @returns The data to state mapper function or undefined if not found
+	 */
+	getDataToStateMapper(type: DiagramType): DataToStateMapper | undefined {
+		return this.definitions.get(type)?.dataToStateMapper;
 	}
 
 	/**

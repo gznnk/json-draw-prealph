@@ -1,5 +1,12 @@
+// Import types.
 import type { SvgCanvasData } from "../types/SvgCanvasData";
 import type { SvgCanvasState } from "../types/SvgCanvasState";
+
+// Import resistry.
+import { DiagramRegistry } from "../../registry";
+
+// Import utils.
+import { applyFunctionRecursively } from "./applyFunctionRecursively";
 
 /**
  * Conversion function from SvgCanvasState to SvgCanvasData.
@@ -13,6 +20,14 @@ export const svgCanvasStateToData = (state: SvgCanvasState): SvgCanvasData => {
 		id: state.id,
 		minX: state.minX,
 		minY: state.minY,
-		items: state.items,
+		zoom: state.zoom,
+		items: applyFunctionRecursively(state.items, (item) => {
+			const stateToDataMapper = DiagramRegistry.getStateToDataMapper(item.type);
+			if (stateToDataMapper) {
+				return stateToDataMapper(item);
+			}
+			// Fallback: return the item as is if no mapper is found
+			return item;
+		}),
 	};
 };

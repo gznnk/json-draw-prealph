@@ -2,22 +2,24 @@
 import { useCallback, useRef } from "react";
 
 // Import types.
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
-import type { PathPointData } from "../../../types/data/shapes/PathPointData";
+import type { ConnectLineState } from "../../../types/state/shapes/ConnectLineState";
+import type { PathPointState } from "../../../types/state/shapes/PathPointState";
 import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+
+// Import constants.
+import { DefaultConnectLineState } from "../../../constants/state/shapes/DefaultConnectLineState";
 
 // Import utils.
 import { newEventId } from "../../../utils/core/newEventId";
 import { calcOrientedShapeFromPoints } from "../../../utils/math/geometry/calcOrientedShapeFromPoints";
 import { newId } from "../../../utils/shapes/common/newId";
-import { isConnectableData } from "../../../utils/validation/isConnectableData";
+import { isConnectableState } from "../../../utils/validation/isConnectableState";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
-import { useDataChange } from "../history/useDataChange";
 
-// Import constants.
-import { DEFAULT_CONNECT_LINE_DATA } from "../../../constants/DefaultData";
+// Import hooks.
+import { useDataChange } from "../history/useDataChange";
 
 /**
  * Custom hook to handle connect events on the canvas.
@@ -40,20 +42,20 @@ export const useOnConnect = (props: SvgCanvasSubHooksProps) => {
 		const { onDataChange } = refBus.current;
 
 		const shape = calcOrientedShapeFromPoints(
-			e.points.map((p: PathPointData) => ({ x: p.x, y: p.y })),
+			e.points.map((p: PathPointState) => ({ x: p.x, y: p.y })),
 		);
 
-		const newConnectLine: ConnectLineData = {
-			...DEFAULT_CONNECT_LINE_DATA,
+		const newConnectLine: ConnectLineState = {
+			...DefaultConnectLineState,
 			id: newId(),
 			x: shape.x,
 			y: shape.y,
 			width: shape.width,
 			height: shape.height,
-			items: e.points.map((p: PathPointData) => ({
+			items: e.points.map((p: PathPointState) => ({
 				...p,
 				type: "PathPoint",
-			})) as PathPointData[],
+			})) as PathPointState[],
 			startOwnerId: e.startOwnerId,
 			endOwnerId: e.endOwnerId,
 		};
@@ -63,7 +65,7 @@ export const useOnConnect = (props: SvgCanvasSubHooksProps) => {
 			const items = applyFunctionRecursively(
 				prevState.items,
 				(item: Diagram) => {
-					if (item.id === e.endOwnerId && isConnectableData(item)) {
+					if (item.id === e.endOwnerId && isConnectableState(item)) {
 						return {
 							...item,
 							showConnectPoints: false,

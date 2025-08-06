@@ -3,17 +3,17 @@ import { useCallback, useRef } from "react";
 
 // Import types.
 import type { Box } from "../../../types/core/Box";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
-import type { GroupData } from "../../../types/data/shapes/GroupData";
 import type { AreaSelectionEvent } from "../../../types/events/AreaSelectionEvent";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { GroupState } from "../../../types/state/shapes/GroupState";
 import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { calcDiagramBoundingBox } from "../../../utils/math/geometry/calcDiagramBoundingBox";
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { isSelectableData } from "../../../utils/validation/isSelectableData";
+import { isItemableState } from "../../../utils/validation/isItemableState";
+import { isSelectableState } from "../../../utils/validation/isSelectableState";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 import { removeNonTransformativeShowTransformControls } from "../../utils/removeNonTransformativeShowTransformControls";
@@ -44,7 +44,7 @@ const updateItemsWithOutline = (
 	const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
 
 	return applyFunctionRecursively(items, (item) => {
-		if (!isSelectableData(item)) return item;
+		if (!isSelectableState(item)) return item;
 		if (item.type === "ConnectLine") return item;
 
 		// Use cached bounding box if available, otherwise calculate
@@ -135,7 +135,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			 * Only items with showOutline are marked as selected
 			 */
 			let items = applyFunctionRecursively(prevState.items, (item) => {
-				if (!isSelectableData(item)) {
+				if (!isSelectableState(item)) {
 					return item;
 				}
 				// Mark item as selected if showOutline is true
@@ -155,18 +155,18 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			const processGroupSelectionLogic = (items: Diagram[]): Diagram[] => {
 				const processItem = (item: Diagram): Diagram => {
 					// Recursively process nested items (bottom-up)
-					if (isItemableData(item)) {
+					if (isItemableState(item)) {
 						const updatedItems = item.items.map(processItem);
 						// Select group if all children are selected
 						if (
 							updatedItems.length > 0 &&
 							updatedItems.every(
-								(child) => isSelectableData(child) && child.isSelected,
+								(child) => isSelectableState(child) && child.isSelected,
 							)
 						) {
 							// Deselect children when group is selected
 							const deselectedItems = updatedItems.map((child) => {
-								if (isSelectableData(child)) {
+								if (isSelectableState(child)) {
 									return {
 										...child,
 										isSelected: false,
@@ -199,7 +199,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			 * If only one item is selected, show transform controls for it
 			 */
 			const selectedItems = getSelectedDiagrams(items);
-			let multiSelectGroup: GroupData | undefined = undefined;
+			let multiSelectGroup: GroupState | undefined = undefined;
 			if (selectedItems.length > 1) {
 				// Create multiSelectGroup for multiple selection
 				multiSelectGroup = createMultiSelectGroup(
@@ -209,7 +209,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			} else {
 				// Show transform controls for single selected item
 				items = applyFunctionRecursively(items, (item) => {
-					if (!isSelectableData(item)) {
+					if (!isSelectableState(item)) {
 						return item;
 					}
 					if (item.isSelected) {
@@ -290,10 +290,10 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	const onAreaSelection = useCallback(
 		(event: AreaSelectionEvent) => {
 			const { canvasState, setCanvasState } = refBus.current.props;
-			const { eventType, clientX, clientY } = event;
+			const { eventPhase, clientX, clientY } = event;
 
-			switch (eventType) {
-				case "Start": {
+			switch (eventPhase) {
+				case "Started": {
 					const { canvasRef } = refBus.current.props;
 					const { x, y } = clientToCanvasCoords(
 						clientX,
@@ -309,7 +309,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					cachedBoundingBoxesRef.current.clear();
 
 					applyFunctionRecursively(items, (item) => {
-						if (isSelectableData(item) && item.type !== "ConnectLine") {
+						if (isSelectableState(item) && item.type !== "ConnectLine") {
 							const boundingBox = calcDiagramBoundingBox(item);
 							cachedBoundingBoxesRef.current.set(item.id, boundingBox);
 						}
@@ -372,7 +372,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 					break;
 				}
 
-				case "End": {
+				case "Ended": {
 					// If area selection is not active, do nothing
 					if (canvasState.interactionState !== InteractionState.AreaSelection) {
 						return;
@@ -422,7 +422,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 		setCanvasState((prevState) => ({
 			...prevState,
 			items: applyFunctionRecursively(prevState.items, (item) => {
-				if (!isSelectableData(item)) return item;
+				if (!isSelectableState(item)) return item;
 				return {
 					...item,
 					showOutline: false,

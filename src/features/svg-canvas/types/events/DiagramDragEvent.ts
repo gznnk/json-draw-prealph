@@ -1,11 +1,11 @@
-import type { EventType } from "./EventType";
+import type { EventPhase } from "./EventPhase";
 
 /**
  * Event fired during diagram dragging operations
  */
 export type DiagramDragEvent = {
 	eventId: string;
-	eventType: EventType;
+	eventPhase: EventPhase;
 	id: string;
 	/** The diagram's x position at the start of the drag */
 	startX: number;

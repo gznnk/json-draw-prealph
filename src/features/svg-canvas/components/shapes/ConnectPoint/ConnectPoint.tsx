@@ -8,6 +8,7 @@ import type { PathPointData } from "../../../types/data/shapes/PathPointData";
 import type { DiagramDragDropEvent } from "../../../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
+import type { EventPhase } from "../../../types/events/EventPhase";
 import type { ConnectPointProps } from "../../../types/props/shapes/ConnectPointProps";
 
 // Import hooks
@@ -24,12 +25,11 @@ import { generatePathFromShapeToPoint } from "../../../utils/shapes/connectPoint
 import { getLineDirection } from "../../../utils/shapes/connectPoint/getLineDirection";
 
 // Import constants.
-import { DEFAULT_CONNECT_LINE_DATA } from "../../../constants/DefaultData";
+import { DefaultConnectLineState } from "../../../constants/state/shapes/DefaultConnectLineState";
+import { EVENT_NAME_CONNECTION } from "../../../constants/EventNames";
 
 // Import local module files.
-import { EVENT_NAME_CONNECTION } from "../../../constants/EventNames";
 import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
-import type { EventType } from "../../../types/events/EventType";
 
 /**
  * Connect point component
@@ -64,7 +64,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	const updatePathPoints = (
 		dragX: number,
 		dragY: number,
-		eventType: EventType,
+		eventPhase: EventPhase,
 	) => {
 		let newPoints: Point[] = [];
 
@@ -103,9 +103,9 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 
 		// Notify the path data for the new connection line rendering.
 		onPreviewConnectLine?.({
-			eventType,
+			eventPhase: eventPhase,
 			pathData: {
-				...DEFAULT_CONNECT_LINE_DATA,
+				...DefaultConnectLineState,
 				id: `${id}-connecting-path`,
 				x: 0,
 				y: 0,
@@ -143,14 +143,14 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			return;
 		}
 
-		if (e.eventType !== "End") {
-			refBus.current.updatePathPoints(e.endX, e.endY, e.eventType);
+		if (e.eventPhase !== "Ended") {
+			refBus.current.updatePathPoints(e.endX, e.endY, e.eventPhase);
 		} else {
 			setPathPoints([]);
 
 			// Clear the path data for the new connection line rendering.
 			refBus.current.onPreviewConnectLine?.({
-				eventType: e.eventType,
+				eventPhase: e.eventPhase,
 				pathData: undefined,
 			});
 		}
@@ -309,7 +309,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 					// Clear the path data for the new connection line rendering.
 					refBus.current.onPreviewConnectLine?.({
 						pathData: undefined,
-						eventType: "End",
+						eventPhase: "Ended",
 					});
 				}
 			}

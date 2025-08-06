@@ -1,18 +1,19 @@
 // Import React.
 import { useCallback, useRef } from "react";
 
-// Import types related to SvgCanvas.
-import type { GroupData } from "../../../types/data/shapes/GroupData";
-import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+// Import types.
+import type { GroupState } from "../../../types/state/shapes/GroupState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
+import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-// Import functions related to SvgCanvas.
-import { useDataChange } from "../history/useDataChange";
-import { newId } from "../../../utils/shapes/common/newId";
+// Import utils.
 import { newEventId } from "../../../utils/core/newEventId";
-
+import { newId } from "../../../utils/shapes/common/newId";
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { removeGroupedRecursive } from "../../utils/removeGroupedRecursive";
+
+// Import hooks.
+import { useDataChange } from "../history/useDataChange";
 
 /**
  * Custom hook to handle group events on the canvas.
@@ -51,7 +52,7 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 			}
 
 			// Create a new group data.
-			const group: GroupData = {
+			const group: GroupState = {
 				...prevState.multiSelectGroup,
 				id: newId(),
 				type: "Group",

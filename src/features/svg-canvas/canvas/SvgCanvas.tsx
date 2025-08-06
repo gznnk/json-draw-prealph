@@ -10,20 +10,21 @@ import React, {
 } from "react";
 
 // Import types.
-import { DiagramRegistry } from "../registry";
 import type { SvgViewport } from "../types/core/SvgViewport";
-import { newEventId } from "../utils/core/newEventId";
-import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
 import { InteractionState } from "./types/InteractionState";
+import type { SvgCanvasProps } from "./types/SvgCanvasProps";
+import type { SvgCanvasRef } from "./types/SvgCanvasRef";
+
+// Import constants.
+import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
 
 // Import components.
 import { GridBackground } from "../components/auxiliary/GridBackground";
 import { GridPattern } from "../components/auxiliary/GridPattern";
 import { MiniMap } from "../components/auxiliary/MiniMap";
-import { ZoomControls } from "../components/auxiliary/ZoomControls";
-import { getNextZoomLevel, getPreviousZoomLevel, getResetZoomLevel } from "./utils/zoomLevels";
 import { PointerCaptureElement } from "../components/auxiliary/PointerCaptureElement";
 import { PreviewConnectLine } from "../components/auxiliary/PreviewConnectLine";
+import { ZoomControls } from "../components/auxiliary/ZoomControls";
 import { TextEditor } from "../components/core/Textable";
 import { CanvasMenu } from "../components/menus/CanvasMenu";
 import { ContextMenu, useContextMenu } from "../components/menus/ContextMenu";
@@ -32,9 +33,22 @@ import UserMenu from "../components/menus/UserMenu/UserMenu";
 import { FlashConnectLine } from "../components/shapes/ConnectLine";
 import { Group } from "../components/shapes/Group";
 
-// Imports related to this component.
+// Import registry.
+import { DiagramRegistry } from "../registry";
+import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
+
+// Import utils.
+import { newEventId } from "../utils/core/newEventId";
+import {
+	getNextZoomLevel,
+	getPreviousZoomLevel,
+	getResetZoomLevel,
+} from "./utils/zoomLevels";
+
+// Import hooks.
 import { useShortcutKey } from "./hooks/keyboard/useShortcutKey";
-import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
+
+// Import local module files.
 import {
 	Container,
 	HTMLElementsContainer,
@@ -43,8 +57,6 @@ import {
 	Viewport,
 	ViewportOverlay,
 } from "./SvgCanvasStyled";
-import type { SvgCanvasProps } from "./types/SvgCanvasProps";
-import type { SvgCanvasRef } from "./types/SvgCanvasRef";
 
 // Import context.
 import { EventBusProvider } from "../context/EventBusContext";
@@ -120,9 +132,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		// Container dimensions state
 		const [containerWidth, setContainerWidth] = useState(0);
 		const [containerHeight, setContainerHeight] = useState(0);
-
-		// Track zoom method (wheel vs button) for display purposes
-		const [isWheelZoom, setIsWheelZoom] = useState(false);
 
 		// Reference of the SVG viewport
 		const viewportRef = useRef<SvgViewport>({
@@ -225,7 +234,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 						onAreaSelection({
 							eventId: newEventId(),
-							eventType: "Start",
+							eventPhase: "Started",
 							clientX: e.clientX,
 							clientY: e.clientY,
 						});
@@ -359,7 +368,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 					const delta = e.deltaY > 0 ? 0.9 : 1.1;
 					const newZoom = refBus.current.zoom * delta;
-					setIsWheelZoom(true);
 					refBus.current.onZoom?.(newZoom);
 				}
 			};
@@ -390,7 +398,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				) {
 					onAreaSelection({
 						eventId: newEventId(),
-						eventType: "InProgress",
+						eventPhase: "InProgress",
 						clientX: e.clientX,
 						clientY: e.clientY,
 					});
@@ -422,7 +430,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 					onAreaSelection({
 						eventId: newEventId(),
-						eventType: "End",
+						eventPhase: "Ended",
 						clientX: e.clientX,
 						clientY: e.clientY,
 					});
@@ -434,19 +442,16 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		// Zoom control handlers
 		const handleZoomIn = useCallback(() => {
 			const nextLevel = getNextZoomLevel(zoom);
-			setIsWheelZoom(false);
 			onZoom?.(nextLevel);
 		}, [onZoom, zoom]);
 
 		const handleZoomOut = useCallback(() => {
 			const prevLevel = getPreviousZoomLevel(zoom);
-			setIsWheelZoom(false);
 			onZoom?.(prevLevel);
 		}, [onZoom, zoom]);
 
 		const handleZoomReset = useCallback(() => {
 			const resetLevel = getResetZoomLevel();
-			setIsWheelZoom(false);
 			onZoom?.(resetLevel);
 		}, [onZoom]);
 
@@ -571,7 +576,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 						onZoomIn={handleZoomIn}
 						onZoomOut={handleZoomOut}
 						onZoomReset={handleZoomReset}
-						isWheelZoom={isWheelZoom}
 					/>
 					<MiniMap
 						items={items}

@@ -49,8 +49,8 @@ const RotatePointComponent: React.FC<RotatePointProps> = ({
 	 * Handle drag event.
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		if (e.eventType === "Start") setIsDragging(true);
-		if (e.eventType === "End") setIsDragging(false);
+		if (e.eventPhase === "Started") setIsDragging(true);
+		if (e.eventPhase === "Ended") setIsDragging(false);
 
 		refBus.current.onDrag?.(e);
 	}, []);

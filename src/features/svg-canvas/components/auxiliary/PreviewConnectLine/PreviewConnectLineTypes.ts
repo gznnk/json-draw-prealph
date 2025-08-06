@@ -1,10 +1,10 @@
 // Import types.
-import type { PathData } from "../../../types/data/shapes/PathData";
+import type { PathState } from "../../../types/state/shapes/PathState";
 
 /**
  * Props for PreviewConnectLine component.
  */
 export type PreviewConnectLineProps = {
 	/** The path data for the preview connection line. When undefined, nothing is rendered. */
-	pathData?: PathData;
+	pathData?: PathState;
 };

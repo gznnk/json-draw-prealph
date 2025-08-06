@@ -1,4 +1,7 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
+
+// Import utils.
 import { updateOutlineOfGroup } from "./updateOutlineOfGroup";
 
 /**

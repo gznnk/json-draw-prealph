@@ -5,7 +5,6 @@ import type { CreateDataType } from "./CreateDataType";
  * Implements selectable, transformative, and itemable behaviors to manage collections of elements.
  */
 export type GroupData = CreateDataType<{
-	selectable: true;
 	transformative: true;
 	itemable: true;
 }>;

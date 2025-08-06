@@ -1,20 +1,20 @@
-// Import types related to SvgCanvas.
-import type { Diagram } from "../../../../types/data/catalog/Diagram";
+// Import types.
+import type { Diagram } from "../../../../types/state/catalog/Diagram";
 
-// Import functions related to SvgCanvas.
-import { isFillableData } from "../../../../utils/validation/isFillableData";
-import { isItemableData } from "../../../../utils/validation/isItemableData";
-import { isStrokableData } from "../../../../utils/validation/isStrokableData";
-import { isTextableData } from "../../../../utils/validation/isTextableData";
+// Import utils.
+import { isFillableState } from "../../../../utils/validation/isFillableState";
+import { isItemableState } from "../../../../utils/validation/isItemableState";
+import { isStrokableState } from "../../../../utils/validation/isStrokableState";
+import { isTextableState } from "../../../../utils/validation/isTextableState";
 
 export const findFirstFillableRecursive = (
 	items: Diagram[],
 ): Diagram | undefined => {
 	for (const item of items) {
-		if (isFillableData(item)) {
+		if (isFillableState(item)) {
 			return item;
 		}
-		if (isItemableData(item)) {
+		if (isItemableState(item)) {
 			const foundItem = findFirstFillableRecursive(item.items);
 			if (foundItem) {
 				return foundItem;
@@ -28,10 +28,10 @@ export const findFirstStrokableRecursive = (
 	items: Diagram[],
 ): Diagram | undefined => {
 	for (const item of items) {
-		if (isStrokableData(item)) {
+		if (isStrokableState(item)) {
 			return item;
 		}
-		if (isItemableData(item)) {
+		if (isItemableState(item)) {
 			const foundItem = findFirstStrokableRecursive(item.items);
 			if (foundItem) {
 				return foundItem;
@@ -48,7 +48,7 @@ export const findFirstRectangleRecursive = (
 		if (item.type === "Rectangle") {
 			return item;
 		}
-		if (isItemableData(item)) {
+		if (isItemableState(item)) {
 			const foundItem = findFirstRectangleRecursive(item.items);
 			if (foundItem) {
 				return foundItem;
@@ -65,7 +65,7 @@ export const findFirstBorderRadiusRecursive = (
 		if ("radius" in item) {
 			return item;
 		}
-		if (isItemableData(item)) {
+		if (isItemableState(item)) {
 			const foundItem = findFirstBorderRadiusRecursive(item.items);
 			if (foundItem) {
 				return foundItem;
@@ -79,10 +79,10 @@ export const findFirstTextableRecursive = (
 	items: Diagram[],
 ): Diagram | undefined => {
 	for (const item of items) {
-		if (isTextableData(item)) {
+		if (isTextableState(item)) {
 			return item;
 		}
-		if (isItemableData(item)) {
+		if (isItemableState(item)) {
 			const foundItem = findFirstTextableRecursive(item.items);
 			if (foundItem) {
 				return foundItem;

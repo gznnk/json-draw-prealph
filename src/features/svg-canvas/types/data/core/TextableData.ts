@@ -1,4 +1,4 @@
-// Import base types.
+// Import types.
 import type { TextableType } from "../../core/TextableType";
 import type { TextAlign } from "../../core/TextAlign";
 import type { VerticalAlign } from "../../core/VerticalAlign";
@@ -16,5 +16,4 @@ export type TextableData = {
 	fontSize: number;
 	fontFamily: string;
 	fontWeight: string;
-	isTextEditing: boolean; // Non-persistent property. TODO: Separate persistent and non-persistent properties
 };

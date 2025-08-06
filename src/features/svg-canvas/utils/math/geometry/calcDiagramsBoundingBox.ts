@@ -1,11 +1,11 @@
 // Import types.
 import type { Box } from "../../../types/core/Box";
-import type { Diagram } from "../../../types/data/catalog/Diagram";
+import type { Diagram } from "../../../types/state/catalog/Diagram";
 
 // Import utils.
 import { calcGroupOrientedBox } from "../../../utils/shapes/group/calcGroupOrientedBox";
-import { isItemableData } from "../../../utils/validation/isItemableData";
-import { isTransformativeData } from "../../../utils/validation/isTransformativeData";
+import { isItemableState } from "../../../utils/validation/isItemableState";
+import { isTransformativeState } from "../../../utils/validation/isTransformativeState";
 import { calcDiagramBoundingBox } from "./calcDiagramBoundingBox";
 
 /**
@@ -23,7 +23,7 @@ export const calcDiagramsBoundingBox = (diagrams: Diagram[]): Box => {
 	};
 
 	for (const diagram of diagrams) {
-		if (isItemableData(diagram) && diagram.type === "Group") {
+		if (isItemableState(diagram) && diagram.type === "Group") {
 			const groupOrientedBox = calcGroupOrientedBox(diagram);
 			box.top = Math.min(box.top, groupOrientedBox.y);
 			box.left = Math.min(box.left, groupOrientedBox.x);
@@ -35,7 +35,7 @@ export const calcDiagramsBoundingBox = (diagrams: Diagram[]): Box => {
 				box.bottom,
 				groupOrientedBox.y + groupOrientedBox.height,
 			);
-		} else if (isTransformativeData(diagram)) {
+		} else if (isTransformativeState(diagram)) {
 			const diagramBox = calcDiagramBoundingBox(diagram);
 			box.top = Math.min(box.top, diagramBox.top);
 			box.left = Math.min(box.left, diagramBox.left);

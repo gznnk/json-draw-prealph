@@ -1,6 +1,9 @@
-import type { Diagram } from "../../types/data/catalog/Diagram";
-import { isItemableData } from "../validation/isItemableData";
-import { isSelectableData } from "../validation/isSelectableData";
+// Import types.
+import type { Diagram } from "../../types/state/catalog/Diagram";
+
+// Import utils.
+import { isItemableState } from "../validation/isItemableState";
+import { isSelectableState } from "../validation/isSelectableState";
 
 /**
  * Get the selected diagrams from a list of diagrams.
@@ -14,10 +17,10 @@ export const getSelectedDiagrams = (
 	selectedDiagrams: Diagram[] = [],
 ) => {
 	for (const item of diagrams) {
-		if (isSelectableData(item)) {
+		if (isSelectableState(item)) {
 			if (item.isSelected) {
 				selectedDiagrams.push(item);
-			} else if (isItemableData(item)) {
+			} else if (isItemableState(item)) {
 				getSelectedDiagrams(item.items, selectedDiagrams);
 			}
 		}

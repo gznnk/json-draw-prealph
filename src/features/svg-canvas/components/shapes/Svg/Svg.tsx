@@ -9,20 +9,20 @@ import DOMPurify from "dompurify";
 import type { SvgProps } from "../../../types/props/shapes/SvgProps";
 
 // Import components.
-import { PositionLabel } from "../../core/PositionLabel";
 import { Outline } from "../../core/Outline";
+import { PositionLabel } from "../../core/PositionLabel";
 import { Transformative } from "../../core/Transformative";
 import { SvgGroupElement, SvgRectElement } from "./SvgStyled";
 
 // Import hooks.
-import { useDrag } from "../../../hooks/useDrag";
 import { useClick } from "../../../hooks/useClick";
+import { useDrag } from "../../../hooks/useDrag";
 import { useSelect } from "../../../hooks/useSelect";
 
 // Import utils.
-import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
-import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { mergeProps } from "../../../utils/core/mergeProps";
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 
 /**
  * Svg component.
