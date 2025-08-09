@@ -19,12 +19,12 @@ import { useAddHistory } from "../history/useAddHistory";
  */
 export const useAddDiagram = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useAddHistory(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -32,7 +32,7 @@ export const useAddDiagram = (props: SvgCanvasSubHooksProps) => {
 	return useCallback((e: AddDiagramEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const { setCanvasState } = refBus.current.props;
-		const { onDataChange } = refBus.current;
+		const { addHistory } = refBus.current;
 
 		// Call the function to add a new item to the canvas.
 		setCanvasState((prevState) => {
@@ -46,7 +46,7 @@ export const useAddDiagram = (props: SvgCanvasSubHooksProps) => {
 			} as SvgCanvasState;
 
 			// Notify the data change.
-			onDataChange(e.eventId, newState);
+			addHistory(e.eventId, newState);
 
 			return newState;
 		});

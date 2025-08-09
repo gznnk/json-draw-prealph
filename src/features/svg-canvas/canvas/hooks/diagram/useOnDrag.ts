@@ -28,12 +28,12 @@ import { useAddHistory } from "../history/useAddHistory";
  */
 export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useAddHistory(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -50,7 +50,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 		const {
 			props: { setCanvasState },
 		} = refBus.current;
-		const { onDataChange } = refBus.current;
+		const { addHistory } = refBus.current;
 
 		// Update the canvas state based on the drag event.
 		setCanvasState((prevState) => {
@@ -186,7 +186,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 
 			if (isHistoryEvent(e.eventPhase)) {
 				// Set the history event ID and notify the data change.
-				onDataChange(e.eventId, newState);
+				addHistory(e.eventId, newState);
 			}
 
 			// If the drag event is ended

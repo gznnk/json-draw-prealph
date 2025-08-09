@@ -18,12 +18,12 @@ import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
  */
 export const useDelete = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useAddHistory(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -32,7 +32,7 @@ export const useDelete = (props: SvgCanvasSubHooksProps) => {
 	return useCallback(() => {
 		// Bypass references to avoid function creation in every render.
 		const { setCanvasState } = refBus.current.props;
-		const { onDataChange } = refBus.current;
+		const { addHistory } = refBus.current;
 
 		setCanvasState((prevState) => {
 			// Collect IDs of items that will be deleted and remove selected items.
@@ -93,7 +93,7 @@ export const useDelete = (props: SvgCanvasSubHooksProps) => {
 			} as SvgCanvasState;
 
 			// Notify the data change.
-			onDataChange(eventId, newState);
+			addHistory(eventId, newState);
 
 			return newState;
 		});

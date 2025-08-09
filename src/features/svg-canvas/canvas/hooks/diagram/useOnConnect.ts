@@ -26,12 +26,12 @@ import { useAddHistory } from "../history/useAddHistory";
  */
 export const useOnConnect = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useAddHistory(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -39,7 +39,7 @@ export const useOnConnect = (props: SvgCanvasSubHooksProps) => {
 	return useCallback((e: DiagramConnectEvent) => {
 		// Bypass references to avoid function creation in every render.
 		const { setCanvasState } = refBus.current.props;
-		const { onDataChange } = refBus.current;
+		const { addHistory } = refBus.current;
 
 		const shape = calcOrientedShapeFromPoints(
 			e.points.map((p: PathPointState) => ({ x: p.x, y: p.y })),
@@ -86,7 +86,7 @@ export const useOnConnect = (props: SvgCanvasSubHooksProps) => {
 
 			// Generate event ID and notify the data change.
 			const eventId = newEventId();
-			onDataChange(eventId, newState);
+			addHistory(eventId, newState);
 
 			return newState;
 		});

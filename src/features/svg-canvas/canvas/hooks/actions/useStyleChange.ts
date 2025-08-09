@@ -16,12 +16,12 @@ import { useAddHistory } from "../history/useAddHistory";
  */
 export const useStyleChange = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useAddHistory(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -31,7 +31,7 @@ export const useStyleChange = (props: SvgCanvasSubHooksProps) => {
 		const {
 			props: { setCanvasState },
 		} = refBus.current;
-		const { onDataChange } = refBus.current;
+		const { addHistory } = refBus.current;
 
 		setCanvasState((prevState) => {
 			// Update items with style changes.
@@ -53,7 +53,7 @@ export const useStyleChange = (props: SvgCanvasSubHooksProps) => {
 			};
 
 			// Notify the data change.
-			onDataChange(e.eventId, newState);
+			addHistory(e.eventId, newState);
 
 			// Return new state with updated items.
 			return newState;
