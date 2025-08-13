@@ -1,4 +1,4 @@
-import type { WebSearchNodeData } from "../../../types/data/nodes/WebSearchNodeData";
+import type { WebSearchNodeData } from "../../../types/diagrams/nodes/WebSearchNodeData";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";

@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { LLMNodeProps } from "../../../types/props/nodes/LLMNodeProps";
+import type { LLMNodeProps } from "../../../types/diagrams/nodes/LLMNodeProps";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";
@@ -23,11 +23,7 @@ const LLMNodeMinimapComponent: React.FC<LLMNodeProps> = (props) => {
 			scaleX={props.scaleX}
 			scaleY={props.scaleY}
 		>
-			<CPU_1
-				width={props.width}
-				height={props.height}
-				animation={false}
-			/>
+			<CPU_1 width={props.width} height={props.height} animation={false} />
 		</IconContainer>
 	);
 };

@@ -2,7 +2,7 @@
 import { useCallback, useRef } from "react";
 
 // Import types.
-import type { GroupState } from "../../../types/state/shapes/GroupState";
+import type { GroupState } from "../../../types/diagrams/shapes/GroupTypes";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 

@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { TextAreaNodeProps } from "../../../types/props/nodes/TextAreaNodeProps";
+import type { TextAreaNodeProps } from "../../../types/diagrams/nodes/TextAreaNodeProps";
 
 // Import components related to SvgCanvas.
 import { RectangleMinimap } from "../../shapes/Rectangle/RectangleMinimap";

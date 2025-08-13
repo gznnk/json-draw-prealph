@@ -8,8 +8,8 @@ import type { Point } from "../../../types/core/Point";
 import type { TransformationType } from "../../../types/core/TransformationType";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { EventPhase } from "../../../types/events/EventPhase";
-import type { TransformativeProps } from "../../../types/props/core/TransformativeProps";
-import type { TransformativeState } from "../../../types/state/core/TransformativeState";
+import type { TransformativeProps } from "../../../types/diagrams/core/TransformativeTypes";
+import type { TransformativeState } from "../../../types/diagrams/core/TransformativeTypes";
 
 // Import components.
 import { BottomLabel } from "../BottomLabel";

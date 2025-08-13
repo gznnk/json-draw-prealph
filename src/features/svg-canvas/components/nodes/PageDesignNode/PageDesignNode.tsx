@@ -33,7 +33,7 @@ import {
 	createPageDesignCircle,
 	createPageDesignText,
 } from "./PageDesignShapeUtils";
-import type { PageDesignNodeProps } from "../../../types/props/nodes/PageDesignNodeProps";
+import type { PageDesignNodeProps } from "../../../types/diagrams/nodes/PageDesignNodeProps";
 
 /**
  * PageDesignNode component.
@@ -205,7 +205,8 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 									fill: functionCallArguments.fill,
 									fontFamily: functionCallArguments.fontFamily || "Segoe UI",
 									textAlign: functionCallArguments.textAlign || "center",
-									verticalAlign: functionCallArguments.verticalAlign || "center",
+									verticalAlign:
+										functionCallArguments.verticalAlign || "center",
 								});
 								addDiagram(textElement);
 								input.push(event.item);

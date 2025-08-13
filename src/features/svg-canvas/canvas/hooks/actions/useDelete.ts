@@ -2,7 +2,7 @@
 import { useCallback, useRef } from "react";
 
 // Import types.
-import type { ConnectLineState } from "../../../types/state/shapes/ConnectLineState";
+import type { ConnectLineState } from "../../../types/diagrams/shapes/ConnectTypes";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 

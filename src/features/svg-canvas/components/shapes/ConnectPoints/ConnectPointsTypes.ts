@@ -2,7 +2,7 @@
 import type { Shape } from "../../../types/core/Shape";
 import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";
 import type { PreviewConnectLineEvent } from "../../../types/events/PreviewConnectLineEvent";
-import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
+import type { ConnectPointState } from "../../../types/diagrams/shapes/ConnectPointState";
 
 /**
  * Props for ConnectPoints component

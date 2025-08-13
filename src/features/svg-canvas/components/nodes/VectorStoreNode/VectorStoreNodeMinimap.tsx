@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { VectorStoreNodeProps } from "../../../types/props/nodes/VectorStoreNodeProps";
+import type { VectorStoreNodeProps } from "../../../types/diagrams/nodes/VectorStoreNodeProps";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";
@@ -12,7 +12,9 @@ import { VectorStore } from "../../icons/VectorStore";
 /**
  * VectorStoreNode minimap component - lightweight version without outlines, controls, and labels.
  */
-const VectorStoreNodeMinimapComponent: React.FC<VectorStoreNodeProps> = (props) => {
+const VectorStoreNodeMinimapComponent: React.FC<VectorStoreNodeProps> = (
+	props,
+) => {
 	return (
 		<IconContainer
 			x={props.x}

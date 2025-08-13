@@ -1,6 +1,6 @@
 // Import types.
 import type { Bounds } from "../../../types/core/Bounds";
-import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
 
 // Import constants.
 import { MINIMAP_VIEWPORT_MARGIN } from "../../../constants/core/Constants";

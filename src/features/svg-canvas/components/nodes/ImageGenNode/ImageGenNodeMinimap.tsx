@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { ImageGenNodeProps } from "../../../types/props/nodes/ImageGenNodeProps";
+import type { ImageGenNodeProps } from "../../../types/diagrams/nodes/ImageGenNodeProps";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";
@@ -23,11 +23,7 @@ const ImageGenNodeMinimapComponent: React.FC<ImageGenNodeProps> = (props) => {
 			scaleX={props.scaleX}
 			scaleY={props.scaleY}
 		>
-			<Picture
-				width={props.width}
-				height={props.height}
-				animation={false}
-			/>
+			<Picture width={props.width} height={props.height} animation={false} />
 		</IconContainer>
 	);
 };

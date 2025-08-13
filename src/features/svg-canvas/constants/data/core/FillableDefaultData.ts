@@ -1,4 +1,4 @@
-import type { FillableData } from "../../../types/data/core/FillableData";
+import type { FillableData } from "../../../types/diagrams/core/FillableData";
 
 /**
  * Default fillable data template.

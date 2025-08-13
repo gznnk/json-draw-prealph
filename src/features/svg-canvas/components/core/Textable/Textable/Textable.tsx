@@ -6,7 +6,7 @@ import { memo, useEffect, useRef } from "react";
 import { renderMarkdown } from "../../../../../../shared/markdown";
 
 // Import types.
-import type { TextableState } from "../../../../types/state/core/TextableState";
+import type { TextableState } from "../../../../types/diagrams/core/TextableTypes";
 
 // Import local module files.
 import { ForeignObjectElement, Text, TextWrapper } from "./TextableStyled";

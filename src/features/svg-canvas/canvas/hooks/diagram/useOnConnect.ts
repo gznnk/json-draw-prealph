@@ -2,10 +2,10 @@
 import { useCallback, useRef } from "react";
 
 // Import types.
-import type { ConnectLineState } from "../../../types/state/shapes/ConnectLineState";
-import type { PathPointState } from "../../../types/state/shapes/PathPointState";
+import type { ConnectLineState } from "../../../types/diagrams/shapes/ConnectTypes";
+import type { PathPointState } from "../../../types/diagrams/shapes/PathTypes";
 import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";
-import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import constants.

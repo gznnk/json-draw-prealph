@@ -3,10 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
 import type { SvgCanvasProps } from "../../../../canvas/types/SvgCanvasProps";
-import type { FillableData } from "../../../../types/data/core/FillableData";
-import type { StrokableData } from "../../../../types/data/core/StrokableData";
-import type { TextableData } from "../../../../types/data/core/TextableData";
-import type { RectangleData } from "../../../../types/data/shapes/RectangleData";
+import type { FillableData } from "../../../../types/diagrams/core/FillableData";
+import type { StrokableData } from "../../../../types/diagrams/core/StrokableData";
+import type { TextableData } from "../../../../types/diagrams/core/TextableData";
+import type { RectangleData } from "../../../../types/diagrams/shapes/RectangleData";
 import type { DiagramStyleChangeEvent } from "../../../../types/events/DiagramStyleChangeEvent";
 import type { Diagram } from "../../../../types/state/catalog/Diagram";
 

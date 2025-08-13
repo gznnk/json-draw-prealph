@@ -3,10 +3,10 @@ import { useCallback, useRef } from "react";
 
 // Import types.
 import type { Shape } from "../../../types/core/Shape";
-import type { Diagram } from "../../../types/state/catalog/Diagram";
-import type { ConnectLineState } from "../../../types/state/shapes/ConnectLineState";
-import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
-import type { GroupState } from "../../../types/state/shapes/GroupState";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
+import type { ConnectLineState } from "../../../types/diagrams/shapes/ConnectTypes";
+import type { ConnectPointState } from "../../../types/diagrams/shapes/ConnectTypes";
+import type { GroupState } from "../../../types/diagrams/shapes/GroupTypes";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import utils.

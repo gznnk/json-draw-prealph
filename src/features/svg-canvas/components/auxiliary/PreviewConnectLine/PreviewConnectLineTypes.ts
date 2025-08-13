@@ -1,5 +1,5 @@
 // Import types.
-import type { PathState } from "../../../types/state/shapes/PathState";
+import type { PathState } from "../../../types/diagrams/shapes/PathTypes";
 
 /**
  * Props for PreviewConnectLine component.

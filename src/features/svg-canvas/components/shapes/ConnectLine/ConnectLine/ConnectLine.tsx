@@ -3,7 +3,7 @@ import type React from "react";
 import { memo, useCallback, useRef } from "react";
 
 // Import types.
-import type { ConnectLineProps } from "../../../../types/props/shapes/ConnectLineProps";
+import type { ConnectLineProps } from "../../../../types/diagrams/shapes/ConnectLineProps";
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
 
 // Import components related to SvgCanvas.

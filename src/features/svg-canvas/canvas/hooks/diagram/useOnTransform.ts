@@ -4,8 +4,8 @@ import { useCallback, useRef } from "react";
 // Import types.
 import type { DiagramTransformEvent } from "../../../types/events/DiagramTransformEvent";
 import type { EventPhase } from "../../../types/events/EventPhase";
-import type { Diagram } from "../../../types/state/catalog/Diagram";
-import type { GroupState } from "../../../types/state/shapes/GroupState";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
+import type { GroupState } from "../../../types/diagrams/shapes/GroupTypes";
 import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";

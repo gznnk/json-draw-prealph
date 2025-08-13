@@ -1,4 +1,4 @@
-import type { VectorStoreNodeData } from "../../../types/data/nodes/VectorStoreNodeData";
+import type { VectorStoreNodeData } from "../../../types/diagrams/nodes/VectorStoreNodeData";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";

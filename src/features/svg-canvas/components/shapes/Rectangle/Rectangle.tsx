@@ -3,7 +3,7 @@ import type React from "react";
 import { memo, useMemo, useRef } from "react";
 
 // Import types.
-import type { RectangleProps } from "../../../types/props/shapes/RectangleProps";
+import type { RectangleProps } from "../../../types/diagrams/shapes/RectangleProps";
 
 // Import components.
 import { Outline } from "../../core/Outline";

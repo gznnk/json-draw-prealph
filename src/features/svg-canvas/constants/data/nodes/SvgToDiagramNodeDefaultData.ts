@@ -1,4 +1,4 @@
-import type { SvgToDiagramNodeData } from "../../../types/data/nodes/SvgToDiagramNodeData";
+import type { SvgToDiagramNodeData } from "../../../types/diagrams/nodes/SvgToDiagramNodeData";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";

@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { ConnectPointProps } from "../../../types/props/shapes/ConnectPointProps";
+import type { ConnectPointProps } from "../../../types/diagrams/shapes/ConnectPointProps";
 
 /**
  * ConnectPoint minimap component - lightweight version (essentially invisible for minimap).

@@ -1,4 +1,4 @@
-import type { RectangleData } from "../../../types/data/shapes/RectangleData";
+import type { RectangleData } from "../../../types/diagrams/shapes/RectangleData";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ConnectableDefaultData } from "./ConnectableDefaultData";

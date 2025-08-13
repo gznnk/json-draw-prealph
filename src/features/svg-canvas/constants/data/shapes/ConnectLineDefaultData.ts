@@ -1,4 +1,4 @@
-import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
+import type { ConnectLineData } from "../../../types/diagrams/shapes/ConnectLineData";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ItemableDefaultData } from "../core/ItemableDefaultData";

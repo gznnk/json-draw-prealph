@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { ConnectLineProps } from "../../../types/props/shapes/ConnectLineProps";
+import type { ConnectLineProps } from "../../../types/diagrams/shapes/ConnectLineProps";
 
 // Import components.
 import { PathMinimap } from "../Path/PathMinimap";

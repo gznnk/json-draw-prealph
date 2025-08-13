@@ -1,4 +1,4 @@
-import type { EllipseData } from "../../../types/data/shapes/EllipseData";
+import type { EllipseData } from "../../../types/diagrams/shapes/EllipseData";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ConnectableDefaultData } from "./ConnectableDefaultData";

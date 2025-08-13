@@ -7,7 +7,7 @@ import { Agent } from "../../icons/Agent";
 import { Rectangle } from "../../shapes/Rectangle";
 import { DefaultRectangleState } from "../../../constants/state/shapes/DefaultRectangleState";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
-import type { AgentNodeProps } from "../../../types/props/nodes/AgentNodeProps";
+import type { AgentNodeProps } from "../../../types/diagrams/nodes/AgentNodeProps";
 import { useEventBus } from "../../../context/EventBusContext";
 import { useWorkflowAgentHandler } from "../../../tools/workflow_agent/hook";
 

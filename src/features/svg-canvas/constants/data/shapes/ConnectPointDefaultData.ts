@@ -1,4 +1,4 @@
-import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
+import type { ConnectPointData } from "../../../types/diagrams/shapes/ConnectPointData";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 
 /**

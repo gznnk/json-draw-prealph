@@ -1,8 +1,8 @@
 // Import types.
 import type { TextEditorState } from "../../components/core/Textable";
-import type { Diagram } from "../../types/state/catalog/Diagram";
-import type { GroupState } from "../../types/state/shapes/GroupState";
-import type { PathState } from "../../types/state/shapes/PathState";
+import type { Diagram } from "../../types/diagrams/catalog/DiagramTypes";
+import type { GroupState } from "../../types/diagrams/shapes/GroupTypes";
+import type { PathState } from "../../types/diagrams/shapes/PathTypes";
 import type { AreaSelectionState } from "./AreaSelectionState";
 import type { GrabScrollState } from "./GrabScrollState";
 import type { InteractionState } from "./InteractionState";

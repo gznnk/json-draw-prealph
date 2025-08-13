@@ -2,7 +2,7 @@
 import { memo, useEffect, useState } from "react";
 
 // Import types.
-import type { PathData } from "../../../../types/data/shapes/PathData";
+import type { PathData } from "../../../../types/diagrams/shapes/PathData";
 import type { FlashConnectLineEvent } from "./FlashConnectLineTypes";
 
 // Import utils.

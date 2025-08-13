@@ -1,6 +1,8 @@
 // Import types.
-import type { DiagramData } from "../../types/data/catalog/DiagramData";
-import type { Diagram } from "../../types/state/catalog/Diagram";
+import type {
+	DiagramData,
+	Diagram,
+} from "../../types/diagrams/catalog/DiagramTypes";
 
 // Import registry.
 import { DiagramRegistry } from "../../registry";

@@ -1,6 +1,6 @@
 import type { DiagramType } from "../../../types/core/DiagramType";
-import type { Diagram } from "../../../types/state/catalog/Diagram";
-import type { GroupState } from "../../../types/state/shapes/GroupState";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
+import type { GroupState } from "../../../types/diagrams/shapes/GroupTypes";
 import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import { getAncestorItemsById } from "../getAncestorItemsById";

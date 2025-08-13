@@ -1,4 +1,4 @@
-import type { TransformativeData } from "../../../types/data/core/TransformativeData";
+import type { TransformativeData } from "../../../types/diagrams/core/TransformativeData";
 
 /**
  * Default transformative data template.

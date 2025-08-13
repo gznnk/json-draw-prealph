@@ -14,7 +14,7 @@ import { DefaultEllipseState } from "../../../constants/state/shapes/DefaultElli
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
 // Imports related to this component.
-import type { HubNodeProps } from "../../../types/props/nodes/HubNodeProps";
+import type { HubNodeProps } from "../../../types/diagrams/nodes/HubNodeProps";
 
 const HubNodeComponent: React.FC<HubNodeProps> = (props) => {
 	const [isFlashing, setIsFlashing] = useState(false);

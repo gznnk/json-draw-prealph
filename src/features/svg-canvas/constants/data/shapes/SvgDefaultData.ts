@@ -1,4 +1,4 @@
-import type { SvgData } from "../../../types/data/shapes/SvgData";
+import type { SvgData } from "../../../types/diagrams/shapes/SvgData";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 

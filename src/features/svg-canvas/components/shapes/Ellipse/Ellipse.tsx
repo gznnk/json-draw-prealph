@@ -3,7 +3,7 @@ import type React from "react";
 import { memo, useMemo, useRef } from "react";
 
 // Import types.
-import type { EllipseProps } from "../../../types/props/shapes/EllipseProps";
+import type { EllipseProps } from "../../../types/diagrams/shapes/EllipseProps";
 
 // Import components.
 import { Outline } from "../../core/Outline";

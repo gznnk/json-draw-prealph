@@ -1,4 +1,4 @@
-import type { AgentNodeData } from "../../../types/data/nodes/AgentNodeData";
+import type { AgentNodeData } from "../../../types/diagrams/nodes/AgentNodeData";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";

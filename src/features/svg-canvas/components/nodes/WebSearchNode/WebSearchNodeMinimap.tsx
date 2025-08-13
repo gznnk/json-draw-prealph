@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { WebSearchNodeProps } from "../../../types/props/nodes/WebSearchNodeProps";
+import type { WebSearchNodeProps } from "../../../types/diagrams/nodes/WebSearchNodeProps";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";
@@ -23,11 +23,7 @@ const WebSearchNodeMinimapComponent: React.FC<WebSearchNodeProps> = (props) => {
 			scaleX={props.scaleX}
 			scaleY={props.scaleY}
 		>
-			<WebSearch
-				width={props.width}
-				height={props.height}
-				animation={false}
-			/>
+			<WebSearch width={props.width} height={props.height} animation={false} />
 		</IconContainer>
 	);
 };
