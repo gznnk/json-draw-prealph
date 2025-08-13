@@ -1,6 +1,6 @@
 // Import types.
 import type { Bounds } from "../../../types/core/Bounds";
-import type { GroupState } from "../../../types/state/shapes/GroupState";
+import type { GroupState } from "../../../types/diagrams/shapes/GroupTypes";
 
 // Import utils.
 import { degreesToRadians } from "../../math/common/degreesToRadians";

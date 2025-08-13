@@ -22,7 +22,31 @@ import { newEventId } from "../../../utils/core/newEventId";
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 
 // Import related to this component.
-import type { WebSearchNodeProps } from "../../../types/props/nodes/WebSearchNodeProps";
+import { DefaultConnectPointState } from "../../../constants/state/shapes/DefaultConnectPointState";
+import { useConnectableHandlers } from "../../../hooks/useConnectableHandlers";
+import { useSelectableHandlers } from "../../../hooks/useSelectableHandlers";
+import { useEditableTextHandlers } from "../../../hooks/useEditableTextHandlers";
+import { useResizableHandlers } from "../../../hooks/useResizableHandlers";
+import { useDraggableHandlers } from "../../../hooks/useDraggableHandlers";
+
+// Import components.
+import { ConnectPoint } from "../../shapes/ConnectPoint/ConnectPoint";
+import { Selection } from "../../auxiliary/Selection/Selection";
+import { Resizer } from "../../auxiliary/Resizer/Resizer";
+import { DragPoint } from "../../auxiliary/DragPoint/DragPoint";
+import { TextEditor } from "../../auxiliary/TextEditor/TextEditor";
+
+// Import hooks.
+import { useRef } from "react";
+
+// Import utils.
+import { newConnectPointId } from "../../../utils/shapes/connectPoint/newConnectPointId";
+
+// Import styled components.
+import { NodeFrame, StyledText } from "./WebSearchNodeStyled";
+
+// Import types.
+import type { WebSearchNodeProps } from "../../../types/diagrams/nodes/WebSearchNodeTypes";
 import { WebSearch } from "../../icons/WebSearch";
 
 /**

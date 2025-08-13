@@ -1,6 +1,6 @@
 // Import types.
 import type { EllipseVertices } from "../../../types/core/EllipseVertices";
-import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
+import type { ConnectPointState } from "../../../types/diagrams/shapes/ConnectTypes";
 
 // Import utils.
 import { newId } from "../../../utils/shapes/common/newId";

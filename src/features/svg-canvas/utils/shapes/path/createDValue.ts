@@ -1,5 +1,5 @@
 // Import types.
-import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
 
 /**
  * Creates a path data value (d attribute) from an array of diagram items.

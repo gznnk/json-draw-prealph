@@ -1,5 +1,5 @@
 import { TransformativeDefaultData } from "../../data/core/TransformativeDefaultData";
-import type { TransformativeState } from "../../../types/state/core/TransformativeState";
+import type { TransformativeState } from "../../../types/diagrams/core/TransformativeTypes";
 
 export const DefaultTransformativeState = {
 	...TransformativeDefaultData,

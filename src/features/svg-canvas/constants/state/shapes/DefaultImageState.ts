@@ -1,7 +1,7 @@
 import { DefaultDiagramBaseState } from "../core/DefaultDiagramBaseState";
 import { DefaultSelectableState } from "../core/DefaultSelectableState";
 import { DefaultTransformativeState } from "../core/DefaultTransformativeState";
-import type { ImageState } from "../../../types/state/shapes/ImageState";
+import type { ImageState } from "../../../types/diagrams/shapes/ImageTypes";
 
 export const DefaultImageState = {
 	...DefaultDiagramBaseState,

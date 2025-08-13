@@ -1,5 +1,5 @@
 // Import types.
-import type { TextableState } from "../../types/state/core/TextableState";
+import type { TextableState } from "../../types/diagrams/core/TextableTypes";
 
 /**
  * Check if an object is TextableState.

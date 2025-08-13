@@ -1,5 +1,5 @@
 // Import types.
-import type { ImageGenNodeState } from "../../../types/state/nodes/ImageGenNodeState";
+import type { ImageGenNodeState } from "../../../types/diagrams/nodes/ImageGenNodeTypes";
 
 // Import utils.
 import { newId } from "../../shapes/common/newId";

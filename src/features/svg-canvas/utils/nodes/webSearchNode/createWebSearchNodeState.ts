@@ -1,5 +1,5 @@
 // Import types.
-import type { WebSearchNodeState } from "../../../types/state/nodes/WebSearchNodeState";
+import type { WebSearchNodeState } from "../../../types/diagrams/nodes/WebSearchNodeTypes";
 
 // Import utils.
 import { newId } from "../../shapes/common/newId";

@@ -1,7 +1,7 @@
 import { createDataToStateMapper } from "../../core/createDataToStateMapper";
 import { DefaultAgentNodeState } from "../../../constants/state/nodes/DefaultAgentNodeState";
-import type { AgentNodeData } from "../../../types/data/nodes/AgentNodeData";
-import type { AgentNodeState } from "../../../types/state/nodes/AgentNodeState";
+import type { AgentNodeData } from "../../../types/diagrams/nodes/AgentNodeTypes";
+import type { AgentNodeState } from "../../../types/diagrams/nodes/AgentNodeTypes";
 
 export const mapAgentNodeDataToState = createDataToStateMapper<AgentNodeState>(
 	DefaultAgentNodeState,

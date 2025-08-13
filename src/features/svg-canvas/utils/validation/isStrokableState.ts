@@ -1,5 +1,5 @@
 // Import types.
-import type { StrokableState } from "../../types/state/core/StrokableState";
+import type { StrokableState } from "../../types/diagrams/core/StrokableTypes";
 
 /**
  * Check if an object is StrokableState.

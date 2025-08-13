@@ -5,7 +5,7 @@ import { DefaultConnectableState } from "../core/DefaultConnectableState";
 import { DefaultStrokableState } from "../core/DefaultStrokableState";
 import { DefaultFillableState } from "../core/DefaultFillableState";
 import { DefaultTextableState } from "../core/DefaultTextableState";
-import type { RectangleState } from "../../../types/state/shapes/RectangleState";
+import type { RectangleState } from "../../../types/diagrams/shapes/RectangleTypes";
 
 export const DefaultRectangleState = {
 	...DefaultDiagramBaseState,

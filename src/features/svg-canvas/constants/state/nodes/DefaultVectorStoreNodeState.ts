@@ -1,5 +1,5 @@
 import { DefaultRectangleState } from "../shapes/DefaultRectangleState";
-import type { VectorStoreNodeState } from "../../../types/state/nodes/VectorStoreNodeState";
+import type { VectorStoreNodeState } from "../../../types/diagrams/nodes/VectorStoreNodeTypes";
 
 export const DefaultVectorStoreNodeState = {
 	...DefaultRectangleState,

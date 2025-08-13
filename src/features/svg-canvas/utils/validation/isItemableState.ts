@@ -1,5 +1,5 @@
 // Import types.
-import type { ItemableState } from "../../types/state/core/ItemableState";
+import type { ItemableState } from "../../types/diagrams/core/ItemableTypes";
 
 /**
  * Check if an object is ItemableState.

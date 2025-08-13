@@ -1,5 +1,5 @@
 // Import types.
-import type { Diagram } from "../../types/state/catalog/Diagram";
+import type { Diagram } from "../../types/diagrams/catalog/DiagramTypes";
 
 // Import utils.
 import { isItemableState } from "../validation/isItemableState";

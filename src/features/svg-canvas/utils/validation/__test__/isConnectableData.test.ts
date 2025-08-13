@@ -1,5 +1,5 @@
-import type { ConnectableState } from "../../../types/state/shapes/ConnectableState";
-import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
+import type { ConnectableState } from "../../../types/diagrams/shapes/ConnectTypes";
+import type { ConnectPointState } from "../../../types/diagrams/shapes/ConnectTypes";
 import { isConnectableState } from "../isConnectableState";
 
 describe("isConnectableState", () => {

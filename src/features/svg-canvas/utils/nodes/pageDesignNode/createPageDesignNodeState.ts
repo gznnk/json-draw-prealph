@@ -1,5 +1,5 @@
 // Import types.
-import type { PageDesignNodeState } from "../../../types/state/nodes/PageDesignNodeState";
+import type { PageDesignNodeState } from "../../../types/diagrams/nodes/PageDesignNodeTypes";
 
 // Import utils.
 import { newId } from "../../shapes/common/newId";

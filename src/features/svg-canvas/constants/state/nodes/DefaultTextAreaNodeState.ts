@@ -1,5 +1,5 @@
 import { DefaultRectangleState } from "../shapes/DefaultRectangleState";
-import type { TextAreaNodeState } from "../../../types/state/nodes/TextAreaNodeState";
+import type { TextAreaNodeState } from "../../../types/diagrams/nodes/TextAreaNodeTypes";
 
 export const DefaultTextAreaNodeState = {
 	...DefaultRectangleState,

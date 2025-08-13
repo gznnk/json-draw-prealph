@@ -1,7 +1,7 @@
 import { createRectangleState } from "../rectangle/createRectangleState";
 
 // Import types.
-import type { RectangleState } from "../../../types/state/shapes/RectangleState";
+import type { RectangleState } from "../../../types/diagrams/shapes/RectangleTypes";
 
 /**
  * Converts an SVG Rectangle element to a Rectangle diagram state structure.

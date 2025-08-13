@@ -1,5 +1,5 @@
 import { DefaultRectangleState } from "../shapes/DefaultRectangleState";
-import type { SvgToDiagramNodeState } from "../../../types/state/nodes/SvgToDiagramNodeState";
+import type { SvgToDiagramNodeState } from "../../../types/diagrams/nodes/SvgToDiagramNodeTypes";
 
 export const DefaultSvgToDiagramNodeState = {
 	...DefaultRectangleState,

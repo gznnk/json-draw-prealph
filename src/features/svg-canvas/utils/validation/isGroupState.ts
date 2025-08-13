@@ -1,5 +1,5 @@
 // Import types.
-import type { GroupState } from "../../types/state/shapes/GroupState";
+import type { GroupState } from "../../types/diagrams/shapes/GroupTypes";
 
 /**
  * Check if an object is GroupState.

@@ -1,5 +1,5 @@
 // Import types.
-import type { DiagramData } from "../../types/data/catalog/DiagramData";
+import type { DiagramData } from "../../types/diagrams/catalog/DiagramTypes";
 
 /**
  * Type for the data of the SvgCanvas.

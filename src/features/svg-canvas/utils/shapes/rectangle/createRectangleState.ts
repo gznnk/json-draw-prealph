@@ -2,7 +2,7 @@
 import type { TextAlign } from "../../../types/core/TextAlign";
 import type { TextableType } from "../../../types/core/TextableType";
 import type { VerticalAlign } from "../../../types/core/VerticalAlign";
-import type { RectangleState } from "../../../types/state/shapes/RectangleState";
+import type { RectangleState } from "../../../types/diagrams/shapes/RectangleTypes";
 
 // Import utils.
 import { newId } from "../../../utils/shapes/common/newId";

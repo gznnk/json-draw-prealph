@@ -1,8 +1,12 @@
 // Import types.
 import type { DiagramType } from "../types/core/DiagramType";
-import type { Diagram } from "../types/state/catalog/Diagram";
-import type { ConnectPointState } from "../types/state/shapes/ConnectPointState";
-import type { DiagramDefinition, StateToDataMapper, DataToStateMapper } from "./DiagramDefinition";
+import type { Diagram } from "../types/diagrams/catalog/DiagramTypes";
+import type { ConnectPointState } from "../types/diagrams/shapes/ConnectTypes";
+import type {
+	DiagramDefinition,
+	StateToDataMapper,
+	DataToStateMapper,
+} from "./DiagramDefinition";
 
 /**
  * Registry for managing diagram definitions.

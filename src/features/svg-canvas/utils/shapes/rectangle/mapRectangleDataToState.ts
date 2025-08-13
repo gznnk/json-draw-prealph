@@ -1,7 +1,9 @@
 import { createDataToStateMapper } from "../../core/createDataToStateMapper";
 import { DefaultRectangleState } from "../../../constants/state/shapes/DefaultRectangleState";
-import type { RectangleData } from "../../../types/data/shapes/RectangleData";
-import type { RectangleState } from "../../../types/state/shapes/RectangleState";
+import type {
+	RectangleData,
+	RectangleState,
+} from "../../../types/diagrams/shapes/RectangleTypes";
 
 export const mapRectangleDataToState = createDataToStateMapper<RectangleState>(
 	DefaultRectangleState,

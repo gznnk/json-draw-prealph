@@ -1,4 +1,4 @@
-import type { SelectableState } from "../../../types/state/core/SelectableState";
+import type { SelectableState } from "../../../types/diagrams/core/SelectableTypes";
 
 export const DefaultSelectableState = {
 	isSelected: false,

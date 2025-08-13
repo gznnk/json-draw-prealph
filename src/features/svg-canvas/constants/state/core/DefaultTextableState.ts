@@ -1,5 +1,5 @@
 import { TextableDefaultData } from "../../data/core/TextableDefaultData";
-import type { TextableState } from "../../../types/state/core/TextableState";
+import type { TextableState } from "../../../types/diagrams/core/TextableTypes";
 
 export const DefaultTextableState = {
 	...TextableDefaultData,

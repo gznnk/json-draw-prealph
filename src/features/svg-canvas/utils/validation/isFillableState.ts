@@ -1,5 +1,5 @@
 // Import types.
-import type { FillableState } from "../../types/state/core/FillableState";
+import type { FillableState } from "../../types/diagrams/core/FillableTypes";
 
 /**
  * Check if an object is FillableState.

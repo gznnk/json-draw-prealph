@@ -1,5 +1,5 @@
 // Import types.
-import type { ImageState } from "../../../types/state/shapes/ImageState";
+import type { ImageState } from "../../../types/diagrams/shapes/ImageTypes";
 
 // Import utils.
 import { newId } from "../../../utils/shapes/common/newId";

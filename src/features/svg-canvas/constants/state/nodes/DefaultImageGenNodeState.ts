@@ -1,5 +1,5 @@
 import { DefaultRectangleState } from "../shapes/DefaultRectangleState";
-import type { ImageGenNodeState } from "../../../types/state/nodes/ImageGenNodeState";
+import type { ImageGenNodeState } from "../../../types/diagrams/nodes/ImageGenNodeTypes";
 
 export const DefaultImageGenNodeState = {
 	...DefaultRectangleState,

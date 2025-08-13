@@ -3,7 +3,7 @@ import { DefaultSelectableState } from "../core/DefaultSelectableState";
 import { DefaultTransformativeState } from "../core/DefaultTransformativeState";
 import { DefaultItemableState } from "../core/DefaultItemableState";
 import { DefaultStrokableState } from "../core/DefaultStrokableState";
-import type { ConnectLineState } from "../../../types/state/shapes/ConnectLineState";
+import type { ConnectLineState } from "../../../types/diagrams/shapes/ConnectTypes";
 
 export const DefaultConnectLineState = {
 	...DefaultDiagramBaseState,

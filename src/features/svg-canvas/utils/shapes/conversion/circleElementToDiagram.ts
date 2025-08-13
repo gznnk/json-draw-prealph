@@ -1,7 +1,7 @@
 import { createEllipseState } from "../ellipse/createEllipseState";
 
 // Import types.
-import type { EllipseState } from "../../../types/state/shapes/EllipseState";
+import type { EllipseState } from "../../../types/diagrams/shapes/EllipseTypes";
 
 /**
  * Converts an SVG Circle element to an Ellipse diagram state structure.

@@ -1,5 +1,5 @@
 // Import types.
-import type { SvgState } from "../../../types/state/shapes/SvgState";
+import type { SvgState } from "../../../types/diagrams/shapes/SvgTypes";
 
 // Import utils.
 import { newId } from "../../../utils/shapes/common/newId";

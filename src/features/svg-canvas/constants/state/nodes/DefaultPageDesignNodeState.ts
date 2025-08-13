@@ -1,5 +1,5 @@
 import { DefaultRectangleState } from "../shapes/DefaultRectangleState";
-import type { PageDesignNodeState } from "../../../types/state/nodes/PageDesignNodeState";
+import type { PageDesignNodeState } from "../../../types/diagrams/nodes/PageDesignNodeTypes";
 
 export const DefaultPageDesignNodeState = {
 	...DefaultRectangleState,

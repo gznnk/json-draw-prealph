@@ -1,5 +1,5 @@
 // Import types.
-import type { SvgToDiagramNodeState } from "../../../types/state/nodes/SvgToDiagramNodeState";
+import type { SvgToDiagramNodeState } from "../../../types/diagrams/nodes/SvgToDiagramNodeTypes";
 
 // Import utils.
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";

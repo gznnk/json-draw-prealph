@@ -1,5 +1,5 @@
 // Import types.
-import type { TransformativeState } from "../../types/state/core/TransformativeState";
+import type { TransformativeState } from "../../types/diagrams/core/TransformativeTypes";
 
 /**
  * Check if an object is TransformativeState.

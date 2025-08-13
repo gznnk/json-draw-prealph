@@ -1,7 +1,7 @@
 // Import types.
 import type { SvgCanvasState } from "../../../canvas/types/SvgCanvasState";
-import type { ConnectLineState } from "../../../types/state/shapes/ConnectLineState";
-import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { ConnectLineState } from "../../../types/diagrams/shapes/ConnectTypes";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
 
 // Import utils.
 import { getDiagramById } from "../../core/getDiagramById";

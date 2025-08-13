@@ -1,7 +1,7 @@
 import { DefaultDiagramBaseState } from "../core/DefaultDiagramBaseState";
 import { DefaultSelectableState } from "../core/DefaultSelectableState";
 import { DefaultTransformativeState } from "../core/DefaultTransformativeState";
-import type { SvgState } from "../../../types/state/shapes/SvgState";
+import type { SvgState } from "../../../types/diagrams/shapes/SvgTypes";
 
 export const DefaultSvgState = {
 	...DefaultDiagramBaseState,

@@ -6,7 +6,7 @@ import { memo, useEffect, useRef } from "react";
 import DOMPurify from "dompurify";
 
 // Import types.
-import type { SvgProps } from "../../../types/props/shapes/SvgProps";
+import type { SvgProps } from "../../../types/diagrams/shapes/SvgTypes";
 
 // Import components.
 import { SvgGroupElement } from "./SvgStyled";

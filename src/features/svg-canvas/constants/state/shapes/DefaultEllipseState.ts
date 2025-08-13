@@ -5,7 +5,7 @@ import { DefaultConnectableState } from "../core/DefaultConnectableState";
 import { DefaultStrokableState } from "../core/DefaultStrokableState";
 import { DefaultFillableState } from "../core/DefaultFillableState";
 import { DefaultTextableState } from "../core/DefaultTextableState";
-import type { EllipseState } from "../../../types/state/shapes/EllipseState";
+import type { EllipseState } from "../../../types/diagrams/shapes/EllipseTypes";
 
 export const DefaultEllipseState = {
 	...DefaultDiagramBaseState,

@@ -1,6 +1,6 @@
 // Import types.
 import type { Box } from "../../../types/core/Box";
-import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
 
 // Import utils.
 import { calcGroupOrientedBox } from "../../../utils/shapes/group/calcGroupOrientedBox";

@@ -1,6 +1,6 @@
 // Import types.
-import type { Diagram } from "../../../types/state/catalog/Diagram";
-import type { GroupState } from "../../../types/state/shapes/GroupState";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
+import type { GroupState } from "../../../types/diagrams/shapes/GroupTypes";
 
 // Import utils.
 import { nanToZero } from "../../math/common/nanToZero";

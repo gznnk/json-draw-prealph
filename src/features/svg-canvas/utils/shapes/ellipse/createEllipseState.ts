@@ -2,7 +2,7 @@
 import type { TextableType } from "../../../types/core/TextableType";
 import type { TextAlign } from "../../../types/core/TextAlign";
 import type { VerticalAlign } from "../../../types/core/VerticalAlign";
-import type { EllipseState } from "../../../types/state/shapes/EllipseState";
+import type { EllipseState } from "../../../types/diagrams/shapes/EllipseTypes";
 
 // Import utils.
 import { newId } from "../../../utils/shapes/common/newId";

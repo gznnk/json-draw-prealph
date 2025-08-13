@@ -1,5 +1,5 @@
 import { DefaultRectangleState } from "../shapes/DefaultRectangleState";
-import type { LLMNodeState } from "../../../types/state/nodes/LLMNodeState";
+import type { LLMNodeState } from "../../../types/diagrams/nodes/LLMNodeTypes";
 
 export const DefaultLLMNodeState = {
 	...DefaultRectangleState,

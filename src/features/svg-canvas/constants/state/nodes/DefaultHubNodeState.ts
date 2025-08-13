@@ -1,5 +1,5 @@
 import { DefaultEllipseState } from "../shapes/DefaultEllipseState";
-import type { HubNodeState } from "../../../types/state/nodes/HubNodeState";
+import type { HubNodeState } from "../../../types/diagrams/nodes/HubNodeTypes";
 
 export const DefaultHubNodeState = {
 	...DefaultEllipseState,

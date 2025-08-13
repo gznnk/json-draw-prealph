@@ -1,5 +1,5 @@
 import { StrokableDefaultData } from "../../data/core/StrokableDefaultData";
-import type { StrokableState } from "../../../types/state/core/StrokableState";
+import type { StrokableState } from "../../../types/diagrams/core/StrokableTypes";
 
 export const DefaultStrokableState = {
 	...StrokableDefaultData,

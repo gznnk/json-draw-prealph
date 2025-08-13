@@ -1,8 +1,8 @@
 // Import types.
 import type { DiagramType } from "../types/core/DiagramType";
-import type { Diagram } from "../types/state/catalog/Diagram";
-import type { DiagramData } from "../types/data/catalog/DiagramData";
-import type { ConnectPointState } from "../types/state/shapes/ConnectPointState";
+import type { Diagram } from "../types/diagrams/catalog/DiagramTypes";
+import type { DiagramData } from "../types/diagrams/catalog/DiagramTypes";
+import type { ConnectPointState } from "../types/diagrams/shapes/ConnectTypes";
 
 /**
  * Type for state to data mapper function.

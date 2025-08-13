@@ -1,5 +1,5 @@
 import { DefaultRectangleState } from "../shapes/DefaultRectangleState";
-import type { WebSearchNodeState } from "../../../types/state/nodes/WebSearchNodeState";
+import type { WebSearchNodeState } from "../../../types/diagrams/nodes/WebSearchNodeTypes";
 
 export const DefaultWebSearchNodeState = {
 	...DefaultRectangleState,

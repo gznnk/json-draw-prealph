@@ -2,7 +2,7 @@
 import type React from "react";
 
 // Import types.
-import type { PathData } from "../../../types/data/shapes/PathData";
+import type { PathData } from "../../../types/diagrams/shapes/PathTypes";
 
 // Import components.
 import { ArrowHead } from "../../../components/core/ArrowHead";

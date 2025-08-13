@@ -1,6 +1,8 @@
 // Import types.
 import type { Box } from "../../../types/core/Box";
-import type { Diagram } from "../../../types/state/catalog/Diagram";
+import { calcShapeBoundingBox } from "./calcShapeBoundingBox";
+import { calcNodeBoundingBox } from "./calcNodeBoundingBox";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
 
 // Import utils.
 import { isShape } from "../../validation/isShape";

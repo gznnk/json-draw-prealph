@@ -1,8 +1,8 @@
 // Import types.
 import type { RectangleVertices } from "../../../types/core/RectangleVertices";
 import type { Shape } from "../../../types/core/Shape";
-import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
-import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { ConnectPointState } from "../../../types/diagrams/shapes/ConnectTypes";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
 
 // Import utils.
 import { calcRectangleVertices } from "../../../utils/math/geometry/calcRectangleVertices";

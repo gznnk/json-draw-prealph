@@ -1,5 +1,5 @@
 // Import types.
-import type { SelectableState } from "../../types/state/core/SelectableState";
+import type { SelectableState } from "../../types/diagrams/core/SelectableTypes";
 
 /**
  * Check if an object is SelectableState.

@@ -1,6 +1,6 @@
 // Import types.
-import type { Diagram } from "../../types/state/catalog/Diagram";
-import type { ImageState } from "../../types/state/shapes/ImageState";
+import type { Diagram } from "../../types/diagrams/catalog/DiagramTypes";
+import type { ImageState } from "../../types/diagrams/shapes/ImageTypes";
 
 /**
  * Type guard to check if a diagram is an image data object.
