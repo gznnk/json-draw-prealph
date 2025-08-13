@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { PageDesignNodeProps } from "../../../types/diagrams/nodes/PageDesignNodeProps";
+import type { PageDesignNodeProps } from "../../../types/diagrams/nodes/PageDesignNodeTypes";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";

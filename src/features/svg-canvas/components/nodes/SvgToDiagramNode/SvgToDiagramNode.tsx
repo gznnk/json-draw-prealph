@@ -3,8 +3,8 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { SvgToDiagramNodeProps } from "../../../types/diagrams/nodes/SvgToDiagramNodeProps";
-import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { SvgToDiagramNodeProps } from "../../../types/diagrams/nodes/SvgToDiagramNodeTypes";
+import type { Diagram } from "../../../types/diagrams/catalog/DiagramTypes";
 
 // Import components.
 import { IconContainer } from "../../core/IconContainer";

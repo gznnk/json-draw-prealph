@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { WebSearchNodeProps } from "../../../types/diagrams/nodes/WebSearchNodeProps";
+import type { WebSearchNodeProps } from "../../../types/diagrams/nodes/WebSearchNodeTypes";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";

@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { VectorStoreNodeProps } from "../../../types/diagrams/nodes/VectorStoreNodeProps";
+import type { VectorStoreNodeProps } from "../../../types/diagrams/nodes/VectorStoreNodeTypes";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";

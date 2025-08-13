@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { HubNodeProps } from "../../../types/diagrams/nodes/HubNodeProps";
+import type { HubNodeProps } from "../../../types/diagrams/nodes/HubNodeTypes";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";

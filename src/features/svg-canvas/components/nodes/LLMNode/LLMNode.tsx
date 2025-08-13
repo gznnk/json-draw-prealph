@@ -6,7 +6,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import { OpenAI } from "openai";
 
 // Import types.
-import type { LLMNodeProps } from "../../../types/diagrams/nodes/LLMNodeProps";
+import type { LLMNodeProps } from "../../../types/diagrams/nodes/LLMNodeTypes";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";

@@ -33,7 +33,7 @@ import {
 	createPageDesignCircle,
 	createPageDesignText,
 } from "./PageDesignShapeUtils";
-import type { PageDesignNodeProps } from "../../../types/diagrams/nodes/PageDesignNodeProps";
+import type { PageDesignNodeProps } from "../../../types/diagrams/nodes/PageDesignNodeTypes";
 
 /**
  * PageDesignNode component.

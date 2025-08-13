@@ -1,4 +1,4 @@
-import type { ImageGenNodeData } from "../../../types/diagrams/nodes/ImageGenNodeData";
+import type { ImageGenNodeData } from "../../../types/diagrams/nodes/ImageGenNodeTypes";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";

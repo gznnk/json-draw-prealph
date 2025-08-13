@@ -3,12 +3,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
 import type { SvgCanvasProps } from "../../../../canvas/types/SvgCanvasProps";
-import type { FillableData } from "../../../../types/diagrams/core/FillableData";
-import type { StrokableData } from "../../../../types/diagrams/core/StrokableData";
-import type { TextableData } from "../../../../types/diagrams/core/TextableData";
-import type { RectangleData } from "../../../../types/diagrams/shapes/RectangleData";
+import type { FillableData } from "../../../../types/diagrams/core/FillableTypes";
+import type { StrokableData } from "../../../../types/diagrams/core/StrokableTypes";
+import type { TextableData } from "../../../../types/diagrams/core/TextableTypes";
+import type { RectangleData } from "../../../../types/diagrams/shapes/RectangleTypes";
 import type { DiagramStyleChangeEvent } from "../../../../types/events/DiagramStyleChangeEvent";
-import type { Diagram } from "../../../../types/state/catalog/Diagram";
+import type { Diagram } from "../../../../types/diagrams/catalog/DiagramTypes";
 
 // Import utils.
 import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams";

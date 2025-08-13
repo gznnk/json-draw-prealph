@@ -6,7 +6,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import { OpenAI } from "openai";
 
 // Import types.
-import type { ImageGenNodeProps } from "../../../types/diagrams/nodes/ImageGenNodeProps";
+import type { ImageGenNodeProps } from "../../../types/diagrams/nodes/ImageGenNodeTypes";
 
 // Import components.
 import { IconContainer } from "../../core/IconContainer";

@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { SvgToDiagramNodeProps } from "../../../types/diagrams/nodes/SvgToDiagramNodeProps";
+import type { SvgToDiagramNodeProps } from "../../../types/diagrams/nodes/SvgToDiagramNodeTypes";
 
 // Import components related to SvgCanvas.
 import { IconContainer } from "../../core/IconContainer";
