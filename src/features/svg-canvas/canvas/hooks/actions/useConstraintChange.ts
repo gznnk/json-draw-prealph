@@ -47,15 +47,14 @@ export const useConstraintChange = (props: SvgCanvasSubHooksProps) => {
 			});
 
 			// Create new state with updated items.
-			const newState = {
+			let newState = {
 				...prevState,
 				items,
 			};
 
-			// Notify the data change.
-			addHistory(e.eventId, newState);
+			// Add history
+			newState = addHistory(e.eventId, newState);
 
-			// Return new state with updated items.
 			return newState;
 		});
 	}, []);

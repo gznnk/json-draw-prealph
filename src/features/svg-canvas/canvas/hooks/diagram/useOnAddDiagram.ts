@@ -44,7 +44,7 @@ export const useOnAddDiagram = (props: SvgCanvasSubHooksProps) => {
 
 			// Call the function to add a new item to the canvas.
 			setCanvasState((prevState) => {
-				const newState = {
+				let newState = {
 					...prevState,
 					items: [
 						...prevState.items.map((i) => {
@@ -63,8 +63,8 @@ export const useOnAddDiagram = (props: SvgCanvasSubHooksProps) => {
 					],
 				} as SvgCanvasState;
 
-				// Notify the data change.
-				addHistory(event.eventId, newState);
+				// Add history
+				newState = addHistory(event.eventId, newState);
 
 				return newState;
 			});

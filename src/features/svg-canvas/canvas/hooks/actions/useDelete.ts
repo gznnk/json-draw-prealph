@@ -86,14 +86,14 @@ export const useDelete = (props: SvgCanvasSubHooksProps) => {
 
 			// Create new state.
 			const eventId = newEventId();
-			const newState = {
+			let newState = {
 				...prevState,
 				items, // Apply new items after removing the selected items.
 				multiSelectGroup: undefined, // Hide the multi-select group because the selected items were deleted.
 			} as SvgCanvasState;
 
-			// Notify the data change.
-			addHistory(eventId, newState);
+			// Add history
+			newState = addHistory(eventId, newState);
 
 			return newState;
 		});

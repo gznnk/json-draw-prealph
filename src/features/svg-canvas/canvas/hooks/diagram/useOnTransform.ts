@@ -317,8 +317,8 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 				});
 
 				if (isHistoryEvent(e.eventPhase)) {
-					// Set the history event ID and notify the data change.
-					addHistory(e.eventId, newState);
+					// Add history and get updated state
+					newState = addHistory(e.eventId, newState);
 				}
 
 				// Clean up the stored items at the end of transform

@@ -95,13 +95,13 @@ export const useStackOrderChange = (props: SvgCanvasSubHooksProps) => {
 			}
 
 			// Create new state
-			const newState: SvgCanvasState = {
+			let newState: SvgCanvasState = {
 				...prevState,
 				items,
 			};
 
-			// Notify the data change.
-			addHistory(e.eventId, newState);
+			// Add history
+			newState = addHistory(e.eventId, newState);
 
 			return newState;
 		});

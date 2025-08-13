@@ -37,7 +37,7 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 
 		setCanvasState((prevState) => {
 			// Create a new state with the updated items and multi-select group.
-			const newState = {
+			let newState = {
 				...prevState,
 				items: applyFunctionRecursively(prevState.items, (item) => {
 					// If the id does not match, return the original item.
@@ -60,8 +60,8 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 			}
 
 			if (isHistoryEvent(e.eventPhase)) {
-				// Set the history event ID and notify the data change.
-				addHistory(e.eventId, newState);
+				// Add history
+				newState = addHistory(e.eventId, newState);
 			}
 
 			return newState;

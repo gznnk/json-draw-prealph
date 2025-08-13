@@ -34,15 +34,15 @@ export const useUngroup = (props: SvgCanvasSubHooksProps) => {
 			const newItems = ungroupSelectedGroupsRecursive(prevState.items);
 
 			// Create new state
-			const newState = {
+			let newState = {
 				...prevState,
 				items: newItems,
 				multiSelectGroup: undefined,
 			} as SvgCanvasState;
 
-			// Generate event ID and notify the data change.
+			// Generate event ID and add history
 			const eventId = newEventId();
-			addHistory(eventId, newState);
+			newState = addHistory(eventId, newState);
 
 			return newState;
 		});

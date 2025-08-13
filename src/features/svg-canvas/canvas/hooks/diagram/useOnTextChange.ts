@@ -67,7 +67,7 @@ export const useOnTextChange = (props: SvgCanvasSubHooksProps) => {
 			const isTextEditing = e.eventPhase !== "Ended";
 
 			// Create a new state with the updated text.
-			const newState = {
+			let newState = {
 				...prevState,
 				items: applyFunctionRecursively(prevState.items, (item) =>
 					item.id === e.id ? { ...item, text: e.text, isTextEditing } : item,
@@ -81,7 +81,7 @@ export const useOnTextChange = (props: SvgCanvasSubHooksProps) => {
 
 			// Notify about data change.
 			if (e.eventPhase === "Ended") {
-				addHistory(e.eventId, newState);
+				newState = addHistory(e.eventId, newState);
 			}
 
 			return newState;

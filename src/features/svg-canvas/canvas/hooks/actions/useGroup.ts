@@ -71,14 +71,14 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 
 			// Generate event ID and create new state
 			const eventId = newEventId();
-			const newState = {
+			let newState = {
 				...prevState,
 				items,
 				multiSelectGroup: undefined,
 			} as SvgCanvasState;
 
-			// Notify the data change.
-			addHistory(eventId, newState);
+			// Add history
+			newState = addHistory(eventId, newState);
 
 			return newState;
 		});

@@ -79,14 +79,14 @@ export const useOnConnect = (props: SvgCanvasSubHooksProps) => {
 			const updatedItems = [...items, newConnectLine];
 
 			// Create new state with updated items
-			const newState = {
+			let newState = {
 				...prevState,
 				items: updatedItems,
 			};
 
-			// Generate event ID and notify the data change.
+			// Generate event ID and add history
 			const eventId = newEventId();
-			addHistory(eventId, newState);
+			newState = addHistory(eventId, newState);
 
 			return newState;
 		});

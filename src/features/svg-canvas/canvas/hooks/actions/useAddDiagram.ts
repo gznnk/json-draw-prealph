@@ -40,13 +40,13 @@ export const useAddDiagram = (props: SvgCanvasSubHooksProps) => {
 			if (isSelectableState(e.item) && e.item.isSelected) {
 				newItems = clearSelectionRecursively(prevState.items);
 			}
-			const newState = {
+			let newState = {
 				...prevState,
 				items: [...newItems, e.item],
 			} as SvgCanvasState;
 
-			// Notify the data change.
-			addHistory(e.eventId, newState);
+			// Add history
+			newState = addHistory(e.eventId, newState);
 
 			return newState;
 		});
