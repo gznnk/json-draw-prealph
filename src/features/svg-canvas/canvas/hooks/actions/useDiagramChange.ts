@@ -8,7 +8,7 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 // Import utils.
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
-import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
+import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 
 // Import hooks.
 import { useAddHistory } from "../history/useAddHistory";
@@ -51,7 +51,7 @@ export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
 				}),
 			};
 
-			newState.items = updateOutlineOfAllGroups(newState.items);
+			newState.items = updateOutlineOfAllItemables(newState.items);
 
 			// If the event has minX and minY, update the canvas state
 			if (e.minX !== undefined && e.minY !== undefined) {

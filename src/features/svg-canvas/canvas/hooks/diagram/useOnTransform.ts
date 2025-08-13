@@ -15,7 +15,7 @@ import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshCo
 import { isConnectableState } from "../../../utils/validation/isConnectableState";
 import { createItemMap } from "../../utils/createItemMap";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
-import { updateOutlineOfGroup } from "../../utils/updateOutlineOfGroup";
+import { updateOutlineOfItemable } from "../../utils/updateOutlineOfItemable";
 
 // Import hooks.
 import { useAddHistory } from "../history/useAddHistory";
@@ -311,7 +311,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 				// Update outline of top-level groups that contain transformed diagrams
 				newState.items = newState.items.map((item) => {
 					if (item.type === "Group" && topLevelGroupIds.has(item.id)) {
-						return updateOutlineOfGroup(item);
+						return updateOutlineOfItemable(item);
 					}
 					return item;
 				});

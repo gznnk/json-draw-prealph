@@ -18,7 +18,7 @@ import { createItemMap } from "../../utils/createItemMap";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
-import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
+import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 
 // Import hooks.
 import { useAddHistory } from "../history/useAddHistory";
@@ -205,7 +205,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 					return item;
 				});
 				// Update outline of all groups.
-				newState.items = updateOutlineOfAllGroups(newState.items);
+				newState.items = updateOutlineOfAllItemables(newState.items);
 				// Clean up the canvas state reference.
 				startCanvasState.current = undefined;
 				// Clean up the selected item IDs and initial items map.
