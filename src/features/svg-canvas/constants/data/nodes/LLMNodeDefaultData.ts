@@ -1,4 +1,4 @@
-import type { LLMNodeData } from "../../../types/diagrams/nodes/LLMNodeData";
+import type { LLMNodeData } from "../../../types/diagrams/nodes/LLMNodeTypes";
 import { RectangleDefaultData } from "../shapes/RectangleDefaultData";
 
 /**

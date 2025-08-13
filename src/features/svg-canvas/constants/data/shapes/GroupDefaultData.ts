@@ -1,4 +1,4 @@
-import type { GroupData } from "../../../types/diagrams/shapes/GroupData";
+import type { GroupData } from "../../../types/diagrams/shapes/GroupTypes";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ItemableDefaultData } from "../core/ItemableDefaultData";

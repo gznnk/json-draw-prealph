@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { ImageProps } from "../../../types/diagrams/shapes/ImageProps";
+import type { ImageProps } from "../../../types/diagrams/shapes/ImageTypes";
 
 // Import components.
 import { ImageElement } from "./ImageStyled";

@@ -5,7 +5,7 @@ import { memo, useCallback, useRef, useState } from "react";
 // Import types.
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
-import type { Diagram } from "../../../../types/state/catalog/Diagram";
+import type { Diagram } from "../../../../types/diagrams/catalog/DiagramTypes";
 
 // Import utils.
 import { newId } from "../../../../utils/shapes/common/newId";

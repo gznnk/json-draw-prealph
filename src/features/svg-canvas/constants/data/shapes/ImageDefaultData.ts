@@ -1,4 +1,4 @@
-import type { ImageData } from "../../../types/diagrams/shapes/ImageData";
+import type { ImageData } from "../../../types/diagrams/shapes/ImageTypes";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 

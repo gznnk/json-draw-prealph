@@ -1,4 +1,4 @@
-import type { HubNodeData } from "../../../types/diagrams/nodes/HubNodeData";
+import type { HubNodeData } from "../../../types/diagrams/nodes/HubNodeTypes";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";

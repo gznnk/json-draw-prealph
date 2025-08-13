@@ -1,4 +1,4 @@
-import type { PathData } from "../../../types/diagrams/shapes/PathData";
+import type { PathData } from "../../../types/diagrams/shapes/PathTypes";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ItemableDefaultData } from "../core/ItemableDefaultData";

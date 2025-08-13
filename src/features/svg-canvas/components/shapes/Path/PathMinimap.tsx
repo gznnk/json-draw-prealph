@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { PathProps } from "../../../types/diagrams/shapes/PathProps";
+import type { PathProps } from "../../../types/diagrams/shapes/PathTypes";
 
 // Import components.
 import { PathElement } from "./Path/PathStyled";

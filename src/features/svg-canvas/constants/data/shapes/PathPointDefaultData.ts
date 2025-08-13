@@ -1,4 +1,4 @@
-import type { PathPointData } from "../../../types/diagrams/shapes/PathPointData";
+import type { PathPointData } from "../../../types/diagrams/shapes/PathTypes";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 
 /**

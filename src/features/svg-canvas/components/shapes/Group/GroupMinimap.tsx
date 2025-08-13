@@ -4,7 +4,7 @@ import { memo } from "react";
 
 // Import types.
 import { DiagramRegistry } from "../../../registry";
-import type { GroupProps } from "../../../types/diagrams/shapes/GroupProps";
+import type { GroupProps } from "../../../types/diagrams/shapes/GroupTypes";
 
 /**
  * Group minimap component - lightweight version without outlines, controls, and labels.

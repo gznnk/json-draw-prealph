@@ -1,5 +1,5 @@
 // Import types.
-import type { PathState } from "../state/shapes/PathState";
+import type { PathState } from "../diagrams/shapes/PathTypes";
 import type { EventPhase } from "./EventPhase";
 
 /**

@@ -1,4 +1,4 @@
-import type { DiagramBaseData } from "../../../types/diagrams/core/DiagramBaseData";
+import type { DiagramBaseData } from "../../../types/diagrams/core/DiagramBaseTypes";
 
 /**
  * Default diagram base data template.

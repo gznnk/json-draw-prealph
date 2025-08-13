@@ -1,4 +1,4 @@
-import type { StrokableData } from "../../../types/diagrams/core/StrokableData";
+import type { StrokableData } from "../../../types/diagrams/core/StrokableTypes";
 
 /**
  * Default strokable data template.

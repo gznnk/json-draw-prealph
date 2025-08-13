@@ -4,12 +4,12 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
 import type { Point } from "../../../types/core/Point";
-import type { PathPointData } from "../../../types/diagrams/shapes/PathPointData";
+import type { PathPointData } from "../../../types/diagrams/shapes/PathTypes";
 import type { DiagramDragDropEvent } from "../../../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
 import type { EventPhase } from "../../../types/events/EventPhase";
-import type { ConnectPointProps } from "../../../types/diagrams/shapes/ConnectPointProps";
+import type { ConnectPointProps } from "../../../types/diagrams/shapes/ConnectTypes";
 
 // Import hooks
 import { useEventBus } from "../../../context/EventBusContext";

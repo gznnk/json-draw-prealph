@@ -6,7 +6,7 @@ import { memo } from "react";
 import { DragPoint } from "../../../core/DragPoint";
 
 // Import types related to SvgCanvas.
-import type { PathPointProps } from "../../../../types/diagrams/shapes/PathPointProps";
+import type { PathPointProps } from "../../../../types/diagrams/shapes/PathTypes";
 
 /**
  * Polyline vertex component

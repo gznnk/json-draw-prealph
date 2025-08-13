@@ -5,7 +5,7 @@ import React, { memo } from "react";
 import { DiagramRegistry } from "../../../registry";
 
 // Import types.
-import type { GroupProps } from "../../../types/diagrams/shapes/GroupProps";
+import type { GroupProps } from "../../../types/diagrams/shapes/GroupTypes";
 
 // Import components.
 import { Outline } from "../../core/Outline";

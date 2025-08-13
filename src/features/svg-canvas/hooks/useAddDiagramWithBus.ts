@@ -3,9 +3,6 @@ import { useCallback } from "react";
 
 // Import constants.
 import { ADD_NEW_DIAGRAM_EVENT_NAME } from "../constants/core/EventNames";
-import { useSvgCanvases } from "../../../app/hooks/useSvgCanvases";
-import { EventBusContext } from "../context/EventBusContext";
-import { SvgCanvasActionType } from "../types/core/SvgCanvasActionType";
 
 // Import types.
 import type { Diagram } from "../types/diagrams/catalog/DiagramTypes";

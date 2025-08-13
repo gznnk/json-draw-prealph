@@ -1,4 +1,4 @@
-import type { TextAreaNodeData } from "../../../types/diagrams/nodes/TextAreaNodeData";
+import type { TextAreaNodeData } from "../../../types/diagrams/nodes/TextAreaNodeTypes";
 import { RectangleDefaultData } from "../shapes/RectangleDefaultData";
 
 /**

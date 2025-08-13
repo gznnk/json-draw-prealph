@@ -1,4 +1,4 @@
-import type { TextableData } from "../../../types/diagrams/core/TextableData";
+import type { TextableData } from "../../../types/diagrams/core/TextableTypes";
 
 /**
  * Default textable data template.

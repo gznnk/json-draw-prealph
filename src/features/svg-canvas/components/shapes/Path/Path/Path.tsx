@@ -3,13 +3,13 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
-import type { DiagramBaseData } from "../../../../types/diagrams/core/DiagramBaseData";
-import type { PathData } from "../../../../types/diagrams/shapes/PathData";
+import type { DiagramBaseData } from "../../../../types/diagrams/core/DiagramBaseTypes";
+import type { PathData } from "../../../../types/diagrams/shapes/PathTypes";
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
-import type { PathProps } from "../../../../types/diagrams/shapes/PathProps";
-import type { PathState } from "../../../../types/diagrams/shapes/PathState";
+import type { PathProps } from "../../../../types/diagrams/shapes/PathTypes";
+import type { PathState } from "../../../../types/diagrams/shapes/PathTypes";
 import type { PathMode } from "./PathTypes";
 
 // Import components.

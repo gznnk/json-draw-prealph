@@ -1,5 +1,5 @@
 // Import types.
-import type { Diagram } from "../state/catalog/Diagram";
+import type { Diagram } from "../diagrams/catalog/DiagramTypes";
 
 /**
  * Data structure for diagram change events

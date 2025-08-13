@@ -1,4 +1,4 @@
-import type { PageDesignNodeData } from "../../../types/diagrams/nodes/PageDesignNodeData";
+import type { PageDesignNodeData } from "../../../types/diagrams/nodes/PageDesignNodeTypes";
 import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
 import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
 import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";

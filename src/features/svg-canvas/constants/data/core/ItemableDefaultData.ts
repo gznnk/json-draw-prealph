@@ -1,4 +1,4 @@
-import type { ItemableData } from "../../../types/diagrams/core/ItemableData";
+import type { ItemableData } from "../../../types/diagrams/core/ItemableTypes";
 
 /**
  * Default itemable data template.
