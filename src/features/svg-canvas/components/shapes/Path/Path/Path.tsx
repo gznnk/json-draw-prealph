@@ -15,8 +15,9 @@ import type { PathMode } from "./PathTypes";
 // Import components.
 import { Outline } from "../../../core/Outline";
 import { PositionLabel } from "../../../core/PositionLabel";
-import { Group } from "../../Group";
+import { Transformative } from "../../../core/Transformative";
 import { NewVertexList } from "../NewVertexList";
+import { PathPoint } from "../PathPoint";
 import { SegmentList } from "../SegmentList";
 import { PathElement } from "./PathStyled";
 
@@ -374,24 +375,33 @@ const PathComponent: React.FC<PathProps> = ({
 				scaleY={scaleY}
 				showOutline={showOutline && mode !== "Vertices"}
 			/>
-			{/* Overall transform group */}
-			{isSelected && (
-				<Group
+			{/* Path points for vertices mode */}
+			{mode === "Vertices" &&
+				linePoints.map((point) => (
+					<PathPoint
+						key={point.id}
+						id={point.id}
+						x={point.x}
+						y={point.y}
+						hidden={point.hidden}
+						onDrag={handlePathPointDrag}
+					/>
+				))}
+			{/* Transformative for transform mode */}
+			{mode === "Transform" && (
+				<Transformative
 					id={id}
+					type="Path"
 					x={x}
 					y={y}
-					isSelected={false}
-					showTransformControls={showTransformControls && mode === "Transform"}
-					showOutline={false}
 					width={width}
 					height={height}
 					rotation={rotation}
 					scaleX={scaleX}
 					scaleY={scaleY}
 					keepProportion={keepProportion}
-					items={linePoints}
+					showTransformControls={showTransformControls}
 					isTransforming={isTransforming}
-					onDrag={handlePathPointDrag}
 					onTransform={onTransform}
 				/>
 			)}
