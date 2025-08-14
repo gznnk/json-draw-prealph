@@ -16,7 +16,7 @@ import { useAddHistory } from "../history/useAddHistory";
 /**
  * Custom hook to handle diagram change events on the canvas.
  */
-export const useDiagramChange = (props: SvgCanvasSubHooksProps) => {
+export const useOnDiagramChange = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
 	const addHistory = useAddHistory(props);
 

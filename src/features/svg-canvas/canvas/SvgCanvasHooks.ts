@@ -23,7 +23,7 @@ import { useAddDiagramByType } from "./hooks/actions/useAddDiagramByType";
 import { useConstraintChange } from "./hooks/actions/useConstraintChange";
 import { useCopy } from "./hooks/actions/useCopy";
 import { useDelete } from "./hooks/actions/useDelete";
-import { useDiagramChange } from "./hooks/actions/useDiagramChange";
+import { useOnDiagramChange } from "./hooks/diagram/useOnDiagramChange";
 import { useExport } from "./hooks/actions/useExport";
 import { useGroup } from "./hooks/actions/useGroup";
 import { usePaste } from "./hooks/actions/usePaste";
@@ -137,7 +137,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	const onDelete = useDelete(canvasHooksProps);
 
 	// Handler for the diagram change event.
-	const onDiagramChange = useDiagramChange(canvasHooksProps);
+	const onDiagramChange = useOnDiagramChange(canvasHooksProps);
 
 	// Handler for the diagram style change event.
 	const onStyleChange = useStyleChange(canvasHooksProps);
