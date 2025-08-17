@@ -3,7 +3,6 @@ import type { TransformativeState } from "../../../types/state/core/Transformati
 
 export const DefaultTransformativeState = {
 	...TransformativeDefaultData,
-	keepProportion: false,
 	showTransformControls: false,
 	isTransforming: false,
 } as const satisfies TransformativeState;

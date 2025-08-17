@@ -1,12 +1,10 @@
-import { DefaultDiagramBaseState } from "../core/DefaultDiagramBaseState";
 import { DefaultSelectableState } from "../core/DefaultSelectableState";
 import { DefaultTransformativeState } from "../core/DefaultTransformativeState";
+import { ImageDefaultData } from "../../data/shapes/ImageDefaultData";
 import type { ImageState } from "../../../types/state/shapes/ImageState";
 
 export const DefaultImageState = {
-	...DefaultDiagramBaseState,
+	...ImageDefaultData,
 	...DefaultSelectableState,
 	...DefaultTransformativeState,
-	type: "Image",
-	base64Data: "",
-} as const satisfies ImageState;
+} as const satisfies ImageState;;

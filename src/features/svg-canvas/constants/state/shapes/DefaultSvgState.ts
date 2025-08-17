@@ -1,14 +1,10 @@
-import { DefaultDiagramBaseState } from "../core/DefaultDiagramBaseState";
 import { DefaultSelectableState } from "../core/DefaultSelectableState";
 import { DefaultTransformativeState } from "../core/DefaultTransformativeState";
+import { SvgDefaultData } from "../../data/shapes/SvgDefaultData";
 import type { SvgState } from "../../../types/state/shapes/SvgState";
 
 export const DefaultSvgState = {
-	...DefaultDiagramBaseState,
+	...SvgDefaultData,
 	...DefaultSelectableState,
 	...DefaultTransformativeState,
-	type: "Svg",
-	initialWidth: 100,
-	initialHeight: 100,
-	svgText: "",
-} as const satisfies SvgState;
+} as const satisfies SvgState;;

@@ -1,10 +1,8 @@
-import { DefaultDiagramBaseState } from "../core/DefaultDiagramBaseState";
 import { DefaultSelectableState } from "../core/DefaultSelectableState";
+import { ConnectPointDefaultData } from "../../data/shapes/ConnectPointDefaultData";
 import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
 
 export const DefaultConnectPointState = {
-	...DefaultDiagramBaseState,
+	...ConnectPointDefaultData,
 	...DefaultSelectableState,
-	type: "ConnectPoint",
-	name: "",
-} as const satisfies ConnectPointState;
+} as const satisfies ConnectPointState;;
