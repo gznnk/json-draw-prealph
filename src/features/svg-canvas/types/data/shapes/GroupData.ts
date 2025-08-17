@@ -1,10 +1,18 @@
+// Import types.
 import type { CreateDataType } from "./CreateDataType";
+import type { DiagramFeatures } from "../../core/DiagramFeatures";
+
+/**
+ * Diagram features for Group shapes.
+ */
+export const GroupFeatures = {
+	transformative: true,
+	itemable: true,
+	selectable: true,
+} as const satisfies DiagramFeatures;
 
 /**
  * Data type for grouped diagram elements.
  * Implements selectable, transformative, and itemable behaviors to manage collections of elements.
  */
-export type GroupData = CreateDataType<{
-	transformative: true;
-	itemable: true;
-}>;
+export type GroupData = CreateDataType<typeof GroupFeatures>;

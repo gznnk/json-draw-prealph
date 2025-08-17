@@ -1,4 +1,4 @@
-// Import types related to SvgCanvas.
+// Import types.
 import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";
 import type { PageDesignNodeState } from "../../state/nodes/PageDesignNodeState";
 
@@ -12,6 +12,5 @@ export type PageDesignNodeProps = CreateDiagramProps<
 		transformative: true;
 		connectable: true;
 		executable: true;
-		itemCreatable: true;
 	}
 >;

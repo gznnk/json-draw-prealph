@@ -1,16 +1,12 @@
 // Import types.
-import type { CreateDiagramProps } from "./CreateDiagramProps";
+import type { EllipseFeatures } from "../../data/shapes/EllipseData";
 import type { EllipseState } from "../../state/shapes/EllipseState";
+import type { CreateDiagramProps } from "./CreateDiagramProps";
 
 /**
  * Props for Ellipse component
  */
 export type EllipseProps = CreateDiagramProps<
 	EllipseState,
-	{
-		selectable: true;
-		transformative: true;
-		connectable: true;
-		textable: true;
-	}
+	typeof EllipseFeatures
 >;

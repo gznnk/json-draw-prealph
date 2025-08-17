@@ -1,18 +1,12 @@
-// Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";
+// Import types.
+import type { LLMNodeFeatures } from "../../data/nodes/LLMNodeData";
 import type { LLMNodeState } from "../../state/nodes/LLMNodeState";
+import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";
 
 /**
  * Type of the LLM node component props.
  */
 export type LLMNodeProps = CreateDiagramProps<
 	LLMNodeState,
-	{
-		selectable: true;
-		transformative: true;
-		connectable: true;
-		textable: true;
-		executable: true;
-		itemCreatable: true;
-	}
+	typeof LLMNodeFeatures
 >;

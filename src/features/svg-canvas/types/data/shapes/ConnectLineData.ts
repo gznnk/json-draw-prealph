@@ -1,16 +1,23 @@
+// Import types.
 import type { ArrowHeadType } from "../../core/ArrowHeadType";
+import type { DiagramFeatures } from "../../core/DiagramFeatures";
 import type { PathType } from "../../core/PathType";
 import type { CreateDataType } from "./CreateDataType";
 
 /**
- * Data type for connection lines between diagram elements.
- * Contains properties for defining connection endpoints and visual styling.
+ * Diagram features for ConnectLine shapes.
  */
-export type ConnectLineData = CreateDataType<{
-	transformative: true;
-	itemable: true;
-	strokable: true;
-}> & {
+export const ConnectLineFeatures = {
+	transformative: true,
+	itemable: true,
+	strokable: true,
+	selectable: true,
+} as const satisfies DiagramFeatures;
+
+/**
+ * Data type for connection lines between diagram elements.
+ */
+export type ConnectLineData = CreateDataType<typeof ConnectLineFeatures> & {
 	pathType: PathType;
 	startOwnerId: string;
 	endOwnerId: string;

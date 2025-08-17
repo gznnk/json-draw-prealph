@@ -1,6 +1,6 @@
 // Import types.
 import type { CreateStateType } from "./CreateStateType";
-import type { GroupData } from "../../data/shapes/GroupData";
+import type { GroupData, GroupFeatures } from "../../data/shapes/GroupData";
 
 /**
  * State type for grouped diagram elements.
@@ -8,9 +8,5 @@ import type { GroupData } from "../../data/shapes/GroupData";
  */
 export type GroupState = CreateStateType<
 	GroupData,
-	{
-		selectable: true;
-		transformative: true;
-		itemable: true;
-	}
+	typeof GroupFeatures
 >;

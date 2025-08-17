@@ -1,3 +1,4 @@
+// Import types.
 import type { ConnectPointData } from "./ConnectPointData";
 
 /**

@@ -1,4 +1,4 @@
-// Import types related to SvgCanvas.
+// Import types.
 import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";
 import type { ImageGenNodeState } from "../../state/nodes/ImageGenNodeState";
 
@@ -12,6 +12,5 @@ export type ImageGenNodeProps = CreateDiagramProps<
 		transformative: true;
 		connectable: true;
 		executable: true;
-		itemCreatable: true;
 	}
 >;
