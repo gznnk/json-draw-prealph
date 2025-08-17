@@ -17,14 +17,14 @@ import { Svg } from "../components/shapes/Svg";
 
 // Import minimap shape components
 import { ConnectLineMinimap } from "../components/shapes/ConnectLine";
-import { ConnectPointMinimap } from "../components/shapes/ConnectPoint/ConnectPointMinimap";
-import { EllipseMinimap } from "../components/shapes/Ellipse/EllipseMinimap";
-import { GroupMinimap } from "../components/shapes/Group/GroupMinimap";
-import { ImageMinimap } from "../components/shapes/Image/ImageMinimap";
+import { ConnectPointMinimap } from "../components/shapes/ConnectPoint";
+import { EllipseMinimap } from "../components/shapes/Ellipse";
+import { GroupMinimap } from "../components/shapes/Group";
+import { ImageMinimap } from "../components/shapes/Image";
 import { PathMinimap } from "../components/shapes/Path";
-import { PathPointMinimap } from "../components/shapes/Path/PathPoint/PathPointMinimap";
-import { RectangleMinimap } from "../components/shapes/Rectangle/RectangleMinimap";
-import { SvgMinimap } from "../components/shapes/Svg/SvgMinimap";
+import { PathPointMinimap } from "../components/shapes/Path/PathPoint";
+import { RectangleMinimap } from "../components/shapes/Rectangle";
+import { SvgMinimap } from "../components/shapes/Svg";
 
 // Import node components and their functions
 import { AgentNode } from "../components/nodes/AgentNode";
@@ -38,15 +38,15 @@ import { VectorStoreNode } from "../components/nodes/VectorStoreNode";
 import { WebSearchNode } from "../components/nodes/WebSearchNode";
 
 // Import minimap node components
-import { AgentNodeMinimap } from "../components/nodes/AgentNode/AgentNodeMinimap";
-import { HubNodeMinimap } from "../components/nodes/HubNode/HubNodeMinimap";
-import { ImageGenNodeMinimap } from "../components/nodes/ImageGenNode/ImageGenNodeMinimap";
-import { LLMNodeMinimap } from "../components/nodes/LLMNode/LLMNodeMinimap";
-import { PageDesignNodeMinimap } from "../components/nodes/PageDesignNode/PageDesignNodeMinimap";
-import { SvgToDiagramNodeMinimap } from "../components/nodes/SvgToDiagramNode/SvgToDiagramNodeMinimap";
-import { TextAreaNodeMinimap } from "../components/nodes/TextAreaNode/TextAreaNodeMinimap";
-import { VectorStoreNodeMinimap } from "../components/nodes/VectorStoreNode/VectorStoreNodeMinimap";
-import { WebSearchNodeMinimap } from "../components/nodes/WebSearchNode/WebSearchNodeMinimap";
+import { AgentNodeMinimap } from "../components/nodes/AgentNode";
+import { HubNodeMinimap } from "../components/nodes/HubNode";
+import { ImageGenNodeMinimap } from "../components/nodes/ImageGenNode";
+import { LLMNodeMinimap } from "../components/nodes/LLMNode";
+import { PageDesignNodeMinimap } from "../components/nodes/PageDesignNode";
+import { SvgToDiagramNodeMinimap } from "../components/nodes/SvgToDiagramNode";
+import { TextAreaNodeMinimap } from "../components/nodes/TextAreaNode";
+import { VectorStoreNodeMinimap } from "../components/nodes/VectorStoreNode";
+import { WebSearchNodeMinimap } from "../components/nodes/WebSearchNode";
 
 // Import connect point calculators
 import { calcEllipseConnectPointPosition } from "../utils/shapes/ellipse/calcEllipseConnectPointPosition";
