@@ -13,6 +13,7 @@ export type DiagramType =
 	| "PathPoint"
 	| "Rectangle"
 	| "Svg"
+	| "Button"
 	// Nodes
 	| "AgentNode"
 	| "HubNode"
