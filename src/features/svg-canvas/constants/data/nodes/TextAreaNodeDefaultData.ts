@@ -1,11 +1,16 @@
+// Import types.
 import type { TextAreaNodeData } from "../../../types/data/nodes/TextAreaNodeData";
-import { RectangleDefaultData } from "../shapes/RectangleDefaultData";
+import { TextAreaNodeFeatures } from "../../../types/data/nodes/TextAreaNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default text area node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const TextAreaNodeDefaultData = {
-	...RectangleDefaultData,
+export const TextAreaNodeDefaultData = CreateDefaultData<TextAreaNodeData>({
 	type: "TextAreaNode",
-} as const satisfies TextAreaNodeData;
+	options: TextAreaNodeFeatures,
+	properties: {},
+});

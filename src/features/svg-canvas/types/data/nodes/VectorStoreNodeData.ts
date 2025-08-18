@@ -1,6 +1,6 @@
 // Import types.
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
-import type { RectangleData } from "../shapes/RectangleData";
+import type { CreateDataType } from "../shapes/CreateDataType";
 
 /**
  * Diagram features for VectorStore nodes.
@@ -15,6 +15,6 @@ export const VectorStoreNodeFeatures = {
 /**
  * Type of the VectorStoreNode data.
  */
-export type VectorStoreNodeData = Omit<RectangleData, "type"> & {
+export type VectorStoreNodeData = CreateDataType<typeof VectorStoreNodeFeatures> & {
 	type: "VectorStoreNode";
 };

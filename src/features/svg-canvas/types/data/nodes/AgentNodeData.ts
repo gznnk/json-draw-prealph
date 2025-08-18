@@ -1,6 +1,6 @@
 // Import types.
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
-import type { RectangleData } from "../shapes/RectangleData";
+import type { CreateDataType } from "../shapes/CreateDataType";
 
 /**
  * Diagram features for Agent nodes.
@@ -8,6 +8,9 @@ import type { RectangleData } from "../shapes/RectangleData";
 export const AgentNodeFeatures = {
 	transformative: true,
 	connectable: true,
+	strokable: true,
+	fillable: true,
+	textable: true,
 	selectable: true,
 	executable: true,
 } as const satisfies DiagramFeatures;
@@ -15,6 +18,6 @@ export const AgentNodeFeatures = {
 /**
  * Type of the AgentNode data.
  */
-export type AgentNodeData = Omit<RectangleData, "type"> & {
+export type AgentNodeData = CreateDataType<typeof AgentNodeFeatures> & {
 	type: "AgentNode";
 };

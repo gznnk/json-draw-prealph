@@ -1,6 +1,6 @@
 // Import types.
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
-import type { RectangleData } from "../shapes/RectangleData";
+import type { CreateDataType } from "../shapes/CreateDataType";
 
 /**
  * Diagram features for TextArea nodes.
@@ -8,6 +8,8 @@ import type { RectangleData } from "../shapes/RectangleData";
 export const TextAreaNodeFeatures = {
 	transformative: true,
 	connectable: true,
+	strokable: true,
+	fillable: true,
 	selectable: true,
 	textable: true,
 	executable: true,
@@ -16,6 +18,6 @@ export const TextAreaNodeFeatures = {
 /**
  * Type of the TextAreaNode data.
  */
-export type TextAreaNodeData = Omit<RectangleData, "type"> & {
+export type TextAreaNodeData = CreateDataType<typeof TextAreaNodeFeatures> & {
 	type: "TextAreaNode";
 };

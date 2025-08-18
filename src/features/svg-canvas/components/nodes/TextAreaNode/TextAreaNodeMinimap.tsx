@@ -17,6 +17,7 @@ const TextAreaNodeMinimapComponent: React.FC<TextAreaNodeProps> = (props) => {
 			{...props}
 			text={props.text}
 			textType="markdown"
+			radius={0}
 			showOutline={false}
 			isSelected={false}
 			isTextEditing={false}

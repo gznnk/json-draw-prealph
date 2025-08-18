@@ -1,11 +1,16 @@
+// Import types.
 import type { HubNodeData } from "../../../types/data/nodes/HubNodeData";
-import { RectangleDefaultData } from "../shapes/RectangleDefaultData";
+import { HubNodeFeatures } from "../../../types/data/nodes/HubNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default hub node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const HubNodeDefaultData = {
-	...RectangleDefaultData,
+export const HubNodeDefaultData = CreateDefaultData<HubNodeData>({
 	type: "HubNode",
-} as const satisfies HubNodeData;
+	options: HubNodeFeatures,
+	properties: {},
+});

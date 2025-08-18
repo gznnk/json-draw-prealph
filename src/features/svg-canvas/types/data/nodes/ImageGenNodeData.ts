@@ -1,6 +1,6 @@
 // Import types.
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
-import type { RectangleData } from "../shapes/RectangleData";
+import type { CreateDataType } from "../shapes/CreateDataType";
 
 /**
  * Diagram features for ImageGen nodes.
@@ -15,6 +15,6 @@ export const ImageGenNodeFeatures = {
 /**
  * Type of the ImageGenNode data.
  */
-export type ImageGenNodeData = Omit<RectangleData, "type"> & {
+export type ImageGenNodeData = CreateDataType<typeof ImageGenNodeFeatures> & {
 	type: "ImageGenNode";
 };

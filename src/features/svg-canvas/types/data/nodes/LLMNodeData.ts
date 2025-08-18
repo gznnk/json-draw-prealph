@@ -1,6 +1,6 @@
 // Import types related to SvgCanvas.
-import type { RectangleData } from "../shapes/RectangleData";
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
+import type { CreateDataType } from "../shapes/CreateDataType";
 
 /**
  * Diagram features for LLM nodes.
@@ -18,6 +18,6 @@ export const LLMNodeFeatures = {
 /**
  * Type of the LLM node data.
  */
-export type LLMNodeData = Omit<RectangleData, "type"> & {
+export type LLMNodeData = CreateDataType<typeof LLMNodeFeatures> & {
 	type: "LLMNode";
 };

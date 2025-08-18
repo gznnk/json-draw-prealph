@@ -1,6 +1,6 @@
 // Import types.
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
-import type { RectangleData } from "../shapes/RectangleData";
+import type { CreateDataType } from "../shapes/CreateDataType";
 
 /**
  * Diagram features for WebSearch nodes.
@@ -15,6 +15,6 @@ export const WebSearchNodeFeatures = {
 /**
  * Type of the WebSearchNode data.
  */
-export type WebSearchNodeData = Omit<RectangleData, "type"> & {
+export type WebSearchNodeData = CreateDataType<typeof WebSearchNodeFeatures> & {
 	type: "WebSearchNode";
 };

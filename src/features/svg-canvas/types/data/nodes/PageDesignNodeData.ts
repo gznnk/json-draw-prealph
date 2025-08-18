@@ -1,6 +1,6 @@
 // Import types.
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
-import type { RectangleData } from "../shapes/RectangleData";
+import type { CreateDataType } from "../shapes/CreateDataType";
 
 /**
  * Diagram features for PageDesign nodes.
@@ -15,6 +15,6 @@ export const PageDesignNodeFeatures = {
 /**
  * Type of the PageDesignNode data.
  */
-export type PageDesignNodeData = Omit<RectangleData, "type"> & {
+export type PageDesignNodeData = CreateDataType<typeof PageDesignNodeFeatures> & {
 	type: "PageDesignNode";
 };

@@ -1,6 +1,6 @@
 // Import types.
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
-import type { RectangleData } from "../shapes/RectangleData";
+import type { CreateDataType } from "../shapes/CreateDataType";
 
 /**
  * Diagram features for SvgToDiagram nodes.
@@ -15,6 +15,6 @@ export const SvgToDiagramNodeFeatures = {
 /**
  * Type of the SvgToDiagramNode data.
  */
-export type SvgToDiagramNodeData = Omit<RectangleData, "type"> & {
+export type SvgToDiagramNodeData = CreateDataType<typeof SvgToDiagramNodeFeatures> & {
 	type: "SvgToDiagramNode";
 };

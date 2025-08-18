@@ -1,11 +1,16 @@
+// Import types.
 import type { SvgToDiagramNodeData } from "../../../types/data/nodes/SvgToDiagramNodeData";
-import { RectangleDefaultData } from "../shapes/RectangleDefaultData";
+import { SvgToDiagramNodeFeatures } from "../../../types/data/nodes/SvgToDiagramNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default SVG to diagram node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const SvgToDiagramNodeDefaultData = {
-	...RectangleDefaultData,
+export const SvgToDiagramNodeDefaultData = CreateDefaultData<SvgToDiagramNodeData>({
 	type: "SvgToDiagramNode",
-} as const satisfies SvgToDiagramNodeData;
+	options: SvgToDiagramNodeFeatures,
+	properties: {},
+});
