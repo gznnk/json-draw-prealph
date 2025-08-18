@@ -15,4 +15,5 @@ export const SvgDefaultState = CreateDefaultState<SvgState>({
 	type: "Svg",
 	options: SvgFeatures,
 	baseData: SvgDefaultData,
+	properties: {},
 });

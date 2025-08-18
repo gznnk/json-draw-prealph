@@ -12,4 +12,5 @@ import { CreateDefaultData } from "./CreateDefaultData";
 export const EllipseDefaultData = CreateDefaultData<EllipseData>({
 	type: "Ellipse",
 	options: EllipseFeatures,
+	properties: {},
 });

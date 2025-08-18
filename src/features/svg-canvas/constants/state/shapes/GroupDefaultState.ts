@@ -12,4 +12,5 @@ export const GroupDefaultState = CreateDefaultState<GroupState>({
 	type: "Group",
 	options: GroupFeatures,
 	baseData: GroupDefaultData,
+	properties: {},
 });

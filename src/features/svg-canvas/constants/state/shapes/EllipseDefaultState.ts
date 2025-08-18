@@ -12,4 +12,5 @@ export const EllipseDefaultState = CreateDefaultState<EllipseState>({
 	type: "Ellipse",
 	options: EllipseFeatures,
 	baseData: EllipseDefaultData,
+	properties: {},
 });

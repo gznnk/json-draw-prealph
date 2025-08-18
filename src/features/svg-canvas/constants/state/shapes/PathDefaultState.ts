@@ -12,4 +12,5 @@ export const PathDefaultState = CreateDefaultState<PathState>({
 	type: "Path",
 	options: PathFeatures,
 	baseData: PathDefaultData,
+	properties: {},
 });

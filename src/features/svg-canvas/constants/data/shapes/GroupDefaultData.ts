@@ -12,4 +12,5 @@ import { CreateDefaultData } from "./CreateDefaultData";
 export const GroupDefaultData = CreateDefaultData<GroupData>({
 	type: "Group",
 	options: GroupFeatures,
+	properties: {},
 });

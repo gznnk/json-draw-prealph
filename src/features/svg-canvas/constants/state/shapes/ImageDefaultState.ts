@@ -12,4 +12,5 @@ export const ImageDefaultState = CreateDefaultState<ImageState>({
 	type: "Image",
 	options: ImageFeatures,
 	baseData: ImageDefaultData,
+	properties: {},
 });

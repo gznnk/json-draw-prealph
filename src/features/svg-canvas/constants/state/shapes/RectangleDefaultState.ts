@@ -15,4 +15,5 @@ export const RectangleDefaultState = CreateDefaultState<RectangleState>({
 	type: "Rectangle",
 	options: RectangleFeatures,
 	baseData: RectangleDefaultData,
+	properties: {},
 });
