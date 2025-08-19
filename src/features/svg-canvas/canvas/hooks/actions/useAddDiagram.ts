@@ -12,27 +12,29 @@ import { isSelectableState } from "../../../utils/validation/isSelectableState";
 import { clearSelectionRecursively } from "../../utils/clearSelectionRecursively";
 
 // Import hooks.
-import { useDataChange } from "../history/useDataChange";
+import { useAddHistory } from "../history/useAddHistory";
 
 /**
  * Custom hook to handle new diagram events on the canvas.
  */
 export const useAddDiagram = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useDataChange(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	return useCallback((e: AddDiagramEvent) => {
 		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current.props;
-		const { onDataChange } = refBus.current;
+		const {
+			props: { setCanvasState },
+			addHistory,
+		} = refBus.current;
 
 		// Call the function to add a new item to the canvas.
 		setCanvasState((prevState) => {
@@ -40,13 +42,13 @@ export const useAddDiagram = (props: SvgCanvasSubHooksProps) => {
 			if (isSelectableState(e.item) && e.item.isSelected) {
 				newItems = clearSelectionRecursively(prevState.items);
 			}
-			const newState = {
+			let newState = {
 				...prevState,
 				items: [...newItems, e.item],
 			} as SvgCanvasState;
 
-			// Notify the data change.
-			onDataChange(e.eventId, newState);
+			// Add history
+			newState = addHistory(e.eventId, newState);
 
 			return newState;
 		});

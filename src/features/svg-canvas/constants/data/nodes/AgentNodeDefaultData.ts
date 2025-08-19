@@ -1,15 +1,16 @@
+// Import types.
 import type { AgentNodeData } from "../../../types/data/nodes/AgentNodeData";
-import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
-import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
-import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";
+import { AgentNodeFeatures } from "../../../types/data/nodes/AgentNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default agent node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const AgentNodeDefaultData = {
-	...DiagramBaseDefaultData,
-	...TransformativeDefaultData,
-	...ConnectableDefaultData,
+export const AgentNodeDefaultData = CreateDefaultData<AgentNodeData>({
 	type: "AgentNode",
-} as const satisfies AgentNodeData;
+	options: AgentNodeFeatures,
+	properties: {},
+});

@@ -25,6 +25,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 	strokeWidth = "1px",
 	isSelected = false,
 	items = [],
+	pathType,
 	startArrowHead,
 	endArrowHead,
 	onClick,
@@ -68,11 +69,11 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 			showTransformControls={false}
 			showOutline={false}
 			isTransforming={false}
+			pathType={pathType}
 			dragEnabled={false}
 			transformEnabled={false}
-			segmentDragEnabled={true}
+			verticesModeEnabled={true}
 			rightAngleSegmentDrag={true}
-			newVertexEnabled={true}
 			fixBothEnds={true}
 			startArrowHead={startArrowHead}
 			endArrowHead={endArrowHead}

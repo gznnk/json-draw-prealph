@@ -1,5 +1,5 @@
 // Import types.
-import type { SvgData } from "../../data/shapes/SvgData";
+import type { SvgData, SvgFeatures } from "../../data/shapes/SvgData";
 import type { CreateStateType } from "./CreateStateType";
 
 /**
@@ -7,8 +7,5 @@ import type { CreateStateType } from "./CreateStateType";
  */
 export type SvgState = CreateStateType<
 	SvgData,
-	{
-		selectable: true;
-		transformative: true;
-	}
+	typeof SvgFeatures
 >;

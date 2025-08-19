@@ -18,22 +18,22 @@ import { createItemMap } from "../../utils/createItemMap";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
-import { updateOutlineOfAllGroups } from "../../utils/updateOutlineOfAllGroups";
+import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 
 // Import hooks.
-import { useDataChange } from "../history/useDataChange";
+import { useAddHistory } from "../history/useAddHistory";
 
 /**
  * Custom hook to handle drag events on the canvas.
  */
 export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useDataChange(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -50,7 +50,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 		const {
 			props: { setCanvasState },
 		} = refBus.current;
-		const { onDataChange } = refBus.current;
+		const { addHistory } = refBus.current;
 
 		// Update the canvas state based on the drag event.
 		setCanvasState((prevState) => {
@@ -185,8 +185,8 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 			);
 
 			if (isHistoryEvent(e.eventPhase)) {
-				// Set the history event ID and notify the data change.
-				onDataChange(e.eventId, newState);
+				// Add history and get updated state
+				newState = addHistory(e.eventId, newState);
 			}
 
 			// If the drag event is ended
@@ -205,7 +205,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 					return item;
 				});
 				// Update outline of all groups.
-				newState.items = updateOutlineOfAllGroups(newState.items);
+				newState.items = updateOutlineOfAllItemables(newState.items);
 				// Clean up the canvas state reference.
 				startCanvasState.current = undefined;
 				// Clean up the selected item IDs and initial items map.

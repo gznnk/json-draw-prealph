@@ -1,15 +1,16 @@
+// Import types.
 import type { VectorStoreNodeData } from "../../../types/data/nodes/VectorStoreNodeData";
-import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
-import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
-import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";
+import { VectorStoreNodeFeatures } from "../../../types/data/nodes/VectorStoreNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default vector store node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const VectorStoreNodeDefaultData = {
-	...DiagramBaseDefaultData,
-	...TransformativeDefaultData,
-	...ConnectableDefaultData,
+export const VectorStoreNodeDefaultData = CreateDefaultData<VectorStoreNodeData>({
 	type: "VectorStoreNode",
-} as const satisfies VectorStoreNodeData;
+	options: VectorStoreNodeFeatures,
+	properties: {},
+});

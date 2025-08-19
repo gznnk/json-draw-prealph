@@ -1,15 +1,16 @@
+// Import types.
 import type { PageDesignNodeData } from "../../../types/data/nodes/PageDesignNodeData";
-import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
-import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
-import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";
+import { PageDesignNodeFeatures } from "../../../types/data/nodes/PageDesignNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default page design node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const PageDesignNodeDefaultData = {
-	...DiagramBaseDefaultData,
-	...TransformativeDefaultData,
-	...ConnectableDefaultData,
+export const PageDesignNodeDefaultData = CreateDefaultData<PageDesignNodeData>({
 	type: "PageDesignNode",
-} as const satisfies PageDesignNodeData;
+	options: PageDesignNodeFeatures,
+	properties: {},
+});

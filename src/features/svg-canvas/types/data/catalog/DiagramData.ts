@@ -9,6 +9,7 @@ import type { PathData } from "../shapes/PathData";
 import type { PathPointData } from "../shapes/PathPointData";
 import type { RectangleData } from "../shapes/RectangleData";
 import type { SvgData } from "../shapes/SvgData";
+import type { ButtonData } from "../diagrams/ButtonData";
 
 /**
  * Union type representing all diagram data types.
@@ -25,5 +26,7 @@ export type DiagramData =
 	| PathPointData
 	| RectangleData
 	| SvgData
+	// Diagrams
+	| ButtonData
 	// Nodes
 	| HubNodeData;

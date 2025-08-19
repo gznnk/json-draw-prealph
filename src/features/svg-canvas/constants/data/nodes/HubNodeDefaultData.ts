@@ -1,15 +1,16 @@
+// Import types.
 import type { HubNodeData } from "../../../types/data/nodes/HubNodeData";
-import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
-import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
-import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";
+import { HubNodeFeatures } from "../../../types/data/nodes/HubNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default hub node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const HubNodeDefaultData = {
-	...DiagramBaseDefaultData,
-	...TransformativeDefaultData,
-	...ConnectableDefaultData,
+export const HubNodeDefaultData = CreateDefaultData<HubNodeData>({
 	type: "HubNode",
-} as const satisfies HubNodeData;
+	options: HubNodeFeatures,
+	properties: {},
+});

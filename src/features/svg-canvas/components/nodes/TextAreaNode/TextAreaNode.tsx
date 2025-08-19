@@ -62,7 +62,6 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 					id: props.id,
 					eventId: e.eventId,
 					eventPhase: e.eventPhase,
-					changeType: "Appearance",
 					startDiagram: {
 						text: props.text,
 					},
@@ -88,7 +87,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 
 	return (
 		<>
-			<Rectangle {...props} text={text} textType="markdown" />
+			<Rectangle {...props} text={text} textType="markdown" radius={0}/>
 			{!props.isTextEditing && (
 				<>
 					<TextAreaButton

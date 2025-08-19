@@ -1,10 +1,23 @@
-// Import types related to SvgCanvas.
+// Import types.
+import type { DiagramFeatures } from "../../core/DiagramFeatures";
 import type { CreateDataType } from "../shapes/CreateDataType";
+
+/**
+ * Diagram features for Agent nodes.
+ */
+export const AgentNodeFeatures = {
+	transformative: true,
+	connectable: true,
+	strokable: true,
+	fillable: true,
+	textable: true,
+	selectable: true,
+	executable: true,
+} as const satisfies DiagramFeatures;
 
 /**
  * Type of the AgentNode data.
  */
-export type AgentNodeData = CreateDataType<{
-	transformative: true;
-	connectable: true;
-}>;
+export type AgentNodeData = CreateDataType<typeof AgentNodeFeatures> & {
+	type: "AgentNode";
+};

@@ -20,7 +20,7 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({
 	onAddDiagramByType,
 }) => {
 	return (
-		<CanvasMenuDiv>
+		<CanvasMenuDiv draggable={false}>
 			<CanvasMenuItem
 				onClick={() =>
 					onAddDiagramByType?.({
@@ -61,6 +61,38 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({
 						fill="none"
 						stroke="#D0D4E0"
 					/>
+				</svg>
+			</CanvasMenuItem>
+			<CanvasMenuItem
+				onClick={() =>
+					onAddDiagramByType?.({
+						eventId: newEventId(),
+						diagramType: "Button",
+						isSelected: true,
+					})
+				}
+			>
+				<svg width="20" height="20" viewBox="0 0 24 24">
+					<title>Add Button</title>
+					<rect
+						x="2"
+						y="8"
+						width="20"
+						height="8"
+						rx="4"
+						ry="4"
+						fill="none"
+						stroke="#D0D4E0"
+					/>
+					<text
+						x="12"
+						y="13"
+						fontSize="6"
+						textAnchor="middle"
+						fill="#D0D4E0"
+					>
+						BTN
+					</text>
 				</svg>
 			</CanvasMenuItem>
 			<CanvasMenuItem

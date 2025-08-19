@@ -9,7 +9,7 @@ import type { Diagram } from "../../../types/state/catalog/Diagram";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 // Import constants.
-import { DefaultConnectLineState } from "../../../constants/state/shapes/DefaultConnectLineState";
+import { ConnectLineDefaultState } from "../../../constants/state/shapes/ConnectLineDefaultState";
 
 // Import utils.
 import { newEventId } from "../../../utils/core/newEventId";
@@ -19,34 +19,36 @@ import { isConnectableState } from "../../../utils/validation/isConnectableState
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
 // Import hooks.
-import { useDataChange } from "../history/useDataChange";
+import { useAddHistory } from "../history/useAddHistory";
 
 /**
  * Custom hook to handle connect events on the canvas.
  */
 export const useOnConnect = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useDataChange(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	return useCallback((e: DiagramConnectEvent) => {
 		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current.props;
-		const { onDataChange } = refBus.current;
+		const {
+			props: { setCanvasState },
+			addHistory,
+		} = refBus.current;
 
 		const shape = calcOrientedShapeFromPoints(
 			e.points.map((p: PathPointState) => ({ x: p.x, y: p.y })),
 		);
 
 		const newConnectLine: ConnectLineState = {
-			...DefaultConnectLineState,
+			...ConnectLineDefaultState,
 			id: newId(),
 			x: shape.x,
 			y: shape.y,
@@ -79,14 +81,14 @@ export const useOnConnect = (props: SvgCanvasSubHooksProps) => {
 			const updatedItems = [...items, newConnectLine];
 
 			// Create new state with updated items
-			const newState = {
+			let newState = {
 				...prevState,
 				items: updatedItems,
 			};
 
-			// Generate event ID and notify the data change.
+			// Generate event ID and add history
 			const eventId = newEventId();
-			onDataChange(eventId, newState);
+			newState = addHistory(eventId, newState);
 
 			return newState;
 		});

@@ -9,13 +9,15 @@ import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeE
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../../types/events/DiagramDragEvent";
 import type { PathProps } from "../../../../types/props/shapes/PathProps";
-import type { Diagram } from "../../../../types/state/catalog/Diagram";
+import type { PathState } from "../../../../types/state/shapes/PathState";
+import type { PathMode } from "./PathTypes";
 
 // Import components.
 import { Outline } from "../../../core/Outline";
 import { PositionLabel } from "../../../core/PositionLabel";
-import { Group } from "../../Group";
+import { Transformative } from "../../../core/Transformative";
 import { NewVertexList } from "../NewVertexList";
+import { PathPoint } from "../PathPoint";
 import { SegmentList } from "../SegmentList";
 import { PathElement } from "./PathStyled";
 
@@ -27,23 +29,17 @@ import { useSelect } from "../../../../hooks/useSelect";
 // Import utils.
 import { mergeProps } from "../../../../utils/core/mergeProps";
 import { calcOrientedShapeFromPoints } from "../../../../utils/math/geometry/calcOrientedShapeFromPoints";
+import { isPointerOver } from "../../../../utils/shapes/common/isPointerOver";
 import {
 	createEndPointArrowHead,
 	createStartPointArrowHead,
 } from "../../../../utils/shapes/path/createArrowHeads";
 import { createDValue } from "../../../../utils/shapes/path/createDValue";
+import { createBezierDValue } from "../../../../utils/shapes/path/createBezierDValue";
 import { isItemableState } from "../../../../utils/validation/isItemableState";
 
-// TODO: Cannot enter vertex editing mode when overlapping with border
 /**
- * Polyline component
- * Features:
- * - Polyline drawing
- * - Entire polyline dragging
- * - Polyline selection
- * - Polyline transformation
- * - Line segment dragging
- * - Adding new vertices to polyline
+ * Path component
  */
 const PathComponent: React.FC<PathProps> = ({
 	id,
@@ -64,11 +60,11 @@ const PathComponent: React.FC<PathProps> = ({
 	showTransformControls = false,
 	isTransforming = false,
 	items = [],
+	pathType,
 	dragEnabled = true,
 	transformEnabled = true,
-	segmentDragEnabled = true,
+	verticesModeEnabled = true,
 	rightAngleSegmentDrag = false,
-	newVertexEnabled = true,
 	fixBothEnds = false,
 	startArrowHead = "None",
 	endArrowHead = "None",
@@ -78,24 +74,31 @@ const PathComponent: React.FC<PathProps> = ({
 	onTransform,
 	onDiagramChange,
 }) => {
-	const [isPathPointDragging, setIsPathPointDragging] = useState(false);
+	const [draggingPathPointId, setDraggingPathPointId] = useState<string | null>(
+		null,
+	);
 	const [isSequentialSelection, setIsSequentialSelection] = useState(false);
-	const [isVerticesMode, setIsVerticesMode] = useState(!transformEnabled);
+	const [mode, setMode] = useState<PathMode>("Inactive");
 
-	const startItems = useRef<Diagram[]>(items);
 	const dragSvgRef = useRef<SVGPathElement>({} as SVGPathElement);
+
+	const startDiagram = useRef<Partial<PathState> | null>(null);
+
 	// To avoid frequent handler generation, hold referenced values in useRef
 	const refBusVal = {
 		// Properties
 		id,
 		x,
 		y,
+		width,
+		height,
 		rotation,
 		scaleX,
 		scaleY,
 		isSelected,
-		transformEnabled,
 		dragEnabled,
+		transformEnabled,
+		verticesModeEnabled,
 		items,
 		onDrag,
 		onSelect,
@@ -103,142 +106,152 @@ const PathComponent: React.FC<PathProps> = ({
 		onDiagramChange,
 		// Internal variables and functions
 		isSequentialSelection,
-		isVerticesMode,
+		mode,
 	};
 	const refBus = useRef(refBusVal);
-	refBus.current = refBusVal; /**
-	 * Polyline pointer down event handler
-	 */
-	const handlePointerDown = useCallback(() => {
-		const { isSelected, transformEnabled } = refBus.current;
+	refBus.current = refBusVal;
 
-		if (!transformEnabled) {
-			setIsVerticesMode(true);
-		}
+	// Path pointer down event handler
+	const handlePathPointerDown = useCallback(() => {
+		const { isSelected } = refBus.current;
 
 		if (isSelected) {
 			setIsSequentialSelection(true);
 		}
 	}, []);
-	/**
-	 * Polyline click event handler
-	 */
-	const handleClick = useCallback((e: DiagramClickEvent) => {
-		const {
-			id,
-			isSequentialSelection,
-			isVerticesMode,
-			transformEnabled,
-			onClick,
-		} = refBus.current;
 
-		if (isSequentialSelection && transformEnabled) {
-			setIsVerticesMode(!isVerticesMode);
-		}
-		onClick?.({
-			eventId: e.eventId,
-			id,
-			isSelectedOnPointerDown: e.isSelectedOnPointerDown,
-			isAncestorSelectedOnPointerDown: e.isAncestorSelectedOnPointerDown,
-		});
-	}, []);
-	// Polyline selection state control
-	useEffect(() => {
-		// Clear sequential selection flag when selection is removed from group
-		if (!isSelected) {
-			setIsSequentialSelection(false);
-			setIsVerticesMode(false);
-		}
-	}, [isSelected]);
-	/**
-	 * Polyline drag event handler
-	 */
-	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { id, dragEnabled, items, onDiagramChange, isVerticesMode } =
+	// Path click event handler
+	const handlePathClick = useCallback((e: DiagramClickEvent) => {
+		const { isSequentialSelection, verticesModeEnabled, onClick } =
 			refBus.current;
+
+		if (isSequentialSelection && verticesModeEnabled) {
+			setMode("Vertices");
+		}
+		onClick?.(e);
+	}, []);
+
+	// Path drag event handler
+	const handlePathDrag = useCallback((e: DiagramDragEvent) => {
+		const { dragEnabled, onDrag, mode } = refBus.current;
 
 		// Disable dragging by suppressing event when drag is disabled
 		if (!dragEnabled) {
 			return;
 		}
 
-		// Disable dragging by suppressing event when in vertices mode
-		if (isVerticesMode) {
+		// Disable dragging by suppressing event when not in transform mode
+		if (mode !== "Transform") {
 			return;
 		}
 
-		// Processing at drag start
-		if (e.eventPhase === "Started") {
-			startItems.current = items;
-
-			const startDiagram = {
-				x: e.startX,
-				y: e.startY,
-				items: startItems.current,
-			};
-
-			onDiagramChange?.({
-				eventId: e.eventId,
-				eventPhase: e.eventPhase,
-				changeType: "Drag",
-				id,
-				startDiagram,
-				endDiagram: startDiagram,
-			});
-
-			return;
-		}
-
-		const dx = e.endX - e.startX;
-		const dy = e.endY - e.startY;
-
-		const newItems = startItems.current.map((item) => {
-			const x = item.x + dx;
-			const y = item.y + dy;
-			return { ...item, x, y };
-		});
-
-		onDiagramChange?.({
-			eventId: e.eventId,
-			eventPhase: e.eventPhase,
-			changeType: "Drag",
-			id,
-			startDiagram: {
-				x: e.startX,
-				y: e.startY,
-				items: startItems.current,
-			},
-			endDiagram: {
-				x: e.endX,
-				y: e.endY,
-				items: newItems,
-			},
-		});
+		onDrag?.(e);
 	}, []);
+
+	// Path selection state control
+	useEffect(() => {
+		if (isSelected) {
+			if (transformEnabled) {
+				setMode("Transform");
+			} else {
+				// If transform is disabled, skip transform mode;
+				setMode("Vertices");
+			}
+		} else {
+			setIsSequentialSelection(false);
+			setMode("Inactive");
+		}
+	}, [isSelected, transformEnabled]);
+
+	// Generate drag properties for path element.
+	const dragProps = useDrag({
+		id,
+		type: "Path",
+		x,
+		y,
+		ref: dragSvgRef,
+		onPointerDown: handlePathPointerDown,
+		onDrag: handlePathDrag,
+	});
+
+	// Generate click properties for path element.
+	const clickProps = useClick({
+		id,
+		x,
+		y,
+		isSelected,
+		isAncestorSelected,
+		ref: dragSvgRef,
+		onClick: handlePathClick,
+	});
+
+	// Generate select properties for path element.
+	const selectProps = useSelect({
+		id,
+		onSelect,
+	});
+
+	// Compose props for path element
+	const composedProps = mergeProps(dragProps, clickProps, selectProps);
+
 	/**
 	 * Vertex drag event handler
 	 */
 	const handlePathPointDrag = useCallback((e: DiagramDragEvent) => {
+		const { id, items, onDiagramChange } = refBus.current;
+
 		if (e.eventPhase === "Started") {
-			setIsPathPointDragging(true);
+			setDraggingPathPointId(e.id);
+			startDiagram.current = {
+				items,
+			};
 		}
 
-		refBus.current.onDrag?.(e);
+		if (startDiagram.current === null) return;
+
+		onDiagramChange?.({
+			id,
+			eventId: e.eventId,
+			eventPhase: e.eventPhase,
+			startDiagram: startDiagram.current,
+			endDiagram: {
+				items: items.map((item) => {
+					if (e.id === item.id) {
+						return {
+							...item,
+							x: e.endX,
+							y: e.endY,
+						};
+					}
+					return item;
+				}),
+			},
+			minX: e.minX,
+			minY: e.minY,
+		});
 
 		if (e.eventPhase === "Ended") {
-			setIsPathPointDragging(false);
+			setDraggingPathPointId(null);
 		}
 	}, []);
+
+	// Segment click event handler
+	const handleSegmentClick = useCallback(() => {
+		if (transformEnabled) {
+			setMode("Transform");
+		}
+	}, [transformEnabled]);
+
 	/**
 	 * Change event handler for line segments and new vertices
 	 */
-	const handleDiagramChangeBySegumentAndNewVertex = useCallback(
+	const handleDiagramChangeForVertexAndSegmentDrag = useCallback(
 		(e: DiagramChangeEvent) => {
 			if (!isItemableState<DiagramBaseData>(e.endDiagram)) return; // Type guard with DiagramBaseData
 
 			const { rotation, scaleX, scaleY, onDiagramChange } = refBus.current;
 			if (e.eventPhase === "Ended") {
-				// Calculate new shape of Path's bounding box when new vertex and line segment dragging is completed
+				// Calculate new shape of Path's bounding box when new vertex and segment dragging is completed
 				const newShape = calcOrientedShapeFromPoints(
 					(e.endDiagram.items ?? []).map((p) => ({ x: p.x, y: p.y })),
 					rotation,
@@ -263,60 +276,51 @@ const PathComponent: React.FC<PathProps> = ({
 		},
 		[],
 	);
-	// Generate properties for polyline drag element
-	const dragProps = useDrag({
-		id,
-		type: "Path",
-		x,
-		y,
-		ref: dragSvgRef,
-		onPointerDown: handlePointerDown,
-		onDrag: handleDrag,
-	});
-	// Generate properties for clicking
-	const clickProps = useClick({
-		id,
-		x,
-		y,
-		isSelected,
-		isAncestorSelected,
-		ref: dragSvgRef,
-		onClick: handleClick,
-	}); // Generate properties for selection
-	const selectProps = useSelect({
-		id,
-		onSelect,
-	});
-	// Compose props for path element
-	const composedProps = mergeProps(dragProps, clickProps, selectProps);
+
+	// Transformative click event handler
+	const handleTransformativeClick = useCallback(
+		(e: DiagramClickEvent) => {
+			if (
+				verticesModeEnabled &&
+				isPointerOver(dragSvgRef, e.clientX, e.clientY)
+			) {
+				setMode("Vertices");
+			}
+		},
+		[verticesModeEnabled],
+	);
 
 	// Generate polyline d attribute value
-	const d = createDValue(items);
+	const d = pathType === "Bezier" ? createBezierDValue(items) : createDValue(items);
 
 	// Generate vertex information
 	const isBothEnds = (idx: number) => idx === 0 || idx === items.length - 1;
+
 	const linePoints = items.map((item, idx) => ({
 		...item,
-		hidden: !isVerticesMode || isDragging || (fixBothEnds && isBothEnds(idx)),
+		hidden:
+			mode !== "Vertices" ||
+			(fixBothEnds && isBothEnds(idx)) ||
+			Boolean(draggingPathPointId && item.id !== draggingPathPointId),
 	}));
 
 	// Display flag for dragging line segments
-	const showSegmentList =
-		segmentDragEnabled &&
-		isSelected &&
-		isVerticesMode &&
-		!isDragging &&
-		!isPathPointDragging;
-	// Display flag for new vertices
-	const showNewVertex =
-		newVertexEnabled &&
-		isSelected &&
-		isVerticesMode &&
-		!isDragging &&
-		!isPathPointDragging;
+	const showSegmentList = mode === "Vertices" && !draggingPathPointId;
 
-	// Display flag for overall transform group
-	const showTransformGroup = showTransformControls;
+	// Display flag for new vertices
+	const showNewVertex = mode === "Vertices" && !draggingPathPointId;
+
+	// Display flag for outline
+	const doShowOutline = showOutline && mode !== "Vertices";
+
+	// Display flag for path points
+	const showPathPoints = mode === "Vertices";
+
+	// Display flag for transformative
+	const showTransformative = mode === "Transform";
+
+	// Display flag for dashed guide lines (Bézier mode + Vertices mode)
+	const showDashedGuideLines = pathType === "Bezier" && mode === "Vertices" && !draggingPathPointId;
 
 	// Flag to show the position label.
 	const showPositionLabel = isSelected && isDragging;
@@ -357,6 +361,17 @@ const PathComponent: React.FC<PathProps> = ({
 				ref={dragSvgRef}
 				{...composedProps}
 			/>
+			{/* Dashed guide lines for Bézier curves in vertices mode */}
+			{showDashedGuideLines && (
+				<path
+					d={createDValue(items)}
+					fill="none"
+					stroke="rgba(24, 144, 255, 0.8)"
+					strokeWidth="1px"
+					strokeDasharray="4,2"
+					pointerEvents="none"
+				/>
+			)}
 			{/* Start point arrow head. */}
 			{startArrowHeadComp}
 			{/* End point arrow head. */}
@@ -368,9 +383,8 @@ const PathComponent: React.FC<PathProps> = ({
 					rightAngleSegmentDrag={rightAngleSegmentDrag}
 					fixBothEnds={fixBothEnds}
 					items={items}
-					onPointerDown={handlePointerDown}
-					onClick={handleClick}
-					onDiagramChange={handleDiagramChangeBySegumentAndNewVertex}
+					onClick={handleSegmentClick}
+					onDiagramChange={handleDiagramChangeForVertexAndSegmentDrag}
 				/>
 			)}
 			{/* New vertices */}
@@ -378,42 +392,49 @@ const PathComponent: React.FC<PathProps> = ({
 				<NewVertexList
 					id={id}
 					items={items}
-					onDiagramChange={handleDiagramChangeBySegumentAndNewVertex}
+					onDiagramChange={handleDiagramChangeForVertexAndSegmentDrag}
 				/>
 			)}
-			{/* Outline for selection only */}
-			{!showTransformGroup && (
-				<Outline
-					x={x}
-					y={y}
-					width={width}
-					height={height}
-					rotation={rotation}
-					scaleX={scaleX}
-					scaleY={scaleY}
-					showOutline={showOutline}
-				/>
-			)}
-			{/* Overall transform group */}
-			{showTransformGroup && (
-				<Group
+			{/* Outline for the path */}
+			<Outline
+				x={x}
+				y={y}
+				width={width}
+				height={height}
+				rotation={rotation}
+				scaleX={scaleX}
+				scaleY={scaleY}
+				showOutline={doShowOutline}
+			/>
+			{/* Path points for vertices mode */}
+			{showPathPoints &&
+				linePoints.map((point) => (
+					<PathPoint
+						key={point.id}
+						id={point.id}
+						x={point.x}
+						y={point.y}
+						hidden={point.hidden}
+						onDrag={handlePathPointDrag}
+					/>
+				))}
+			{/* Transformative for transform mode */}
+			{showTransformative && (
+				<Transformative
 					id={id}
+					type="Path"
 					x={x}
 					y={y}
-					isSelected={showTransformControls && !isVerticesMode}
-					showTransformControls={showTransformControls}
-					showOutline={showOutline}
 					width={width}
 					height={height}
 					rotation={rotation}
 					scaleX={scaleX}
 					scaleY={scaleY}
 					keepProportion={keepProportion}
-					items={linePoints}
+					showTransformControls={showTransformControls}
 					isTransforming={isTransforming}
-					onDrag={handlePathPointDrag}
 					onTransform={onTransform}
-					onDiagramChange={onDiagramChange}
+					onClick={handleTransformativeClick}
 				/>
 			)}
 			{/* Position label. */}

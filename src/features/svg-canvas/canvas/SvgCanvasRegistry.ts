@@ -15,16 +15,22 @@ import { Path, PathPoint } from "../components/shapes/Path";
 import { Rectangle } from "../components/shapes/Rectangle";
 import { Svg } from "../components/shapes/Svg";
 
+// Import diagram components
+import { Button } from "../components/diagrams/Button";
+
 // Import minimap shape components
-import { ConnectLineMinimap } from "../components/shapes/ConnectLine/ConnectLineMinimap";
-import { ConnectPointMinimap } from "../components/shapes/ConnectPoint/ConnectPointMinimap";
-import { EllipseMinimap } from "../components/shapes/Ellipse/EllipseMinimap";
-import { GroupMinimap } from "../components/shapes/Group/GroupMinimap";
-import { ImageMinimap } from "../components/shapes/Image/ImageMinimap";
-import { PathMinimap } from "../components/shapes/Path/PathMinimap";
-import { PathPointMinimap } from "../components/shapes/Path/PathPoint/PathPointMinimap";
-import { RectangleMinimap } from "../components/shapes/Rectangle/RectangleMinimap";
-import { SvgMinimap } from "../components/shapes/Svg/SvgMinimap";
+import { ConnectLineMinimap } from "../components/shapes/ConnectLine";
+import { ConnectPointMinimap } from "../components/shapes/ConnectPoint";
+import { EllipseMinimap } from "../components/shapes/Ellipse";
+import { GroupMinimap } from "../components/shapes/Group";
+import { ImageMinimap } from "../components/shapes/Image";
+import { PathMinimap } from "../components/shapes/Path";
+import { PathPointMinimap } from "../components/shapes/Path/PathPoint";
+import { RectangleMinimap } from "../components/shapes/Rectangle";
+import { SvgMinimap } from "../components/shapes/Svg";
+
+// Import diagram minimap components
+import { ButtonMinimap } from "../components/diagrams/Button";
 
 // Import node components and their functions
 import { AgentNode } from "../components/nodes/AgentNode";
@@ -38,19 +44,20 @@ import { VectorStoreNode } from "../components/nodes/VectorStoreNode";
 import { WebSearchNode } from "../components/nodes/WebSearchNode";
 
 // Import minimap node components
-import { AgentNodeMinimap } from "../components/nodes/AgentNode/AgentNodeMinimap";
-import { HubNodeMinimap } from "../components/nodes/HubNode/HubNodeMinimap";
-import { ImageGenNodeMinimap } from "../components/nodes/ImageGenNode/ImageGenNodeMinimap";
-import { LLMNodeMinimap } from "../components/nodes/LLMNode/LLMNodeMinimap";
-import { PageDesignNodeMinimap } from "../components/nodes/PageDesignNode/PageDesignNodeMinimap";
-import { SvgToDiagramNodeMinimap } from "../components/nodes/SvgToDiagramNode/SvgToDiagramNodeMinimap";
-import { TextAreaNodeMinimap } from "../components/nodes/TextAreaNode/TextAreaNodeMinimap";
-import { VectorStoreNodeMinimap } from "../components/nodes/VectorStoreNode/VectorStoreNodeMinimap";
-import { WebSearchNodeMinimap } from "../components/nodes/WebSearchNode/WebSearchNodeMinimap";
+import { AgentNodeMinimap } from "../components/nodes/AgentNode";
+import { HubNodeMinimap } from "../components/nodes/HubNode";
+import { ImageGenNodeMinimap } from "../components/nodes/ImageGenNode";
+import { LLMNodeMinimap } from "../components/nodes/LLMNode";
+import { PageDesignNodeMinimap } from "../components/nodes/PageDesignNode";
+import { SvgToDiagramNodeMinimap } from "../components/nodes/SvgToDiagramNode";
+import { TextAreaNodeMinimap } from "../components/nodes/TextAreaNode";
+import { VectorStoreNodeMinimap } from "../components/nodes/VectorStoreNode";
+import { WebSearchNodeMinimap } from "../components/nodes/WebSearchNode";
 
 // Import connect point calculators
 import { calcEllipseConnectPointPosition } from "../utils/shapes/ellipse/calcEllipseConnectPointPosition";
 import { calcRectangleConnectPointPosition } from "../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { calcButtonConnectPointPosition } from "../utils/diagrams/button/calcButtonConnectPointPosition";
 
 // Import create functions
 import { createAgentNodeState } from "../utils/nodes/agentNode/createAgentNodeState";
@@ -66,6 +73,7 @@ import { createEllipseState } from "../utils/shapes/ellipse/createEllipseState";
 import { createImageState } from "../utils/shapes/image/createImageState";
 import { createPathState } from "../utils/shapes/path/createPathState";
 import { createRectangleState } from "../utils/shapes/rectangle/createRectangleState";
+import { createButtonState } from "../utils/diagrams/button/createButtonState";
 
 // Import export functions
 import { imageToBlob } from "../utils/shapes/image/imageToBlob";
@@ -90,6 +98,7 @@ import { pathPointStateToData } from "../utils/shapes/path/mapPathPointStateToDa
 import { pathStateToData } from "../utils/shapes/path/mapPathStateToData";
 import { rectangleStateToData } from "../utils/shapes/rectangle/mapRectangleStateToData";
 import { svgStateToData } from "../utils/shapes/svg/mapSvgStateToData";
+import { mapButtonStateToData } from "../utils/diagrams/button/mapButtonStateToData";
 
 // Import data to state mapping functions
 import { mapAgentNodeDataToState } from "../utils/nodes/agentNode/mapAgentNodeDataToState";
@@ -110,6 +119,7 @@ import { mapPathDataToState } from "../utils/shapes/path/mapPathDataToState";
 import { mapPathPointDataToState } from "../utils/shapes/path/mapPathPointDataToState";
 import { mapRectangleDataToState } from "../utils/shapes/rectangle/mapRectangleDataToState";
 import { mapSvgDataToState } from "../utils/shapes/svg/mapSvgDataToState";
+import { mapButtonDataToState } from "../utils/diagrams/button/mapButtonDataToState";
 
 /**
  * Initialize all diagram registrations for the SvgCanvas.
@@ -129,6 +139,17 @@ export const initializeSvgCanvasDiagrams = (): void => {
 		exportFunction: undefined,
 		stateToDataMapper: rectangleStateToData as StateToDataMapper,
 		dataToStateMapper: mapRectangleDataToState as DataToStateMapper,
+	});
+
+	DiagramRegistry.register({
+		type: "Button",
+		component: Button,
+		minimapComponent: ButtonMinimap,
+		connectPointCalculator: calcButtonConnectPointPosition,
+		createFunction: createButtonState,
+		exportFunction: undefined,
+		stateToDataMapper: mapButtonStateToData as StateToDataMapper,
+		dataToStateMapper: mapButtonDataToState as DataToStateMapper,
 	});
 
 	DiagramRegistry.register({

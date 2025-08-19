@@ -11,27 +11,29 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import { isItemableState } from "../../../utils/validation/isItemableState";
 
 // Import hooks.
-import { useDataChange } from "../history/useDataChange";
+import { useAddHistory } from "../history/useAddHistory";
 
 /**
  * Custom hook to handle stack order change events on the canvas.
  */
 export const useStackOrderChange = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useDataChange(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	return useCallback((e: StackOrderChangeEvent) => {
 		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current.props;
-		const { onDataChange } = refBus.current;
+		const {
+			props: { setCanvasState },
+			addHistory,
+		} = refBus.current;
 
 		setCanvasState((prevState) => {
 			const moveInList = (items: Diagram[]): Diagram[] => {
@@ -95,13 +97,13 @@ export const useStackOrderChange = (props: SvgCanvasSubHooksProps) => {
 			}
 
 			// Create new state
-			const newState: SvgCanvasState = {
+			let newState: SvgCanvasState = {
 				...prevState,
 				items,
 			};
 
-			// Notify the data change.
-			onDataChange(e.eventId, newState);
+			// Add history
+			newState = addHistory(e.eventId, newState);
 
 			return newState;
 		});

@@ -10,7 +10,7 @@ import type { Diagram } from "../../../../types/state/catalog/Diagram";
 // Import utils.
 import { newId } from "../../../../utils/shapes/common/newId";
 
-// Imports related to this component.
+// Import local modules.
 import { NewVertex, type NewVertexData } from "../NewVertex";
 
 /**
@@ -100,7 +100,6 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 			onDiagramChange?.({
 				eventId: e.eventId,
 				eventPhase: e.eventPhase,
-				changeType: "Transform",
 				id,
 				startDiagram: {
 					items: startItems.current,
@@ -108,6 +107,8 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 				endDiagram: {
 					items: newItems,
 				},
+				minX: e.minX,
+				minY: e.minY,
 			});
 		}
 
@@ -120,7 +121,6 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 			onDiagramChange?.({
 				eventId: e.eventId,
 				eventPhase: e.eventPhase,
-				changeType: "Transform",
 				id,
 				startDiagram: {
 					items: startItems.current,
@@ -130,8 +130,11 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 						item.id === e.id ? { ...item, x: e.endX, y: e.endY } : item,
 					),
 				},
+				minX: e.minX,
+				minY: e.minY,
 			});
 		}
+
 		// Processing at drag completion
 		if (e.eventPhase === "Ended") {
 			// Clear the new vertex being dragged
@@ -141,7 +144,6 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 			onDiagramChange?.({
 				eventId: e.eventId,
 				eventPhase: e.eventPhase,
-				changeType: "Transform",
 				id,
 				startDiagram: {
 					items: startItems.current,
@@ -158,17 +160,15 @@ const NewVertexListComponent: React.FC<NewVertexListProps> = ({
 							: item,
 					),
 				},
+				minX: e.minX,
+				minY: e.minY,
 			});
 		}
 	}, []);
 
-	return (
-		<>
-			{newVertexList.map((item) => (
-				<NewVertex key={item.id} {...item} onDrag={handleNewVertexDrag} />
-			))}
-		</>
-	);
+	return newVertexList.map((item) => (
+		<NewVertex key={item.id} {...item} onDrag={handleNewVertexDrag} />
+	));
 };
 
 export const NewVertexList = memo(NewVertexListComponent);

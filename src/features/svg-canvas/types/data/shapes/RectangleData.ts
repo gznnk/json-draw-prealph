@@ -1,15 +1,24 @@
+// Import types.
+import type { DiagramFeatures } from "../../core/DiagramFeatures";
 import type { CreateDataType } from "./CreateDataType";
+
+/**
+ * Diagram features for Rectangle shapes.
+ */
+export const RectangleFeatures = {
+	transformative: true,
+	connectable: true,
+	strokable: true,
+	fillable: true,
+	textable: true,
+	selectable: true,
+	fileDroppable: true,
+} as const satisfies DiagramFeatures;
 
 /**
  * Data type for rectangle shapes.
  * Contains properties specific to rectangular diagram elements.
  */
-export type RectangleData = CreateDataType<{
-	transformative: true;
-	connectable: true;
-	strokable: true;
-	fillable: true;
-	textable: true;
-}> & {
+export type RectangleData = CreateDataType<typeof RectangleFeatures> & {
 	radius: number;
 };

@@ -1,11 +1,23 @@
-// Import types related to SvgCanvas.
-import type { RectangleData } from "../shapes/RectangleData";
+// Import types.
+import type { DiagramFeatures } from "../../core/DiagramFeatures";
+import type { CreateDataType } from "../shapes/CreateDataType";
+
+/**
+ * Diagram features for TextArea nodes.
+ */
+export const TextAreaNodeFeatures = {
+	transformative: true,
+	connectable: true,
+	strokable: true,
+	fillable: true,
+	selectable: true,
+	textable: true,
+	executable: true,
+} as const satisfies DiagramFeatures;
 
 /**
  * Type of the TextAreaNode data.
  */
-export type TextAreaNodeData = Omit<RectangleData, "type"> & {
+export type TextAreaNodeData = CreateDataType<typeof TextAreaNodeFeatures> & {
 	type: "TextAreaNode";
-	text?: string;
-	isTextEditing?: boolean;
 };

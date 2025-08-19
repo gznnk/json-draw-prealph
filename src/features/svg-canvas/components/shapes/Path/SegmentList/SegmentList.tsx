@@ -37,18 +37,20 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 	rightAngleSegmentDrag,
 	fixBothEnds,
 	items,
-	onPointerDown,
 	onClick,
 	onDiagramChange,
 }) => {
+	// State to manage the segment being dragged.
 	const [draggingSegment, setDraggingSegment] = useState<
 		SegmentData | undefined
 	>();
+	// Reference to store the segment being dragged at the start of the drag.
 	const startSegment = useRef<SegmentData>(undefined);
 
 	// Items of owner Path component at the start of the segment drag.
 	const startItems = useRef<Diagram[]>(items);
 
+	// Build segment list: all segments normally, only dragged segment during drag operation.
 	const segmentList: SegmentData[] = [];
 	if (draggingSegment) {
 		segmentList.push(draggingSegment);
@@ -114,10 +116,12 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 				...segment,
 			};
 
-			if (fixBothEnds && (idx === 0 || idx === segmentList.length - 1)) {
-				// If both ends are fixed, add a new vertex when moving both ends of the segment.
+			// If both ends are fixed, add a new vertex when moving both ends of the segment.
+			const isBothEndsIdx = idx === 0 || idx === segmentList.length - 1;
+			if (fixBothEnds && isBothEndsIdx) {
 				const newItems = [...items];
 
+				// If the segment is the last segment, add a new vertex at the end.
 				if (idx === segmentList.length - 1) {
 					const newItem = {
 						id: newId(),
@@ -129,6 +133,7 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 					newSegment.endPointId = newItem.id;
 				}
 
+				// If the segment is the first segment, add a new vertex at the start.
 				if (idx === 0) {
 					const newItem = {
 						id: newId(),
@@ -140,10 +145,10 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 					newSegment.startPointId = newItem.id;
 				}
 
+				// Apply the new vertices to the path.
 				onDiagramChange?.({
 					eventId: e.eventId,
 					eventPhase: e.eventPhase,
-					changeType: "Transform",
 					id,
 					startDiagram: {
 						items: startItems.current,
@@ -151,16 +156,22 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 					endDiagram: {
 						items: newItems,
 					},
+					minX: e.minX,
+					minY: e.minY,
 				});
 			}
 
+			// Track segment for drag updates.
 			setDraggingSegment(newSegment);
-		}
 
-		if (!draggingSegment || !startSegment.current) {
+			// End drag start operation.
 			return;
 		}
 
+		// Type guard.
+		if (!draggingSegment || !startSegment.current) return;
+
+		// Calculate new segment position based on drag event.
 		const dx = e.endX - e.startX;
 		const dy = e.endY - e.startY;
 		const newStartX = startSegment.current.startX + dx;
@@ -168,59 +179,39 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 		const newEndX = startSegment.current.endX + dx;
 		const newEndY = startSegment.current.endY + dy;
 
-		if (e.eventPhase === "InProgress") {
-			setDraggingSegment({
-				...draggingSegment,
-				startX: newStartX,
-				startY: newStartY,
-				endX: newEndX,
-				endY: newEndY,
-			});
+		// Update the segment being dragged with new coordinates.
+		setDraggingSegment({
+			...draggingSegment,
+			startX: newStartX,
+			startY: newStartY,
+			endX: newEndX,
+			endY: newEndY,
+		});
 
-			onDiagramChange?.({
-				eventId: e.eventId,
-				eventPhase: e.eventPhase,
-				changeType: "Transform",
-				id,
-				startDiagram: {
-					items: startItems.current,
-				},
-				endDiagram: {
-					items: items.map((item) => {
-						if (item.id === draggingSegment.startPointId) {
-							return { ...item, x: newStartX, y: newStartY };
-						}
-						if (item.id === draggingSegment.endPointId) {
-							return { ...item, x: newEndX, y: newEndY };
-						}
-						return item;
-					}),
-				},
-			});
-		}
+		// Notify parent component of vertex position changes from segment drag
+		onDiagramChange?.({
+			eventId: e.eventId,
+			eventPhase: e.eventPhase,
+			id,
+			startDiagram: {
+				items: startItems.current,
+			},
+			endDiagram: {
+				items: items.map((item) => {
+					if (item.id === draggingSegment.startPointId) {
+						return { ...item, x: newStartX, y: newStartY };
+					}
+					if (item.id === draggingSegment.endPointId) {
+						return { ...item, x: newEndX, y: newEndY };
+					}
+					return item;
+				}),
+			},
+			minX: e.minX,
+			minY: e.minY,
+		});
 
 		if (e.eventPhase === "Ended") {
-			onDiagramChange?.({
-				eventId: e.eventId,
-				eventPhase: e.eventPhase,
-				changeType: "Transform",
-				id,
-				startDiagram: {
-					items: startItems.current,
-				},
-				endDiagram: {
-					items: items.map((item) => {
-						// When dragging is complete, change from temporary ID to new ID
-						if (item.id === draggingSegment.startPointId) {
-							return { ...item, x: newStartX, y: newStartY };
-						}
-						if (item.id === draggingSegment.endPointId) {
-							return { ...item, x: newEndX, y: newEndY };
-						}
-						return item;
-					}),
-				},
-			});
 			setDraggingSegment(undefined);
 		}
 	}, []);
@@ -230,7 +221,6 @@ const SegmentListComponent: React.FC<SegmentListProps> = ({
 			key={item.id}
 			{...item}
 			rightAngleSegmentDrag={rightAngleSegmentDrag}
-			onPointerDown={onPointerDown}
 			onClick={onClick}
 			onDrag={handleSegmentDrag}
 		/>

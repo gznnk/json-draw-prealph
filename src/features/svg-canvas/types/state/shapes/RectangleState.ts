@@ -1,5 +1,9 @@
+// Import types.
+import type {
+	RectangleData,
+	RectangleFeatures,
+} from "../../data/shapes/RectangleData";
 import type { CreateStateType } from "./CreateStateType";
-import type { RectangleData } from "../../data/shapes/RectangleData";
 
 /**
  * State type for rectangle shapes.
@@ -7,12 +11,5 @@ import type { RectangleData } from "../../data/shapes/RectangleData";
  */
 export type RectangleState = CreateStateType<
 	RectangleData,
-	{
-		selectable: true;
-		transformative: true;
-		connectable: true;
-		strokable: true;
-		fillable: true;
-		textable: true;
-	}
+	typeof RectangleFeatures
 >;

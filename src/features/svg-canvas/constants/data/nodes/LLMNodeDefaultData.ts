@@ -1,11 +1,16 @@
+// Import types.
 import type { LLMNodeData } from "../../../types/data/nodes/LLMNodeData";
-import { RectangleDefaultData } from "../shapes/RectangleDefaultData";
+import { LLMNodeFeatures } from "../../../types/data/nodes/LLMNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default LLM node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const LLMNodeDefaultData = {
-	...RectangleDefaultData,
+export const LLMNodeDefaultData = CreateDefaultData<LLMNodeData>({
 	type: "LLMNode",
-} as const satisfies LLMNodeData;
+	options: LLMNodeFeatures,
+	properties: {},
+});

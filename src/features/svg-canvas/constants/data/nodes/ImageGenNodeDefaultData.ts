@@ -1,15 +1,16 @@
+// Import types.
 import type { ImageGenNodeData } from "../../../types/data/nodes/ImageGenNodeData";
-import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
-import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
-import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";
+import { ImageGenNodeFeatures } from "../../../types/data/nodes/ImageGenNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default image generation node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const ImageGenNodeDefaultData = {
-	...DiagramBaseDefaultData,
-	...TransformativeDefaultData,
-	...ConnectableDefaultData,
+export const ImageGenNodeDefaultData = CreateDefaultData<ImageGenNodeData>({
 	type: "ImageGenNode",
-} as const satisfies ImageGenNodeData;
+	options: ImageGenNodeFeatures,
+	properties: {},
+});

@@ -2,7 +2,7 @@
 import { createRectangleState } from "../../shapes/rectangle/createRectangleState";
 
 // Import constants.
-import { DefaultTextAreaNodeState } from "../../../constants/state/nodes/DefaultTextAreaNodeState";
+import { TextAreaNodeDefaultState } from "../../../constants/state/nodes/TextAreaNodeDefaultState";
 
 /**
  * Creates state for a TextArea node with specified properties.
@@ -19,22 +19,10 @@ export const createTextAreaNodeState = ({
 	y: number;
 }) => {
 	const state = createRectangleState({
+		...TextAreaNodeDefaultState,
 		x,
 		y,
-		width: DefaultTextAreaNodeState.width,
-		height: DefaultTextAreaNodeState.height,
-		radius: DefaultTextAreaNodeState.radius,
-		stroke: DefaultTextAreaNodeState.stroke,
-		strokeWidth: DefaultTextAreaNodeState.strokeWidth,
-		fill: DefaultTextAreaNodeState.fill,
-		textType: DefaultTextAreaNodeState.textType,
-		textAlign: DefaultTextAreaNodeState.textAlign,
-		verticalAlign: DefaultTextAreaNodeState.verticalAlign,
-		fontSize: DefaultTextAreaNodeState.fontSize,
-		fontColor: DefaultTextAreaNodeState.fontColor,
 	});
-
-	state.type = "TextAreaNode";
 
 	return state;
 };

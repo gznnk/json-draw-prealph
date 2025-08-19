@@ -1,11 +1,18 @@
+// Import types.
+import type { DiagramFeatures } from "../../core/DiagramFeatures";
 import type { CreateDataType } from "./CreateDataType";
 
 /**
- * Data type for Image component.
- * Contains properties specific to image elements including base64 encoded image data.
+ * Diagram features for Image shapes.
  */
-export type ImageData = CreateDataType<{
-	transformative: true;
-}> & {
+export const ImageFeatures = {
+	transformative: true,
+	selectable: true,
+} as const satisfies DiagramFeatures;
+
+/**
+ * Data type for Image component.
+ */
+export type ImageData = CreateDataType<typeof ImageFeatures> & {
 	base64Data: string;
 };

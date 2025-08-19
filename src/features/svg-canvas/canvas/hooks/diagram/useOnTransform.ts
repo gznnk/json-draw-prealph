@@ -15,10 +15,10 @@ import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshCo
 import { isConnectableState } from "../../../utils/validation/isConnectableState";
 import { createItemMap } from "../../utils/createItemMap";
 import { isHistoryEvent } from "../../utils/isHistoryEvent";
-import { updateOutlineOfGroup } from "../../utils/updateOutlineOfGroup";
+import { updateOutlineOfItemable } from "../../utils/updateOutlineOfItemable";
 
 // Import hooks.
-import { useDataChange } from "../history/useDataChange";
+import { useAddHistory } from "../history/useAddHistory";
 
 // Import utils.
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
@@ -41,12 +41,12 @@ const getIsTransformingState = (eventPhase: EventPhase): boolean => {
  */
 export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useDataChange(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -247,7 +247,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 			const {
 				props: { setCanvasState },
 			} = refBus.current;
-			const { onDataChange } = refBus.current;
+			const { addHistory } = refBus.current;
 
 			// Update the canvas state based on the transform event.
 			setCanvasState((prevState) => {
@@ -282,10 +282,9 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 						[],
 						topLevelGroupIds,
 					),
-					interactionState:
-						e.eventPhase === "Started" || e.eventPhase === "InProgress"
-							? InteractionState.Transforming
-							: InteractionState.Idle,
+					interactionState: getIsTransformingState(e.eventPhase)
+						? InteractionState.Transforming
+						: InteractionState.Idle,
 					multiSelectGroup: prevState.multiSelectGroup
 						? ({
 								...prevState.multiSelectGroup,
@@ -311,14 +310,14 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 				// Update outline of top-level groups that contain transformed diagrams
 				newState.items = newState.items.map((item) => {
 					if (item.type === "Group" && topLevelGroupIds.has(item.id)) {
-						return updateOutlineOfGroup(item);
+						return updateOutlineOfItemable(item);
 					}
 					return item;
 				});
 
 				if (isHistoryEvent(e.eventPhase)) {
-					// Set the history event ID and notify the data change.
-					onDataChange(e.eventId, newState);
+					// Add history and get updated state
+					newState = addHistory(e.eventId, newState);
 				}
 
 				// Clean up the stored items at the end of transform

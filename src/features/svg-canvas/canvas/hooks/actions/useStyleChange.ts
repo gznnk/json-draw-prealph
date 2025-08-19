@@ -9,19 +9,19 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
 // Import hooks.
-import { useDataChange } from "../history/useDataChange";
+import { useAddHistory } from "../history/useAddHistory";
 
 /**
  * Custom hook to handle diagram style change events on the canvas.
  */
 export const useStyleChange = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useDataChange(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -31,7 +31,7 @@ export const useStyleChange = (props: SvgCanvasSubHooksProps) => {
 		const {
 			props: { setCanvasState },
 		} = refBus.current;
-		const { onDataChange } = refBus.current;
+		const { addHistory } = refBus.current;
 
 		setCanvasState((prevState) => {
 			// Update items with style changes.
@@ -47,15 +47,14 @@ export const useStyleChange = (props: SvgCanvasSubHooksProps) => {
 			});
 
 			// Create new state with updated items.
-			const newState = {
+			let newState = {
 				...prevState,
 				items,
 			};
 
-			// Notify the data change.
-			onDataChange(e.eventId, newState);
+			// Add history
+			newState = addHistory(e.eventId, newState);
 
-			// Return new state with updated items.
 			return newState;
 		});
 	}, []);

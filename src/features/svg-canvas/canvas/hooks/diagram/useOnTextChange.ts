@@ -11,7 +11,7 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
 // Import hooks.
-import { useDataChange } from "../history/useDataChange";
+import { useAddHistory } from "../history/useAddHistory";
 
 /**
  * Custom hook to handle text change events on the canvas.
@@ -19,20 +19,22 @@ import { useDataChange } from "../history/useDataChange";
  */
 export const useOnTextChange = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useDataChange(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	return useCallback((e: DiagramTextChangeEvent) => {
 		// Bypass references to avoid function creation in every render.
-		const { setCanvasState } = refBus.current.props;
-		const { onDataChange } = refBus.current;
+		const {
+			props: { setCanvasState },
+			addHistory,
+		} = refBus.current;
 
 		setCanvasState((prevState) => {
 			// Handle text editing initiation
@@ -67,7 +69,7 @@ export const useOnTextChange = (props: SvgCanvasSubHooksProps) => {
 			const isTextEditing = e.eventPhase !== "Ended";
 
 			// Create a new state with the updated text.
-			const newState = {
+			let newState = {
 				...prevState,
 				items: applyFunctionRecursively(prevState.items, (item) =>
 					item.id === e.id ? { ...item, text: e.text, isTextEditing } : item,
@@ -81,7 +83,7 @@ export const useOnTextChange = (props: SvgCanvasSubHooksProps) => {
 
 			// Notify about data change.
 			if (e.eventPhase === "Ended") {
-				onDataChange(e.eventId, newState);
+				newState = addHistory(e.eventId, newState);
 			}
 
 			return newState;

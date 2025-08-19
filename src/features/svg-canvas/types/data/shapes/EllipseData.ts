@@ -1,13 +1,21 @@
+// Import types.
+import type { DiagramFeatures } from "../../core/DiagramFeatures";
 import type { CreateDataType } from "./CreateDataType";
 
 /**
- * Data type for ellipse shapes.
- * Includes properties for styling, text, connections and transformations of elliptical elements.
+ * Diagram features for Ellipse shapes.
  */
-export type EllipseData = CreateDataType<{
-	transformative: true;
-	connectable: true;
-	strokable: true;
-	fillable: true;
-	textable: true;
-}>;
+export const EllipseFeatures = {
+	transformative: true,
+	connectable: true,
+	strokable: true,
+	fillable: true,
+	textable: true,
+	selectable: true,
+	fileDroppable: true,
+} as const satisfies DiagramFeatures;
+
+/**
+ * Data type for ellipse shapes.
+ */
+export type EllipseData = CreateDataType<typeof EllipseFeatures>;

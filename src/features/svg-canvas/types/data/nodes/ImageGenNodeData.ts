@@ -1,10 +1,20 @@
-// Import types related to SvgCanvas.
+// Import types.
+import type { DiagramFeatures } from "../../core/DiagramFeatures";
 import type { CreateDataType } from "../shapes/CreateDataType";
+
+/**
+ * Diagram features for ImageGen nodes.
+ */
+export const ImageGenNodeFeatures = {
+	transformative: true,
+	connectable: true,
+	selectable: true,
+	executable: true,
+} as const satisfies DiagramFeatures;
 
 /**
  * Type of the ImageGenNode data.
  */
-export type ImageGenNodeData = CreateDataType<{
-	transformative: true;
-	connectable: true;
-}>;
+export type ImageGenNodeData = CreateDataType<typeof ImageGenNodeFeatures> & {
+	type: "ImageGenNode";
+};

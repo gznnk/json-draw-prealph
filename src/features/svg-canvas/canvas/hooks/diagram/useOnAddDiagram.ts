@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 
 // Import constants.
-import { ADD_NEW_DIAGRAM_EVENT_NAME } from "../../../constants/EventNames";
+import { ADD_NEW_DIAGRAM_EVENT_NAME } from "../../../constants/core/EventNames";
 
 // Import types.
 import type { AddDiagramEvent } from "../../../types/events/AddDiagramEvent";
@@ -13,19 +13,19 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import { isSelectableState } from "../../../utils/validation/isSelectableState";
 
 // Import hooks.
-import { useDataChange } from "../history/useDataChange";
+import { useAddHistory } from "../history/useAddHistory";
 
 /**
  * Custom hook to handle new diagram events on the canvas.
  */
 export const useOnAddDiagram = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler.
-	const onDataChange = useDataChange(props);
+	const addHistory = useAddHistory(props);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		onDataChange,
+		addHistory,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -37,14 +37,16 @@ export const useOnAddDiagram = (props: SvgCanvasSubHooksProps) => {
 		// Listener for new diagram events.
 		const newDiagramListener = (e: Event) => {
 			// Bypass references to avoid function creation in every render.
-			const { setCanvasState } = refBus.current.props;
-			const { onDataChange } = refBus.current;
+			const {
+				props: { setCanvasState },
+				addHistory,
+			} = refBus.current;
 
 			const event = (e as CustomEvent<AddDiagramEvent>).detail;
 
 			// Call the function to add a new item to the canvas.
 			setCanvasState((prevState) => {
-				const newState = {
+				let newState = {
 					...prevState,
 					items: [
 						...prevState.items.map((i) => {
@@ -63,8 +65,8 @@ export const useOnAddDiagram = (props: SvgCanvasSubHooksProps) => {
 					],
 				} as SvgCanvasState;
 
-				// Notify the data change.
-				onDataChange(event.eventId, newState);
+				// Add history
+				newState = addHistory(event.eventId, newState);
 
 				return newState;
 			});

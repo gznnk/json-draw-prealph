@@ -1,22 +1,15 @@
-// Import types related to SvgCanvas.
-import type { CreateDiagramProps } from "./CreateDiagramProps";
+// Import types.
+import type { PathFeatures } from "../../data/shapes/PathData";
 import type { PathState } from "../../state/shapes/PathState";
+import type { CreateDiagramProps } from "./CreateDiagramProps";
 
 /**
  * Props for Path component
  */
-export type PathProps = CreateDiagramProps<
-	PathState,
-	{
-		selectable: true;
-		transformative: true;
-		itemable: true;
-	}
-> & {
+export type PathProps = CreateDiagramProps<PathState, typeof PathFeatures> & {
 	dragEnabled?: boolean;
 	transformEnabled?: boolean;
-	segmentDragEnabled?: boolean;
+	verticesModeEnabled?: boolean;
 	rightAngleSegmentDrag?: boolean;
-	newVertexEnabled?: boolean;
 	fixBothEnds?: boolean;
 };

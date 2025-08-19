@@ -1,15 +1,16 @@
+// Import types.
 import type { WebSearchNodeData } from "../../../types/data/nodes/WebSearchNodeData";
-import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
-import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
-import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";
+import { WebSearchNodeFeatures } from "../../../types/data/nodes/WebSearchNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default web search node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const WebSearchNodeDefaultData = {
-	...DiagramBaseDefaultData,
-	...TransformativeDefaultData,
-	...ConnectableDefaultData,
+export const WebSearchNodeDefaultData = CreateDefaultData<WebSearchNodeData>({
 	type: "WebSearchNode",
-} as const satisfies WebSearchNodeData;
+	options: WebSearchNodeFeatures,
+	properties: {},
+});

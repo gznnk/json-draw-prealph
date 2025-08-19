@@ -1,15 +1,16 @@
+// Import types.
 import type { SvgToDiagramNodeData } from "../../../types/data/nodes/SvgToDiagramNodeData";
-import { DiagramBaseDefaultData } from "../core/DiagramBaseDefaultData";
-import { TransformativeDefaultData } from "../core/TransformativeDefaultData";
-import { ConnectableDefaultData } from "../shapes/ConnectableDefaultData";
+import { SvgToDiagramNodeFeatures } from "../../../types/data/nodes/SvgToDiagramNodeData";
+
+// Import helpers.
+import { CreateDefaultData } from "../shapes/CreateDefaultData";
 
 /**
  * Default SVG to diagram node data template.
- * Used for State to Data conversion mapping.
+ * Generated using Features definition and CreateDefaultData helper.
  */
-export const SvgToDiagramNodeDefaultData = {
-	...DiagramBaseDefaultData,
-	...TransformativeDefaultData,
-	...ConnectableDefaultData,
+export const SvgToDiagramNodeDefaultData = CreateDefaultData<SvgToDiagramNodeData>({
 	type: "SvgToDiagramNode",
-} as const satisfies SvgToDiagramNodeData;
+	options: SvgToDiagramNodeFeatures,
+	properties: {},
+});
