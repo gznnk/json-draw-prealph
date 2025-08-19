@@ -51,13 +51,13 @@ export const Text = styled.div<TextProps>`
     border: none;
     outline: none;
     background: transparent;
+    box-sizing: border-box;
+    padding: 2px 6px;
     pointer-events: none;
     user-select: none;
     overflow: hidden;
     word-break: ${(props) => props.wordBreak};
     white-space: ${(props) => props.whiteSpace};
-    padding: 2px 6px;
-    box-sizing: border-box;
 
     p {
         margin: 0.5em 0;

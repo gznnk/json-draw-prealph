@@ -8,7 +8,7 @@ import { degreesToRadians } from "../../../../utils/math/common/degreesToRadians
 import { newEventId } from "../../../../utils/core/newEventId";
 
 // Import local module files.
-import { Input, TextArea } from "./TextEditorStyled";
+import { EditableText, TextEditorWrapper } from "./TextEditorStyled";
 import type { TextEditorProps } from "./TextEditorTypes";
 
 /**
@@ -24,7 +24,6 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	scaleX,
 	scaleY,
 	rotation,
-	textType,
 	textAlign,
 	verticalAlign,
 	fontColor,
@@ -34,82 +33,68 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 	isActive,
 	onTextChange,
 }) => {
-	const prevIsActive = useRef(isActive);
-	// Refs for input and textarea elements.
-	// These refs are used to focus the input or textarea when the component is active.
-	const inputRef = useRef<HTMLInputElement>(null);
-	const textAreaRef = useRef<HTMLTextAreaElement>(null);
+	// Create references bypass to avoid function creation in every render.
+	const refBusVal = {
+		text,
+	};
+	const refBus = useRef(refBusVal);
+	refBus.current = refBusVal;
 
-	// Focus the input or textarea when the component is active.
+	// Ref for contentEditable div.
+	// This ref is used to focus the div when the component is active.
+	const editableRef = useRef<HTMLDivElement>(null);
+
+	// Focus the contentEditable div when the component is active.
 	useEffect(() => {
-		if (prevIsActive.current === false && isActive) {
-			if (textType === "text") {
-				inputRef.current?.focus();
-				// Set the selection range to the end of the text in the input.
-				inputRef.current?.setSelectionRange(text.length, text.length);
-			} else {
-				textAreaRef.current?.focus();
-				// Set the selection range to the end of the text in the textarea.
-				textAreaRef.current?.setSelectionRange(text.length, text.length);
+		if (isActive) {
+			if (editableRef.current) {
+				editableRef.current.textContent = refBus.current.text ?? "";
+				editableRef.current?.focus();
+				// Move cursor to end of text
+				const selection = window.getSelection();
+				const range = document.createRange();
+				if (editableRef.current.childNodes.length > 0) {
+					range.selectNodeContents(editableRef.current);
+					range.collapse(false);
+					selection?.removeAllRanges();
+					selection?.addRange(range);
+				}
 			}
-			onTextChange?.({
-				eventId: newEventId(),
-				eventPhase: "Started",
-				id,
-				text: text,
-			});
 		}
-		prevIsActive.current = isActive;
-	}, [id, isActive, text, textType, onTextChange]);
+	}, [isActive]);
 
-	// Hide the thext editor when not active.
+	// Hide the text editor when not active.
 	if (!isActive) return null;
 
 	/**
-	 * Handle text change event for textarea.
+	 * Handle input event for contentEditable div.
 	 */
-	const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+	const handleEditableInput = (e: React.FormEvent<HTMLDivElement>) => {
+		const newText = e.currentTarget.textContent || "";
+		// editableRef.current.textContent = newText;
+		// console.log(e.currentTarget.innerText);
+		// console.log(e.currentTarget.innerHTML);
+		// console.log(e.currentTarget.textContent);
+		console.log("Text changed:", newText);
 		onTextChange?.({
 			eventId: newEventId(),
 			eventPhase: "InProgress",
 			id,
-			text: e.target.value,
+			text: newText,
 		});
 	};
 
 	/**
-	 * Handle blur event for textarea.
+	 * Handle blur event for contentEditable div.
 	 */
-	const handleTextAreaBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+	const handleEditableBlur = (e: React.FormEvent<HTMLDivElement>) => {
+		const newText = e.currentTarget.textContent || "";
+		// editableRef.current.textContent = newText;
 		onTextChange?.({
 			eventId: newEventId(),
 			eventPhase: "Ended",
 			id,
-			text: e.target.value,
-		});
-	};
-
-	/**
-	 * Handle text change event for input.
-	 */
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		onTextChange?.({
-			eventId: newEventId(),
-			eventPhase: "InProgress",
-			id,
-			text: e.target.value,
-		});
-	};
-
-	/**
-	 * Handle blur event for input.
-	 */
-	const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-		onTextChange?.({
-			eventId: newEventId(),
-			eventPhase: "Ended",
-			id,
-			text: e.target.value,
+			text: newText,
 		});
 	};
 
@@ -122,39 +107,36 @@ const TextEditorComponent: React.FC<TextEditorProps> = ({
 		y,
 	);
 
-	// Commom properties for both input and textarea.
-	const commonProps = {
-		value: text,
+	// Wrapper properties
+	const wrapperProps = {
 		left: -width / 2,
 		top: -height / 2,
 		transform,
 		width,
 		height,
-		textAlign,
 		verticalAlign,
+	};
+
+	// Common properties for contentEditable div.
+	const editableProps = {
+		textAlign,
 		color: fontColor,
 		fontSize,
 		fontFamily,
 		fontWeight,
 	};
 
-	return textType === "text" ? (
-		<Input
-			{...commonProps}
-			// Additional properties for input.
-			type="text"
-			ref={inputRef}
-			onChange={handleInputChange}
-			onBlur={handleInputBlur}
-		/>
-	) : (
-		<TextArea
-			{...commonProps}
-			// Additional properties for textarea.
-			ref={textAreaRef}
-			onChange={handleTextAreaChange}
-			onBlur={handleTextAreaBlur}
-		/>
+	return (
+		<TextEditorWrapper {...wrapperProps}>
+			<EditableText
+				{...editableProps}
+				ref={editableRef}
+				contentEditable
+				suppressContentEditableWarning
+				onInput={handleEditableInput}
+				onBlur={handleEditableBlur}
+			/>
+		</TextEditorWrapper>
 	);
 };
 
