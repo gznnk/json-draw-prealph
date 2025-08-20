@@ -2,19 +2,19 @@
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
-// Import types related to SvgCanvas.
+// Import types.
 import type { TextAreaNodeProps } from "../../../types/props/nodes/TextAreaNodeProps";
 
-// Import components related to SvgCanvas.
+// Import components.
 import { Rectangle } from "../../shapes/Rectangle";
 
-// Import hooks related to SvgCanvas.
+// Import hooks.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
-// Import functions related to SvgCanvas.
+// Import functions.
 import { newEventId } from "../../../utils/core/newEventId";
 
-// Imports related to this component.
+// Import local modules.
 import { TextAreaButton, TextAreaButtonText } from "./TextAreaNodeStyled";
 
 /**
@@ -87,7 +87,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 
 	return (
 		<>
-			<Rectangle {...props} text={text} textType="markdown" radius={0}/>
+			<Rectangle {...props} text={text} textType="markdown" radius={0} />
 			{!props.isTextEditing && (
 				<>
 					<TextAreaButton

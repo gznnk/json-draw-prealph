@@ -57,10 +57,20 @@ export const useOnTextChange = (props: SvgCanvasSubHooksProps) => {
 
 				if (!targetItem) return prevState;
 
-				newState.textEditorState = {
-					...(targetItem as Diagram),
-					isActive: true,
-				} as TextEditorState;
+				if (e.initializeAttributes) {
+					// If initial attributes are provided, use them to create the text editor state.
+					newState.textEditorState = {
+						id: e.id,
+						...e.initializeAttributes,
+						isActive: true,
+					} as TextEditorState;
+				} else {
+					// If no initial attributes are provided, use the target item's attributes.
+					newState.textEditorState = {
+						...(targetItem as Diagram),
+						isActive: true,
+					} as TextEditorState;
+				}
 
 				return newState;
 			}

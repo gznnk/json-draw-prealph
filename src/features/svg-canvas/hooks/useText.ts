@@ -2,7 +2,10 @@
 import { useCallback, useRef } from "react";
 
 // Import types.
-import type { DiagramTextChangeEvent } from "../types/events/DiagramTextChangeEvent";
+import type {
+	DiagramTextChangeEvent,
+	TextEditorAttributes,
+} from "../types/events/DiagramTextChangeEvent";
 
 // Import utils.
 import { newEventId } from "../utils/core/newEventId";
@@ -11,6 +14,7 @@ export type UseTextProps = {
 	id: string;
 	isSelected: boolean;
 	isTextEditEnabled?: boolean;
+	attributes?: TextEditorAttributes;
 	onTextChange?: (e: DiagramTextChangeEvent) => void;
 };
 
@@ -25,6 +29,7 @@ export type UseTextReturn = {
 export const useText = (props: UseTextProps): UseTextReturn => {
 	const {
 		id,
+		attributes,
 		isSelected,
 		isTextEditEnabled = true,
 		onTextChange = () => {},
@@ -33,6 +38,7 @@ export const useText = (props: UseTextProps): UseTextReturn => {
 	// Create references bypass to avoid function creation in every render
 	const refBusVal = {
 		id,
+		attributes,
 		isSelected,
 		isTextEditEnabled,
 		onTextChange,
@@ -42,7 +48,8 @@ export const useText = (props: UseTextProps): UseTextReturn => {
 
 	const onDoubleClick = useCallback(() => {
 		// Bypass references to avoid function creation in every render
-		const { id, isSelected, isTextEditEnabled, onTextChange } = refBus.current;
+		const { id, attributes, isSelected, isTextEditEnabled, onTextChange } =
+			refBus.current;
 
 		// Only start text editing if text editing is enabled and the item is selected
 		if (!isTextEditEnabled || !isSelected) {
@@ -50,10 +57,11 @@ export const useText = (props: UseTextProps): UseTextReturn => {
 		}
 
 		const textChangeEvent: DiagramTextChangeEvent = {
+			eventId: newEventId(),
 			eventPhase: "Started",
 			id,
 			text: "",
-			eventId: newEventId(),
+			initializeAttributes: attributes,
 		};
 		onTextChange(textChangeEvent);
 	}, []);
