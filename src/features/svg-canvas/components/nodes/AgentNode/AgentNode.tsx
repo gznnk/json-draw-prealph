@@ -25,7 +25,7 @@ const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
-			if (e.eventPhase !== "Instant" && e.eventPhase !== "Ended") return;
+			if (e.eventPhase !== "Ended") return;
 
 			setIsProcessing(true);
 			props.onExecute?.({

@@ -47,7 +47,7 @@ const WebSearchNodeComponent: React.FC<WebSearchNodeProps> = (props) => {
 		id: props.id,
 		onPropagation: async (e) => {
 			if (e.data.text === "") return;
-			if (e.eventPhase !== "Instant" && e.eventPhase !== "Ended") return;
+			if (e.eventPhase !== "Ended") return;
 
 			const processId = newEventId();
 			setProcessIdList((prev) => [...prev, processId]);

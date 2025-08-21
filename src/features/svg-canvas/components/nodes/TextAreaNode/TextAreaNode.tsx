@@ -45,7 +45,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 		props.onExecute?.({
 			id: props.id,
 			eventId: newEventId(),
-			eventPhase: "Instant",
+			eventPhase: "Ended",
 			data: {
 				text: props.text,
 			},
@@ -56,7 +56,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 	useExecutionChain({
 		id: props.id,
 		onPropagation: (e) => {
-			if (e.eventPhase === "Ended" || e.eventPhase === "Instant") {
+			if (e.eventPhase === "Ended") {
 				// Update the text state with the new text from the event data.
 				props.onDiagramChange?.({
 					id: props.id,

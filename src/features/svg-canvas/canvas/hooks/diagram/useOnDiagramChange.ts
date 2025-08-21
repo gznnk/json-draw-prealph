@@ -9,7 +9,6 @@ import { InteractionState } from "../../types/InteractionState";
 
 // Import utils.
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
-import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 
 // Import hooks.
@@ -72,7 +71,7 @@ export const useOnDiagramChange = (props: SvgCanvasSubHooksProps) => {
 				newState.minY = e.minY;
 			}
 
-			if (isHistoryEvent(e.eventPhase)) {
+			if (e.eventPhase === "Ended") {
 				// Add history
 				newState = addHistory(e.eventId, newState);
 			}

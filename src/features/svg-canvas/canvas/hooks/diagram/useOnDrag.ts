@@ -16,7 +16,6 @@ import { isTransformativeState } from "../../../utils/validation/isTransformativ
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createItemMap } from "../../utils/createItemMap";
 import { createMultiSelectGroup } from "../../utils/createMultiSelectGroup";
-import { isHistoryEvent } from "../../utils/isHistoryEvent";
 import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 
@@ -184,7 +183,7 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				startCanvasState.current,
 			);
 
-			if (isHistoryEvent(e.eventPhase)) {
+			if (e.eventPhase === "Ended") {
 				// Add history and get updated state
 				newState = addHistory(e.eventId, newState);
 			}
