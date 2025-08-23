@@ -1,29 +1,32 @@
 /**
- * 図形Atlas用の共通型定義
- * 各図形のAtlasファイルで使用される構造化された型システム
+ * Common type definitions for Diagram Atlas system
+ * Structured type system used by each diagram's Atlas files
  */
 import type { DiagramFeatures } from "../types/core/DiagramFeatures";
 import type { DiagramType } from "../types/core/DiagramType";
+import type { DiagramData } from "../types/data/catalog/DiagramData";
+import type { Diagram } from "../types/state/catalog/Diagram";
 import type { ConnectPointState } from "../types/state/shapes/ConnectPointState";
+export type {
+	DataToStateMapper,
+	StateToDataMapper,
+} from "../registry/DiagramDefinition";
 
 /**
- * 図形Atlasの基本構造を定義する型
+ * Base structure type for Diagram Atlas
  *
- * @template TData - データ型
- * @template TFeatures - フィーチャー型
- * @template TState - ステート型
- * @template TProps - Props型
+ * @template TData - Data type
+ * @template TState - State type
+ * @template TProps - Props type
  */
 export type DiagramAtlas<
-	// biome-ignore lint/suspicious/noExplicitAny: Generic type parameter requires flexibility
-	TData = any,
-	// biome-ignore lint/suspicious/noExplicitAny: Generic type parameter requires flexibility
-	TState = any,
+	TData extends DiagramData,
+	TState extends Diagram,
 	// biome-ignore lint/suspicious/noExplicitAny: Generic type parameter requires flexibility
 	TProps = any,
 > = {
 	// ============================================================================
-	// 型定義 (Types)
+	// Types
 	// ============================================================================
 
 	/** Type identifier */
@@ -33,7 +36,7 @@ export type DiagramAtlas<
 	features: DiagramFeatures;
 
 	// ============================================================================
-	// デフォルト値 (Defaults)
+	// Defaults
 	// ============================================================================
 
 	/** Default Data */
@@ -43,7 +46,7 @@ export type DiagramAtlas<
 	defaultState: TState;
 
 	// ============================================================================
-	// コンポーネント (Components)
+	// Components
 	// ============================================================================
 
 	/** Component */
@@ -53,20 +56,19 @@ export type DiagramAtlas<
 	minimapComponent: React.FC<TProps>;
 
 	// ============================================================================
-	// ユーティリティ関数 (Utility Functions)
+	// Utility Functions
 	// ============================================================================
 
 	/** Create Functions */
-	// biome-ignore lint/suspicious/noExplicitAny: Dynamic props require flexible typing
-	createState: (props: { x: number; y: number; [key: string]: any }) => TState;
+	createState: (props: { x: number; y: number }) => Diagram;
 
 	/** Export Function */
-	export?: (state: TState) => TData;
+	export: ((state: Diagram) => Blob | undefined) | undefined;
 
 	/** Calculator Functions */
-	calcConnectPointPosition?: (state: TState) => ConnectPointState[];
+	calcConnectPointPosition: (state: Diagram) => ConnectPointState[];
 
 	/** Mapper Functions */
-	dataToState: (data: TData) => TState;
-	stateToData: (state: TState) => TData;
+	dataToState: (data: DiagramData) => Diagram;
+	stateToData: (state: Diagram) => DiagramData;
 };

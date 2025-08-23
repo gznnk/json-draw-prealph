@@ -12,7 +12,7 @@ import { Ellipse } from "../components/shapes/Ellipse";
 import { Group } from "../components/shapes/Group";
 import { Image } from "../components/shapes/Image";
 import { Path, PathPoint } from "../components/shapes/Path";
-import { Rectangle } from "../components/shapes/Rectangle";
+
 import { Svg } from "../components/shapes/Svg";
 import { Text } from "../components/shapes/Text";
 
@@ -27,7 +27,7 @@ import { GroupMinimap } from "../components/shapes/Group";
 import { ImageMinimap } from "../components/shapes/Image";
 import { PathMinimap } from "../components/shapes/Path";
 import { PathPointMinimap } from "../components/shapes/Path/PathPoint";
-import { RectangleMinimap } from "../components/shapes/Rectangle";
+
 import { SvgMinimap } from "../components/shapes/Svg";
 import { TextMinimap } from "../components/shapes/Text";
 
@@ -58,6 +58,7 @@ import { WebSearchNodeMinimap } from "../components/nodes/WebSearchNode";
 
 // Import connect point calculators
 import { calcEllipseConnectPointPosition } from "../utils/shapes/ellipse/calcEllipseConnectPointPosition";
+import { RectangleAtlas } from "../atlas/shapes/RectangleAtlas";
 import { calcRectangleConnectPointPosition } from "../utils/shapes/rectangle/calcRectangleConnectPointPosition";
 import { calcButtonConnectPointPosition } from "../utils/diagrams/button/calcButtonConnectPointPosition";
 
@@ -74,7 +75,7 @@ import { createWebSearchNodeState } from "../utils/nodes/webSearchNode/createWeb
 import { createEllipseState } from "../utils/shapes/ellipse/createEllipseState";
 import { createImageState } from "../utils/shapes/image/createImageState";
 import { createPathState } from "../utils/shapes/path/createPathState";
-import { createRectangleState } from "../utils/shapes/rectangle/createRectangleState";
+
 import { createTextState } from "../utils/shapes/text/createTextState";
 import { createButtonState } from "../utils/diagrams/button/createButtonState";
 
@@ -99,7 +100,7 @@ import { groupStateToData } from "../utils/shapes/group/mapGroupStateToData";
 import { imageStateToData } from "../utils/shapes/image/mapImageStateToData";
 import { pathPointStateToData } from "../utils/shapes/path/mapPathPointStateToData";
 import { pathStateToData } from "../utils/shapes/path/mapPathStateToData";
-import { rectangleStateToData } from "../utils/shapes/rectangle/mapRectangleStateToData";
+
 import { svgStateToData } from "../utils/shapes/svg/mapSvgStateToData";
 import { textStateToData } from "../utils/shapes/text/mapTextStateToData";
 import { mapButtonStateToData } from "../utils/diagrams/button/mapButtonStateToData";
@@ -121,7 +122,7 @@ import { mapGroupDataToState } from "../utils/shapes/group/mapGroupDataToState";
 import { mapImageDataToState } from "../utils/shapes/image/mapImageDataToState";
 import { mapPathDataToState } from "../utils/shapes/path/mapPathDataToState";
 import { mapPathPointDataToState } from "../utils/shapes/path/mapPathPointDataToState";
-import { mapRectangleDataToState } from "../utils/shapes/rectangle/mapRectangleDataToState";
+
 import { mapSvgDataToState } from "../utils/shapes/svg/mapSvgDataToState";
 import { mapTextDataToState } from "../utils/shapes/text/mapTextDataToState";
 import { mapButtonDataToState } from "../utils/diagrams/button/mapButtonDataToState";
@@ -135,16 +136,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.clear();
 
 	// Register shape diagrams
-	DiagramRegistry.register({
-		type: "Rectangle",
-		component: Rectangle,
-		minimapComponent: RectangleMinimap,
-		calcConnectPointPosition: calcRectangleConnectPointPosition,
-		createState: createRectangleState,
-		export: undefined,
-		stateToData: rectangleStateToData as StateToDataMapper,
-		dataToState: mapRectangleDataToState as DataToStateMapper,
-	});
+	DiagramRegistry.register(RectangleAtlas);
 
 	DiagramRegistry.register({
 		type: "Text",

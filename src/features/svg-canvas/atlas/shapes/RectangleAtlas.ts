@@ -1,35 +1,39 @@
 /**
- * Rectangle図形関連ファイルの完全索引
+ * Rectangle Shape Atlas
  *
- * この索引ファイルは開発者がRectangle図形に関連する
- * 全ての型、デフォルト値、ユーティリティ関数を素早く
- * 見つけるために作成されています。
+ * Complete index and registry for Rectangle shape-related components.
+ * This atlas provides centralized access to all Rectangle-related types,
+ * default values, components, and utility functions.
  *
- * 注意: このファイルは実際のプログラムでは使用しません。
- * 開発用の参照資料としてのみ使用してください。
+ * This file serves both as a developer reference and as a programmatic
+ * registry for the DiagramRegistry system.
  */
 // ============================================================================
-// 型定義 (Types)
+// Types
 // ============================================================================
-import type { DiagramAtlas } from "../DiagramAtlas";
+import type {
+	DiagramAtlas,
+	DataToStateMapper,
+	StateToDataMapper,
+} from "../DiagramAtlas";
 import type { RectangleData } from "../../types/data/shapes/RectangleData";
 import type { RectangleState } from "../../types/state/shapes/RectangleState";
 import type { RectangleProps } from "../../types/props/shapes/RectangleProps";
 import { RectangleFeatures } from "../../types/data/shapes/RectangleData";
 
 // ============================================================================
-// デフォルト値 (Defaults)
+// Defaults
 // ============================================================================
 import { RectangleDefaultData } from "../../constants/data/shapes/RectangleDefaultData";
 import { RectangleDefaultState } from "../../constants/state/shapes/RectangleDefaultState";
 
 // ============================================================================
-// コンポーネント (Components)
+// Components
 // ============================================================================
 import { Rectangle, RectangleMinimap } from "../../components/shapes/Rectangle";
 
 // ============================================================================
-// ユーティリティ関数 (Utility Functions)
+// Utility Functions
 // ============================================================================
 import { createRectangleState } from "../../utils/shapes/rectangle/createRectangleState";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
@@ -37,45 +41,46 @@ import { rectangleDataToState } from "../../utils/shapes/rectangle/mapRectangleD
 import { rectangleStateToData } from "../../utils/shapes/rectangle/mapRectangleStateToData";
 
 /**
- * Rectangle図形の完全なAtlas定義型
+ * Rectangle Shape Atlas Type Definition
  */
-export type RectangleAtlas = DiagramAtlas<
+type RectangleAtlas = DiagramAtlas<
 	RectangleData,
 	RectangleState,
 	RectangleProps
 >;
 
 /**
- * Rectangle図形の実際のAtlasオブジェクト
+ * Rectangle Shape Atlas Implementation
  */
 export const RectangleAtlas: RectangleAtlas = {
 	// ============================================================================
-	// 型定義 (Types)
+	// Types
 	// ============================================================================
+
 	type: "Rectangle",
 	features: RectangleFeatures,
 
 	// ============================================================================
-	// デフォルト値 (Defaults)
+	// Defaults
 	// ============================================================================
 
 	defaultData: RectangleDefaultData,
 	defaultState: RectangleDefaultState,
 
 	// ============================================================================
-	// コンポーネント (Components)
+	// Components
 	// ============================================================================
 
 	component: Rectangle,
 	minimapComponent: RectangleMinimap,
 
 	// ============================================================================
-	// ユーティリティ関数 (Utility Functions)
+	// Utility Functions
 	// ============================================================================
 
 	createState: createRectangleState,
 	export: undefined,
 	calcConnectPointPosition: calcRectangleConnectPointPosition,
-	dataToState: rectangleDataToState,
-	stateToData: rectangleStateToData,
+	dataToState: rectangleDataToState as DataToStateMapper,
+	stateToData: rectangleStateToData as StateToDataMapper,
 };
