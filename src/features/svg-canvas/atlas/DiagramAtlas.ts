@@ -2,10 +2,9 @@
  * 図形Atlas用の共通型定義
  * 各図形のAtlasファイルで使用される構造化された型システム
  */
-
-import type { Diagram } from "../types/state/catalog/Diagram";
-import type { ConnectPointState } from "../types/state/shapes/ConnectPointState";
 import type { DiagramFeatures } from "../types/core/DiagramFeatures";
+import type { DiagramType } from "../types/core/DiagramType";
+import type { ConnectPointState } from "../types/state/shapes/ConnectPointState";
 
 /**
  * 図形Atlasの基本構造を定義する型
@@ -26,6 +25,9 @@ export type DiagramAtlas<
 	// ============================================================================
 	// 型定義 (Types)
 	// ============================================================================
+
+	/** Type identifier */
+	type: DiagramType;
 
 	/** Data Types (Serialization) */
 	features: DiagramFeatures;
@@ -58,8 +60,11 @@ export type DiagramAtlas<
 	// biome-ignore lint/suspicious/noExplicitAny: Dynamic props require flexible typing
 	createState: (props: { x: number; y: number; [key: string]: any }) => TState;
 
+	/** Export Function */
+	export?: (state: TState) => TData;
+
 	/** Calculator Functions */
-	calcConnectPointPosition?: (diagram: Diagram) => ConnectPointState[];
+	calcConnectPointPosition?: (state: TState) => ConnectPointState[];
 
 	/** Mapper Functions */
 	dataToState: (data: TData) => TState;

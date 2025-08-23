@@ -33,17 +33,17 @@ export type DiagramDefinition = {
 	minimapComponent: React.FC<any>;
 
 	/** Function to calculate connect point positions for the diagram */
-	connectPointCalculator: (diagram: Diagram) => ConnectPointState[];
+	calcConnectPointPosition: (diagram: Diagram) => ConnectPointState[];
 
 	/** Function to create a new instance of the diagram */
-	createFunction: (props: { x: number; y: number }) => Diagram | undefined;
+	createState: (props: { x: number; y: number }) => Diagram | undefined;
 
 	/** Function to export the diagram to external format */
-	exportFunction: ((diagram: Diagram) => Blob | undefined) | undefined;
+	export: ((diagram: Diagram) => Blob | undefined) | undefined;
 
 	/** Function to map state to data format for serialization */
-	stateToDataMapper: StateToDataMapper;
+	stateToData: StateToDataMapper;
 
 	/** Function to map data to state format for deserialization */
-	dataToStateMapper: DataToStateMapper;
+	dataToState: DataToStateMapper;
 };

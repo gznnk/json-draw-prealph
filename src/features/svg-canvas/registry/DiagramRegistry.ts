@@ -61,7 +61,7 @@ class DiagramRegistryClass {
 	getConnectPointCalculator(
 		type: DiagramType,
 	): ((diagram: Diagram) => ConnectPointState[]) | undefined {
-		return this.definitions.get(type)?.connectPointCalculator;
+		return this.definitions.get(type)?.calcConnectPointPosition;
 	}
 
 	/**
@@ -73,7 +73,7 @@ class DiagramRegistryClass {
 	getCreateFunction(
 		type: DiagramType,
 	): ((props: { x: number; y: number }) => Diagram | undefined) | undefined {
-		return this.definitions.get(type)?.createFunction;
+		return this.definitions.get(type)?.createState;
 	}
 
 	/**
@@ -85,7 +85,7 @@ class DiagramRegistryClass {
 	getExportFunction(
 		type: DiagramType,
 	): (((diagram: Diagram) => Blob | undefined) | undefined) | undefined {
-		return this.definitions.get(type)?.exportFunction;
+		return this.definitions.get(type)?.export;
 	}
 
 	/**
@@ -95,7 +95,7 @@ class DiagramRegistryClass {
 	 * @returns The state to data mapper function or undefined if not found
 	 */
 	getStateToDataMapper(type: DiagramType): StateToDataMapper | undefined {
-		return this.definitions.get(type)?.stateToDataMapper;
+		return this.definitions.get(type)?.stateToData;
 	}
 
 	/**
@@ -105,7 +105,7 @@ class DiagramRegistryClass {
 	 * @returns The data to state mapper function or undefined if not found
 	 */
 	getDataToStateMapper(type: DiagramType): DataToStateMapper | undefined {
-		return this.definitions.get(type)?.dataToStateMapper;
+		return this.definitions.get(type)?.dataToState;
 	}
 
 	/**

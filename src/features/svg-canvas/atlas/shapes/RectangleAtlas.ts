@@ -52,7 +52,7 @@ export const RectangleAtlas: RectangleAtlas = {
 	// ============================================================================
 	// 型定義 (Types)
 	// ============================================================================
-
+	type: "Rectangle",
 	features: RectangleFeatures,
 
 	// ============================================================================
@@ -74,6 +74,7 @@ export const RectangleAtlas: RectangleAtlas = {
 	// ============================================================================
 
 	createState: createRectangleState,
+	export: undefined,
 	calcConnectPointPosition: calcRectangleConnectPointPosition,
 	dataToState: rectangleDataToState,
 	stateToData: rectangleStateToData,
