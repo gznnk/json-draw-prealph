@@ -183,13 +183,11 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				startCanvasState.current,
 			);
 
+			// If the drag event is ended
 			if (e.eventPhase === "Ended") {
 				// Add history and get updated state
 				newState = addHistory(e.eventId, newState);
-			}
 
-			// If the drag event is ended
-			if (e.eventPhase === "Ended") {
 				// Restore showTransformControls from initial state for transformative items
 				newState.items = applyFunctionRecursively(newState.items, (item) => {
 					if (selectedIds.has(item.id) && isTransformativeState(item)) {

@@ -29,7 +29,6 @@ export function CreateDefaultState<T>(config: {
 
 	// Build default state by combining base data and state with feature-specific defaults
 	const result = {
-		...baseData,
 		...DiagramBaseDefaultState,
 		...(options.selectable ? SelectableDefaultState : {}),
 		...(options.transformative ? TransformativeDefaultState : {}),
@@ -38,6 +37,7 @@ export function CreateDefaultState<T>(config: {
 		...(options.strokable ? StrokableDefaultState : {}),
 		...(options.fillable ? FillableDefaultState : {}),
 		...(options.textable ? TextableDefaultState : {}),
+		...baseData,
 		...(properties ? properties : {}),
 		type,
 	} as const;
