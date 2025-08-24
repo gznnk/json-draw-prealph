@@ -8,7 +8,7 @@ import type { ItemableState } from "../../types/state/core/ItemableState";
 import { degreesToRadians } from "../math/common/degreesToRadians";
 import { nanToZero } from "../math/common/nanToZero";
 import { rotatePoint } from "../math/points/rotatePoint";
-import { calcUnrotatedGroupBoundingBox } from "../shapes/group/calcUnrotatedGroupBoundingBox";
+import { calcUnrotatedItemableBoundingBox } from "./calcUnrotatedItemableBoundingBox";
 import { isPoint } from "../validation/isPoint";
 import { isShape } from "../validation/isShape";
 
@@ -51,7 +51,7 @@ export const calcItemableOrientedBox = (
 			};
 		}
 	} else {
-		boundingBox = calcUnrotatedGroupBoundingBox(items, x, y, rotation);
+		boundingBox = calcUnrotatedItemableBoundingBox(items, x, y, rotation);
 	}
 
 	// Rotate corner points around the group center

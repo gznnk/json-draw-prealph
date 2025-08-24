@@ -1,11 +1,11 @@
 // Import types.
-import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { Diagram } from "../../types/state/catalog/Diagram";
 
 // Import utils.
-import { degreesToRadians } from "../../math/common/degreesToRadians";
-import { nanToZero } from "../../math/common/nanToZero";
-import { rotatePoint } from "../../math/points/rotatePoint";
-import { isTransformativeState } from "../../validation/isTransformativeState";
+import { degreesToRadians } from "../math/common/degreesToRadians";
+import { nanToZero } from "../math/common/nanToZero";
+import { rotatePoint } from "../math/points/rotatePoint";
+import { isTransformativeState } from "../validation/isTransformativeState";
 
 /**
  * Calculates the bounding box of a diagram when the group rotation is removed.

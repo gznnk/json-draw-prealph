@@ -1,8 +1,8 @@
 // Import types.
-import type { Diagram } from "../../../types/state/catalog/Diagram";
+import type { Diagram } from "../../types/state/catalog/Diagram";
 
 // Import utils.
-import { isItemableState } from "../../validation/isItemableState";
+import { isItemableState } from "../validation/isItemableState";
 import { calcDiagramBoundingBoxInUnrotatedGroup } from "./calcDiagramBoundingBoxInUnrotatedGroup";
 
 /**
@@ -15,13 +15,17 @@ import { calcDiagramBoundingBoxInUnrotatedGroup } from "./calcDiagramBoundingBox
  * @param changeItem - Changed shape within the group
  * @returns Group bounding box
  */
-export const calcUnrotatedGroupBoundingBox = (
+export const calcUnrotatedItemableBoundingBox = (
 	items: Diagram[],
 	groupCenterX = 0,
 	groupCenterY = 0,
 	groupRotation = 0,
 	changeItem?: Diagram,
 ) => {
+	if (items.length === 0) {
+		throw new Error("Unsupported itemable state");
+	}
+
 	// Recursively process shapes in the group and calculate the coordinates of the group's four sides
 	let top = Number.POSITIVE_INFINITY;
 	let left = Number.POSITIVE_INFINITY;
@@ -33,7 +37,7 @@ export const calcUnrotatedGroupBoundingBox = (
 			? (item.items ?? []).filter((i) => i.type !== "ConnectPoint")
 			: [];
 		if (itemItems.length > 0) {
-			const groupBoundingBox = calcUnrotatedGroupBoundingBox(
+			const groupBoundingBox = calcUnrotatedItemableBoundingBox(
 				itemItems,
 				groupCenterX,
 				groupCenterY,
