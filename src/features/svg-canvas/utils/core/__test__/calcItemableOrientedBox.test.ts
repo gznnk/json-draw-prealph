@@ -374,6 +374,25 @@ describe("calcItemableOrientedBox", () => {
 				height: 40,
 			});
 		});
+
+		it("should handle complex rotated group with mixed rotations", () => {
+			// Create child items with different rotations
+			const mockItems: Diagram[] = [
+				createMockShape(20, 10, 30, 20, 0) as Diagram,   // Child 1: no rotation (0°)
+				createMockShape(-15, -5, 25, 15, 45) as Diagram, // Child 2: 45° rotation
+			];
+
+			// Parent group rotated 45 degrees
+			const shape = createMockShape(0, 0, 100, 80, 45, mockItems);
+			const result = calcItemableOrientedBox(shape);
+
+			// Complex scenario: parent rotation + child rotations
+			// The function calculates bounds considering both parent and child transformations
+			expect(result.x).toBeCloseTo(7.93, 2);
+			expect(result.y).toBeCloseTo(0.73, 2);
+			expect(result.width).toBeCloseTo(65.53, 2);
+			expect(result.height).toBeCloseTo(39.32, 2);
+		});
 	});
 
 	describe("Type compatibility", () => {
