@@ -32,7 +32,9 @@
       "Bash(git commit:*)",
       "Bash(npx tsc:*)",
       "mcp__serena__insert_after_symbol",
-      "mcp__serena__replace_lines"
+      "mcp__serena__replace_lines",
+      "mcp__serena__read_memory",
+      "Bash(npm test:*)"
     ],
     "deny": []
   },
