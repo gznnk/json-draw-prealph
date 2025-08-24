@@ -11,7 +11,10 @@ import { PathAtlas } from "../atlas/shapes/PathAtlas";
 import { PathPointAtlas } from "../atlas/shapes/PathPointAtlas";
 import { RectangleAtlas } from "../atlas/shapes/RectangleAtlas";
 import { SvgAtlas } from "../atlas/shapes/SvgAtlas";
+
+// Import Element Atlas objects
 import { TextAtlas } from "../atlas/elements/TextAtlas";
+import { FrameAtlas } from "../atlas/elements/FrameAtlas";
 
 // Import Diagram Atlas objects
 import { ButtonAtlas } from "../atlas/diagrams/ButtonAtlas";
@@ -47,7 +50,12 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	DiagramRegistry.register(PathPointAtlas);
 	DiagramRegistry.register(RectangleAtlas);
 	DiagramRegistry.register(SvgAtlas);
+
+	// ============================================================================
+	// Element Atlas Registration
+	// ============================================================================
 	DiagramRegistry.register(TextAtlas);
+	DiagramRegistry.register(FrameAtlas);
 
 	// ============================================================================
 	// Diagram Atlas Registration

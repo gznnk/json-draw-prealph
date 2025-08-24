@@ -14,6 +14,7 @@ export type DiagramType =
 	| "Rectangle"
 	| "Svg"
 	| "Text"
+	| "Frame"
 	| "Button"
 	// Nodes
 	| "AgentNode"

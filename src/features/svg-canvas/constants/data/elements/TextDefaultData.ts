@@ -11,11 +11,5 @@ import { TextFeatures } from "../../../types/data/elements/TextData";
 export const TextDefaultData: TextData = CreateDefaultData<TextData>({
 	type: "Text",
 	options: TextFeatures,
-	properties: {
-		width: 100,
-		height: 100,
-		rotation: 0,
-		scaleX: 1,
-		scaleY: 1,
-	},
+	properties: {},
 });

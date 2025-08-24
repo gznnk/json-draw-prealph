@@ -4,20 +4,20 @@ import type { Shape } from "../../core/Shape";
 import type { CreateDataType } from "../shapes/CreateDataType";
 
 /**
- * Diagram features for Text shapes.
+ * Diagram features for Frame elements.
  */
-export const TextFeatures = {
+export const FrameFeatures = {
 	transformative: false,
 	connectable: false,
-	strokable: false,
-	fillable: false,
-	textable: true,
+	strokable: true,
+	fillable: true,
+	textable: false,
 	selectable: false,
 	fileDroppable: false,
 } as const satisfies DiagramFeatures;
 
 /**
- * Data type for text shapes.
- * Contains properties specific to text diagram elements.
+ * Data type for frame elements.
+ * Contains properties specific to frame diagram elements.
  */
-export type TextData = CreateDataType<typeof TextFeatures> & Shape;
+export type FrameData = CreateDataType<typeof FrameFeatures> & Shape;

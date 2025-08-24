@@ -30,6 +30,10 @@ export const createTextAreaNodeState = ({
 		}),
 		type: "TextAreaNode",
 		items: [
+			createRectangleState({
+				x,
+				y,
+			}),
 			{
 				...createTextState({
 					x,

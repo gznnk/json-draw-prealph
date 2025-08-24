@@ -3,44 +3,32 @@ import type React from "react";
 import { memo, useRef } from "react";
 
 // Import types.
-import type { TextProps } from "../../../types/props/elements/TextProps";
-
-// Import components.
-import { Textable } from "../../core/Textable";
+import type { FrameProps } from "../../../types/props/elements/FrameProps";
 
 // Import hooks.
 import { useClick } from "../../../hooks/useClick";
 import { useDrag } from "../../../hooks/useDrag";
 import { useHover } from "../../../hooks/useHover";
-import { useText } from "../../../hooks/useText";
 
 // Import utils.
 import { mergeProps } from "../../../utils/core/mergeProps";
 
 /**
- * Text component - a simple text shape with textable feature only
+ * Frame component - a simple rectangular frame element
  */
-const TextComponent: React.FC<TextProps> = ({
+const FrameComponent: React.FC<FrameProps> = ({
 	id,
 	x,
 	y,
 	width,
 	height,
-	text,
-	textType,
-	fontColor,
-	fontSize,
-	fontFamily,
-	fontWeight,
-	textAlign,
-	verticalAlign,
-	isTextEditing,
-	isTextEditEnabled = true,
+	fill = "transparent",
+	stroke = "black",
+	strokeWidth = 1,
 	onDrag,
 	onDragOver,
 	onDragLeave,
 	onClick,
-	onTextChange,
 	onHoverChange,
 }) => {
 	// Reference to the SVG element to be transformed
@@ -50,25 +38,15 @@ const TextComponent: React.FC<TextProps> = ({
 	const refBusVal = {
 		// Properties
 		id,
-		isTextEditEnabled,
 		onDrag,
-		onTextChange,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	// Generate properties for text editing
-	const { onDoubleClick } = useText({
-		id,
-		isSelected: isTextEditEnabled,
-		isTextEditEnabled,
-		onTextChange,
-	});
-
 	// Generate properties for dragging
 	const dragProps = useDrag({
 		id,
-		type: "Text",
+		type: "Frame",
 		x,
 		y,
 		ref: svgRef,
@@ -82,7 +60,7 @@ const TextComponent: React.FC<TextProps> = ({
 		id,
 		x,
 		y,
-		isSelected: false, // Text is not selectable
+		isSelected: false, // Frame is not selectable
 		isAncestorSelected: false,
 		ref: svgRef,
 		onClick,
@@ -99,42 +77,23 @@ const TextComponent: React.FC<TextProps> = ({
 
 	return (
 		<>
-			{/* Invisible background rectangle for interaction */}
+			{/* Main frame rectangle */}
 			<rect
 				id={id}
 				x={x - width / 2}
 				y={y - height / 2}
 				width={width}
 				height={height}
-				fill="transparent"
-				stroke="none"
+				fill={fill}
+				stroke={stroke}
+				strokeWidth={strokeWidth}
 				tabIndex={0}
 				cursor="move"
 				ref={svgRef}
-				onDoubleClick={onDoubleClick}
 				{...composedProps}
 			/>
-			{/* Text content */}
-			{isTextEditEnabled && (
-				<Textable
-					x={x - width / 2}
-					y={y - height / 2}
-					width={width}
-					height={height}
-					transform=""
-					text={text}
-					textType={textType}
-					fontColor={fontColor}
-					fontSize={fontSize}
-					fontFamily={fontFamily}
-					fontWeight={fontWeight}
-					textAlign={textAlign}
-					verticalAlign={verticalAlign}
-					isTextEditing={isTextEditing}
-				/>
-			)}
 		</>
 	);
 };
 
-export const Text = memo(TextComponent);
+export const Frame = memo(FrameComponent);
