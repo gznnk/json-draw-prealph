@@ -1,5 +1,5 @@
 // Import data types.
-import type { ButtonData } from "../diagrams/ButtonData";
+import type { ButtonData } from "../elements/ButtonData";
 import type { AgentNodeData } from "../nodes/AgentNodeData";
 import type { HubNodeData } from "../nodes/HubNodeData";
 import type { ImageGenNodeData } from "../nodes/ImageGenNodeData";

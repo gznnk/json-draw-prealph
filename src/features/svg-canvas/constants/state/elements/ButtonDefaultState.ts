@@ -1,9 +1,9 @@
 // Import types.
-import type { ButtonState } from "../../../types/state/diagrams/ButtonState";
+import type { ButtonState } from "../../../types/state/elements/ButtonState";
 
 // Import constants.
-import { ButtonDefaultData } from "../../data/diagrams/ButtonDefaultData";
-import { ButtonFeatures } from "../../../types/data/diagrams/ButtonData";
+import { ButtonDefaultData } from "../../data/elements/ButtonDefaultData";
+import { ButtonFeatures } from "../../../types/data/elements/ButtonData";
 import { CreateDefaultState } from "../shapes/CreateDefaultState";
 
 /**

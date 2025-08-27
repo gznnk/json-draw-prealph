@@ -3,7 +3,7 @@ import type React from "react";
 import { memo } from "react";
 
 // Import types.
-import type { ButtonProps } from "../../../types/props/diagrams/ButtonProps";
+import type { ButtonProps } from "../../../types/props/elements/ButtonProps";
 
 // Import components.
 import { Textable } from "../../core/Textable";

@@ -17,7 +17,7 @@ import { TextAtlas } from "../atlas/elements/TextAtlas";
 import { FrameAtlas } from "../atlas/elements/FrameAtlas";
 
 // Import Diagram Atlas objects
-import { ButtonAtlas } from "../atlas/diagrams/ButtonAtlas";
+import { ButtonAtlas } from "../atlas/elements/ButtonAtlas";
 
 // Import Node Atlas objects
 import { AgentNodeAtlas } from "../atlas/nodes/AgentNodeAtlas";

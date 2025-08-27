@@ -1,5 +1,5 @@
 // Import types.
-import type { ButtonState } from "../diagrams/ButtonState";
+import type { ButtonState } from "../elements/ButtonState";
 import type { AgentNodeState } from "../nodes/AgentNodeState";
 import type { HubNodeState } from "../nodes/HubNodeState";
 import type { ImageGenNodeState } from "../nodes/ImageGenNodeState";

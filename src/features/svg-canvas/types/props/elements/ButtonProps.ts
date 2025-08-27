@@ -1,6 +1,6 @@
 // Import types.
-import type { ButtonFeatures } from "../../data/diagrams/ButtonData";
-import type { ButtonState } from "../../state/diagrams/ButtonState";
+import type { ButtonFeatures } from "../../data/elements/ButtonData";
+import type { ButtonState } from "../../state/elements/ButtonState";
 import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";
 
 /**

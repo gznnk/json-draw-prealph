@@ -16,29 +16,29 @@ import type {
 	DataToStateMapper,
 	StateToDataMapper,
 } from "../DiagramAtlas";
-import type { ButtonData } from "../../types/data/diagrams/ButtonData";
-import type { ButtonState } from "../../types/state/diagrams/ButtonState";
-import type { ButtonProps } from "../../types/props/diagrams/ButtonProps";
-import { ButtonFeatures } from "../../types/data/diagrams/ButtonData";
+import type { ButtonData } from "../../types/data/elements/ButtonData";
+import type { ButtonState } from "../../types/state/elements/ButtonState";
+import type { ButtonProps } from "../../types/props/elements/ButtonProps";
+import { ButtonFeatures } from "../../types/data/elements/ButtonData";
 
 // ============================================================================
 // Defaults
 // ============================================================================
-import { ButtonDefaultData } from "../../constants/data/diagrams/ButtonDefaultData";
-import { ButtonDefaultState } from "../../constants/state/diagrams/ButtonDefaultState";
+import { ButtonDefaultData } from "../../constants/data/elements/ButtonDefaultData";
+import { ButtonDefaultState } from "../../constants/state/elements/ButtonDefaultState";
 
 // ============================================================================
 // Components
 // ============================================================================
-import { Button, ButtonMinimap } from "../../components/diagrams/Button";
+import { Button, ButtonMinimap } from "../../components/elements/Button";
 
 // ============================================================================
 // Utility Functions
 // ============================================================================
-import { createButtonState } from "../../utils/diagrams/button/createButtonState";
-import { calcButtonConnectPointPosition } from "../../utils/diagrams/button/calcButtonConnectPointPosition";
-import { mapButtonStateToData } from "../../utils/diagrams/button/mapButtonStateToData";
-import { mapButtonDataToState } from "../../utils/diagrams/button/mapButtonDataToState";
+import { createButtonState } from "../../utils/elements/button/createButtonState";
+import { calcButtonConnectPointPosition } from "../../utils/elements/button/calcButtonConnectPointPosition";
+import { mapButtonStateToData } from "../../utils/elements/button/mapButtonStateToData";
+import { mapButtonDataToState } from "../../utils/elements/button/mapButtonDataToState";
 
 /**
  * Button Diagram Atlas Type Definition
