@@ -12,10 +12,13 @@ import { Textable } from "../../core/Textable";
 import { useClick } from "../../../hooks/useClick";
 import { useDrag } from "../../../hooks/useDrag";
 import { useHover } from "../../../hooks/useHover";
+import { useSelect } from "../../../hooks/useSelect";
 import { useText } from "../../../hooks/useText";
 
 // Import utils.
 import { mergeProps } from "../../../utils/core/mergeProps";
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 
 /**
  * Text component - a simple text shape with textable feature only
@@ -26,6 +29,9 @@ const TextComponent: React.FC<TextProps> = ({
 	y,
 	width,
 	height,
+	scaleX,
+	scaleY,
+	rotation,
 	text,
 	textType,
 	fontColor,
@@ -40,6 +46,7 @@ const TextComponent: React.FC<TextProps> = ({
 	onDragOver,
 	onDragLeave,
 	onClick,
+	onSelect,
 	onTextChange,
 	onHoverChange,
 }) => {
@@ -63,6 +70,23 @@ const TextComponent: React.FC<TextProps> = ({
 		isSelected: isTextEditEnabled,
 		isTextEditEnabled,
 		onTextChange,
+		attributes: {
+			x,
+			y,
+			width,
+			height,
+			rotation,
+			scaleX,
+			scaleY,
+			text,
+			textType,
+			fontColor,
+			fontSize,
+			fontFamily,
+			fontWeight,
+			textAlign,
+			verticalAlign,
+		},
 	});
 
 	// Generate properties for dragging
@@ -88,6 +112,12 @@ const TextComponent: React.FC<TextProps> = ({
 		onClick,
 	});
 
+	// Generate properties for selection
+	const selectProps = useSelect({
+		id,
+		onSelect,
+	});
+
 	// Generate properties for hovering
 	const hoverProps = useHover({
 		id,
@@ -95,21 +125,36 @@ const TextComponent: React.FC<TextProps> = ({
 	});
 
 	// Compose props for the SVG element
-	const composedProps = mergeProps(dragProps, clickProps, hoverProps);
+	const composedProps = mergeProps(
+		dragProps,
+		clickProps,
+		selectProps,
+		hoverProps,
+	);
+
+	// Generate rect transform attribute
+	const transform = createSvgTransform(
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		x,
+		y,
+	);
 
 	return (
 		<>
 			{/* Invisible background rectangle for interaction */}
 			<rect
 				id={id}
-				x={x - width / 2}
-				y={y - height / 2}
+				x={-width / 2}
+				y={-height / 2}
 				width={width}
 				height={height}
 				fill="transparent"
 				stroke="none"
 				tabIndex={0}
 				cursor="move"
+				transform={transform}
 				ref={svgRef}
 				onDoubleClick={onDoubleClick}
 				{...composedProps}
@@ -117,11 +162,11 @@ const TextComponent: React.FC<TextProps> = ({
 			{/* Text content */}
 			{isTextEditEnabled && (
 				<Textable
-					x={x - width / 2}
-					y={y - height / 2}
+					x={-width / 2}
+					y={-height / 2}
 					width={width}
 					height={height}
-					transform=""
+					transform={transform}
 					text={text}
 					textType={textType}
 					fontColor={fontColor}

@@ -51,9 +51,7 @@ export const createTextAreaNodeState = ({
 		items: [
 			createTextState({
 				x,
-				y: y + 20,
-				width: TextAreaNodeDefaultState.width - 10,
-				height: TextAreaNodeDefaultState.height - 30,
+				y,
 			}),
 		],
 		connectPoints,
