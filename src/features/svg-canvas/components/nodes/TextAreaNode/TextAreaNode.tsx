@@ -121,30 +121,44 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 		},
 	});
 
+	// Center position of Text component
 	const textCenter = rotatePoint(
 		x,
-		y,
+		y - height / 2 + 10 + (height - 60) / 2,
 		x,
-		y - height / 2 + 20 + (height - 50) / 2,
+		y,
 		degreesToRadians(rotation),
 	);
 
 	return (
 		<>
-			<Frame {...props} stroke="black" strokeWidth="1px" fill="white">
-				<rect
-					x={width / 2 - 50}
-					y={height / 2 - 30}
-					width={40}
-					height={20}
-					fill="transparent"
-					stroke="black"
-					strokeWidth={1}
-				/>
+			<Frame {...props} stroke="black" strokeWidth="1px" fill="white" cornerRadius={6}>
+				<>
+					<rect
+						x={-width / 2 + 10}
+						y={-height / 2 + 10}
+						width={width - 20}
+						height={height - 60}
+						fill="#f0f0f0"
+						stroke="black"
+						strokeWidth={1}
+						rx={6}
+						ry={6}
+					/>
+					<rect
+						x={width / 2 - 50}
+						y={height / 2 - 30}
+						width={40}
+						height={20}
+						fill="transparent"
+						stroke="black"
+						strokeWidth={1}
+					/>
+				</>
 			</Frame>
 			<Text
 				{...textState}
-				x={x}
+				x={textCenter.x}
 				y={textCenter.y}
 				width={width - 20}
 				height={height - 50}

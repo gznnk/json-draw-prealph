@@ -10,6 +10,7 @@ export const EllipseFeatures = {
 	connectable: true,
 	strokable: true,
 	fillable: true,
+	cornerRoundable: false,
 	textable: true,
 	selectable: true,
 	fileDroppable: true,

@@ -52,6 +52,8 @@ export const createTextAreaNodeState = ({
 			createTextState({
 				x,
 				y,
+				textAlign: "left",
+				verticalAlign: "top",
 			}),
 		],
 		connectPoints,

@@ -11,6 +11,7 @@ export const TextFeatures = {
 	connectable: false,
 	strokable: false,
 	fillable: false,
+	cornerRoundable: false,
 	textable: true,
 	selectable: false,
 	fileDroppable: false,

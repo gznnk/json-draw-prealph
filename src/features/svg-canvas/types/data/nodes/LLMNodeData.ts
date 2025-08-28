@@ -10,6 +10,7 @@ export const LLMNodeFeatures = {
 	connectable: true,
 	strokable: true,
 	fillable: true,
+	cornerRoundable: false,
 	textable: true,
 	selectable: true,
 	executable: true,

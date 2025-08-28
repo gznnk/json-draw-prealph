@@ -1,5 +1,6 @@
 import type { DiagramBaseData } from "../../data/core/DiagramBaseData";
 import type { DiagramBaseState } from "../core/DiagramBaseState";
+import type { CornerRoundableState } from "../core/CornerRoundableState";
 import type { FillableState } from "../core/FillableState";
 import type { ItemableState } from "../core/ItemableState";
 import type { SelectableState } from "../core/SelectableState";
@@ -7,7 +8,6 @@ import type { StrokableState } from "../core/StrokableState";
 import type { TextableState } from "../core/TextableState";
 import type { TransformativeState } from "../core/TransformativeState";
 import type { ConnectableState } from "./ConnectableState";
-
 
 // Import the new unified features type
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
@@ -28,6 +28,5 @@ export type CreateStateType<
 	(U["connectable"] extends true ? ConnectableState : object) &
 	(U["strokable"] extends true ? StrokableState : object) &
 	(U["fillable"] extends true ? FillableState : object) &
+	(U["cornerRoundable"] extends true ? CornerRoundableState : object) &
 	(U["textable"] extends true ? TextableState : object);
-
-

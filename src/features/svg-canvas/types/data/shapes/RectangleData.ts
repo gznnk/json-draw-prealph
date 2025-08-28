@@ -10,6 +10,7 @@ export const RectangleFeatures = {
 	connectable: true,
 	strokable: true,
 	fillable: true,
+	cornerRoundable: true,
 	textable: true,
 	selectable: true,
 	fileDroppable: true,
@@ -19,6 +20,4 @@ export const RectangleFeatures = {
  * Data type for rectangle shapes.
  * Contains properties specific to rectangular diagram elements.
  */
-export type RectangleData = CreateDataType<typeof RectangleFeatures> & {
-	radius: number;
-};
+export type RectangleData = CreateDataType<typeof RectangleFeatures>;

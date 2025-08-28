@@ -12,7 +12,7 @@ export const ButtonDefaultData: ButtonData = CreateDefaultData<ButtonData>({
 	type: "Button",
 	options: ButtonFeatures,
 	properties: {
-		borderRadius: 6,
+		cornerRadius: 6,
 		width: 88,
 		height: 32,
 		fill: "#1677ff",

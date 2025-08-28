@@ -11,6 +11,7 @@ export const FrameFeatures = {
 	connectable: true,
 	strokable: true,
 	fillable: true,
+	cornerRoundable: true,
 	textable: false,
 	selectable: true,
 	fileDroppable: false,

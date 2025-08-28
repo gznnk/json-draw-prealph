@@ -11,6 +11,7 @@ export const PathFeatures = {
 	transformative: true,
 	itemable: true,
 	strokable: true,
+	cornerRoundable: false,
 	selectable: true,
 } as const satisfies DiagramFeatures;
 

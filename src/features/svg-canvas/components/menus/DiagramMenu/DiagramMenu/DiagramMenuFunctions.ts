@@ -58,15 +58,15 @@ export const findFirstRectangleRecursive = (
 	return undefined;
 };
 
-export const findFirstBorderRadiusRecursive = (
+export const findFirstCornerRoundableRecursive = (
 	items: Diagram[],
 ): Diagram | undefined => {
 	for (const item of items) {
-		if ("radius" in item) {
+		if ("cornerRadius" in item) {
 			return item;
 		}
 		if (isItemableState(item)) {
-			const foundItem = findFirstBorderRadiusRecursive(item.items);
+			const foundItem = findFirstCornerRoundableRecursive(item.items);
 			if (foundItem) {
 				return foundItem;
 			}

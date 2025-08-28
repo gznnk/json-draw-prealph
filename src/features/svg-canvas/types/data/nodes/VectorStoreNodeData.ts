@@ -8,6 +8,7 @@ import type { CreateDataType } from "../shapes/CreateDataType";
 export const VectorStoreNodeFeatures = {
 	transformative: true,
 	connectable: true,
+	cornerRoundable: false,
 	selectable: true,
 	executable: true,
 } as const satisfies DiagramFeatures;

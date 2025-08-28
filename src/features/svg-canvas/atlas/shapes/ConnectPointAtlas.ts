@@ -29,13 +29,17 @@ import { ConnectPointDefaultState } from "../../constants/state/shapes/ConnectPo
 // ============================================================================
 // Components
 // ============================================================================
-import { ConnectPoint, ConnectPointMinimap } from "../../components/shapes/ConnectPoint";
+import {
+	ConnectPoint,
+	ConnectPointMinimap,
+} from "../../components/shapes/ConnectPoint";
 
 // ============================================================================
 // Utility Functions
 // ============================================================================
 import { connectPointStateToData } from "../../utils/shapes/connectPoint/mapConnectPointStateToData";
 import { mapConnectPointDataToState } from "../../utils/shapes/connectPoint/mapConnectPointDataToState";
+import { dummyImplementation } from "../DiagramAtlas";
 
 /**
  * ConnectPoint Shape Atlas Type Definition
@@ -75,11 +79,7 @@ export const ConnectPointAtlas: ConnectPointAtlas = {
 	// Utility Functions
 	// ============================================================================
 
-	createState: (props: { x: number; y: number }) => ({
-		...ConnectPointDefaultState,
-		x: props.x,
-		y: props.y,
-	}),
+	createState: dummyImplementation,
 	export: undefined,
 	calcConnectPointPosition: () => [],
 	dataToState: mapConnectPointDataToState as DataToStateMapper,

@@ -8,6 +8,7 @@ import type { DiagramFeatures } from "../../core/DiagramFeatures";
 export const GroupFeatures = {
 	transformative: true,
 	itemable: true,
+	cornerRoundable: false,
 	selectable: true,
 } as const satisfies DiagramFeatures;
 

@@ -14,7 +14,7 @@ export const ButtonDefaultState: ButtonState = CreateDefaultState<ButtonState>({
 	options: ButtonFeatures,
 	baseData: ButtonDefaultData,
 	properties: {
-		borderRadius: 6,
+		cornerRadius: 6,
 		width: 88,
 		height: 32,
 		fill: "#1677ff",

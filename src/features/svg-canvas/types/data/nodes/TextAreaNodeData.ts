@@ -11,6 +11,7 @@ export const TextAreaNodeFeatures = {
 	connectable: true,
 	strokable: false,
 	fillable: false,
+	cornerRoundable: false,
 	selectable: true,
 	textable: false,
 	executable: true,

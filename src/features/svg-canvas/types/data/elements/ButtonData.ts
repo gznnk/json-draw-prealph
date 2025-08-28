@@ -10,6 +10,7 @@ export const ButtonFeatures = {
 	connectable: true,        // Can connect to other shapes
 	strokable: true,          // Has stroke properties
 	fillable: true,           // Has fill properties
+	cornerRoundable: true,    // Has corner radius properties
 	textable: true,           // Can contain text
 	selectable: true,         // Can be selected
 	fileDroppable: true,      // Can accept file drops
@@ -19,7 +20,4 @@ export const ButtonFeatures = {
  * Data type for Button shapes.
  * Contains properties specific to Button diagram elements.
  */
-export type ButtonData = CreateDataType<typeof ButtonFeatures> & {
-	// Button-specific properties
-	borderRadius: number;
-};
+export type ButtonData = CreateDataType<typeof ButtonFeatures>;

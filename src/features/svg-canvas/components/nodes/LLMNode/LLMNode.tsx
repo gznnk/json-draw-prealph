@@ -135,7 +135,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				</IconContainer>
 			)}
 			<RectangleWrapper visible={props.isTextEditing}>
-				<Rectangle {...props} radius={0}/>
+				<Rectangle {...props} cornerRadius={0}/>
 			</RectangleWrapper>
 		</>
 	);

@@ -16,6 +16,8 @@ export type DiagramFeatures = {
 	strokable?: boolean;
 	/** Fill/background styling */
 	fillable?: boolean;
+	/** Corner radius styling */
+	cornerRoundable?: boolean;
 	/** Text content and styling */
 	textable?: boolean;
 	/** Executable/clickable functionality */

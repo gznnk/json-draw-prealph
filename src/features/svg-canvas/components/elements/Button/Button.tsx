@@ -37,7 +37,7 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 	y,
 	width,
 	height,
-	borderRadius,
+	cornerRadius,
 	rotation,
 	scaleX,
 	scaleY,
@@ -177,8 +177,8 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 				y={-height / 2}
 				width={width}
 				height={height}
-				rx={borderRadius}
-				ry={borderRadius}
+				rx={cornerRadius}
+				ry={cornerRadius}
 				fill={fill}
 				stroke={stroke}
 				strokeWidth={strokeWidth}

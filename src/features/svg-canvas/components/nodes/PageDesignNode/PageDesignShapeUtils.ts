@@ -33,7 +33,7 @@ export const createPageDesignRectangle = ({
 		y: centerY,
 		width,
 		height,
-		radius: rx,
+		cornerRadius: rx,
 		fill,
 		stroke,
 		strokeWidth: `${strokeWidth}px`,
@@ -113,7 +113,7 @@ export const createPageDesignText = ({
 		y: centerY,
 		width,
 		height,
-		radius: 0,
+		cornerRadius: 0,
 		fill: "transparent", // Transparent background for text-only elements
 		stroke: "transparent",
 		strokeWidth: "0px",

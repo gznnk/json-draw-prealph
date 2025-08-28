@@ -7,6 +7,7 @@ import type { CreateDataType } from "./CreateDataType";
  */
 export const ImageFeatures = {
 	transformative: true,
+	cornerRoundable: false,
 	selectable: true,
 } as const satisfies DiagramFeatures;
 
