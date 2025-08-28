@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { memo, useMemo, useRef } from "react";
+import { memo, useRef } from "react";
 
 // Import types.
 import type { ButtonProps } from "../../../types/props/elements/ButtonProps";
@@ -10,12 +10,10 @@ import { Outline } from "../../core/Outline";
 import { PositionLabel } from "../../core/PositionLabel";
 import { Textable } from "../../core/Textable";
 import { Transformative } from "../../core/Transformative";
-import { ConnectPoints } from "../../shapes/ConnectPoints";
 
 // Import hooks.
 import { useClick } from "../../../hooks/useClick";
 import { useDrag } from "../../../hooks/useDrag";
-import { useFileDrop } from "../../../hooks/useFileDrop";
 import { useHover } from "../../../hooks/useHover";
 import { useSelect } from "../../../hooks/useSelect";
 import { useText } from "../../../hooks/useText";
@@ -47,8 +45,6 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 	strokeWidth,
 	isSelected,
 	isAncestorSelected = false,
-	connectPoints,
-	showConnectPoints = false,
 	text,
 	textType,
 	fontColor,
@@ -70,10 +66,7 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 	onClick,
 	onSelect,
 	onTransform,
-	onConnect,
-	onPreviewConnectLine,
 	onTextChange,
-	onFileDrop,
 	onHoverChange,
 }) => {
 	// Reference to the SVG element to be transformed
@@ -134,30 +127,12 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 		onHoverChange,
 	});
 
-	// Generate properties for file drop
-	const fileDropProps = useFileDrop({ id, onFileDrop });
-
 	// Compose props for ButtonElement
 	const composedProps = mergeProps(
 		dragProps,
 		clickProps,
 		selectProps,
 		hoverProps,
-		fileDropProps,
-	);
-
-	// Suppress ConnectPoint re-rendering by memoization
-	const ownerShape = useMemo(
-		() => ({
-			x,
-			y,
-			width,
-			height,
-			rotation,
-			scaleX,
-			scaleY,
-		}),
-		[x, y, width, height, rotation, scaleX, scaleY],
 	);
 
 	// Generate rect transform attribute
@@ -235,15 +210,7 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 					onTransform={onTransform}
 				/>
 			)}
-			<ConnectPoints
-				ownerId={id}
-				ownerShape={ownerShape}
-				connectPoints={connectPoints}
-				showConnectPoints={showConnectPoints}
-				shouldRender={!isDragging && !isTransforming && !isSelected}
-				onConnect={onConnect}
-				onPreviewConnectLine={onPreviewConnectLine}
-			/>
+
 			{isSelected && isDragging && (
 				<PositionLabel
 					x={x}

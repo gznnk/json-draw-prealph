@@ -36,18 +36,14 @@ import { Button, ButtonMinimap } from "../../components/elements/Button";
 // Utility Functions
 // ============================================================================
 import { createButtonState } from "../../utils/elements/button/createButtonState";
-import { calcButtonConnectPointPosition } from "../../utils/elements/button/calcButtonConnectPointPosition";
 import { mapButtonStateToData } from "../../utils/elements/button/mapButtonStateToData";
 import { mapButtonDataToState } from "../../utils/elements/button/mapButtonDataToState";
+import { dummyImplementation } from "../DiagramAtlas";
 
 /**
  * Button Diagram Atlas Type Definition
  */
-type ButtonAtlas = DiagramAtlas<
-	ButtonData,
-	ButtonState,
-	ButtonProps
->;
+type ButtonAtlas = DiagramAtlas<ButtonData, ButtonState, ButtonProps>;
 
 /**
  * Button Diagram Atlas Implementation
@@ -80,7 +76,7 @@ export const ButtonAtlas: ButtonAtlas = {
 
 	createState: createButtonState,
 	export: undefined,
-	calcConnectPointPosition: calcButtonConnectPointPosition,
+	calcConnectPointPosition: dummyImplementation,
 	dataToState: mapButtonDataToState as DataToStateMapper,
 	stateToData: mapButtonStateToData as StateToDataMapper,
 };

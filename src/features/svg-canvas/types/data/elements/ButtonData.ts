@@ -7,13 +7,13 @@ import type { CreateDataType } from "../shapes/CreateDataType";
  */
 export const ButtonFeatures = {
 	transformative: true,     // Can be transformed (resize, rotate)
-	connectable: true,        // Can connect to other shapes
+	connectable: false,        // Can connect to other shapes
 	strokable: true,          // Has stroke properties
 	fillable: true,           // Has fill properties
 	cornerRoundable: true,    // Has corner radius properties
 	textable: true,           // Can contain text
 	selectable: true,         // Can be selected
-	fileDroppable: true,      // Can accept file drops
+	fileDroppable: false,      // Can accept file drops
 } as const satisfies DiagramFeatures;
 
 /**
