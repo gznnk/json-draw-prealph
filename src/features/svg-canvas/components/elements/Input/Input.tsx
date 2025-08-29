@@ -32,6 +32,10 @@ const InputComponent: React.FC<InputProps> = ({
 	scaleX,
 	scaleY,
 	rotation,
+	fill,
+	stroke,
+	strokeWidth,
+	cornerRadius,
 	text,
 	textType,
 	fontColor,
@@ -142,15 +146,18 @@ const InputComponent: React.FC<InputProps> = ({
 
 	return (
 		<>
-			{/* Invisible background rectangle for interaction */}
+			{/* Background rectangle for interaction and styling */}
 			<rect
 				id={id}
 				x={-width / 2}
 				y={-height / 2}
 				width={width}
 				height={height}
-				fill="transparent"
-				stroke="none"
+				rx={cornerRadius}
+				ry={cornerRadius}
+				fill={fill}
+				stroke={stroke}
+				strokeWidth={strokeWidth}
 				tabIndex={0}
 				cursor="move"
 				transform={transform}
