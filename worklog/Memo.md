@@ -15,3 +15,6 @@
 * ファイルドロップ不可
 
 上記のために、shapeのfeatureを作る必要あり
+
+# その他
+* itemableTypeが"abstract"の時以外は、DefaultStateでitemableTypeを設定する必要あり

@@ -3,7 +3,6 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
-import type { DiagramBaseData } from "../../../../types/data/core/DiagramBaseData";
 import type { PathData } from "../../../../types/data/shapes/PathData";
 import type { DiagramChangeEvent } from "../../../../types/events/DiagramChangeEvent";
 import type { DiagramClickEvent } from "../../../../types/events/DiagramClickEvent";
@@ -36,7 +35,8 @@ import {
 } from "../../../../utils/shapes/path/createArrowHeads";
 import { createDValue } from "../../../../utils/shapes/path/createDValue";
 import { createBezierDValue } from "../../../../utils/shapes/path/createBezierDValue";
-import { isItemableState } from "../../../../utils/validation/isItemableState";
+import type { DiagramData } from "../../../../types/data/catalog/DiagramData";
+import { isItemableData } from "../../../../utils/validation/isItemableData";
 
 /**
  * Path component
@@ -247,7 +247,7 @@ const PathComponent: React.FC<PathProps> = ({
 	 */
 	const handleDiagramChangeForVertexAndSegmentDrag = useCallback(
 		(e: DiagramChangeEvent) => {
-			if (!isItemableState<DiagramBaseData>(e.endDiagram)) return; // Type guard with DiagramBaseData
+			if (!isItemableData<DiagramData>(e.endDiagram)) return; // Type guard with DiagramBaseData
 
 			const { rotation, scaleX, scaleY, onDiagramChange } = refBus.current;
 			if (e.eventPhase === "Ended") {

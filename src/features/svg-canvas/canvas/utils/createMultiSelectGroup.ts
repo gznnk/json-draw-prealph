@@ -34,6 +34,7 @@ export const createMultiSelectGroup = (
 		isSelected: true,
 		showTransformControls: true,
 		showOutline: true,
+		itemableType: "abstract",
 		items: [],
 	} as GroupState;
 };
