@@ -13,6 +13,7 @@ import { ConnectPoints } from "../../shapes/ConnectPoints";
 // Import hooks.
 import { useClick } from "../../../hooks/useClick";
 import { useDrag } from "../../../hooks/useDrag";
+import { useExecutionChain } from "../../../hooks/useExecutionChain";
 import { useHover } from "../../../hooks/useHover";
 import { useSelect } from "../../../hooks/useSelect";
 
@@ -55,6 +56,7 @@ const FrameComponent: React.FC<FrameProps> = ({
 	onConnect,
 	onPreviewConnectLine,
 	onHoverChange,
+	onPropagation,
 }) => {
 	// Reference to the SVG element to be transformed
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
@@ -126,6 +128,15 @@ const FrameComponent: React.FC<FrameProps> = ({
 		x,
 		y,
 	);
+
+	// Handle execution events using the execution chain hook
+	useExecutionChain({
+		id,
+		onPropagation: (e) => {
+			// Forward the event directly to the parent component
+			onPropagation?.(e);
+		},
+	});
 
 	return (
 		<>
