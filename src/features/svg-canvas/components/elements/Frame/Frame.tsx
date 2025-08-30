@@ -31,6 +31,8 @@ const FrameComponent: React.FC<FrameProps> = ({
 	y,
 	width,
 	height,
+	minWidth,
+	minHeight,
 	rotation,
 	scaleX,
 	scaleY,
@@ -178,6 +180,8 @@ const FrameComponent: React.FC<FrameProps> = ({
 					y={y}
 					width={width}
 					height={height}
+					minWidth={minWidth}
+					minHeight={minHeight}
 					rotation={rotation}
 					scaleX={scaleX}
 					scaleY={scaleY}

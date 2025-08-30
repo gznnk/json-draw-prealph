@@ -145,6 +145,8 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 		<>
 			<Frame
 				{...props}
+				minWidth={200}
+				minHeight={100}
 				stroke="#E5E6EB"
 				strokeWidth="1px"
 				fill="white"

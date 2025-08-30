@@ -62,6 +62,8 @@ const TransformativeComponent: React.FC<Props> = ({
 	showTransformControls,
 	onTransform,
 	onClick,
+	minWidth = 0,
+	minHeight = 0,
 }) => {
 	const [isResizing, setIsResizing] = useState(false);
 	const [isRotating, setIsRotating] = useState(false);
@@ -231,6 +233,61 @@ const TransformativeComponent: React.FC<Props> = ({
 		return nanToZero(height * aspectRatio) * scaleX * scaleY;
 	};
 
+	/**
+	 * Checks if dimensions are below minimum values and adjusts them.
+	 * Returns adjusted dimensions that meet minimum requirements.
+	 */
+	const enforceMinimumDimensions = (
+		newWidth: number,
+		newHeight: number,
+		aspectRatio?: number,
+		shouldKeepProportion?: boolean,
+	): { width: number; height: number } => {
+		const absWidth = Math.abs(newWidth);
+		const absHeight = Math.abs(newHeight);
+		const widthSign = signNonZero(newWidth);
+		const heightSign = signNonZero(newHeight);
+
+		// Check if either dimension is below minimum
+		const widthBelowMin = absWidth < minWidth;
+		const heightBelowMin = absHeight < minHeight;
+
+		if (!widthBelowMin && !heightBelowMin) {
+			return { width: newWidth, height: newHeight };
+		}
+
+		if (!shouldKeepProportion || !aspectRatio) {
+			// Without proportion constraint, just enforce minimums independently
+			return {
+				width: widthBelowMin ? minWidth * widthSign : newWidth,
+				height: heightBelowMin ? minHeight * heightSign : newHeight,
+			};
+		}
+
+		// With proportion constraint, we need to adjust both dimensions
+		// Choose the constraint that results in larger dimensions
+		const minWidthFromHeight = minHeight * aspectRatio;
+		const minHeightFromWidth = minWidth / aspectRatio;
+
+		let adjustedWidth: number;
+		let adjustedHeight: number;
+
+		if (minWidthFromHeight > minWidth) {
+			// Height constraint is more restrictive
+			adjustedHeight = minHeight * heightSign;
+			adjustedWidth = minWidthFromHeight * widthSign;
+		} else {
+			// Width constraint is more restrictive
+			adjustedWidth = minWidth * widthSign;
+			adjustedHeight = minHeightFromWidth * heightSign;
+		}
+
+		return {
+			width: adjustedWidth,
+			height: adjustedHeight,
+		};
+	};
+
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		// Component properties
@@ -254,6 +311,9 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent,
 		calcHeightWithAspectRatio,
 		calcWidthWithAspectRatio,
+		enforceMinimumDimensions,
+		minWidth,
+		minHeight,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -268,6 +328,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
+			enforceMinimumDimensions,
 		} = refBus.current;
 
 		setResizingByEvent(e.eventPhase);
@@ -282,7 +343,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			startFrame.current.bottomRightPoint.y,
 		);
 
-		const newWidth = inversedRightBottom.x - inversedDragPoint.x;
+		let newWidth = inversedRightBottom.x - inversedDragPoint.x;
 		let newHeight: number;
 		if (doKeepProportion && startFrame.current.aspectRatio) {
 			newHeight = calcHeightWithAspectRatio(
@@ -294,6 +355,16 @@ const TransformativeComponent: React.FC<Props> = ({
 		} else {
 			newHeight = inversedRightBottom.y - inversedDragPoint.y;
 		}
+
+		// Enforce minimum dimensions
+		const enforced = enforceMinimumDimensions(
+			newWidth,
+			newHeight,
+			startFrame.current.aspectRatio,
+			doKeepProportion,
+		);
+		newWidth = enforced.width;
+		newHeight = enforced.height;
 
 		const inversedCenterX = inversedRightBottom.x - nanToZero(newWidth / 2);
 		const inversedCenterY = inversedRightBottom.y - nanToZero(newHeight / 2);
@@ -324,6 +395,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
+			enforceMinimumDimensions,
 		} = refBus.current;
 
 		setResizingByEvent(e.eventPhase);
@@ -338,7 +410,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			startFrame.current.topRightPoint.y,
 		);
 
-		const newWidth = inversedRightTop.x - inversedDragPoint.x;
+		let newWidth = inversedRightTop.x - inversedDragPoint.x;
 		let newHeight: number;
 		if (doKeepProportion && startFrame.current.aspectRatio) {
 			newHeight = calcHeightWithAspectRatio(
@@ -350,6 +422,16 @@ const TransformativeComponent: React.FC<Props> = ({
 		} else {
 			newHeight = inversedDragPoint.y - inversedRightTop.y;
 		}
+
+		// Enforce minimum dimensions
+		const enforced = enforceMinimumDimensions(
+			newWidth,
+			newHeight,
+			startFrame.current.aspectRatio,
+			doKeepProportion,
+		);
+		newWidth = enforced.width;
+		newHeight = enforced.height;
 
 		const inversedCenterX = inversedRightTop.x - nanToZero(newWidth / 2);
 		const inversedCenterY = inversedRightTop.y + nanToZero(newHeight / 2);
@@ -379,6 +461,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
+			enforceMinimumDimensions,
 		} = refBus.current;
 
 		setResizingByEvent(e.eventPhase);
@@ -393,7 +476,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			startFrame.current.bottomLeftPoint.y,
 		);
 
-		const newWidth = inversedDragPoint.x - inversedLeftBottom.x;
+		let newWidth = inversedDragPoint.x - inversedLeftBottom.x;
 		let newHeight: number;
 		if (doKeepProportion && startFrame.current.aspectRatio) {
 			newHeight = calcHeightWithAspectRatio(
@@ -405,6 +488,16 @@ const TransformativeComponent: React.FC<Props> = ({
 		} else {
 			newHeight = inversedLeftBottom.y - inversedDragPoint.y;
 		}
+
+		// Enforce minimum dimensions
+		const enforced = enforceMinimumDimensions(
+			newWidth,
+			newHeight,
+			startFrame.current.aspectRatio,
+			doKeepProportion,
+		);
+		newWidth = enforced.width;
+		newHeight = enforced.height;
 
 		const inversedCenterX = inversedLeftBottom.x + nanToZero(newWidth / 2);
 		const inversedCenterY = inversedLeftBottom.y - nanToZero(newHeight / 2);
@@ -434,6 +527,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
+			enforceMinimumDimensions,
 		} = refBus.current;
 
 		setResizingByEvent(e.eventPhase);
@@ -448,7 +542,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			startFrame.current.topLeftPoint.y,
 		);
 
-		const newWidth = inversedDragPoint.x - inversedLeftTop.x;
+		let newWidth = inversedDragPoint.x - inversedLeftTop.x;
 		let newHeight: number;
 		if (doKeepProportion && startFrame.current.aspectRatio) {
 			newHeight = calcHeightWithAspectRatio(
@@ -460,6 +554,16 @@ const TransformativeComponent: React.FC<Props> = ({
 		} else {
 			newHeight = inversedDragPoint.y - inversedLeftTop.y;
 		}
+
+		// Enforce minimum dimensions
+		const enforced = enforceMinimumDimensions(
+			newWidth,
+			newHeight,
+			startFrame.current.aspectRatio,
+			doKeepProportion,
+		);
+		newWidth = enforced.width;
+		newHeight = enforced.height;
 
 		const inversedCenterX = inversedLeftTop.x + nanToZero(newWidth / 2);
 		const inversedCenterY = inversedLeftTop.y + nanToZero(newHeight / 2);
@@ -489,6 +593,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			triggerTransform,
 			setResizingByEvent,
 			calcWidthWithAspectRatio,
+			enforceMinimumDimensions,
 		} = refBus.current;
 
 		setResizingByEvent(e.eventPhase);
@@ -504,7 +609,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 
 		let newWidth: number;
-		const newHeight = inversedBottomCenter.y - inversedDragPoint.y;
+		let newHeight = inversedBottomCenter.y - inversedDragPoint.y;
 		if (doKeepProportion && startFrame.current.aspectRatio) {
 			newWidth = calcWidthWithAspectRatio(
 				newHeight,
@@ -515,6 +620,16 @@ const TransformativeComponent: React.FC<Props> = ({
 		} else {
 			newWidth = startFrame.current.width * startFrame.current.scaleX;
 		}
+
+		// Enforce minimum dimensions
+		const enforced = enforceMinimumDimensions(
+			newWidth,
+			newHeight,
+			startFrame.current.aspectRatio,
+			doKeepProportion,
+		);
+		newWidth = enforced.width;
+		newHeight = enforced.height;
 
 		const inversedCenterX = inversedBottomCenter.x;
 		const inversedCenterY = inversedBottomCenter.y - nanToZero(newHeight / 2);
@@ -549,6 +664,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
+			enforceMinimumDimensions,
 		} = refBus.current;
 
 		setResizingByEvent(e.eventPhase);
@@ -563,7 +679,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			startFrame.current.rightCenterPoint.y,
 		);
 
-		const newWidth = inversedRightCenter.x - inversedDragPoint.x;
+		let newWidth = inversedRightCenter.x - inversedDragPoint.x;
 		let newHeight: number;
 		if (doKeepProportion && startFrame.current.aspectRatio) {
 			newHeight = calcHeightWithAspectRatio(
@@ -575,6 +691,16 @@ const TransformativeComponent: React.FC<Props> = ({
 		} else {
 			newHeight = startFrame.current.height * startFrame.current.scaleY;
 		}
+
+		// Enforce minimum dimensions
+		const enforced = enforceMinimumDimensions(
+			newWidth,
+			newHeight,
+			startFrame.current.aspectRatio,
+			doKeepProportion,
+		);
+		newWidth = enforced.width;
+		newHeight = enforced.height;
 
 		const inversedCenterX = inversedRightCenter.x - nanToZero(newWidth / 2);
 		const inversedCenterY = inversedRightCenter.y;
@@ -609,6 +735,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
+			enforceMinimumDimensions,
 		} = refBus.current;
 
 		setResizingByEvent(e.eventPhase);
@@ -623,7 +750,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			startFrame.current.leftCenterPoint.y,
 		);
 
-		const newWidth = inversedDragPoint.x - inversedLeftCenter.x;
+		let newWidth = inversedDragPoint.x - inversedLeftCenter.x;
 		let newHeight: number;
 		if (doKeepProportion && startFrame.current.aspectRatio) {
 			newHeight = calcHeightWithAspectRatio(
@@ -635,6 +762,16 @@ const TransformativeComponent: React.FC<Props> = ({
 		} else {
 			newHeight = startFrame.current.height * startFrame.current.scaleY;
 		}
+
+		// Enforce minimum dimensions
+		const enforced = enforceMinimumDimensions(
+			newWidth,
+			newHeight,
+			startFrame.current.aspectRatio,
+			doKeepProportion,
+		);
+		newWidth = enforced.width;
+		newHeight = enforced.height;
 
 		const inversedCenterX = inversedLeftCenter.x + nanToZero(newWidth / 2);
 		const inversedCenterY = inversedLeftCenter.y;
@@ -669,6 +806,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			triggerTransform,
 			setResizingByEvent,
 			calcWidthWithAspectRatio,
+			enforceMinimumDimensions,
 		} = refBus.current;
 
 		setResizingByEvent(e.eventPhase);
@@ -684,7 +822,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 
 		let newWidth: number;
-		const newHeight = inversedDragPoint.y - inversedTopCenter.y;
+		let newHeight = inversedDragPoint.y - inversedTopCenter.y;
 		if (doKeepProportion && startFrame.current.aspectRatio) {
 			newWidth = calcWidthWithAspectRatio(
 				newHeight,
@@ -695,6 +833,16 @@ const TransformativeComponent: React.FC<Props> = ({
 		} else {
 			newWidth = startFrame.current.width * startFrame.current.scaleX;
 		}
+
+		// Enforce minimum dimensions
+		const enforced = enforceMinimumDimensions(
+			newWidth,
+			newHeight,
+			startFrame.current.aspectRatio,
+			doKeepProportion,
+		);
+		newWidth = enforced.width;
+		newHeight = enforced.height;
 
 		const inversedCenterX = inversedTopCenter.x;
 		const inversedCenterY = inversedTopCenter.y + nanToZero(newHeight / 2);
