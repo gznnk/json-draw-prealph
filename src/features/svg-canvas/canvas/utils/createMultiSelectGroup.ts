@@ -23,6 +23,7 @@ export const createMultiSelectGroup = (
 
 	return {
 		id: MULTI_SELECT_GROUP,
+		type: "Group",
 		x: boundingBox.left + (boundingBox.right - boundingBox.left) / 2,
 		y: boundingBox.top + (boundingBox.bottom - boundingBox.top) / 2,
 		width: boundingBox.right - boundingBox.left,
@@ -32,8 +33,9 @@ export const createMultiSelectGroup = (
 		scaleY: 1,
 		keepProportion: previousKeepProportion,
 		isSelected: true,
-		showTransformControls: true,
 		showOutline: true,
+		showTransformControls: true,
+		isTransforming: false,
 		itemableType: "abstract",
 		items: [],
 	} as GroupState;
