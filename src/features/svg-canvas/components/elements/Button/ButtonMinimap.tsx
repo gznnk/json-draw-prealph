@@ -5,9 +5,6 @@ import { memo } from "react";
 // Import types.
 import type { ButtonProps } from "../../../types/props/elements/ButtonProps";
 
-// Import components.
-import { Textable } from "../../core/Textable";
-
 // Import utils.
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
@@ -31,15 +28,6 @@ const ButtonMinimapComponent: React.FC<ButtonProps> = ({
 	fill,
 	stroke,
 	strokeWidth,
-	text,
-	textType,
-	fontColor,
-	fontSize,
-	fontFamily,
-	fontWeight,
-	textAlign,
-	verticalAlign,
-	isTextEditEnabled = true,
 	isTransparent,
 }) => {
 	// Generate rect transform attribute
@@ -52,41 +40,21 @@ const ButtonMinimapComponent: React.FC<ButtonProps> = ({
 	);
 
 	return (
-		<>
-			<ButtonElement
-				id={id}
-				x={-width / 2}
-				y={-height / 2}
-				width={width}
-				height={height}
-				rx={cornerRadius}
-				ry={cornerRadius}
-				fill={fill}
-				stroke={stroke}
-				strokeWidth={strokeWidth}
-				isTransparent={isTransparent}
-				transform={transform}
-				pointerEvents="none"
-			/>
-			{isTextEditEnabled && text && (
-				<Textable
-					x={-width / 2}
-					y={-height / 2}
-					width={width}
-					height={height}
-					transform={transform}
-					text={text}
-					textType={textType}
-					fontColor={fontColor}
-					fontSize={fontSize}
-					fontFamily={fontFamily}
-					fontWeight={fontWeight}
-					textAlign={textAlign}
-					verticalAlign={verticalAlign}
-					isTextEditing={false}
-				/>
-			)}
-		</>
+		<ButtonElement
+			id={id}
+			x={-width / 2}
+			y={-height / 2}
+			width={width}
+			height={height}
+			rx={cornerRadius}
+			ry={cornerRadius}
+			fill={fill}
+			stroke={stroke}
+			strokeWidth={strokeWidth}
+			isTransparent={isTransparent}
+			transform={transform}
+			pointerEvents="none"
+		/>
 	);
 };
 
