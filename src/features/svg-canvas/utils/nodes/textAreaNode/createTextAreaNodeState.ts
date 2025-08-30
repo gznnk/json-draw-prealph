@@ -5,7 +5,7 @@ import type { TextAreaNodeState } from "../../../types/state/nodes/TextAreaNodeS
 import { TextAreaNodeDefaultState } from "../../../constants/state/nodes/TextAreaNodeDefaultState";
 
 // Import utils.
-import { createTextState } from "../../elements/text/createTextState";
+import { createInputState } from "../../elements/input/createInputState";
 import { newId } from "../../shapes/common/newId";
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
 
@@ -49,11 +49,9 @@ export const createTextAreaNodeState = ({
 		x,
 		y,
 		items: [
-			createTextState({
+			createInputState({
 				x,
 				y,
-				textAlign: "left",
-				verticalAlign: "top",
 			}),
 		],
 		connectPoints,
