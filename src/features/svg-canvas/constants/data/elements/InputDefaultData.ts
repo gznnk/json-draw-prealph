@@ -11,5 +11,16 @@ import { CreateDefaultData } from "../shapes/CreateDefaultData";
 export const InputDefaultData: InputData = CreateDefaultData<InputData>({
 	type: "Input",
 	options: InputFeatures,
-	properties: {},
+	properties: {
+		fill: "#FFFFFF",
+		stroke: "#D9D9D9",
+		strokeWidth: "1px",
+		cornerRadius: 6,
+		fontColor: "#000000",
+		fontSize: 14,
+		fontFamily: "Segoe UI",
+		fontWeight: "normal",
+		textAlign: "left",
+		verticalAlign: "top",
+	},
 });

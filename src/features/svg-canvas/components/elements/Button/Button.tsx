@@ -5,6 +5,9 @@ import { memo, useRef } from "react";
 // Import types.
 import type { ButtonProps } from "../../../types/props/elements/ButtonProps";
 
+// Import constants.
+import { ButtonDefaultState } from "../../../constants/state/elements/ButtonDefaultState";
+
 // Import components.
 import { Outline } from "../../core/Outline";
 import { PositionLabel } from "../../core/PositionLabel";
@@ -23,7 +26,6 @@ import { mergeProps } from "../../../utils/core/mergeProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 
-import { ButtonDefaultState } from "../../../constants/state/elements/ButtonDefaultState";
 // Import styled components.
 import { ButtonElement } from "./ButtonStyled";
 

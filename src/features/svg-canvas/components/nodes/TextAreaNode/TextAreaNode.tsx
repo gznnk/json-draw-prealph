@@ -49,7 +49,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 	// Apply the props.text to the state when the component mounts or when props.text changes.
 	useEffect(() => {
 		setText(inputState.text);
-	}, [inputState]);
+	}, [inputState.text]);
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
@@ -183,11 +183,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 				scaleX={scaleX}
 				scaleY={scaleY}
 				rotation={rotation}
-				cornerRadius={6}
 				text={text}
-				fill="#FFFFFF"
-				stroke="#D9D9D9"
-				strokeWidth="1px"
 				onDrag={handleDrag}
 				onSelect={handleSelect}
 				onTextChange={onTextChange}

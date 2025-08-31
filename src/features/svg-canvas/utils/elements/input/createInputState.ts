@@ -10,7 +10,10 @@ import { newId } from "../../shapes/common/newId";
 /**
  * Create Input state
  */
-export const createInputState = ({ x, y }: { x: number; y: number }): InputState => ({
+export const createInputState = ({
+	x,
+	y,
+}: { x: number; y: number }): InputState => ({
 	...InputDefaultState,
 	id: newId(),
 	x,

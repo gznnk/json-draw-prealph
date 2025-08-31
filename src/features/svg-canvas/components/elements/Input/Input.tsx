@@ -5,6 +5,9 @@ import { memo, useRef } from "react";
 // Import types.
 import type { InputProps } from "../../../types/props/elements/InputProps";
 
+// Import constants.
+import { InputDefaultData } from "../../../constants/data/elements/InputDefaultData";
+
 // Import components.
 import { Textable } from "../../core/Textable";
 
@@ -32,18 +35,18 @@ const InputComponent: React.FC<InputProps> = ({
 	scaleX,
 	scaleY,
 	rotation,
-	fill,
-	stroke,
-	strokeWidth,
-	cornerRadius,
+	fill = InputDefaultData.fill,
+	stroke = InputDefaultData.stroke,
+	strokeWidth = InputDefaultData.strokeWidth,
+	cornerRadius = InputDefaultData.cornerRadius,
 	text,
 	textType,
-	fontColor,
-	fontSize,
-	fontFamily,
-	fontWeight,
-	textAlign,
-	verticalAlign,
+	fontColor = InputDefaultData.fontColor,
+	fontSize = InputDefaultData.fontSize,
+	fontFamily = InputDefaultData.fontFamily,
+	fontWeight = InputDefaultData.fontWeight,
+	textAlign = InputDefaultData.textAlign,
+	verticalAlign = InputDefaultData.verticalAlign,
 	isTextEditing,
 	isTextEditEnabled = true,
 	onDrag,

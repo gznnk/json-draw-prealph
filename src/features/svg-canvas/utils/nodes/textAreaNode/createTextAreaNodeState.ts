@@ -19,7 +19,7 @@ import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectan
 export const createTextAreaNodeState = ({
 	x,
 	y,
-	width = 100,
+	width = 200,
 	height = 100,
 	rotation = 0,
 	scaleX = 1,
@@ -48,6 +48,11 @@ export const createTextAreaNodeState = ({
 		id: newId(),
 		x,
 		y,
+		width,
+		height,
+		rotation,
+		scaleX,
+		scaleY,
 		items: [
 			createInputState({
 				x,
