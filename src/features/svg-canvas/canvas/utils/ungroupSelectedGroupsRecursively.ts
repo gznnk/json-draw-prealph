@@ -11,7 +11,7 @@ import { isSelectableState } from "../../utils/validation/isSelectableState";
  * @param items - List of all existing diagrams.
  * @returns Updated list of diagrams.
  */
-export const ungroupSelectedGroupsRecursive = (items: Diagram[]) => {
+export const ungroupSelectedGroupsRecursively = (items: Diagram[]) => {
 	// Recursively ungroup selected groups and rebuild the item list.
 	const ungroupedItems: Diagram[] = [];
 
@@ -28,7 +28,7 @@ export const ungroupSelectedGroupsRecursive = (items: Diagram[]) => {
 			} else {
 				const updatedGroup: Diagram = {
 					...item,
-					items: ungroupSelectedGroupsRecursive(item.items),
+					items: ungroupSelectedGroupsRecursively(item.items),
 				};
 				ungroupedItems.push(updatedGroup);
 			}
