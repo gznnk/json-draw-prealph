@@ -20,4 +20,6 @@ export type ButtonProps = Optional<
 	| "textAlign"
 	| "verticalAlign"
 	| "textType"
->;
+> & {
+	effectsEnabled?: boolean;
+};

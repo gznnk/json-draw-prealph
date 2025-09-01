@@ -171,6 +171,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 					showTransformControls={false}
 					text="Send"
 					isTextEditing={false}
+					effectsEnabled
 					onDrag={handleDrag}
 					onClick={handleButtonClick}
 				/>

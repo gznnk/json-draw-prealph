@@ -63,6 +63,7 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 	showOutline = false,
 	showTransformControls = false,
 	isTransforming = false,
+	effectsEnabled = false,
 	onDrag,
 	onDragOver,
 	onDragLeave,
@@ -163,6 +164,7 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 				tabIndex={0}
 				cursor="move"
 				isTransparent={isTransparent}
+				effectsEnabled={effectsEnabled}
 				transform={transform}
 				ref={svgRef}
 				onDoubleClick={onDoubleClick}

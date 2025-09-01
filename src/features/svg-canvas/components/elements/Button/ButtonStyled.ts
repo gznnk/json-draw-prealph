@@ -6,6 +6,7 @@ import styled from "@emotion/styled";
  */
 type ButtonProps = {
 	isTransparent?: boolean;
+	effectsEnabled?: boolean;
 };
 
 /**
@@ -17,10 +18,14 @@ export const ButtonElement = styled.rect<ButtonProps>`
     transition: opacity 0.2s cubic-bezier(0.645, 0.045, 0.355, 1), filter 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 
     &:hover {
-        opacity: ${(props) => (props.isTransparent ? 0 : 0.85)};
+        opacity: ${(props) => 
+			props.effectsEnabled 
+				? (props.isTransparent ? 0 : 0.85)
+				: (props.isTransparent ? 0 : 1)
+		};
     }
 
     &:active {
-        filter: brightness(0.75);
+        filter: ${(props) => props.effectsEnabled ? 'brightness(0.75)' : 'none'};
     }
 `;
