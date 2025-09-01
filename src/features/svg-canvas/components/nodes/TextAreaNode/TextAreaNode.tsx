@@ -35,6 +35,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 		scaleY,
 		rotation,
 		items,
+		isSelected,
 		onDrag,
 		onSelect,
 		onTextChange,
@@ -184,6 +185,8 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 				scaleY={scaleY}
 				rotation={rotation}
 				text={text}
+				isSelected={isSelected}
+				isAncestorSelected={isSelected}
 				onDrag={handleDrag}
 				onSelect={handleSelect}
 				onTextChange={onTextChange}
