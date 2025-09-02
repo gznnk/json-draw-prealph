@@ -18,6 +18,9 @@ import { useHover } from "../../../hooks/useHover";
 import { useSelect } from "../../../hooks/useSelect";
 import { useText } from "../../../hooks/useText";
 
+// Import context.
+import { useSvgViewport } from "../../../context/SvgViewportContext";
+
 // Import utils.
 import { mergeProps } from "../../../utils/core/mergeProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
@@ -62,6 +65,9 @@ const InputComponent: React.FC<InputProps> = ({
 	// Reference to the SVG element to be transformed
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
+	// Get viewport information for coordinate conversion
+	const viewportRef = useSvgViewport();
+
 	// To avoid frequent handler generation, hold referenced values in useRef
 	const refBusVal = {
 		// Properties
@@ -74,12 +80,52 @@ const InputComponent: React.FC<InputProps> = ({
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	// Generate properties for text editing
+	// Generate properties for text editing with coordinate transformation
 	const { onDoubleClick } = useText({
 		id,
 		isSelected,
 		isTextEditEnabled,
 		onTextChange,
+		attributes: () => {
+			const domMatrix = svgRef.current?.getScreenCTM();
+			console.log("SVG Element DOMMatrix:", domMatrix);
+			const domMatrix2 = svgRef.current?.getCTM();
+			console.log("SVG Element CTM:", domMatrix2);
+			const zeroOrigin = new DOMMatrix().translate(
+				viewportRef.current.minX,
+				viewportRef.current.minY,
+			);
+			if (!domMatrix2) {
+				return undefined;
+			}
+
+			// const domMatrix3 = zeroOrigin.multiply(domMatrix2.inverse());
+			// console.log("SVG Element Transformed CTM:", domMatrix3);
+
+			const p = new DOMPoint(x, y);
+			const transformedPoint = p.matrixTransform(
+				zeroOrigin.multiply(domMatrix2),
+			);
+			console.log("Transformed Point:", transformedPoint);
+
+			return {
+				x: transformedPoint.x,
+				y: transformedPoint.y,
+				width,
+				height,
+				scaleX,
+				scaleY,
+				rotation,
+				text,
+				textType,
+				textAlign,
+				verticalAlign,
+				fontColor,
+				fontSize,
+				fontFamily,
+				fontWeight,
+			};
+		},
 	});
 
 	// Generate properties for dragging
