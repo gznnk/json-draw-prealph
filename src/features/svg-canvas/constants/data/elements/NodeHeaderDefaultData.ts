@@ -19,7 +19,7 @@ export const NodeHeaderDefaultData: NodeHeaderData =
 			fontFamily: "Segoe UI",
 			fontWeight: "400",
 			textAlign: "left",
-			verticalAlign: "middle",
+			verticalAlign: "center",
 			iconBackgroundColor: "#E6E6E6",
 		},
 	});
