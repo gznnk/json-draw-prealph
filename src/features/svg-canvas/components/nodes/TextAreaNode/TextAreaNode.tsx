@@ -19,6 +19,15 @@ import { newEventId } from "../../../utils/core/newEventId";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { affineTransformation } from "../../../utils/math/transform/affineTransformation";
 
+// Import local modules.
+import {
+	BASE_MARGIN,
+	BUTTON_HEIGHT,
+	BUTTON_MARGIN_BOTTOM,
+	BUTTON_MARGIN_TOP,
+	BUTTON_WIDTH,
+} from "./TextAreaConstants";
+
 /**
  * TextAreaNode component.
  */
@@ -82,9 +91,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 		});
 	}, []);
 
-	/**
-	 * Handler for button click events.
-	 */
+	// Handler for button click events.
 	const handleButtonClick = useCallback(() => {
 		// Bypass references to avoid function creation in every render.
 		const { text, id, onExecute } = refBus.current;
@@ -131,15 +138,22 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 		}
 	}, []);
 
-	const textCenter = affineTransformation(
+	const inputHeight =
+		height -
+		(BASE_MARGIN + BUTTON_HEIGHT + BUTTON_MARGIN_TOP + BUTTON_MARGIN_BOTTOM);
+
+	const inputCenter = affineTransformation(
 		0,
-		-(height / 2 - ((height - 72) / 2 + 16)),
+		-(height / 2 - (inputHeight / 2 + BASE_MARGIN)),
 		scaleX,
 		scaleY,
 		degreesToRadians(rotation),
 		x,
 		y,
 	);
+
+	const buttonX = width / 2 - BUTTON_WIDTH / 2 - BASE_MARGIN;
+	const buttonY = height / 2 - BUTTON_HEIGHT / 2 - BUTTON_MARGIN_BOTTOM;
 
 	return (
 		<>
@@ -155,10 +169,10 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 			>
 				<Button
 					id={`${id}-button`}
-					x={width / 2 - 56}
-					y={height / 2 - 27}
-					width={80}
-					height={32}
+					x={buttonX}
+					y={buttonY}
+					width={BUTTON_WIDTH}
+					height={BUTTON_HEIGHT}
 					scaleX={1}
 					scaleY={1}
 					rotation={0}
@@ -177,10 +191,10 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 			</Frame>
 			<Input
 				{...inputState}
-				x={textCenter.x}
-				y={textCenter.y}
-				width={width - 32}
-				height={height - 72}
+				x={inputCenter.x}
+				y={inputCenter.y}
+				width={width - BASE_MARGIN * 2}
+				height={inputHeight}
 				scaleX={scaleX}
 				scaleY={scaleY}
 				rotation={rotation}
