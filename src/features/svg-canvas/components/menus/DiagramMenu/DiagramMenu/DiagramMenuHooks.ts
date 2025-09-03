@@ -25,7 +25,7 @@ import {
 	findFirstFillableRecursive,
 	findFirstStrokableRecursive,
 	findFirstTextableRecursive,
-} from "./DiagramMenuFunctions";
+} from "./DiagramMenuUtils";
 import type {
 	DiagramMenuProps,
 	DiagramMenuStateMap,
