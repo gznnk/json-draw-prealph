@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { memo, useRef } from "react";
+import { memo } from "react";
 
 // Import types.
 import type { NodeHeaderProps } from "../../../types/props/elements/NodeHeaderProps";
@@ -9,20 +9,15 @@ import type { NodeHeaderProps } from "../../../types/props/elements/NodeHeaderPr
 import { NodeHeaderDefaultData } from "../../../constants/data/elements/NodeHeaderDefaultData";
 
 // Import components.
-import { Textable } from "../../core/Textable";
+import { Input } from "../Input";
 
 // Import hooks.
-import { useClick } from "../../../hooks/useClick";
-import { useDrag } from "../../../hooks/useDrag";
-import { useHover } from "../../../hooks/useHover";
-import { useSelect } from "../../../hooks/useSelect";
-import { useText } from "../../../hooks/useText";
 
 // Import utils.
-import { mergeProps } from "../../../utils/core/mergeProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 
+import { affineTransformation } from "../../../utils/math/transform/affineTransformation";
 // Import local modules.
 import { ICON_TEXT_MARGIN } from "./NodeHeaderConstants";
 
@@ -34,119 +29,38 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 	x,
 	y,
 	width,
-	height = 30,
+	height = NodeHeaderDefaultData.height,
 	scaleX,
 	scaleY,
 	rotation,
 	text,
-	textType,
 	fontColor = NodeHeaderDefaultData.fontColor,
 	fontSize = NodeHeaderDefaultData.fontSize,
 	fontFamily = NodeHeaderDefaultData.fontFamily,
 	fontWeight = NodeHeaderDefaultData.fontWeight,
 	textAlign = NodeHeaderDefaultData.textAlign,
 	verticalAlign = NodeHeaderDefaultData.verticalAlign,
+	isTextEditing,
 	iconComponent: IconComponent,
 	iconBackgroundColor = NodeHeaderDefaultData.iconBackgroundColor,
-	isTextEditing,
-	isTextEditEnabled = true,
 	isSelected,
 	isAncestorSelected = false,
 	onDrag,
-	onDragOver,
-	onDragLeave,
-	onClick,
 	onSelect,
 	onTextChange,
-	onHoverChange,
 }) => {
-	// Reference to the SVG element to be transformed
-	const svgRef = useRef<SVGGElement>({} as SVGGElement);
-
-	// To avoid frequent handler generation, hold referenced values in useRef
-	const refBusVal = {
-		// Properties
-		id,
-		isSelected,
-		isTextEditEnabled,
-		onDrag,
-		onTextChange,
-	};
-	const refBus = useRef(refBusVal);
-	refBus.current = refBusVal;
-
 	// Constants for layout
 	const iconSize = height;
 	const iconX = -width / 2 + iconSize / 2; // No left padding
-	const textX = -width / 2 + iconSize + ICON_TEXT_MARGIN; // Margin from icon
-	const textWidth = width - iconSize - ICON_TEXT_MARGIN; // Remaining width minus margin
-
-	// Generate properties for text editing with coordinate transformation
-	const { onDoubleClick } = useText({
-		id,
-		isSelected,
-		isTextEditEnabled,
-		onTextChange,
-		attributes: {
-			x: x + textX + textWidth / 2,
-			y,
-			width: textWidth,
-			height,
-			scaleX,
-			scaleY,
-			rotation,
-			text,
-			textType,
-			fontColor,
-			fontSize,
-			fontFamily,
-			fontWeight,
-			textAlign,
-			verticalAlign,
-		},
-	});
-
-	// Generate properties for dragging
-	const dragProps = useDrag({
-		id,
-		type: "NodeHeader",
+	const textWidth = width - iconSize - ICON_TEXT_MARGIN; // Remaining width minus margin ; // Margin from icon
+	const textCenter = affineTransformation(
+		textWidth / 2 - (width / 2 - iconSize - ICON_TEXT_MARGIN),
+		0,
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
 		x,
 		y,
-		ref: svgRef,
-		onDrag,
-		onDragOver,
-		onDragLeave,
-	});
-
-	// Generate properties for clicking
-	const clickProps = useClick({
-		id,
-		x,
-		y,
-		isSelected,
-		isAncestorSelected,
-		ref: svgRef,
-		onClick,
-	});
-
-	// Generate properties for selection
-	const selectProps = useSelect({
-		id,
-		onSelect,
-	});
-
-	// Generate properties for hovering
-	const hoverProps = useHover({
-		id,
-		onHoverChange,
-	});
-
-	// Compose props for the SVG element
-	const composedProps = mergeProps(
-		dragProps,
-		clickProps,
-		selectProps,
-		hoverProps,
 	);
 
 	// Generate transform attribute
@@ -161,15 +75,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 	return (
 		<>
 			{/* Main container group */}
-			<g
-				id={id}
-				tabIndex={0}
-				cursor="move"
-				transform={transform}
-				ref={svgRef}
-				onDoubleClick={onDoubleClick}
-				{...composedProps}
-			>
+			<g cursor="move" transform={transform}>
 				{/* Icon background (rounded rectangle) */}
 				<rect
 					x={iconX - iconSize / 2}
@@ -196,6 +102,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 								display: "flex",
 								alignItems: "center",
 								justifyContent: "center",
+								pointerEvents: "none",
 							}}
 						>
 							<IconComponent width={iconSize * 0.6} height={iconSize * 0.6} />
@@ -205,24 +112,35 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 			</g>
 
 			{/* Text content */}
-			{isTextEditEnabled && (
-				<Textable
-					x={textX}
-					y={-height / 2}
-					width={textWidth}
-					height={height}
-					transform={transform}
-					text={text}
-					textType={textType}
-					fontColor={fontColor}
-					fontSize={fontSize}
-					fontFamily={fontFamily}
-					fontWeight={fontWeight}
-					textAlign={textAlign}
-					verticalAlign={verticalAlign}
-					isTextEditing={isTextEditing}
-				/>
-			)}
+			<Input
+				id={id}
+				x={textCenter.x}
+				y={textCenter.y}
+				width={textWidth}
+				height={height}
+				scaleX={scaleX}
+				scaleY={scaleY}
+				rotation={rotation}
+				keepProportion={false}
+				strokeWidth="0px"
+				text={text}
+				textType="text"
+				fontColor={fontColor}
+				fontSize={fontSize}
+				fontFamily={fontFamily}
+				fontWeight={fontWeight}
+				textAlign={textAlign}
+				verticalAlign={verticalAlign}
+				isTextEditing={isTextEditing}
+				isSelected={isSelected}
+				isAncestorSelected={isAncestorSelected}
+				showOutline={false}
+				isTransforming={false}
+				showTransformControls={false}
+				onDrag={onDrag}
+				onSelect={onSelect}
+				onTextChange={onTextChange}
+			/>
 		</>
 	);
 };
