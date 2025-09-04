@@ -11,15 +11,14 @@ import { NodeHeaderDefaultData } from "../../../constants/data/elements/NodeHead
 // Import components.
 import { Input } from "../Input";
 
-// Import hooks.
-
 // Import utils.
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { affineTransformation } from "../../../utils/math/transform/affineTransformation";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 
-import { affineTransformation } from "../../../utils/math/transform/affineTransformation";
 // Import local modules.
 import { ICON_TEXT_MARGIN } from "./NodeHeaderConstants";
+import { IconWrapper, MainContainerGroup } from "./NodeHeaderStyled";
 
 /**
  * NodeHeader component - an icon with text in a row layout
@@ -75,7 +74,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 	return (
 		<>
 			{/* Main container group */}
-			<g cursor="move" transform={transform}>
+			<MainContainerGroup transform={transform}>
 				{/* Icon background (rounded rectangle) */}
 				<rect
 					x={iconX - iconSize / 2}
@@ -95,21 +94,10 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 						width={iconSize}
 						height={iconSize}
 					>
-						<div
-							style={{
-								width: "100%",
-								height: "100%",
-								display: "flex",
-								alignItems: "center",
-								justifyContent: "center",
-								pointerEvents: "none",
-							}}
-						>
-							{icon}
-						</div>
+						<IconWrapper>{icon}</IconWrapper>
 					</foreignObject>
 				)}
-			</g>
+			</MainContainerGroup>
 
 			{/* Text content */}
 			<Input
