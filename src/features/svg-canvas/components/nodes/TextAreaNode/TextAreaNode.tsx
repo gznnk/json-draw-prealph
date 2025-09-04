@@ -21,6 +21,7 @@ import { newEventId } from "../../../utils/core/newEventId";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { affineTransformation } from "../../../utils/math/transform/affineTransformation";
 
+import { TextArea } from "../../icons/TextArea";
 // Import local modules.
 import {
 	BASE_MARGIN,
@@ -227,6 +228,8 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 				rotation={rotation}
 				isSelected={isSelected}
 				isAncestorSelected={isSelected}
+				icon={<TextArea fill="#ffffff" />}
+				iconBackgroundColor="#1890ff"
 				onDrag={handleDrag}
 				onSelect={handleSelect}
 				onTextChange={onTextChange}

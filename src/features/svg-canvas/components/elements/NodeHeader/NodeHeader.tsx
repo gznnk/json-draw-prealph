@@ -41,7 +41,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 	textAlign = NodeHeaderDefaultData.textAlign,
 	verticalAlign = NodeHeaderDefaultData.verticalAlign,
 	isTextEditing,
-	iconComponent: IconComponent,
+	icon,
 	iconBackgroundColor = NodeHeaderDefaultData.iconBackgroundColor,
 	isSelected,
 	isAncestorSelected = false,
@@ -88,7 +88,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 				/>
 
 				{/* Icon component */}
-				{IconComponent && (
+				{icon && (
 					<foreignObject
 						x={iconX - iconSize / 2}
 						y={-iconSize / 2}
@@ -105,7 +105,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 								pointerEvents: "none",
 							}}
 						>
-							<IconComponent width={iconSize * 0.6} height={iconSize * 0.6} />
+							{icon}
 						</div>
 					</foreignObject>
 				)}

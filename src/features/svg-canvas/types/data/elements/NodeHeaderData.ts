@@ -22,12 +22,6 @@ export const NodeHeaderFeatures = {
  * Contains properties specific to NodeHeader diagram elements.
  */
 export type NodeHeaderData = CreateDataType<typeof NodeHeaderFeatures> & {
-	/** Icon component to display */
-	iconComponent?: React.ComponentType<{
-		width?: number;
-		height?: number;
-		animation?: boolean;
-	}>;
 	/** Background color for the icon container */
 	iconBackgroundColor?: string;
 };
