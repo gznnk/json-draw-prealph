@@ -16,8 +16,11 @@ import type { Prettify } from "../../../../../shared/utility-types";
 /**
  * Generic type creator for diagram data types.
  * Conditionally includes feature interfaces based on provided features.
+ *
+ * @template T - DiagramFeatures configuration
+ * @template P - Additional properties type (optional)
  */
-export type CreateDataType<T extends DiagramFeatures> = Prettify<
+export type CreateDataType<T extends DiagramFeatures, P = object> = Prettify<
 	DiagramBaseData &
 		(T["frameable"] extends true ? FrameableData : object) &
 		(T["transformative"] extends true ? TransformativeData : object) &
@@ -26,5 +29,6 @@ export type CreateDataType<T extends DiagramFeatures> = Prettify<
 		(T["strokable"] extends true ? StrokableData : object) &
 		(T["fillable"] extends true ? FillableData : object) &
 		(T["cornerRoundable"] extends true ? CornerRoundableData : object) &
-		(T["textable"] extends true ? TextableData : object)
+		(T["textable"] extends true ? TextableData : object) &
+		P
 >;

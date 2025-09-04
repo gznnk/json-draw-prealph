@@ -20,6 +20,6 @@ export const LLMNodeFeatures = {
 /**
  * Type of the LLM node data.
  */
-export type LLMNodeData = CreateDataType<typeof LLMNodeFeatures> & {
+export type LLMNodeData = CreateDataType<typeof LLMNodeFeatures, {
 	type: "LLMNode";
-};
+}>;

@@ -19,11 +19,11 @@ export const ConnectLineFeatures = {
 /**
  * Data type for connection lines between diagram elements.
  */
-export type ConnectLineData = CreateDataType<typeof ConnectLineFeatures> & {
+export type ConnectLineData = CreateDataType<typeof ConnectLineFeatures, {
 	pathType: PathType;
 	startOwnerId: string;
 	endOwnerId: string;
 	autoRouting: boolean;
 	startArrowHead?: ArrowHeadType;
 	endArrowHead?: ArrowHeadType;
-};
+}>;

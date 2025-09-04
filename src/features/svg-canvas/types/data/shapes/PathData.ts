@@ -19,8 +19,8 @@ export const PathFeatures = {
 /**
  * Data type for polyline/path elements.
  */
-export type PathData = CreateDataType<typeof PathFeatures> & {
+export type PathData = CreateDataType<typeof PathFeatures, {
 	pathType: PathType;
 	startArrowHead?: ArrowHeadType;
 	endArrowHead?: ArrowHeadType;
-};
+}>;

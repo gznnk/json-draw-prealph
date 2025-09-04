@@ -15,6 +15,6 @@ export const ImageFeatures = {
 /**
  * Data type for Image component.
  */
-export type ImageData = CreateDataType<typeof ImageFeatures> & {
+export type ImageData = CreateDataType<typeof ImageFeatures, {
 	base64Data: string;
-};
+}>;

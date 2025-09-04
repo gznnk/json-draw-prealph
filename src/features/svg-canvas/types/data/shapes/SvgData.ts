@@ -14,8 +14,8 @@ export const SvgFeatures = {
 /**
  * Type for the data of the Svg component.
  */
-export type SvgData = CreateDataType<typeof SvgFeatures> & {
+export type SvgData = CreateDataType<typeof SvgFeatures, {
 	initialWidth: number;
 	initialHeight: number;
 	svgText: string;
-};
+}>;
