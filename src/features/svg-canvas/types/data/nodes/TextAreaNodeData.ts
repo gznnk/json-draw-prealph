@@ -21,6 +21,9 @@ export const TextAreaNodeFeatures = {
 /**
  * Type of the TextAreaNode data.
  */
-export type TextAreaNodeData = CreateDataType<typeof TextAreaNodeFeatures, {
-	type: "TextAreaNode";
-}>;
+export type TextAreaNodeData = CreateDataType<
+	typeof TextAreaNodeFeatures,
+	{
+		type: "TextAreaNode";
+	}
+>;

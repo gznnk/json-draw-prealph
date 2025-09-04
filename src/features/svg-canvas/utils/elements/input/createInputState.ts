@@ -13,9 +13,11 @@ import { newId } from "../../shapes/common/newId";
 export const createInputState = ({
 	x,
 	y,
-}: { x: number; y: number }): InputState => ({
+	text = "",
+}: { x: number; y: number; text?: string }): InputState => ({
 	...InputDefaultState,
 	id: newId(),
 	x,
 	y,
+	text,
 });

@@ -9,7 +9,8 @@ import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";
  */
 export type TextAreaNodeProps = CreateDiagramProps<
 	TextAreaNodeState,
-	typeof TextAreaNodeFeatures
-> & {
-	onTextChange: (e: DiagramTextChangeEvent) => void;
-};
+	typeof TextAreaNodeFeatures,
+	{
+		onTextChange: (e: DiagramTextChangeEvent) => void;
+	}
+>;

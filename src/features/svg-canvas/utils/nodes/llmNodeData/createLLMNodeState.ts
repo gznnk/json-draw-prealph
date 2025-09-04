@@ -1,5 +1,11 @@
+// Import types.
+import type { LLMNodeState } from "../../../types/state/nodes/LLMNodeState";
+
 // Import utils.
-import { createRectangleState } from "../../shapes/rectangle/createRectangleState";
+import { createInputState } from "../../elements/input/createInputState";
+import { createNodeHeaderState } from "../../elements/nodeHeader/createNodeHeaderState";
+import { newId } from "../../shapes/common/newId";
+import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
 
 // Import constants.
 import { LLMNodeDefaultState } from "../../../constants/state/nodes/LLMNodeDefaultState";
@@ -9,33 +15,66 @@ import { LLMNodeDefaultState } from "../../../constants/state/nodes/LLMNodeDefau
  *
  * @param x - The x coordinate of the node
  * @param y - The y coordinate of the node
- * @param text - Optional text content of the node
+ * @param width - Optional width of the node
+ * @param height - Optional height of the node
+ * @param rotation - Optional rotation of the node
+ * @param scaleX - Optional x scale of the node
+ * @param scaleY - Optional y scale of the node
  * @returns LLM node state object
  */
 export const createLLMNodeState = ({
 	x,
 	y,
-	text,
+	width = LLMNodeDefaultState.width,
+	height = LLMNodeDefaultState.height,
+	rotation = 0,
+	scaleX = 1,
+	scaleY = 1,
+	text = "",
 }: {
 	x: number;
 	y: number;
+	width?: number;
+	height?: number;
+	rotation?: number;
+	scaleX?: number;
+	scaleY?: number;
 	text?: string;
 }) => {
-	const state = createRectangleState({
+	const connectPoints = createRectangleConnectPoint({
 		x,
 		y,
-		stroke: LLMNodeDefaultState.stroke,
-		fill: LLMNodeDefaultState.fill,
-		textType: LLMNodeDefaultState.textType,
-		textAlign: LLMNodeDefaultState.textAlign,
-		verticalAlign: LLMNodeDefaultState.verticalAlign,
-		fontColor: LLMNodeDefaultState.fontColor,
-		fontSize: LLMNodeDefaultState.fontSize,
-		text: text ?? LLMNodeDefaultState.text,
-		keepProportion: LLMNodeDefaultState.keepProportion,
+		width,
+		height,
+		rotation,
+		scaleX,
+		scaleY,
 	});
 
-	state.type = "LLMNode";
+	const state = {
+		...LLMNodeDefaultState,
+		id: newId(),
+		x,
+		y,
+		width,
+		height,
+		rotation,
+		scaleX,
+		scaleY,
+		items: [
+			createNodeHeaderState({
+				x,
+				y,
+				text: "LLM",
+			}),
+			createInputState({
+				x,
+				y,
+				text,
+			}),
+		],
+		connectPoints,
+	} as LLMNodeState;
 
 	return state;
 };
