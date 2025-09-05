@@ -17,11 +17,15 @@ const ConnectPointsComponent: React.FC<ConnectPointsProps> = ({
 	connectPoints,
 	showConnectPoints,
 	shouldRender,
+	connectEnabled = true,
 	onConnect,
 	onPreviewConnectLine,
 }) => {
-	// Don't render if connect points should not be shown
 	if (!shouldRender) {
+		return null;
+	}
+
+	if (connectEnabled === false) {
 		return null;
 	}
 

@@ -18,6 +18,8 @@ export type ConnectPointsProps = {
 	showConnectPoints: boolean;
 	/** Whether to render connect points at all */
 	shouldRender: boolean;
+	/** Whether the connect points are enabled for connections */
+	connectEnabled?: boolean;
 	/** Connect event handler */
 	onConnect?: (event: DiagramConnectEvent) => void;
 	/** Preview connect line event handler */
