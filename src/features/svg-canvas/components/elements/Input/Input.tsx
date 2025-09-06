@@ -1,6 +1,6 @@
 // Import React.
 import type React from "react";
-import { memo, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 
 // Import types.
 import type { InputProps } from "../../../types/props/elements/InputProps";
@@ -75,6 +75,14 @@ const InputComponent: React.FC<InputProps> = ({
 	onDiagramChange,
 	onHoverChange,
 }) => {
+	// Internal text state
+	const [internalText, setInternalText] = useState(text);
+
+	// Sync internal state with props when text prop changes
+	useEffect(() => {
+		setInternalText(text);
+	}, [text]);
+
 	// Reference to the SVG element to be transformed
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
@@ -154,7 +162,7 @@ const InputComponent: React.FC<InputProps> = ({
 	useExecutionChain({
 		id,
 		onPropagation: (e) => {
-			if (e.eventPhase === "Ended" && e.data.text) {
+			if (e.eventPhase === "Ended") {
 				// Update the diagram state with the new text
 				onDiagramChange?.({
 					id,
@@ -167,6 +175,8 @@ const InputComponent: React.FC<InputProps> = ({
 						text: e.data.text,
 					},
 				});
+			} else {
+				setInternalText(e.data.text);
 			}
 		},
 	});
@@ -233,7 +243,7 @@ const InputComponent: React.FC<InputProps> = ({
 					width={width}
 					height={height}
 					transform={transform}
-					text={text}
+					text={internalText}
 					textType={textType}
 					fontColor={fontColor}
 					fontSize={fontSize}
