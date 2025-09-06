@@ -60,10 +60,14 @@ export const createTextAreaNodeState = ({
 				y,
 				text: "Text",
 			}),
-			createInputState({
-				x,
-				y,
-			}),
+			{
+				...createInputState({
+					x,
+					y,
+					verticalAlign: "top",
+				}),
+				connectPoints: [],
+			},
 		],
 		connectPoints,
 	} as TextAreaNodeState;

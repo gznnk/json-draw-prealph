@@ -121,7 +121,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 
 			try {
 				const stream = await openai.responses.create({
-					model: "gpt-4o",
+					model: "gpt-5",
 					instructions,
 					input: inputText,
 					stream: true,
@@ -188,10 +188,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 
 	const inputHeight =
 		height -
-		(HEADER_MARGIN_TOP +
-			HEADER_HEIGHT +
-			HEADER_MARGIN_BOTTOM +
-			BASE_MARGIN);
+		(HEADER_MARGIN_TOP + HEADER_HEIGHT + HEADER_MARGIN_BOTTOM + BASE_MARGIN);
 
 	const headerCenter = affineTransformation(
 		0,

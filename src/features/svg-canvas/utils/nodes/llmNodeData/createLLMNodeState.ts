@@ -67,11 +67,15 @@ export const createLLMNodeState = ({
 				y,
 				text: "LLM",
 			}),
-			createInputState({
-				x,
-				y,
-				text,
-			}),
+			{
+				...createInputState({
+					x,
+					y,
+					text,
+					verticalAlign: "top",
+				}),
+				connectPoints: [],
+			},
 		],
 		connectPoints,
 	} as LLMNodeState;
