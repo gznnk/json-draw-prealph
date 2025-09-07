@@ -25,8 +25,8 @@ import { generatePathFromFrameToPoint } from "../../../utils/shapes/connectPoint
 import { getLineDirection } from "../../../utils/shapes/connectPoint/getLineDirection";
 
 // Import constants.
-import { ConnectLineDefaultState } from "../../../constants/state/shapes/ConnectLineDefaultState";
 import { EVENT_NAME_CONNECTION } from "../../../constants/core/EventNames";
+import { ConnectLineDefaultState } from "../../../constants/state/shapes/ConnectLineDefaultState";
 
 // Import local module files.
 import type { ConnectingPoint, ConnectionEvent } from "./ConnectPointTypes";
@@ -41,6 +41,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	ownerId,
 	ownerFrame,
 	alwaysVisible,
+	connectType = "both",
 	onConnect,
 	onPreviewConnectLine,
 }) => {
@@ -124,6 +125,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 		y,
 		ownerId,
 		ownerFrame,
+		connectType,
 		onConnect,
 		onPreviewConnectLine,
 		eventBus,
@@ -138,18 +140,25 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	 * Drag event handler for the connect point
 	 */
 	const handleDrag = useCallback((e: DiagramDragEvent) => {
+		const { connectType, onPreviewConnectLine, updatePathPoints } =
+			refBus.current;
+
+		if (connectType === "end-only") {
+			return;
+		}
+
 		if (connectingPoint.current) {
 			// If there is a connecting point, use that point as the end point
 			return;
 		}
 
 		if (e.eventPhase !== "Ended") {
-			refBus.current.updatePathPoints(e.endX, e.endY, e.eventPhase);
+			updatePathPoints(e.endX, e.endY, e.eventPhase);
 		} else {
 			setPathPoints([]);
 
 			// Clear the path data for the new connection line rendering.
-			refBus.current.onPreviewConnectLine?.({
+			onPreviewConnectLine?.({
 				eventPhase: e.eventPhase,
 				pathData: undefined,
 			});
@@ -250,6 +259,10 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 	 * @returns {void}
 	 */
 	const handleHover = useCallback((e: DiagramHoverChangeEvent) => {
+		const { connectType } = refBus.current;
+		if (connectType === "end-only") {
+			return;
+		}
 		setIsHovered(e.isHovered);
 	}, []);
 
@@ -333,7 +346,7 @@ const ConnectPointComponent: React.FC<ConnectPointProps> = ({
 			radius={6}
 			stroke="rgba(255, 204, 0, 0.8)"
 			fill="rgba(255, 204, 0, 0.8)"
-			cursor="pointer"
+			cursor={connectType === "end-only" ? "default" : "pointer"}
 			outline="none"
 			isTransparent={!alwaysVisible && !isHovered}
 			onDrag={handleDrag}

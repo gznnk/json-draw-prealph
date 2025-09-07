@@ -126,6 +126,8 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 		const { id, text, inputState, onDiagramChange, onExecute, setText } =
 			refBus.current;
 
+		setText(e.data.text);
+
 		if (e.eventPhase === "Ended") {
 			// Update the text state with the new text from the event data.
 			onDiagramChange?.({
@@ -149,8 +151,6 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 					text: e.data.text,
 				},
 			});
-		} else {
-			setText(e.data.text);
 		}
 	}, []);
 

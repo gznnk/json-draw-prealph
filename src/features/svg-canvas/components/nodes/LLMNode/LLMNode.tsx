@@ -263,6 +263,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				showOutline={false}
 				isTransforming={false}
 				showTransformControls={false}
+				connectType="end-only"
 				onDrag={handleDrag}
 				onDragOver={onDragOver}
 				onDragLeave={onDragLeave}

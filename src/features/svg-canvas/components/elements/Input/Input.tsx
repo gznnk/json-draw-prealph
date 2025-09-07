@@ -60,6 +60,7 @@ const InputComponent: React.FC<InputProps> = ({
 	connectPoints = [],
 	showConnectPoints = false,
 	connectEnabled = true,
+	connectType = "both",
 	showOutline = false,
 	showTransformControls = false,
 	isTransforming = false,
@@ -288,6 +289,7 @@ const InputComponent: React.FC<InputProps> = ({
 				showConnectPoints={showConnectPoints}
 				shouldRender={!isDragging && !isTransforming && !isSelected}
 				connectEnabled={connectEnabled}
+				connectType={connectType}
 				onConnect={onConnect}
 				onPreviewConnectLine={onPreviewConnectLine}
 			/>

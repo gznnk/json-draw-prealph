@@ -18,6 +18,7 @@ const ConnectPointsComponent: React.FC<ConnectPointsProps> = ({
 	showConnectPoints,
 	shouldRender,
 	connectEnabled = true,
+	connectType = "both",
 	onConnect,
 	onPreviewConnectLine,
 }) => {
@@ -41,6 +42,7 @@ const ConnectPointsComponent: React.FC<ConnectPointsProps> = ({
 					ownerId={ownerId}
 					ownerFrame={ownerFrame}
 					alwaysVisible={showConnectPoints}
+					connectType={connectType}
 					onConnect={onConnect}
 					onPreviewConnectLine={onPreviewConnectLine}
 				/>

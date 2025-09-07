@@ -1,4 +1,5 @@
 // Import types.
+import type { ConnectType } from "../../../types/core/ConnectType";
 import type { Frame } from "../../../types/core/Frame";
 import type { DiagramConnectEvent } from "../../../types/events/DiagramConnectEvent";
 import type { PreviewConnectLineEvent } from "../../../types/events/PreviewConnectLineEvent";
@@ -20,6 +21,8 @@ export type ConnectPointsProps = {
 	shouldRender: boolean;
 	/** Whether the connect points are enabled for connections */
 	connectEnabled?: boolean;
+	/** Connection type for the connect points */
+	connectType?: ConnectType;
 	/** Connect event handler */
 	onConnect?: (event: DiagramConnectEvent) => void;
 	/** Preview connect line event handler */
