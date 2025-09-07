@@ -4,6 +4,7 @@ import { memo } from "react";
 
 // Import types.
 import type { InputProps } from "../../../types/props/elements/InputProps";
+import { nanToZero } from "../../../utils/math/common/nanToZero";
 
 /**
  * Input minimap component (simplified version for minimap)
@@ -11,27 +12,26 @@ import type { InputProps } from "../../../types/props/elements/InputProps";
 const InputMinimapComponent: React.FC<InputProps> = ({
 	x,
 	y,
-	text,
-	fontColor,
-	fontSize,
-	fontFamily,
-	fontWeight,
-	textAlign,
+	width,
+	height,
+	fill,
+	stroke,
+	strokeWidth,
+	cornerRadius,
 }) => {
 	return (
-		<text
-			x={x}
-			y={y}
-			fill={fontColor}
-			fontSize={fontSize}
-			fontFamily={fontFamily}
-			fontWeight={fontWeight}
-			textAnchor={textAlign === "left" ? "start" : textAlign === "right" ? "end" : "middle"}
-			dominantBaseline="central"
+		<rect
+			x={x - nanToZero(width / 2)}
+			y={y - nanToZero(height / 2)}
+			width={width}
+			height={height}
+			rx={cornerRadius}
+			ry={cornerRadius}
+			fill={fill}
+			stroke={stroke}
+			strokeWidth={strokeWidth}
 			pointerEvents="none"
-		>
-			{text || "Input"}
-		</text>
+		/>
 	);
 };
 
