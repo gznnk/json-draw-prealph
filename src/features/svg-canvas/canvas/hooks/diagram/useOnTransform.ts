@@ -62,7 +62,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 		(
 			item: Diagram,
 			e: DiagramTransformEvent,
-			transformedDiagrams: Diagram[],
+			transformedConnectables: Diagram[],
 			ancestors: string[] = [],
 			topLevelGroupIds: Set<string> = new Set(),
 		): Diagram => {
@@ -128,7 +128,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 						newItems = newItems.map((child) => {
 							if (isConnectableState(child)) {
 								const updatedChild = updateDiagramConnectPoints(child);
-								transformedDiagrams.push(updatedChild);
+								transformedConnectables.push(updatedChild);
 								return updatedChild;
 							}
 							return child;
@@ -137,7 +137,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 						newItems = transformRecursively(
 							initialItem.items ?? [],
 							e,
-							transformedDiagrams,
+							transformedConnectables,
 							true,
 							[...ancestors, item.id],
 							topLevelGroupIds,
@@ -157,7 +157,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 
 				// If the item is connectable, add it to the transformed diagrams.
 				if (isConnectableState(newItem)) {
-					transformedDiagrams.push(newItem);
+					transformedConnectables.push(newItem);
 				}
 			} else {
 				newItem = {
@@ -169,7 +169,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 				// Update the connect points of the transformed item.
 				updateDiagramConnectPoints(newItem);
 				if (isConnectableState(newItem)) {
-					transformedDiagrams.push(newItem);
+					transformedConnectables.push(newItem);
 				}
 			}
 
@@ -182,7 +182,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 		(
 			items: Diagram[],
 			e: DiagramTransformEvent,
-			transformedDiagrams: Diagram[],
+			transformedConnectables: Diagram[],
 			isTransformedChild: boolean,
 			ancestors: string[] = [],
 			topLevelGroupIds: Set<string> = new Set(),
@@ -210,7 +210,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 							newItem.items = newItem.items.map((child) => {
 								if (isConnectableState(child)) {
 									const updatedChild = updateDiagramConnectPoints(child);
-									transformedDiagrams.push(updatedChild);
+									transformedConnectables.push(updatedChild);
 									return updatedChild;
 								}
 								return child;
@@ -219,7 +219,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 							newItem.items = transformRecursively(
 								newItem.items ?? [],
 								e,
-								transformedDiagrams,
+								transformedConnectables,
 								true,
 								[...ancestors, item.id],
 								topLevelGroupIds,
@@ -230,7 +230,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 					// Update the connect points of the transformed item.
 					newItem = updateDiagramConnectPoints(newItem);
 					if (isConnectableState(newItem)) {
-						transformedDiagrams.push(newItem);
+						transformedConnectables.push(newItem);
 					}
 
 					// Add top-level group to the set if this is a transformed item and we have ancestors
@@ -245,7 +245,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 					const transformedChild = transformChild(
 						item,
 						e,
-						transformedDiagrams,
+						transformedConnectables,
 						ancestors,
 						topLevelGroupIds,
 					);
@@ -264,7 +264,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 						items: transformRecursively(
 							item.items ?? [],
 							e,
-							transformedDiagrams,
+							transformedConnectables,
 							false,
 							[...ancestors, item.id],
 							topLevelGroupIds,
@@ -306,7 +306,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 				}
 
 				// Transformed diagrams to be updated.
-				const transformedDiagrams: Diagram[] = [];
+				const transformedConnectables: Diagram[] = [];
 				const topLevelGroupIds = new Set<string>();
 
 				let newState = {
@@ -314,7 +314,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 					items: transformRecursively(
 						prevState.items,
 						e,
-						transformedDiagrams,
+						transformedConnectables,
 						false,
 						[],
 						topLevelGroupIds,
@@ -339,13 +339,14 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 
 				// Refresh the connect lines for the transformed diagrams.
 				newState = refreshConnectLines(
-					transformedDiagrams,
+					transformedConnectables,
 					newState,
 					startCanvasState.current,
 				);
 
 				// Update outline of top-level groups that contain transformed diagrams
 				newState.items = newState.items.map((item) => {
+					// TODO: Check the target is really a group
 					if (item.type === "Group" && topLevelGroupIds.has(item.id)) {
 						return updateOutlineOfItemable(item);
 					}
