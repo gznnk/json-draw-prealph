@@ -15,13 +15,13 @@ import { Button } from "../../elements/Button";
 import { Frame } from "../../elements/Frame";
 import { Input } from "../../elements/Input";
 import { NodeHeader } from "../../elements/NodeHeader";
+import { TextArea } from "../../icons/TextArea";
 
 // Import utils.
 import { newEventId } from "../../../utils/core/newEventId";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { affineTransformation } from "../../../utils/math/transform/affineTransformation";
 
-import { TextArea } from "../../icons/TextArea";
 // Import local modules.
 import {
 	BASE_MARGIN,

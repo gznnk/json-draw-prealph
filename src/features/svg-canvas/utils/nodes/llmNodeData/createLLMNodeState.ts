@@ -6,7 +6,14 @@ import { createInputState } from "../../elements/input/createInputState";
 import { createNodeHeaderState } from "../../elements/nodeHeader/createNodeHeaderState";
 import { newId } from "../../shapes/common/newId";
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
+import { affineTransformation } from "../../math/transform/affineTransformation";
+import { degreesToRadians } from "../../math/common/degreesToRadians";
+import { createLLMNodeInputFrame } from "./createLLMNodeInputFrame";
 
+import {
+	HEADER_HEIGHT,
+	HEADER_MARGIN_TOP,
+} from "../../../components/nodes/LLMNode/LLMNodeConstants";
 // Import constants.
 import { LLMNodeDefaultState } from "../../../constants/state/nodes/LLMNodeDefaultState";
 
@@ -51,6 +58,27 @@ export const createLLMNodeState = ({
 		scaleY,
 	});
 
+	// Calculate dimensions and positions for child elements
+	const headerCenter = affineTransformation(
+		0,
+		-(height / 2 - (HEADER_HEIGHT / 2 + HEADER_MARGIN_TOP)),
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		x,
+		y,
+	);
+
+	const inputFrame = createLLMNodeInputFrame({
+		x,
+		y,
+		width,
+		height,
+		rotation,
+		scaleX,
+		scaleY,
+	});
+
 	const state = {
 		...LLMNodeDefaultState,
 		id: newId(),
@@ -63,18 +91,23 @@ export const createLLMNodeState = ({
 		scaleY,
 		items: [
 			createNodeHeaderState({
-				x,
-				y,
+				x: headerCenter.x,
+				y: headerCenter.y,
 				text: "LLM",
 			}),
 			{
 				...createInputState({
-					x,
-					y,
+					x: inputFrame.x,
+					y: inputFrame.y,
+					width: inputFrame.width,
+					height: inputFrame.height,
+					rotation: inputFrame.rotation,
+					scaleX: inputFrame.scaleX,
+					scaleY: inputFrame.scaleY,
 					text,
 					verticalAlign: "top",
 				}),
-				connectPoints: [],
+				//connectPoints: [],
 			},
 		],
 		connectPoints,
