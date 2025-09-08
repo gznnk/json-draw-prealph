@@ -6,7 +6,9 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { OpenAI } from "openai";
 
 // Import types.
+import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
 import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEvent";
 import type { ExecutionPropagationEvent } from "../../../types/events/ExecutionPropagationEvent";
 import type { LLMNodeProps } from "../../../types/props/nodes/LLMNodeProps";
@@ -49,10 +51,13 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 		rotation,
 		items,
 		isSelected,
+		isAncestorSelected,
 		onDrag,
 		onDragOver,
 		onDragLeave,
 		onSelect,
+		onClick,
+		onHoverChange,
 		onTextChange,
 		onExecute,
 		onDiagramChange,
@@ -76,6 +81,8 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 		instructions,
 		onDrag,
 		onSelect,
+		onClick,
+		onHoverChange,
 		onExecute,
 	};
 	const refBus = useRef(refBusVal);
@@ -107,6 +114,25 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 		});
 	}, []);
 
+	// Handler for click events.
+	const handleClick = useCallback((e: DiagramClickEvent) => {
+		const { id, onClick } = refBus.current;
+		onClick?.({
+			...e,
+			id,
+		});
+	}, []);
+
+	// Handler for hover change events.
+	const handleHoverChange = useCallback((e: DiagramHoverChangeEvent) => {
+		const { id, onHoverChange } = refBus.current;
+		onHoverChange?.({
+			...e,
+			id,
+		});
+	}, []);
+
+	// Handler for executing the LLM with streaming response
 	const handleExecution = useCallback(
 		async (inputText: string) => {
 			if (inputText === "") return;
@@ -220,18 +246,20 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				scaleY={scaleY}
 				rotation={rotation}
 				isSelected={isSelected}
-				isAncestorSelected={isSelected}
+				isAncestorSelected={isAncestorSelected}
 				icon={<LLM fill="#ffffff" />}
 				iconBackgroundColor={processIdList.length > 0 ? "#10B981" : "#8B5CF6"}
 				onDrag={handleDrag}
 				onSelect={handleSelect}
+				onClick={handleClick}
+				onHoverChange={handleHoverChange}
 				onTextChange={onTextChange}
 			/>
 			<Input
 				{...inputState}
 				text={instructions}
 				isSelected={isSelected}
-				isAncestorSelected={isSelected}
+				isAncestorSelected={isAncestorSelected}
 				showOutline={false}
 				isTransforming={false}
 				showTransformControls={false}
@@ -240,6 +268,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				onDragOver={onDragOver}
 				onDragLeave={onDragLeave}
 				onSelect={handleSelect}
+				onClick={handleClick}
 				onTextChange={onTextChange}
 				onDiagramChange={onDiagramChange}
 			/>

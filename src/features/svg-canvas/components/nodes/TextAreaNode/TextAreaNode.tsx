@@ -3,7 +3,9 @@ import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Import types.
+import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
+import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
 import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEvent";
 import type { ExecutionPropagationEvent } from "../../../types/events/ExecutionPropagationEvent";
 import type { TextAreaNodeProps } from "../../../types/props/nodes/TextAreaNodeProps";
@@ -49,8 +51,11 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 		rotation,
 		items,
 		isSelected,
+		isAncestorSelected,
 		onDrag,
 		onSelect,
+		onClick,
+		onHoverChange,
 		onTextChange,
 		onDiagramChange,
 		onExecute,
@@ -72,6 +77,8 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 		text,
 		onDrag,
 		onSelect,
+		onClick,
+		onHoverChange,
 		onExecute,
 		onDiagramChange,
 		inputState,
@@ -93,6 +100,24 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 	const handleSelect = useCallback((e: DiagramSelectEvent) => {
 		const { id, onSelect } = refBus.current;
 		onSelect?.({
+			...e,
+			id,
+		});
+	}, []);
+
+	// Handler for click events.
+	const handleClick = useCallback((e: DiagramClickEvent) => {
+		const { id, onClick } = refBus.current;
+		onClick?.({
+			...e,
+			id,
+		});
+	}, []);
+
+	// Handler for hover change events.
+	const handleHoverChange = useCallback((e: DiagramHoverChangeEvent) => {
+		const { id, onHoverChange } = refBus.current;
+		onHoverChange?.({
 			...e,
 			id,
 		});
@@ -238,11 +263,13 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 				scaleY={scaleY}
 				rotation={rotation}
 				isSelected={isSelected}
-				isAncestorSelected={isSelected}
+				isAncestorSelected={isAncestorSelected}
 				icon={<TextArea fill="#ffffff" />}
 				iconBackgroundColor="#1890ff"
 				onDrag={handleDrag}
 				onSelect={handleSelect}
+				onClick={handleClick}
+				onHoverChange={handleHoverChange}
 				onTextChange={onTextChange}
 			/>
 			<Input
@@ -256,12 +283,13 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 				rotation={rotation}
 				text={text}
 				isSelected={isSelected}
-				isAncestorSelected={isSelected}
+				isAncestorSelected={isAncestorSelected}
 				showOutline={false}
 				isTransforming={false}
 				showTransformControls={false}
 				onDrag={handleDrag}
 				onSelect={handleSelect}
+				onClick={handleClick}
 				onTextChange={onTextChange}
 			/>
 		</>

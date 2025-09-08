@@ -46,6 +46,8 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 	isAncestorSelected = false,
 	onDrag,
 	onSelect,
+	onClick,
+	onHoverChange,
 	onTextChange,
 }) => {
 	// Constants for layout
@@ -129,6 +131,8 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 				showTransformControls={false}
 				onDrag={onDrag}
 				onSelect={onSelect}
+				onClick={onClick}
+				onHoverChange={onHoverChange}
 				onTextChange={onTextChange}
 			/>
 		</>
