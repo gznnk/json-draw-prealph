@@ -22,6 +22,7 @@ import { useSelect } from "../../../hooks/useSelect";
 import { mergeProps } from "../../../utils/core/mergeProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
+import { calculateEffectiveDimensions } from "../../../utils/math/geometry/calculateEffectiveDimensions";
 
 /**
  * Frame component - a simple rectangular frame element
@@ -62,6 +63,14 @@ const FrameComponent: React.FC<FrameProps> = ({
 	onHoverChange,
 	onPropagation,
 }) => {
+	// Calculate effective dimensions using minimums if provided
+	const { effectiveWidth, effectiveHeight } = calculateEffectiveDimensions(
+		width,
+		height,
+		minWidth,
+		minHeight,
+	);
+
 	// Reference to the SVG element to be transformed
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
@@ -115,13 +124,13 @@ const FrameComponent: React.FC<FrameProps> = ({
 		() => ({
 			x,
 			y,
-			width,
-			height,
+			width: effectiveWidth,
+			height: effectiveHeight,
 			rotation,
 			scaleX,
 			scaleY,
 		}),
-		[x, y, width, height, rotation, scaleX, scaleY],
+		[x, y, effectiveWidth, effectiveHeight, rotation, scaleX, scaleY],
 	);
 
 	// Generate rect transform attribute
@@ -147,10 +156,10 @@ const FrameComponent: React.FC<FrameProps> = ({
 			{/* Main frame rectangle */}
 			<rect
 				id={id}
-				x={-width / 2}
-				y={-height / 2}
-				width={width}
-				height={height}
+				x={-effectiveWidth / 2}
+				y={-effectiveHeight / 2}
+				width={effectiveWidth}
+				height={effectiveHeight}
 				rx={cornerRadius}
 				ry={cornerRadius}
 				fill={fill}
@@ -166,8 +175,8 @@ const FrameComponent: React.FC<FrameProps> = ({
 			<Outline
 				x={x}
 				y={y}
-				width={width}
-				height={height}
+				width={effectiveWidth}
+				height={effectiveHeight}
 				rotation={rotation}
 				scaleX={scaleX}
 				scaleY={scaleY}
@@ -179,8 +188,8 @@ const FrameComponent: React.FC<FrameProps> = ({
 					type="Frame"
 					x={x}
 					y={y}
-					width={width}
-					height={height}
+					width={effectiveWidth}
+					height={effectiveHeight}
 					minWidth={minWidth}
 					minHeight={minHeight}
 					rotation={rotation}
@@ -205,8 +214,8 @@ const FrameComponent: React.FC<FrameProps> = ({
 				<PositionLabel
 					x={x}
 					y={y}
-					width={width}
-					height={height}
+					width={effectiveWidth}
+					height={effectiveHeight}
 					rotation={rotation}
 					scaleX={scaleX}
 					scaleY={scaleY}

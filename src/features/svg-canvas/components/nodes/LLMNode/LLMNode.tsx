@@ -28,6 +28,7 @@ import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 import { newEventId } from "../../../utils/core/newEventId";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { affineTransformation } from "../../../utils/math/transform/affineTransformation";
+import { calculateEffectiveDimensions } from "../../../utils/math/geometry/calculateEffectiveDimensions";
 
 // Import local modules.
 import {
@@ -46,6 +47,8 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 		y,
 		width,
 		height,
+		minWidth = 200,
+		minHeight = 200,
 		scaleX,
 		scaleY,
 		rotation,
@@ -62,6 +65,14 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 		onExecute,
 		onDiagramChange,
 	} = props;
+
+	// Calculate effective dimensions using minimums if provided
+	const { effectiveWidth, effectiveHeight } = calculateEffectiveDimensions(
+		width,
+		height,
+		minWidth,
+		minHeight,
+	);
 
 	const nodeHeaderState = items[0] as NodeHeaderState;
 	const inputState = items[1] as InputState;
@@ -216,7 +227,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 
 	const headerCenter = affineTransformation(
 		0,
-		-(height / 2 - (HEADER_HEIGHT / 2 + HEADER_MARGIN_TOP)),
+		-(effectiveHeight / 2 - (HEADER_HEIGHT / 2 + HEADER_MARGIN_TOP)),
 		scaleX,
 		scaleY,
 		degreesToRadians(rotation),
@@ -228,6 +239,8 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 		<>
 			<Frame
 				{...props}
+				width={effectiveWidth}
+				height={effectiveHeight}
 				minWidth={200}
 				minHeight={200}
 				stroke="#E5E6EB"
@@ -240,7 +253,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				{...nodeHeaderState}
 				x={headerCenter.x}
 				y={headerCenter.y}
-				width={width - BASE_MARGIN * 2}
+				width={effectiveWidth - BASE_MARGIN * 2}
 				height={HEADER_HEIGHT}
 				scaleX={scaleX}
 				scaleY={scaleY}

@@ -28,6 +28,7 @@ import { mergeProps } from "../../../utils/core/mergeProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { negativeToZero } from "../../../utils/math/common/negativeToZero";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
+import { calculateEffectiveDimensions } from "../../../utils/math/geometry/calculateEffectiveDimensions";
 
 /**
  * Input component - a simple text shape with textable feature only
@@ -38,6 +39,8 @@ const InputComponent: React.FC<InputProps> = ({
 	y,
 	width,
 	height,
+	minWidth,
+	minHeight,
 	scaleX,
 	scaleY,
 	rotation,
@@ -78,6 +81,14 @@ const InputComponent: React.FC<InputProps> = ({
 	onDiagramChange,
 	onHoverChange,
 }) => {
+	// Calculate effective dimensions using minimums if provided
+	const { effectiveWidth, effectiveHeight } = calculateEffectiveDimensions(
+		width,
+		height,
+		minWidth,
+		minHeight,
+	);
+
 	// Internal text state
 	const [internalText, setInternalText] = useState(text);
 
@@ -110,8 +121,8 @@ const InputComponent: React.FC<InputProps> = ({
 		attributes: {
 			x,
 			y,
-			width,
-			height,
+			width: effectiveWidth,
+			height: effectiveHeight,
 			scaleX,
 			scaleY,
 			rotation,
@@ -199,13 +210,13 @@ const InputComponent: React.FC<InputProps> = ({
 		() => ({
 			x,
 			y,
-			width,
-			height,
+			width: effectiveWidth,
+			height: effectiveHeight,
 			rotation,
 			scaleX,
 			scaleY,
 		}),
-		[x, y, width, height, rotation, scaleX, scaleY],
+		[x, y, effectiveWidth, effectiveHeight, rotation, scaleX, scaleY],
 	);
 
 	// Generate rect transform attribute
@@ -222,10 +233,10 @@ const InputComponent: React.FC<InputProps> = ({
 			{/* Background rectangle for interaction and styling */}
 			<rect
 				id={id}
-				x={-width / 2}
-				y={-height / 2}
-				width={negativeToZero(width)}
-				height={negativeToZero(height)}
+				x={-effectiveWidth / 2}
+				y={-effectiveHeight / 2}
+				width={negativeToZero(effectiveWidth)}
+				height={negativeToZero(effectiveHeight)}
 				rx={cornerRadius}
 				ry={cornerRadius}
 				fill={fill}
@@ -241,10 +252,10 @@ const InputComponent: React.FC<InputProps> = ({
 			{/* Text content */}
 			{isTextEditEnabled && (
 				<Textable
-					x={-width / 2}
-					y={-height / 2}
-					width={width}
-					height={height}
+					x={-effectiveWidth / 2}
+					y={-effectiveHeight / 2}
+					width={effectiveWidth}
+					height={effectiveHeight}
 					transform={transform}
 					text={internalText}
 					textType={textType}
@@ -260,8 +271,8 @@ const InputComponent: React.FC<InputProps> = ({
 			<Outline
 				x={x}
 				y={y}
-				width={width}
-				height={height}
+				width={effectiveWidth}
+				height={effectiveHeight}
 				rotation={rotation}
 				scaleX={scaleX}
 				scaleY={scaleY}
@@ -273,8 +284,10 @@ const InputComponent: React.FC<InputProps> = ({
 					type="Input"
 					x={x}
 					y={y}
-					width={width}
-					height={height}
+					width={effectiveWidth}
+					height={effectiveHeight}
+					minWidth={minWidth}
+					minHeight={minHeight}
 					rotation={rotation}
 					scaleX={scaleX}
 					scaleY={scaleY}
