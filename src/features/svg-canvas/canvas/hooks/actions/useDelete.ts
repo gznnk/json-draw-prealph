@@ -11,7 +11,9 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import { newEventId } from "../../../utils/core/newEventId";
 import { isItemableState } from "../../../utils/validation/isItemableState";
 import { isSelectableState } from "../../../utils/validation/isSelectableState";
+import { cleanupGroups } from "../../utils/cleanupGroups";
 import { useAddHistory } from "../history/useAddHistory";
+import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 
 /**
  * Custom hook to handle delete events on the canvas.
@@ -105,10 +107,15 @@ export const useDelete = (props: SvgCanvasSubHooksProps) => {
 				return true;
 			});
 
+			// Apply group cleanup to the items
+			items = cleanupGroups(items);
+
+			items = updateOutlineOfAllItemables(items);
+
 			// Create new state.
 			let newState = {
 				...prevState,
-				items, // Apply new items after removing the selected items.
+				items, // Apply new items after removing the selected items and cleaning up groups.
 				multiSelectGroup: undefined, // Hide the multi-select group because the selected items were deleted.
 			} as SvgCanvasState;
 
