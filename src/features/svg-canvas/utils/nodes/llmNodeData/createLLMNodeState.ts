@@ -27,6 +27,9 @@ import {
  * @param rotation - Optional rotation of the node
  * @param scaleX - Optional x scale of the node
  * @param scaleY - Optional y scale of the node
+ * @param text - Optional initial text content
+ * @param minWidth - Optional minimum width of the node
+ * @param minHeight - Optional minimum height of the node
  * @returns LLM node state object
  */
 export const createLLMNodeState = ({
@@ -38,6 +41,8 @@ export const createLLMNodeState = ({
 	scaleX = 1,
 	scaleY = 1,
 	text = "",
+	minWidth = LLMNodeDefaultState.minWidth,
+	minHeight = LLMNodeDefaultState.minHeight,
 }: {
 	x: number;
 	y: number;
@@ -47,6 +52,8 @@ export const createLLMNodeState = ({
 	scaleX?: number;
 	scaleY?: number;
 	text?: string;
+	minWidth?: number;
+	minHeight?: number;
 }) => {
 	const connectPoints = createRectangleConnectPoint({
 		x,
@@ -89,6 +96,8 @@ export const createLLMNodeState = ({
 		rotation,
 		scaleX,
 		scaleY,
+		minWidth,
+		minHeight,
 		items: [
 			createNodeHeaderState({
 				x: headerCenter.x,

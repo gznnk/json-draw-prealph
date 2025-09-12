@@ -57,14 +57,14 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 		y,
 		width,
 		height,
-		minWidth = MIN_WIDTH,
-		minHeight = MIN_HEIGHT,
 		scaleX,
 		scaleY,
 		rotation,
 		items,
 		isSelected,
 		isAncestorSelected,
+		minWidth = MIN_WIDTH,
+		minHeight = MIN_HEIGHT,
 		onDrag,
 		onDragOver,
 		onDragLeave,
@@ -251,8 +251,8 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				{...props}
 				width={effectiveWidth}
 				height={effectiveHeight}
-				minWidth={MIN_WIDTH}
-				minHeight={MIN_HEIGHT}
+				minWidth={minWidth}
+				minHeight={minHeight}
 				stroke={BORDER_COLOR}
 				strokeWidth={BORDER_WIDTH}
 				fill={BACKGROUND_COLOR}
