@@ -10,12 +10,12 @@ import { newId } from "../../shapes/common/newId";
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
 import { createLLMNodeInputFrame } from "./createLLMNodeInputFrame";
 
+// Import constants.
+import { LLMNodeDefaultState } from "../../../constants/state/nodes/LLMNodeDefaultState";
 import {
 	HEADER_HEIGHT,
 	HEADER_MARGIN_TOP,
-} from "../../../components/nodes/LLMNode/LLMNodeConstants";
-// Import constants.
-import { LLMNodeDefaultState } from "../../../constants/state/nodes/LLMNodeDefaultState";
+} from "../../../constants/styling/core/LayoutStyling";
 
 /**
  * Creates state for an LLM node with specified properties.

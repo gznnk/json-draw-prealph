@@ -12,7 +12,7 @@ import {
 	HEADER_HEIGHT,
 	HEADER_MARGIN_BOTTOM,
 	HEADER_MARGIN_TOP,
-} from "../../../components/nodes/LLMNode/LLMNodeConstants";
+} from "../../../constants/styling/core/LayoutStyling";
 
 /**
  * Creates a Frame state for LLMNode Input component containing x, y, width, height, rotation, scaleX, and scaleY.
