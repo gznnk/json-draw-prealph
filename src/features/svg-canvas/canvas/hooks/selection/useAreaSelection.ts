@@ -43,9 +43,17 @@ const updateItemsWithOutline = (
 	const minY = Math.min(selectionBounds.startY, selectionBounds.endY);
 	const maxY = Math.max(selectionBounds.startY, selectionBounds.endY);
 
-	return applyFunctionRecursively(items, (item) => {
+	return applyFunctionRecursively(items, (item, ancestors) => {
 		if (!isSelectableState(item)) return item;
 		if (item.type === "ConnectLine") return item;
+		if (
+			ancestors.some(
+				(ancestor) =>
+					isItemableState(ancestor) && ancestor.itemableType === "concrete",
+			)
+		) {
+			return item;
+		}
 
 		// Use cached bounding box if available, otherwise calculate
 		const itemBounds =
