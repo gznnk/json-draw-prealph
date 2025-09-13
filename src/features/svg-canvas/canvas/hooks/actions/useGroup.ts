@@ -2,6 +2,7 @@
 import { useCallback, useRef } from "react";
 
 // Import types.
+import type { ConnectLineState } from "../../../types/state/shapes/ConnectLineState";
 import type { GroupState } from "../../../types/state/shapes/GroupState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
@@ -10,13 +11,15 @@ import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps"
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { newEventId } from "../../../utils/core/newEventId";
 import { newId } from "../../../utils/shapes/common/newId";
+import { isConnectLineState } from "../../../utils/validation/isConnectLineState";
 import { isSelectableState } from "../../../utils/validation/isSelectableState";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
+import { cleanupGroups } from "../../utils/cleanupGroups";
+import { collectDiagramIds } from "../../utils/collectDiagramIds";
 import { removeSelectedDiagrams } from "../../utils/removeSelectedDiagrams";
 
 // Import hooks.
 import { useAddHistory } from "../history/useAddHistory";
-import { cleanupGroups } from "../../utils/cleanupGroups";
 
 /**
  * Custom hook to handle group events on the canvas.
@@ -64,7 +67,9 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 				isSelected: true,
 				showOutline: true,
 				items: applyFunctionRecursively(selectedItems, (childItem) => {
-					if (!isSelectableState(childItem)) return childItem; // Type guard.
+					if (!isSelectableState(childItem)) {
+						return childItem;
+					}
 					return {
 						...childItem,
 						isSelected: false,
@@ -76,7 +81,29 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 			// Create next state items.
 			const selectedRemovedItems = removeSelectedDiagrams(prevState.items);
 			const groupsCleanedUpItems = cleanupGroups(selectedRemovedItems);
-			const nextItems = [...groupsCleanedUpItems, group];
+			const mergedItems = [...groupsCleanedUpItems, group];
+
+			// Bring connect lines forward that are connected to grouped components.
+			const groupedDiagramIds = collectDiagramIds(selectedItems);
+			const targetConnectLines: ConnectLineState[] = [];
+			for (const diagram of mergedItems) {
+				if (
+					isConnectLineState(diagram) &&
+					(groupedDiagramIds.includes(diagram.startOwnerId) ||
+						groupedDiagramIds.includes(diagram.endOwnerId))
+				) {
+					targetConnectLines.push(diagram);
+				}
+			}
+			const nextItems = [
+				...mergedItems.filter(
+					(item) =>
+						!targetConnectLines.some(
+							(connectLine) => connectLine.id === item.id,
+						),
+				),
+				...targetConnectLines,
+			];
 
 			// Create next state
 			const eventId = newEventId();
