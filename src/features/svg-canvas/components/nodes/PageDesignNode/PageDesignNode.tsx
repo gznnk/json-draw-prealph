@@ -100,9 +100,9 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 				});
 
 				let count = 0;
-				while (count < 10) {
+				while (count < 1000) {
 					const stream = await openai.responses.create({
-						model: "gpt-4o",
+						model: "gpt-5",
 						input,
 						stream: true, // Required!
 						tools: PAGE_DESIGN_TOOLS,
