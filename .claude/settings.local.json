@@ -36,7 +36,8 @@
       "mcp__serena__read_memory",
       "Bash(npm test:*)",
       "Bash(git log:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "mcp__serena__insert_at_line"
     ],
     "deny": []
   },

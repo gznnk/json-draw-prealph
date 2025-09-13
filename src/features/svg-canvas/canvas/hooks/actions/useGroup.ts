@@ -6,16 +6,17 @@ import type { GroupState } from "../../../types/state/shapes/GroupState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
-import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 // Import utils.
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { newEventId } from "../../../utils/core/newEventId";
 import { newId } from "../../../utils/shapes/common/newId";
-import { removeGroupedRecursive } from "../../utils/removeGroupedRecursive";
-
 import { isSelectableState } from "../../../utils/validation/isSelectableState";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
+import { removeSelectedDiagrams } from "../../utils/removeSelectedDiagrams";
+
 // Import hooks.
 import { useAddHistory } from "../history/useAddHistory";
+import { cleanupGroups } from "../../utils/cleanupGroups";
 
 /**
  * Custom hook to handle group events on the canvas.
@@ -63,10 +64,7 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 				isSelected: true,
 				showOutline: true,
 				items: applyFunctionRecursively(selectedItems, (childItem) => {
-					if (!isSelectableState(childItem)) {
-						// Ignore non-selectable child items.
-						return childItem;
-					}
+					if (!isSelectableState(childItem)) return childItem; // Type guard.
 					return {
 						...childItem,
 						isSelected: false,
@@ -75,23 +73,23 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 					};
 				}),
 			};
-			// Remove grouped shapes from the shape array
-			let items = removeGroupedRecursive(prevState.items);
-			// Add new group
-			items = [...items, group];
+			// Create next state items.
+			const selectedRemovedItems = removeSelectedDiagrams(prevState.items);
+			const groupsCleanedUpItems = cleanupGroups(selectedRemovedItems);
+			const nextItems = [...groupsCleanedUpItems, group];
 
-			// Generate event ID and create new state
+			// Create next state
 			const eventId = newEventId();
-			let newState = {
+			let nextState = {
 				...prevState,
-				items,
+				items: nextItems,
 				multiSelectGroup: undefined,
 			} as SvgCanvasState;
 
 			// Add history
-			newState = addHistory(eventId, newState);
+			nextState = addHistory(eventId, nextState);
 
-			return newState;
+			return nextState;
 		});
 	}, []);
 };
