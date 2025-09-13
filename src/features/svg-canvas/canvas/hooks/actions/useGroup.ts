@@ -7,6 +7,9 @@ import type { GroupState } from "../../../types/state/shapes/GroupState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
+// Import hooks.
+import { useAddHistory } from "../history/useAddHistory";
+
 // Import utils.
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { newEventId } from "../../../utils/core/newEventId";
@@ -17,9 +20,7 @@ import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { cleanupGroups } from "../../utils/cleanupGroups";
 import { collectDiagramIds } from "../../utils/collectDiagramIds";
 import { removeSelectedDiagrams } from "../../utils/removeSelectedDiagrams";
-
-// Import hooks.
-import { useAddHistory } from "../history/useAddHistory";
+import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 
 /**
  * Custom hook to handle group events on the canvas.
@@ -44,8 +45,8 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 		} = refBus.current;
 
 		setCanvasState((prevState) => {
-			const selectedItems = getSelectedDiagrams(prevState.items);
-			if (selectedItems.length < 2) {
+			const selectedDiagrams = getSelectedDiagrams(prevState.items);
+			if (selectedDiagrams.length < 2) {
 				// Do not group if there are less than 2 selected shapes
 				// If this is reached, there is a flaw in the caller's control logic
 				console.error("Invalid selection count for group.");
@@ -66,7 +67,7 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 				type: "Group",
 				isSelected: true,
 				showOutline: true,
-				items: applyFunctionRecursively(selectedItems, (childItem) => {
+				items: applyFunctionRecursively(selectedDiagrams, (childItem) => {
 					if (!isSelectableState(childItem)) {
 						return childItem;
 					}
@@ -84,7 +85,7 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 			const mergedItems = [...groupsCleanedUpItems, group];
 
 			// Bring connect lines forward that are connected to grouped components.
-			const groupedDiagramIds = collectDiagramIds(selectedItems);
+			const groupedDiagramIds = collectDiagramIds(selectedDiagrams);
 			const targetConnectLines: ConnectLineState[] = [];
 			for (const diagram of mergedItems) {
 				if (
@@ -95,7 +96,7 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 					targetConnectLines.push(diagram);
 				}
 			}
-			const nextItems = [
+			const orderedItems = [
 				...mergedItems.filter(
 					(item) =>
 						!targetConnectLines.some(
@@ -105,11 +106,13 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 				...targetConnectLines,
 			];
 
+			const outlineUpdatedItems = updateOutlineOfAllItemables(orderedItems);
+
 			// Create next state
 			const eventId = newEventId();
 			let nextState = {
 				...prevState,
-				items: nextItems,
+				items: outlineUpdatedItems,
 				multiSelectGroup: undefined,
 			} as SvgCanvasState;
 
