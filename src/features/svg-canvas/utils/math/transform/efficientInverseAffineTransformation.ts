@@ -1,9 +1,11 @@
 // Import types.
 import type { Point } from "../../../types/core/Point";
 
+// Import utils.
+import { inverseAffineTransformation } from "./inverseAffineTransformation";
+
 /**
- * Applies an inverse affine transformation to a point.
- * Used to convert transformed coordinates back to original coordinates.
+ * Applies an efficient inverse affine transformation to a point with optimizations.
  *
  * @param px - X-coordinate of the transformed point
  * @param py - Y-coordinate of the transformed point
@@ -14,7 +16,7 @@ import type { Point } from "../../../types/core/Point";
  * @param ty - Translation distance in y-direction from the original transformation
  * @returns The original point before transformation
  */
-export const inverseAffineTransformation = (
+export const efficientInverseAffineTransformation = (
 	px: number,
 	py: number,
 	sx: number,
@@ -23,17 +25,13 @@ export const inverseAffineTransformation = (
 	tx: number,
 	ty: number,
 ): Point => {
-	// Calculate trigonometric values once
-	const cosTheta = Math.cos(theta);
-	const sinTheta = Math.sin(theta);
+	// Special case optimization: no rotation
+	if (theta === 0) {
+		return {
+			x: (px - tx) / sx,
+			y: (py - ty) / sy,
+		};
+	}
 
-	// Apply inverse translation first
-	const translatedX = px - tx;
-	const translatedY = py - ty;
-
-	// Apply inverse affine transformation
-	const originalX = (cosTheta * translatedX + sinTheta * translatedY) / sx;
-	const originalY = (-sinTheta * translatedX + cosTheta * translatedY) / sy;
-
-	return { x: originalX, y: originalY };
+	return inverseAffineTransformation(px, py, sx, sy, theta, tx, ty);
 };

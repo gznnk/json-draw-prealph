@@ -29,7 +29,7 @@ import { createLinearY2xFunction } from "../../../utils/math/geometry/createLine
 import { calcClosestCircleIntersection } from "../../../utils/math/points/calcClosestCircleIntersection";
 import { calcRadians } from "../../../utils/math/points/calcRadians";
 import { efficientAffineTransformation } from "../../../utils/math/transform/efficientAffineTransformation";
-import { inverseAffineTransformation } from "../../../utils/math/transform/inverseAffineTransformation";
+import { efficientInverseAffineTransformation } from "../../../utils/math/transform/efficientInverseAffineTransformation";
 import { getCursorFromAngle } from "../../../utils/shapes/common/getCursorFromAngle";
 
 // Import local module files.
@@ -116,7 +116,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		);
 
 	const inverseAffineTransformationOnDrag = (x: number, y: number) =>
-		inverseAffineTransformation(
+		efficientInverseAffineTransformation(
 			x,
 			y,
 			1,
