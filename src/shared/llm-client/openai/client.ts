@@ -76,6 +76,11 @@ export class OpenAIClient implements LLMClient {
 							property.enum = param.enum;
 						}
 
+						// itemsが指定されている場合は追加
+						if (param.items) {
+							property.items = param.items;
+						}
+
 						acc[param.name] = property;
 						return acc;
 					},

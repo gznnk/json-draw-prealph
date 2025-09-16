@@ -25,6 +25,7 @@ export const groupShapesToolDefinition: ToolDefinition = {
 			type: "array",
 			description:
 				"Array of shape IDs to be grouped together. Must contain at least 2 shape IDs.",
+			items: { type: "string" },
 		},
 	],
 };

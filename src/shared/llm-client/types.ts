@@ -42,6 +42,7 @@ export type ToolParameter = {
 	type: string;
 	description: string;
 	enum?: string[];
+	items?: { type: string };
 };
 
 /**
