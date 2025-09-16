@@ -7,7 +7,6 @@ import type { ToolDefinition } from "../../../../shared/llm-client/types";
  */
 const TOOL_DESCRIPTION = `
 Adds a standalone text element to the canvas at the specified position.
-This is a simple tool for creating text-only elements without background shapes.
 Use for headings, descriptions, labels, and other standalone text content.
 Returns a JSON object containing the text element ID, content, and positioning.
 `;
@@ -23,12 +22,14 @@ export const textElementToolDefinition: ToolDefinition = {
 		{
 			name: "x",
 			type: "number",
-			description: "The X coordinate of the top-left corner of the text element.",
+			description:
+				"The X coordinate of the top-left corner of the text element.",
 		},
 		{
 			name: "y",
 			type: "number",
-			description: "The Y coordinate of the top-left corner of the text element.",
+			description:
+				"The Y coordinate of the top-left corner of the text element.",
 		},
 		{
 			name: "width",
@@ -53,7 +54,8 @@ export const textElementToolDefinition: ToolDefinition = {
 		{
 			name: "fill",
 			type: "string",
-			description: "Color of the text (CSS color format: hex, rgb, named colors).",
+			description:
+				"Color of the text (CSS color format: hex, rgb, named colors).",
 		},
 		{
 			name: "fontFamily",
@@ -63,13 +65,15 @@ export const textElementToolDefinition: ToolDefinition = {
 		{
 			name: "textAlign",
 			type: "string",
-			description: "Text horizontal alignment: 'left', 'center', or 'right'. Default is 'center'.",
+			description:
+				"Horizontal text alignment within the rectangle. Default is 'center'.",
 			enum: ["left", "center", "right"],
 		},
 		{
 			name: "verticalAlign",
 			type: "string",
-			description: "Text vertical alignment: 'top', 'center', or 'bottom'. Default is 'center'.",
+			description:
+				"Vertical text alignment within the rectangle. Default is 'center'.",
 			enum: ["top", "center", "bottom"],
 		},
 	],

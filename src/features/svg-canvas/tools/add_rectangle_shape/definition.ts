@@ -1,19 +1,12 @@
 // Import libraries.
 import type { ToolDefinition } from "../../../../shared/llm-client/types";
 
-// Import shared descriptions.
-import {
-	X_PARAM_DESCRIPTION,
-	Y_PARAM_DESCRIPTION,
-} from "../shared/descriptions";
-
 /**
  * Description text for the add_rectangle_shape tool.
  * Explains the purpose and behavior of the rectangle shape.
  */
 const TOOL_DESCRIPTION = `
 Adds a rectangle shape to the canvas at the specified position with optional text content.
-This is a simple tool for creating rectangular shapes that can include text.
 Returns a JSON object containing the shape ID, type, and dimensions.
 `;
 
@@ -27,12 +20,12 @@ export const rectangleShapeToolDefinition: ToolDefinition = {
 		{
 			name: "x",
 			type: "number",
-			description: X_PARAM_DESCRIPTION,
+			description: "The X coordinate of the top-left corner of the rectangle.",
 		},
 		{
 			name: "y",
 			type: "number",
-			description: Y_PARAM_DESCRIPTION,
+			description: "The Y coordinate of the top-left corner of the rectangle.",
 		},
 		{
 			name: "width",
@@ -54,7 +47,7 @@ export const rectangleShapeToolDefinition: ToolDefinition = {
 			name: "stroke",
 			type: "string",
 			description:
-				"The stroke (border) color of the rectangle. Default is 'transparent'.",
+				"The stroke (border) color of the rectangle  (CSS color format: hex, rgb, named colors). Default is 'transparent'.",
 		},
 		{
 			name: "strokeWidth",
@@ -76,14 +69,14 @@ export const rectangleShapeToolDefinition: ToolDefinition = {
 			name: "textAlign",
 			type: "string",
 			description:
-				"Text horizontal alignment: 'left', 'center', or 'right'. Default is 'center'.",
+				"Horizontal text alignment within the rectangle. Default is 'center'.",
 			enum: ["left", "center", "right"],
 		},
 		{
 			name: "verticalAlign",
 			type: "string",
 			description:
-				"Text vertical alignment: 'top', 'center', or 'bottom'. Default is 'center'.",
+				"Vertical text alignment within the rectangle. Default is 'center'.",
 			enum: ["top", "center", "bottom"],
 		},
 		{

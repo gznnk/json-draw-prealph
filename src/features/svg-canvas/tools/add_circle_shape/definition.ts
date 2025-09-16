@@ -7,7 +7,6 @@ import type { ToolDefinition } from "../../../../shared/llm-client/types";
  */
 const TOOL_DESCRIPTION = `
 Adds a circle shape to the canvas at the specified center position.
-This is a simple tool for creating circular shapes.
 Returns a JSON object containing the shape ID, type, and dimensions.
 `;
 
@@ -44,7 +43,7 @@ export const circleShapeToolDefinition: ToolDefinition = {
 			name: "stroke",
 			type: "string",
 			description:
-				"The stroke (border) color of the circle. Default is 'transparent'.",
+				"The stroke (border) color of the rectangle  (CSS color format: hex, rgb, named colors). Default is 'transparent'.",
 		},
 		{
 			name: "strokeWidth",
