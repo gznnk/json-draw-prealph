@@ -16,12 +16,11 @@ import { RectangleDefaultState } from "../../../constants/state/shapes/Rectangle
 // Import hooks related to SvgCanvas.
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 
-// Import functions related to SvgCanvas.
-import { useAddDiagram } from "../../../hooks/useAddDiagram";
-
 // Import tools.
 import { useGroupShapesTool } from "../../../tools/group_shapes";
 import { useAddRectangleShapeTool } from "../../../tools/add_rectangle_shape";
+import { useAddCircleShapeTool } from "../../../tools/add_circle_shape";
+import { useAddTextElementTool } from "../../../tools/add_text_element";
 
 // Import context.
 import { useEventBus } from "../../../context/EventBusContext";
@@ -35,20 +34,17 @@ import {
 	PAGE_DESIGN_AGENT_INSTRUCTIONS,
 	PAGE_DESIGN_TOOLS,
 } from "./PageDesignConstants";
-import {
-	createPageDesignCircle,
-	createPageDesignText,
-} from "./PageDesignFrameUtils";
 import type { PageDesignNodeProps } from "../../../types/props/nodes/PageDesignNodeProps";
 
 /**
  * PageDesignNode component.
  */
 const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
-	const addDiagram = useAddDiagram();
 	const eventBus = useEventBus();
 	const groupShapes = useGroupShapesTool(eventBus);
 	const addRectangleShape = useAddRectangleShapeTool(eventBus);
+	const addCircleShape = useAddCircleShapeTool(eventBus);
+	const addTextElement = useAddTextElementTool(eventBus);
 	const [apiKey, setApiKey] = useState<string>("");
 	const [processIdList, setProcessIdList] = useState<string[]>([]);
 
@@ -185,54 +181,30 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 							}
 
 							if (functionName === "add_circle_shape") {
-								const circleFrame = createPageDesignCircle({
-									cx: functionCallArguments.cx,
-									cy: functionCallArguments.cy,
-									r: functionCallArguments.r,
-									fill: functionCallArguments.fill,
-									stroke: functionCallArguments.stroke || "transparent",
-									strokeWidth: functionCallArguments.strokeWidth || 1,
+								const result = addCircleShape({
+									name: functionName,
+									arguments: functionCallArguments,
+									callId: event.item.call_id,
 								});
-								addDiagram(circleFrame);
 								input.push(event.item);
 								input.push({
 									type: "function_call_output",
 									call_id: event.item.call_id,
-									output: JSON.stringify({
-										id: circleFrame.id,
-										type: "Ellipse",
-										width: circleFrame.width,
-										height: circleFrame.height,
-									}),
+									output: JSON.stringify(result),
 								});
 							}
 
 							if (functionName === "add_text_element") {
-								const textElement = createPageDesignText({
-									x: functionCallArguments.x,
-									y: functionCallArguments.y,
-									width: functionCallArguments.width,
-									height: functionCallArguments.height,
-									text: functionCallArguments.text,
-									fontSize: functionCallArguments.fontSize,
-									fill: functionCallArguments.fill,
-									fontFamily: functionCallArguments.fontFamily || "Segoe UI",
-									textAlign: functionCallArguments.textAlign || "center",
-									verticalAlign:
-										functionCallArguments.verticalAlign || "center",
+								const result = addTextElement({
+									name: functionName,
+									arguments: functionCallArguments,
+									callId: event.item.call_id,
 								});
-								addDiagram(textElement);
 								input.push(event.item);
 								input.push({
 									type: "function_call_output",
 									call_id: event.item.call_id,
-									output: JSON.stringify({
-										id: textElement.id,
-										type: "Rectangle",
-										width: textElement.width,
-										height: textElement.height,
-										text: functionCallArguments.text,
-									}),
+									output: JSON.stringify(result),
 								});
 							}
 
@@ -246,7 +218,12 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 								input.push({
 									type: "function_call_output",
 									call_id: event.item.call_id,
-									output: JSON.stringify(result || { success: true, groupedShapes: functionCallArguments.shapeIds }),
+									output: JSON.stringify(
+										result || {
+											success: true,
+											groupedShapes: functionCallArguments.shapeIds,
+										},
+									),
 								});
 							}
 						}
