@@ -53,6 +53,7 @@ import { useAreaSelection } from "./hooks/selection/useAreaSelection";
 import { useClearAllSelection } from "./hooks/selection/useClearAllSelection";
 import { useSelectAll } from "./hooks/selection/useSelectAll";
 import { useOnConnectNodes } from "./hooks/tools/useOnConnectNodes";
+import { useOnGroupShapes } from "./hooks/tools/useOnGroupShapes";
 
 /**
  * Props for the useSvgCanvas hook.
@@ -227,6 +228,8 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// tools
 	// Hook for the connect nodes tool.
 	useOnConnectNodes(canvasHooksProps);
+	// Hook for the group shapes tool.
+	useOnGroupShapes(canvasHooksProps);
 
 	// Create the canvas props object that will be passed to the SvgCanvas component.
 	const canvasProps = {
