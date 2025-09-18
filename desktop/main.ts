@@ -22,7 +22,7 @@ function createWindow() {
 
 	const startUrl = isDev
 		? process.env.ELECTRON_START_URL || "http://localhost:5173"
-		: `file://${path.join(__dirname, "../dist/index.html")}`;
+		: `file://${path.join(__dirname, "../dist-web/index.html")}`;
 
 	mainWindow.loadURL(startUrl);
 

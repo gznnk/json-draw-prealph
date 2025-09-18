@@ -14,6 +14,7 @@ export default defineConfig({
 	// base: "/react-vite-project/",
 	plugins: [react()],
 	build: {
+		outDir: "dist-web",
 		rollupOptions: {
 			plugins: [
 				license({
@@ -22,7 +23,7 @@ export default defineConfig({
 						content: COPYRIGHT,
 					},
 					thirdParty: {
-						output: path.join(__dirname, "dist", "DEPENDENCIES"),
+						output: path.join(__dirname, "dist-web", "DEPENDENCIES"),
 						includePrivate: true,
 					},
 				}),
