@@ -15,17 +15,9 @@
 			"runtimeArgs": []
 		},
 		{
-			"type": "chrome",
-			"request": "attach",
-			"name": "Attach to Web App",
-			"port": 9222,
-			"webRoot": "${workspaceFolder}",
-			"urlFilter": "http://localhost:5173/*"
-		},
-		{
 			"type": "node",
 			"request": "launch",
-			"name": "Debug Jest Tests",
+			"name": "Debug Tests",
 			"runtimeExecutable": "npm",
 			"runtimeArgs": ["run", "test", "--"],
 			"args": ["--runInBand", "--watchAll=false"],
@@ -35,15 +27,19 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Debug Electron Main Process",
+			"name": "Debug Electron: Main",
 			"program": "${workspaceFolder}/dist-desktop/main.js",
 			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-			"runtimeArgs": ["--enable-logging", "--inspect=5858", "--remote-debugging-port=9222"],
+			"runtimeArgs": [
+				"--enable-logging",
+				"--inspect=5858",
+				"--remote-debugging-port=9222"
+			],
 			"env": {
 				"NODE_ENV": "development"
 			},
 			"console": "integratedTerminal",
-			"preLaunchTask": "npm: electron:build",
+			"preLaunchTask": "npm run electron:build",
 			"sourceMaps": true,
 			"outFiles": ["${workspaceFolder}/dist-desktop/**/*.js"],
 			"skipFiles": ["<node_internals>/**"],
@@ -52,33 +48,18 @@
 			}
 		},
 		{
-			"type": "node",
-			"request": "launch",
-			"name": "Debug Electron with Web Dev Server",
-			"program": "${workspaceFolder}/dist-desktop/main.js",
-			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-			"runtimeArgs": ["--enable-logging", "--inspect=5858", "--remote-debugging-port=9222"],
-			"env": {
-				"NODE_ENV": "development",
-				"ELECTRON_START_URL": "http://localhost:5173"
-			},
-			"console": "integratedTerminal",
-			"preLaunchTask": "Start Dev Server",
-			"sourceMaps": true,
-			"outFiles": ["${workspaceFolder}/dist-desktop/**/*.js"],
-			"skipFiles": ["<node_internals>/**"],
-			"windows": {
-				"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
-			}
+			"type": "chrome",
+			"request": "attach",
+			"name": "Debug Electron: Renderer",
+			"port": 9222,
+			"webRoot": "${workspaceFolder}",
+			"urlFilter": "http://localhost:5173/*"
 		}
 	],
 	"compounds": [
 		{
-			"name": "Debug Electron + Web App",
-			"configurations": [
-				"Debug Electron Main Process",
-				"Attach to Web App"
-			],
+			"name": "Debug Electron",
+			"configurations": ["Debug Electron: Main", "Debug Electron: Renderer"],
 			"stopAll": true
 		}
 	]
