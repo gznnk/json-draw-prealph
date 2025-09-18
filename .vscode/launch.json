@@ -15,6 +15,14 @@
 			"runtimeArgs": []
 		},
 		{
+			"type": "chrome",
+			"request": "attach",
+			"name": "Attach to Web App",
+			"port": 9222,
+			"webRoot": "${workspaceFolder}",
+			"urlFilter": "http://localhost:5173/*"
+		},
+		{
 			"type": "node",
 			"request": "launch",
 			"name": "Debug Jest Tests",
@@ -62,6 +70,16 @@
 			"windows": {
 				"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
 			}
+		}
+	],
+	"compounds": [
+		{
+			"name": "Debug Electron + Web App",
+			"configurations": [
+				"Debug Electron Main Process",
+				"Attach to Web App"
+			],
+			"stopAll": true
 		}
 	]
 }
