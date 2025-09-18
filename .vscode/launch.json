@@ -12,9 +12,7 @@
 			"webRoot": "${workspaceFolder}",
 			"preLaunchTask": "npm run dev",
 			"postDebugTask": "terminate",
-			"runtimeArgs": [
-				"--load-extension=${workspaceFolder}/chrome_extensions/react-developer-tools/6.1.1_0"
-			]
+			"runtimeArgs": []
 		},
 		{
 			"type": "node",
