@@ -5,20 +5,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Core Development
+
 ```bash
 npm run dev          # Start development server
 npm run build        # Build for production (runs tsc -b && vite build)
 npm run preview      # Preview production build
 npm run lint         # Run ESLint
+npm run format       # Format code with Prettier
+npm run format:check # Check code formatting with Prettier
 npm test             # Run Jest tests
 ```
 
 ### Deployment
+
 ```bash
 npm run deploy       # Build and deploy to GitHub Pages
 ```
 
 ### Dependency Analysis
+
 ```bash
 npm run dep          # Generate dependency graph, list, and check circular deps
 npm run dep:check    # Check for circular dependencies only
@@ -32,6 +37,7 @@ npm run dep:circle   # Check circular dependencies with madge
 This is a React TypeScript application built with Vite that provides an AI-powered visual workflow editor with SVG canvas functionality.
 
 ### Project Structure
+
 ```
 src/
 ├── app/                    # Main application layer
@@ -52,12 +58,14 @@ src/
 ```
 
 ### Dependency Rules
+
 - Architecture follows: `app` → `features` → `shared`
 - `shared` modules must not depend on other layers
 - Cross-feature dependencies should be minimized
 - Use the event bus for loose coupling between features
 
 ### Key Features
+
 - **SVG Canvas**: Interactive canvas with drag-and-drop nodes, connections, transformations
 - **AI Integration**: OpenAI GPT-4 and Anthropic Claude integration
 - **Node Types**: LLM, Agent, Text, Image Generation, Web Search, Vector Store, Hub nodes
@@ -67,6 +75,7 @@ src/
 ## Coding Standards
 
 ### React Components
+
 - Use arrow function syntax with `const ComponentNameComponent`
 - Export as `memo(ComponentNameComponent)` for memoization
 - No default exports - use named exports only
@@ -76,26 +85,31 @@ src/
 import { memo } from "react";
 
 const ButtonComponent = (): JSX.Element => {
-  return <button>Click</button>;
+	return <button>Click</button>;
 };
 
 export const Button = memo(ButtonComponent);
 ```
 
 ### TypeScript
+
 - Use explicit typing when intent needs clarity
 - Prefer `type` over `interface` for props
 - Named exports only (no default exports)
 - Use `node:` prefix for Node.js built-in modules
 
-### Code Style (Biome + ESLint)
+### Code Style (ESLint + Prettier)
+
 - Double quotes for strings
 - Semicolons required
-- 2-space indentation
+- Tab indentation (2-space equivalent)
 - Trailing commas in multi-line structures
 - Template literals over string concatenation
+- Automatic import organization and sorting
+- Consistent code formatting with Prettier
 
 ## Testing
+
 - Jest with jsdom environment
 - Testing Library for React components
 - Test files: `**/?(*.)+(spec|test).[tj]s?(x)`
@@ -111,9 +125,11 @@ The SVG canvas is the core feature with complex state management:
 - **Registry Pattern**: Diagram types registered in `features/svg-canvas/registry/`
 
 ### Shape Management
+
 For adding, modifying, or deleting shapes on the canvas, refer to the `adding-shapes.md` documentation which provides detailed guidance on shape operations.
 
 Key canvas capabilities:
+
 - Multi-select with area selection
 - Undo/redo history
 - Copy/paste functionality
@@ -133,6 +149,7 @@ Key canvas capabilities:
 ## Task Completion Verification
 
 **IMPORTANT**: After completing any task, follow these steps:
+
 1. Run `npm run build` to verify that your changes don't introduce build errors
 2. Fix any TypeScript errors or build issues before considering the task complete
 3. Ask the user if they want to commit the changes to git
@@ -141,8 +158,9 @@ Key canvas capabilities:
 ## Dependencies Note
 
 This project uses:
+
 - React 19 with Emotion for styling
 - OpenAI SDK and Anthropic SDK for AI features
 - markdown-it, KaTeX, highlight.js for rich text
 - Jest for testing
-- Biome and ESLint for code quality
+- ESLint and Prettier for code quality and formatting
