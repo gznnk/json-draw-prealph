@@ -1,21 +1,16 @@
-// Import types.
+import { createLLMNodeInputFrame } from "./createLLMNodeInputFrame";
+import { LLMNodeDefaultState } from "../../../constants/state/nodes/LLMNodeDefaultState";
+import {
+	HEADER_HEIGHT,
+	HEADER_MARGIN_TOP,
+} from "../../../constants/styling/core/LayoutStyling";
 import type { LLMNodeState } from "../../../types/state/nodes/LLMNodeState";
-
-// Import utils.
 import { createInputState } from "../../elements/input/createInputState";
 import { createNodeHeaderState } from "../../elements/nodeHeader/createNodeHeaderState";
 import { degreesToRadians } from "../../math/common/degreesToRadians";
 import { efficientAffineTransformation } from "../../math/transform/efficientAffineTransformation";
 import { newId } from "../../shapes/common/newId";
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
-import { createLLMNodeInputFrame } from "./createLLMNodeInputFrame";
-
-// Import constants.
-import { LLMNodeDefaultState } from "../../../constants/state/nodes/LLMNodeDefaultState";
-import {
-	HEADER_HEIGHT,
-	HEADER_MARGIN_TOP,
-} from "../../../constants/styling/core/LayoutStyling";
 
 /**
  * Creates state for an LLM node with specified properties.

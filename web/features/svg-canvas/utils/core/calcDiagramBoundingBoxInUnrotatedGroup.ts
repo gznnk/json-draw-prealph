@@ -1,7 +1,4 @@
-// Import types.
 import type { Diagram } from "../../types/state/core/Diagram";
-
-// Import utils.
 import { degreesToRadians } from "../math/common/degreesToRadians";
 import { nanToZero } from "../math/common/nanToZero";
 import { rotatePoint } from "../math/points/rotatePoint";

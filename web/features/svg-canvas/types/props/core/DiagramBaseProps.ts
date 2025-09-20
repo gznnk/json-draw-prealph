@@ -1,6 +1,6 @@
-import type { DiagramDragEvent } from "../../events/DiagramDragEvent";
-import type { DiagramDragDropEvent } from "../../events/DiagramDragDropEvent";
 import type { DiagramClickEvent } from "../../events/DiagramClickEvent";
+import type { DiagramDragDropEvent } from "../../events/DiagramDragDropEvent";
+import type { DiagramDragEvent } from "../../events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../events/DiagramHoverChangeEvent";
 
 /**

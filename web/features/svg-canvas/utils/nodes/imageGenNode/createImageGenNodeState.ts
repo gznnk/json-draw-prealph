@@ -1,12 +1,7 @@
-// Import types.
+import { ImageGenNodeDefaultState } from "../../../constants/state/nodes/ImageGenNodeDefaultState";
 import type { ImageGenNodeState } from "../../../types/state/nodes/ImageGenNodeState";
-
-// Import utils.
 import { newId } from "../../shapes/common/newId";
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
-
-// Import constants.
-import { ImageGenNodeDefaultState } from "../../../constants/state/nodes/ImageGenNodeDefaultState";
 
 /**
  * Creates state for an ImageGen node with specified properties.
@@ -15,13 +10,7 @@ import { ImageGenNodeDefaultState } from "../../../constants/state/nodes/ImageGe
  * @param y - The y coordinate of the node
  * @returns ImageGen node state object
  */
-export const createImageGenNodeState = ({
-	x,
-	y,
-}: {
-	x: number;
-	y: number;
-}) => {
+export const createImageGenNodeState = ({ x, y }: { x: number; y: number }) => {
 	const connectPoints = createRectangleConnectPoint({
 		x,
 		y,

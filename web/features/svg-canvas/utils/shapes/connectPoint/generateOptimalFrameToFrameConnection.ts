@@ -1,18 +1,15 @@
-// Import types.
-import type { Point } from "../../../types/core/Point";
-import type { Frame } from "../../../types/core/Frame";
-
-// Import utils.
-import { closer } from "../../math/common/closer";
-import { calcRectangleBoundingBoxGeometry } from "../../math/geometry/calcRectangleBoundingBoxGeometry";
-import { isLineIntersectingBoxGeometry } from "../../math/geometry/isLineIntersectingBoxGeometry";
 import { addMarginToBoxGeometry } from "./addMarginToBoxGeometry";
 import { cleanPath } from "./cleanPath";
 import { generatePathFromFrameToPoint } from "./generatePathFromFrameToPoint";
-import { selectOptimalPathFromCandidates } from "./selectOptimalPathFromCandidates";
 import { getLineDirection } from "./getLineDirection";
 import { getSecondConnectPoint } from "./getSecondConnectPoint";
 import { removeDuplicatePoints } from "./removeDuplicatePoints";
+import { selectOptimalPathFromCandidates } from "./selectOptimalPathFromCandidates";
+import type { Frame } from "../../../types/core/Frame";
+import type { Point } from "../../../types/core/Point";
+import { closer } from "../../math/common/closer";
+import { calcRectangleBoundingBoxGeometry } from "../../math/geometry/calcRectangleBoundingBoxGeometry";
+import { isLineIntersectingBoxGeometry } from "../../math/geometry/isLineIntersectingBoxGeometry";
 
 /**
  * Adds a candidate point to the collection and generates intersection points

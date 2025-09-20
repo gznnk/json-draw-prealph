@@ -1,4 +1,3 @@
-// Import types.
 import type { Optional } from "../../../../../shared/utility-types";
 import type { InputFeatures } from "../../data/elements/InputData";
 import type { InputState } from "../../state/elements/InputState";

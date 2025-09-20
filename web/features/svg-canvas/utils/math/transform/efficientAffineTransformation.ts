@@ -1,8 +1,5 @@
-// Import types.
-import type { Point } from "../../../types/core/Point";
-
-// Import utils.
 import { affineTransformation } from "./affineTransformation";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Applies an efficient affine transformation to a point with optimizations.

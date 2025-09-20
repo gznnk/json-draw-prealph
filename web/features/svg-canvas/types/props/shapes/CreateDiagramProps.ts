@@ -1,4 +1,5 @@
-// Import types.
+import type { ConnectableProps } from "./ConnectableProps";
+import type { Prettify } from "../../../../../shared/utility-types";
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
 import type { DiagramBaseProps } from "../core/DiagramBaseProps";
 import type { ExecutableProps } from "../core/ExecutableProps";
@@ -7,10 +8,8 @@ import type { ItemableProps } from "../core/ItemableProps";
 import type { SelectableProps } from "../core/SelectableProps";
 import type { TextableProps } from "../core/TextableProps";
 import type { TransformativeProps } from "../core/TransformativeProps";
-import type { ConnectableProps } from "./ConnectableProps";
 
 // Import shared modules.
-import type { Prettify } from "../../../../../shared/utility-types";
 
 /**
  * Create diagram props type with unified features.

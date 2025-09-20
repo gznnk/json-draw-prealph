@@ -1,6 +1,6 @@
+import { isStraight } from "./isStraight";
 import type { Point } from "../../../types/core/Point";
 import { calcManhattanDistance } from "../../math/points/calcManhattanDistance";
-import { isStraight } from "./isStraight";
 
 export type GridPoint = Point & {
 	score?: number;

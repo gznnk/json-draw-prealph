@@ -1,4 +1,3 @@
-// Import types.
 import type { TransformativeData } from "../../data/core/TransformativeData";
 
 /**

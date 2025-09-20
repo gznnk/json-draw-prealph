@@ -1,4 +1,3 @@
-// Import types.
 import type { HubNodeFeatures } from "../../data/nodes/HubNodeData";
 import type { HubNodeState } from "../../state/nodes/HubNodeState";
 import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";

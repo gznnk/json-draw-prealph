@@ -1,4 +1,3 @@
-// Import types.
 import type { CreateStateType } from "./CreateStateType";
 import type { ImageData, ImageFeatures } from "../../data/shapes/ImageData";
 

@@ -1,4 +1,3 @@
-// Import types.
 import type { WebSearchNodeFeatures } from "../../data/nodes/WebSearchNodeData";
 import type { WebSearchNodeState } from "../../state/nodes/WebSearchNodeState";
 import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";

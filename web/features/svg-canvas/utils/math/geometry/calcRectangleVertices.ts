@@ -1,8 +1,5 @@
-// Import types.
-import type { RectangleVertices } from "../../../types/core/RectangleVertices";
 import type { Frame } from "../../../types/core/Frame";
-
-// Import utils.
+import type { RectangleVertices } from "../../../types/core/RectangleVertices";
 import { degreesToRadians } from "../common/degreesToRadians";
 import { nanToZero } from "../common/nanToZero";
 import { efficientAffineTransformation } from "../transform/efficientAffineTransformation";

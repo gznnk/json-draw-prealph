@@ -1,10 +1,5 @@
-// Import types.
-import type { TextAreaNodeState } from "../../../types/state/nodes/TextAreaNodeState";
-
-// Import constants.
 import { TextAreaNodeDefaultState } from "../../../constants/state/nodes/TextAreaNodeDefaultState";
-
-// Import utils.
+import type { TextAreaNodeState } from "../../../types/state/nodes/TextAreaNodeState";
 import { createInputState } from "../../elements/input/createInputState";
 import { createNodeHeaderState } from "../../elements/nodeHeader/createNodeHeaderState";
 import { newId } from "../../shapes/common/newId";

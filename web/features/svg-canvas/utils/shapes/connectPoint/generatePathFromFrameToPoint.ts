@@ -1,10 +1,10 @@
+import { addMarginToBoxGeometry } from "./addMarginToBoxGeometry";
+import { getLineDirection } from "./getLineDirection";
 import type { BoxGeometry } from "../../../types/core/BoxGeometry";
-import type { Point } from "../../../types/core/Point";
 import type { Direction } from "../../../types/core/Direction";
+import type { Point } from "../../../types/core/Point";
 import { closer } from "../../math/common/closer";
 import { segmentsIntersect } from "../../math/geometry/segmentsIntersect";
-import { getLineDirection } from "./getLineDirection";
-import { addMarginToBoxGeometry } from "./addMarginToBoxGeometry";
 
 /**
  * Generates connection path points from a frame to an arbitrary point.

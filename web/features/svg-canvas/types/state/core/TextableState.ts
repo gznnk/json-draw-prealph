@@ -1,4 +1,3 @@
-// Import types.
 import type { TextableData } from "../../data/core/TextableData";
 
 /**

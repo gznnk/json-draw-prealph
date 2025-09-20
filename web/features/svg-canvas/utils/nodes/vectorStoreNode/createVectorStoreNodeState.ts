@@ -1,12 +1,7 @@
-// Import types.
+import { VectorStoreNodeDefaultState } from "../../../constants/state/nodes/VectorStoreNodeDefaultState";
 import type { VectorStoreNodeState } from "../../../types/state/nodes/VectorStoreNodeState";
-
-// Import utils.
 import { newId } from "../../shapes/common/newId";
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
-
-// Import constants.
-import { VectorStoreNodeDefaultState } from "../../../constants/state/nodes/VectorStoreNodeDefaultState";
 
 /**
  * Creates state for a VectorStore node with specified properties.

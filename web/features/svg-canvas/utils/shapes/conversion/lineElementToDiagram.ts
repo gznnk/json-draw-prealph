@@ -1,12 +1,7 @@
-// Import types.
+import { PathDefaultState } from "../../../constants/state/shapes/PathDefaultState";
 import type { PathPointState } from "../../../types/state/shapes/PathPointState";
 import type { PathState } from "../../../types/state/shapes/PathState";
-
-// Import utils.
 import { newId } from "../common/newId";
-
-// Import constants.
-import { PathDefaultState } from "../../../constants/state/shapes/PathDefaultState";
 
 /**
  * Converts an SVG Line element to a Path diagram state structure.

@@ -18,12 +18,12 @@
  * const data = mapper(state); // { id: '1', name: 'John' }
  * ```
  */
-// biome-ignore lint/suspicious/noExplicitAny: Required for generic type mapping
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createStateToDataMapper = <TData extends Record<string, any>>(
 	template: TData,
 ) => {
 	const dataKeys = Object.keys(
-		// biome-ignore lint/suspicious/noExplicitAny: Required for generic type mapping
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		template as Record<string, any>,
 	) as (keyof TData)[];
 
@@ -31,7 +31,7 @@ export const createStateToDataMapper = <TData extends Record<string, any>>(
 		const result = {} as TData;
 
 		for (const key of dataKeys) {
-			// biome-ignore lint/suspicious/noExplicitAny: Required for generic type mapping
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(result as any)[key] = (state as any)[key];
 		}
 

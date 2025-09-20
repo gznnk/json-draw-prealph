@@ -13,7 +13,7 @@ export const deepCopy = <T>(obj: T): T => {
 		return obj.map((item) => deepCopy(item)) as unknown as T;
 	}
 
-	// biome-ignore lint/suspicious/noExplicitAny: Because the type of obj is unknown, we need to use any to avoid type errors.
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const result = {} as Record<string, any>;
 
 	for (const key of Object.keys(obj) as Array<keyof typeof obj>) {

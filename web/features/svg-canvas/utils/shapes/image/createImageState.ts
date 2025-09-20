@@ -1,11 +1,6 @@
-// Import types.
-import type { ImageState } from "../../../types/state/shapes/ImageState";
-
-// Import utils.
-import { newId } from "../../../utils/shapes/common/newId";
-
-// Import constants from Image component.
 import { ImageDefaultState } from "../../../constants/state/shapes/ImageDefaultState";
+import type { ImageState } from "../../../types/state/shapes/ImageState";
+import { newId } from "../../../utils/shapes/common/newId";
 
 /**
  * Creates image state with the specified properties.

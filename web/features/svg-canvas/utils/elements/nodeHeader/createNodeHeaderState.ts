@@ -1,10 +1,5 @@
-// Import types.
-import type { NodeHeaderState } from "../../../types/state/elements/NodeHeaderState";
-
-// Import constants.
 import { NodeHeaderDefaultState } from "../../../constants/state/elements/NodeHeaderDefaultState";
-
-// Import utils.
+import type { NodeHeaderState } from "../../../types/state/elements/NodeHeaderState";
 import { newId } from "../../shapes/common/newId";
 
 /**
@@ -14,7 +9,11 @@ export const createNodeHeaderState = ({
 	x,
 	y,
 	text = "Chat Area",
-}: { x: number; y: number; text?: string }): NodeHeaderState => ({
+}: {
+	x: number;
+	y: number;
+	text?: string;
+}): NodeHeaderState => ({
 	...NodeHeaderDefaultState,
 	id: newId(),
 	x,

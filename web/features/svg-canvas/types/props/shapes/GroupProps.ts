@@ -1,11 +1,10 @@
-// Import type.
+import type { CreateDiagramProps } from "./CreateDiagramProps";
 import type { GroupFeatures } from "../../data/shapes/GroupData";
 import type { DiagramConnectEvent } from "../../events/DiagramConnectEvent";
 import type { DiagramTextChangeEvent } from "../../events/DiagramTextChangeEvent";
 import type { ExecuteEvent } from "../../events/ExecuteEvent";
 import type { PreviewConnectLineEvent } from "../../events/PreviewConnectLineEvent";
 import type { GroupState } from "../../state/shapes/GroupState";
-import type { CreateDiagramProps } from "./CreateDiagramProps";
 
 /**
  * Props for Group component.

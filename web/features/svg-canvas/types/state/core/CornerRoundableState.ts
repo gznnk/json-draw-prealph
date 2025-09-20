@@ -1,4 +1,3 @@
-// Import types.
 import type { CornerRoundableData } from "../../data/core/CornerRoundableData";
 
 /**

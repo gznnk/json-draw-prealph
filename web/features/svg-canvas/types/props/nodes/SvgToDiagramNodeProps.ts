@@ -1,4 +1,3 @@
-// Import types.
 import type { SvgToDiagramNodeFeatures } from "../../data/nodes/SvgToDiagramNodeData";
 import type { SvgToDiagramNodeState } from "../../state/nodes/SvgToDiagramNodeState";
 import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";

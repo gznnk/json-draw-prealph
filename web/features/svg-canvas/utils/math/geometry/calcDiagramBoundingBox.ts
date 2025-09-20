@@ -1,8 +1,5 @@
-// Import types.
 import type { Box } from "../../../types/core/Box";
 import type { Diagram } from "../../../types/state/core/Diagram";
-
-// Import utils.
 import { isFrame } from "../../validation/isFrame";
 import { degreesToRadians } from "../common/degreesToRadians";
 import { efficientAffineTransformation } from "../transform/efficientAffineTransformation";

@@ -1,15 +1,10 @@
-// Import types.
+import { createEllipseConnectPoint } from "./createEllipseConnectPoint";
+import { EllipseDefaultState } from "../../../constants/state/shapes/EllipseDefaultState";
 import type { TextableType } from "../../../types/core/TextableType";
 import type { TextAlign } from "../../../types/core/TextAlign";
 import type { VerticalAlign } from "../../../types/core/VerticalAlign";
 import type { EllipseState } from "../../../types/state/shapes/EllipseState";
-
-// Import constants.
-import { EllipseDefaultState } from "../../../constants/state/shapes/EllipseDefaultState";
-
-// Import utils.
 import { newId } from "../../../utils/shapes/common/newId";
-import { createEllipseConnectPoint } from "./createEllipseConnectPoint";
 
 /**
  * Creates ellipse state with the specified properties.

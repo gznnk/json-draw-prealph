@@ -1,9 +1,6 @@
-// Import types.
+import { segmentsIntersect } from "./segmentsIntersect";
 import type { BoxGeometry } from "../../../types/core/BoxGeometry";
 import type { Point } from "../../../types/core/Point";
-
-// Import utils.
-import { segmentsIntersect } from "./segmentsIntersect";
 
 /**
  * Determines if a line segment intersects with a box geometry.

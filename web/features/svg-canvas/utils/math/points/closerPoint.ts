@@ -1,8 +1,5 @@
-// Import types.
-import type { Point } from "../../../types/core/Point";
-
-// Import utils.
 import { calcEuclideanDistance } from "./calcEuclideanDistance";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Returns the point (from two options) that is closer to a reference point.

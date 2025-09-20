@@ -1,5 +1,7 @@
-// Import types.
-import type { ButtonData, ButtonFeatures } from "../../data/elements/ButtonData";
+import type {
+	ButtonData,
+	ButtonFeatures,
+} from "../../data/elements/ButtonData";
 import type { CreateStateType } from "../shapes/CreateStateType";
 
 /**

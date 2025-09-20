@@ -1,4 +1,3 @@
-// Import types.
 import type { TextAreaNodeFeatures } from "../../data/nodes/TextAreaNodeData";
 import type { DiagramTextChangeEvent } from "../../events/DiagramTextChangeEvent";
 import type { TextAreaNodeState } from "../../state/nodes/TextAreaNodeState";

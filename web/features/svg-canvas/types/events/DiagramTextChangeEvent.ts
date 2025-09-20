@@ -1,7 +1,6 @@
-// Import types.
+import type { EventPhase } from "./EventPhase";
 import type { Frame } from "../core/Frame";
 import type { TextableData } from "../data/core/TextableData";
-import type { EventPhase } from "./EventPhase";
 
 /**
  * Attributes for the text editor component.

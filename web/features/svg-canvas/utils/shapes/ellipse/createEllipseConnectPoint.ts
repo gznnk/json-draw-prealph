@@ -1,8 +1,5 @@
-// Import types.
 import type { EllipseVertices } from "../../../types/core/EllipseVertices";
 import type { ConnectPointState } from "../../../types/state/shapes/ConnectPointState";
-
-// Import utils.
 import { newId } from "../../../utils/shapes/common/newId";
 import { calcEllipseVertices } from "../../math/geometry/calcEllipseVertices";
 

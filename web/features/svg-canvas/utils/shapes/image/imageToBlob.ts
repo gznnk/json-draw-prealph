@@ -1,7 +1,4 @@
-// Import types.
 import type { Diagram } from "../../../types/state/core/Diagram";
-
-// Import utils.
 import { isImageState } from "../../../utils/validation/isImageState";
 
 /**

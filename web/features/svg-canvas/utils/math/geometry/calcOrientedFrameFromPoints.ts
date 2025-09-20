@@ -1,8 +1,5 @@
-// Import types.
-import type { Point } from "../../../types/core/Point";
 import type { Frame } from "../../../types/core/Frame";
-
-// Import utils.
+import type { Point } from "../../../types/core/Point";
 import { degreesToRadians } from "../common/degreesToRadians";
 import { nanToZero } from "../common/nanToZero";
 import { efficientAffineTransformation } from "../transform/efficientAffineTransformation";
@@ -38,7 +35,15 @@ export const calcOrientedFrameFromPoints = (
 	const radians = degreesToRadians(rotation);
 
 	const inversePoints = points.map((p) =>
-		efficientInverseAffineTransformation(p.x, p.y, scaleX, scaleY, radians, x, y),
+		efficientInverseAffineTransformation(
+			p.x,
+			p.y,
+			scaleX,
+			scaleY,
+			radians,
+			x,
+			y,
+		),
 	);
 
 	const inverseLeft = Math.min(...inversePoints.map((p) => p.x));

@@ -1,9 +1,6 @@
-// Import types.
+import { calcDiagramBoundingBox } from "./calcDiagramBoundingBox";
 import type { Box } from "../../../types/core/Box";
 import type { Diagram } from "../../../types/state/core/Diagram";
-
-// Import utils.
-import { calcDiagramBoundingBox } from "./calcDiagramBoundingBox";
 
 /**
  * Calculate the bounding box of all provided diagrams.

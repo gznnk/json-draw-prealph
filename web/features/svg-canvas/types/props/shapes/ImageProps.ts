@@ -1,7 +1,6 @@
-// Import types.
+import type { CreateDiagramProps } from "./CreateDiagramProps";
 import type { ImageFeatures } from "../../data/shapes/ImageData";
 import type { ImageState } from "../../state/shapes/ImageState";
-import type { CreateDiagramProps } from "./CreateDiagramProps";
 
 /**
  * Props for the Image component.

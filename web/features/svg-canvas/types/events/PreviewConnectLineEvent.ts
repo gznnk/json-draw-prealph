@@ -1,6 +1,5 @@
-// Import types.
-import type { PathState } from "../state/shapes/PathState";
 import type { EventPhase } from "./EventPhase";
+import type { PathState } from "../state/shapes/PathState";
 
 /**
  * Event that represents a preview connection line state change.

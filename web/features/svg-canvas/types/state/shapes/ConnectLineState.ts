@@ -1,9 +1,8 @@
-// Import types.
+import type { CreateStateType } from "./CreateStateType";
 import type {
 	ConnectLineData,
 	ConnectLineFeatures,
 } from "../../data/shapes/ConnectLineData";
-import type { CreateStateType } from "./CreateStateType";
 
 /**
  * State type for connection lines between diagram elements.

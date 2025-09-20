@@ -1,5 +1,5 @@
-import type { Point } from "../../../types/core/Point";
 import { isStraight } from "./isStraight";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Cleans up a path by removing unnecessary intermediate points that are in straight lines.

@@ -1,12 +1,7 @@
-// Import types.
-import type { SvgToDiagramNodeState } from "../../../types/state/nodes/SvgToDiagramNodeState";
-
-// Import utils.
-import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
-import { newId } from "../../shapes/common/newId";
-
-// Import constants.
 import { SvgToDiagramNodeDefaultState } from "../../../constants/state/nodes/SvgToDiagramNodeDefaultState";
+import type { SvgToDiagramNodeState } from "../../../types/state/nodes/SvgToDiagramNodeState";
+import { newId } from "../../shapes/common/newId";
+import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
 
 /**
  * Creates state for a SvgToDiagram node with specified properties.

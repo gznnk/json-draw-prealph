@@ -1,4 +1,3 @@
-// Import types.
 import type { Point } from "../../../types/core/Point";
 
 /**
@@ -15,7 +14,7 @@ export const createLinearX2yFunction = (p1: Point, p2: Point) => {
 
 	return (x: number) => {
 		return {
-			x: x,
+			x,
 			y: Number.isFinite(a) ? a * x + b : p1.y,
 		};
 	};

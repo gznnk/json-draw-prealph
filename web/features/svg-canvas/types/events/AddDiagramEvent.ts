@@ -1,4 +1,3 @@
-// Import types.
 import type { Diagram } from "../state/core/Diagram";
 
 /**

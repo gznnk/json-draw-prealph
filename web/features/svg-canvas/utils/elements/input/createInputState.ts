@@ -1,13 +1,8 @@
-// Import types.
-import type { InputState } from "../../../types/state/elements/InputState";
-
-// Import constants.
 import { InputDefaultState } from "../../../constants/state/elements/InputDefaultState";
-
-import type { TextAlign } from "../../../types/core/TextAlign";
 import type { TextableType } from "../../../types/core/TextableType";
+import type { TextAlign } from "../../../types/core/TextAlign";
 import type { VerticalAlign } from "../../../types/core/VerticalAlign";
-// Import utils.
+import type { InputState } from "../../../types/state/elements/InputState";
 import { newId } from "../../shapes/common/newId";
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
 

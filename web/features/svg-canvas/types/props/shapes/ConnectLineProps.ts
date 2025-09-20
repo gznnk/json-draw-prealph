@@ -1,7 +1,6 @@
-// Import types related to SvgCanvas.
 import type { CreateDiagramProps } from "./CreateDiagramProps";
-import type { ConnectLineState } from "../../state/shapes/ConnectLineState";
 import type { ConnectLineFeatures } from "../../data/shapes/ConnectLineData";
+import type { ConnectLineState } from "../../state/shapes/ConnectLineState";
 
 /**
  * Props for ConnectLine component.

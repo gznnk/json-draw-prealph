@@ -1,4 +1,3 @@
-// Import types.
 import type { LLMNodeFeatures } from "../../data/nodes/LLMNodeData";
 import type { DiagramTextChangeEvent } from "../../events/DiagramTextChangeEvent";
 import type { LLMNodeState } from "../../state/nodes/LLMNodeState";

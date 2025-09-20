@@ -1,12 +1,7 @@
-// Import types.
+import { PageDesignNodeDefaultState } from "../../../constants/state/nodes/PageDesignNodeDefaultState";
 import type { PageDesignNodeState } from "../../../types/state/nodes/PageDesignNodeState";
-
-// Import utils.
 import { newId } from "../../shapes/common/newId";
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
-
-// Import constants.
-import { PageDesignNodeDefaultState } from "../../../constants/state/nodes/PageDesignNodeDefaultState";
 
 export const createPageDesignNodeState = ({
 	x,

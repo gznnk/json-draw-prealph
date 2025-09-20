@@ -1,4 +1,5 @@
-// Import types.
+import type { ConnectableState } from "./ConnectableState";
+import type { Prettify } from "../../../../../shared/utility-types";
 import type { DiagramFeatures } from "../../core/DiagramFeatures";
 import type { DiagramBaseData } from "../../data/core/DiagramBaseData";
 import type { CornerRoundableState } from "../core/CornerRoundableState";
@@ -9,16 +10,7 @@ import type { SelectableState } from "../core/SelectableState";
 import type { StrokableState } from "../core/StrokableState";
 import type { TextableState } from "../core/TextableState";
 import type { TransformativeState } from "../core/TransformativeState";
-import type { ConnectableState } from "./ConnectableState";
 
-// Import shared modules.
-import type { Prettify } from "../../../../../shared/utility-types";
-
-/**
- * Create state type with unified features.
- * This type conditionally merges different state interfaces based on specified features,
- * allowing components to selectively inherit specific behaviors and state properties.
- */
 /**
  * Create state type with unified features.
  * This type conditionally merges different state interfaces based on specified features,

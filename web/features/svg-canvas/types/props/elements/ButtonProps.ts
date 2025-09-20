@@ -1,4 +1,3 @@
-// Import types.
 import type { Optional } from "../../../../../shared/utility-types";
 import type { ButtonFeatures } from "../../data/elements/ButtonData";
 import type { ButtonState } from "../../state/elements/ButtonState";

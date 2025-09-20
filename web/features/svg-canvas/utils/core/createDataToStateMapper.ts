@@ -19,7 +19,7 @@
  * const state = mapper(data); // { id: '1', name: 'John', isLoading: false, isSelected: false }
  * ```
  */
-// biome-ignore lint/suspicious/noExplicitAny: Required for generic type mapping
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createDataToStateMapper = <TState extends Record<string, any>>(
 	defaultState: TState,
 ) => {

@@ -1,4 +1,3 @@
-// Import types.
 import type { InputData, InputFeatures } from "../../data/elements/InputData";
 import type { CreateStateType } from "../shapes/CreateStateType";
 

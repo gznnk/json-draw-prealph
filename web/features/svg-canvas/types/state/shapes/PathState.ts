@@ -1,6 +1,5 @@
-// Import types.
-import type { PathData, PathFeatures } from "../../data/shapes/PathData";
 import type { CreateStateType } from "./CreateStateType";
+import type { PathData, PathFeatures } from "../../data/shapes/PathData";
 
 /**
  * State type for polyline/path elements.

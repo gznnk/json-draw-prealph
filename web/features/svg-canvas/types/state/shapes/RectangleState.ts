@@ -1,9 +1,8 @@
-// Import types.
+import type { CreateStateType } from "./CreateStateType";
 import type {
 	RectangleData,
 	RectangleFeatures,
 } from "../../data/shapes/RectangleData";
-import type { CreateStateType } from "./CreateStateType";
 
 /**
  * State type for rectangle shapes.

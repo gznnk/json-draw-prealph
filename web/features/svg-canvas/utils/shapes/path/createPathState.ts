@@ -1,12 +1,7 @@
-// Import types.
-import type { PathState } from "../../../types/state/shapes/PathState";
-import type { PathPointData } from "../../../types/data/shapes/PathPointData";
-
-// Import utils.
-import { newId } from "../../../utils/shapes/common/newId";
-
-// Import constants from Path component.
 import { PathDefaultState } from "../../../constants/state/shapes/PathDefaultState";
+import type { PathPointData } from "../../../types/data/shapes/PathPointData";
+import type { PathState } from "../../../types/state/shapes/PathState";
+import { newId } from "../../../utils/shapes/common/newId";
 
 /**
  * Creates path state with the specified properties.

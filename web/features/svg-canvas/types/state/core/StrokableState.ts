@@ -1,4 +1,3 @@
-// Import types.
 import type { StrokableData } from "../../data/core/StrokableData";
 
 /**

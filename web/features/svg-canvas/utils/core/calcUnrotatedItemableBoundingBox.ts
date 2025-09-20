@@ -1,9 +1,6 @@
-// Import types.
-import type { Diagram } from "../../types/state/core/Diagram";
-
-// Import utils.
-import { isItemableState } from "../validation/isItemableState";
 import { calcDiagramBoundingBoxInUnrotatedGroup } from "./calcDiagramBoundingBoxInUnrotatedGroup";
+import type { Diagram } from "../../types/state/core/Diagram";
+import { isItemableState } from "../validation/isItemableState";
 
 /**
  * Calculates the bounding box of a group when its rotation is reset

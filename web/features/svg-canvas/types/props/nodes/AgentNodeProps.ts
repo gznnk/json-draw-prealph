@@ -1,4 +1,3 @@
-// Import types.
 import type { AgentNodeFeatures } from "../../data/nodes/AgentNodeData";
 import type { AgentNodeState } from "../../state/nodes/AgentNodeState";
 import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";

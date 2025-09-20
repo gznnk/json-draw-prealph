@@ -1,4 +1,3 @@
-// Import types.
 import type { ImageGenNodeFeatures } from "../../data/nodes/ImageGenNodeData";
 import type { ImageGenNodeState } from "../../state/nodes/ImageGenNodeState";
 import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";

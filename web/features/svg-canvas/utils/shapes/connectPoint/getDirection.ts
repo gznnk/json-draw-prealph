@@ -1,5 +1,5 @@
-import { radiansToDegrees } from "../../math/common/radiansToDegrees";
 import type { Direction } from "../../../types/core/Direction";
+import { radiansToDegrees } from "../../math/common/radiansToDegrees";
 
 /**
  * Converts radians to direction based on angle degrees.

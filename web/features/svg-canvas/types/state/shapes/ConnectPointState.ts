@@ -1,4 +1,3 @@
-// Import types.
 import type { ConnectPointData } from "../../data/shapes/ConnectPointData";
 import type { DiagramBaseState } from "../core/DiagramBaseState";
 

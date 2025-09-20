@@ -1,11 +1,6 @@
-// Import types.
-import type { SvgState } from "../../../types/state/shapes/SvgState";
-
-// Import utils.
-import { newId } from "../../../utils/shapes/common/newId";
-
-// Import constants from Svg component.
 import { SvgDefaultState } from "../../../constants/state/shapes/SvgDefaultState";
+import type { SvgState } from "../../../types/state/shapes/SvgState";
+import { newId } from "../../../utils/shapes/common/newId";
 
 /**
  * Creates svg state with the specified properties.

@@ -1,4 +1,3 @@
-// Import types.
 import type { FillableData } from "../../data/core/FillableData";
 
 /**

@@ -1,12 +1,7 @@
-// Import types.
+import { WebSearchNodeDefaultState } from "../../../constants/state/nodes/WebSearchNodeDefaultState";
 import type { WebSearchNodeState } from "../../../types/state/nodes/WebSearchNodeState";
-
-// Import utils.
 import { newId } from "../../shapes/common/newId";
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
-
-// Import constants.
-import { WebSearchNodeDefaultState } from "../../../constants/state/nodes/WebSearchNodeDefaultState";
 
 /**
  * Creates state for a WebSearch node with specified properties.

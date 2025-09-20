@@ -1,8 +1,5 @@
-// Import types.
-import type { Point } from "../../../types/core/Point";
-
-// Import utils.
 import { closerPoint } from "./closerPoint";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Calculates the closest intersection point between a circle and a line.

@@ -1,15 +1,10 @@
-// Import types.
-import type { TextAlign } from "../../../types/core/TextAlign";
+import { createRectangleConnectPoint } from "./createRectangleConnectPoint";
+import { RectangleDefaultState } from "../../../constants/state/shapes/RectangleDefaultState";
 import type { TextableType } from "../../../types/core/TextableType";
+import type { TextAlign } from "../../../types/core/TextAlign";
 import type { VerticalAlign } from "../../../types/core/VerticalAlign";
 import type { RectangleState } from "../../../types/state/shapes/RectangleState";
-
-// Import constants.
-import { RectangleDefaultState } from "../../../constants/state/shapes/RectangleDefaultState";
-
-// Import utils.
 import { newId } from "../../../utils/shapes/common/newId";
-import { createRectangleConnectPoint } from "./createRectangleConnectPoint";
 
 /**
  * Creates rectangle state with the specified properties.

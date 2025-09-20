@@ -1,4 +1,3 @@
-// Import types.
 import type { PageDesignNodeFeatures } from "../../data/nodes/PageDesignNodeData";
 import type { PageDesignNodeState } from "../../state/nodes/PageDesignNodeState";
 import type { CreateDiagramProps } from "../shapes/CreateDiagramProps";

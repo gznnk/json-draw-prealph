@@ -1,8 +1,8 @@
+import { getLineDirection } from "./getLineDirection";
 import { CONNECT_LINE_MARGIN } from "../../../constants/core/Constants";
 import type { BoxGeometry } from "../../../types/core/BoxGeometry";
-import type { Point } from "../../../types/core/Point";
 import type { Frame } from "../../../types/core/Frame";
-import { getLineDirection } from "./getLineDirection";
+import type { Point } from "../../../types/core/Point";
 
 /**
  * Gets the second connect point for a shape based on direction.

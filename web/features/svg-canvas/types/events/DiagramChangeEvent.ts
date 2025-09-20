@@ -1,6 +1,5 @@
-// Import types.
-import type { Diagram } from "../state/core/Diagram";
 import type { EventPhase } from "./EventPhase";
+import type { Diagram } from "../state/core/Diagram";
 
 /**
  * Data structure for diagram change events

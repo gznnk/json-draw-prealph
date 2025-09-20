@@ -1,7 +1,10 @@
+import { createLLMNodeInputFrame } from "./createLLMNodeInputFrame";
+import {
+	MIN_WIDTH,
+	MIN_HEIGHT,
+} from "../../../constants/styling/nodes/LLMNodeStyling";
 import type { Frame } from "../../../types/core/Frame";
 import type { Diagram } from "../../../types/state/core/Diagram";
-import { createLLMNodeInputFrame } from "./createLLMNodeInputFrame";
-import { MIN_WIDTH, MIN_HEIGHT } from "../../../constants/styling/nodes/LLMNodeStyling";
 
 export const transformLLMNodeItems = (
 	ownerFrame: Frame,

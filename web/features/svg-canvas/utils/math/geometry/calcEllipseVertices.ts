@@ -1,8 +1,5 @@
-// Import types.
 import type { EllipseVertices } from "../../../types/core/EllipseVertices";
 import type { Frame } from "../../../types/core/Frame";
-
-// Import utils.
 import { degreesToRadians } from "../common/degreesToRadians";
 import { efficientAffineTransformation } from "../transform/efficientAffineTransformation";
 

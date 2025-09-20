@@ -1,9 +1,6 @@
-// Import types.
+import { calcRectangleVertices } from "./calcRectangleVertices";
 import type { BoxGeometry } from "../../../types/core/BoxGeometry";
 import type { Frame } from "../../../types/core/Frame";
-
-// Import utils.
-import { calcRectangleVertices } from "./calcRectangleVertices";
 
 /**
  * Calculates the bounding box geometry of a rectangle.

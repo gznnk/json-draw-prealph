@@ -1,10 +1,5 @@
-// Import types.
-import type { ButtonState } from "../../../types/state/elements/ButtonState";
-
-// Import constants.
 import { ButtonDefaultState } from "../../../constants/state/elements/ButtonDefaultState";
-
-// Import utils.
+import type { ButtonState } from "../../../types/state/elements/ButtonState";
 import { newId } from "../../shapes/common/newId";
 import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectangleConnectPoint";
 
