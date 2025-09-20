@@ -11,11 +11,14 @@ export const HeaderContainer = styled.header<{ height?: number }>`
 	border-bottom: 1px solid #096dd9;
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: flex-start;
 	padding: 0 16px;
 	box-sizing: border-box;
 	color: #ffffff;
 	font-size: 12px;
+	position: relative;
+	overflow: visible;
+	z-index: 1000;
 `;
 
 /**
@@ -27,14 +30,5 @@ export const HeaderTitle = styled.div`
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-`;
-
-/**
- * Controls container for the header.
- * Houses action buttons and controls on the right side of the header.
- */
-export const HeaderControls = styled.div`
-	display: flex;
-	align-items: center;
-	gap: 8px;
+	margin-right: 16px;
 `;
