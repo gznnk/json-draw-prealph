@@ -180,6 +180,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 
 			return newItem;
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],
 	);
 
@@ -351,8 +352,7 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 
 				// Update outline of top-level groups that contain transformed diagrams
 				newState.items = newState.items.map((item) => {
-					// TODO: Check the target is really a group
-					if (item.type === "Group" && topLevelGroupIds.has(item.id)) {
+					if (topLevelGroupIds.has(item.id)) {
 						return updateOutlineOfItemable(item);
 					}
 					return item;
