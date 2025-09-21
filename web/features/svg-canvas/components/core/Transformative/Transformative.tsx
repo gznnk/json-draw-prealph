@@ -4,7 +4,6 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { ROTATE_POINT_MARGIN } from "./TransformativeConstants";
 import type { DiagramType } from "../../../types/core/DiagramType";
 import type { Point } from "../../../types/core/Point";
-import type { TransformationType } from "../../../types/core/TransformationType";
 import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { EventPhase } from "../../../types/events/EventPhase";
@@ -134,7 +133,6 @@ const TransformativeComponent: React.FC<Props> = ({
 		onTransform?.({
 			eventId: e.eventId,
 			eventPhase: "Started",
-			transformationType: "Resize",
 			id,
 			startFrame: startFrame.current,
 			endFrame: startFrame.current,
@@ -154,7 +152,6 @@ const TransformativeComponent: React.FC<Props> = ({
 		const event = {
 			eventId: e.eventId,
 			eventPhase: e.eventPhase,
-			transformationType: "Resize" as TransformationType,
 			id,
 			startFrame: {
 				...startFrame.current,
@@ -927,7 +924,6 @@ const TransformativeComponent: React.FC<Props> = ({
 			onTransform?.({
 				eventId: e.eventId,
 				eventPhase: "Started",
-				transformationType: "Rotation",
 				id,
 				startFrame: startFrame.current,
 				endFrame: startFrame.current,
@@ -947,7 +943,6 @@ const TransformativeComponent: React.FC<Props> = ({
 		const event = {
 			eventId: e.eventId,
 			eventPhase: e.eventPhase,
-			transformationType: "Rotation" as TransformationType,
 			id,
 			startFrame: {
 				...startFrame.current,
