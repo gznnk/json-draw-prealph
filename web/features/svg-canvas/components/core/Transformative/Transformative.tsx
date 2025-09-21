@@ -117,7 +117,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			startFrame.current.y,
 		);
 
-	const triggerTransformStart = (e: DiagramDragEvent) => {
+	const recordStartFrame = () => {
 		startFrame.current = {
 			x,
 			y,
@@ -129,18 +129,6 @@ const TransformativeComponent: React.FC<Props> = ({
 			aspectRatio: width / height,
 			...vertices,
 		};
-
-		onTransform?.({
-			eventId: e.eventId,
-			eventPhase: "Started",
-			id,
-			startFrame: startFrame.current,
-			endFrame: startFrame.current,
-			cursorX: e.cursorX,
-			cursorY: e.cursorY,
-			minX: e.minX,
-			minY: e.minY,
-		});
 	};
 
 	const triggerTransform = (
@@ -291,7 +279,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		isSwapped,
 		affineTransformationOnDrag,
 		inverseAffineTransformationOnDrag,
-		triggerTransformStart,
+		recordStartFrame,
 		triggerTransform,
 		setResizingByEvent,
 		calcHeightWithAspectRatio,
@@ -309,7 +297,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			doKeepProportion,
 			inverseAffineTransformationOnDrag,
 			affineTransformationOnDrag,
-			triggerTransformStart,
+			recordStartFrame,
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
@@ -319,7 +307,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventPhase);
 
 		if (e.eventPhase === "Started") {
-			return triggerTransformStart(e);
+			recordStartFrame();
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -376,7 +364,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			doKeepProportion,
 			inverseAffineTransformationOnDrag,
 			affineTransformationOnDrag,
-			triggerTransformStart,
+			recordStartFrame,
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
@@ -386,7 +374,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventPhase);
 
 		if (e.eventPhase === "Started") {
-			return triggerTransformStart(e);
+			recordStartFrame();
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -442,7 +430,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			doKeepProportion,
 			inverseAffineTransformationOnDrag,
 			affineTransformationOnDrag,
-			triggerTransformStart,
+			recordStartFrame,
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
@@ -452,7 +440,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventPhase);
 
 		if (e.eventPhase === "Started") {
-			return triggerTransformStart(e);
+			recordStartFrame();
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -508,7 +496,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			doKeepProportion,
 			inverseAffineTransformationOnDrag,
 			affineTransformationOnDrag,
-			triggerTransformStart,
+			recordStartFrame,
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
@@ -518,7 +506,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventPhase);
 
 		if (e.eventPhase === "Started") {
-			return triggerTransformStart(e);
+			recordStartFrame();
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -574,7 +562,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			doKeepProportion,
 			inverseAffineTransformationOnDrag,
 			affineTransformationOnDrag,
-			triggerTransformStart,
+			recordStartFrame,
 			triggerTransform,
 			setResizingByEvent,
 			calcWidthWithAspectRatio,
@@ -584,7 +572,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventPhase);
 
 		if (e.eventPhase === "Started") {
-			return triggerTransformStart(e);
+			recordStartFrame();
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -645,7 +633,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			doKeepProportion,
 			inverseAffineTransformationOnDrag,
 			affineTransformationOnDrag,
-			triggerTransformStart,
+			recordStartFrame,
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
@@ -655,7 +643,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventPhase);
 
 		if (e.eventPhase === "Started") {
-			return triggerTransformStart(e);
+			recordStartFrame();
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -716,7 +704,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			doKeepProportion,
 			inverseAffineTransformationOnDrag,
 			affineTransformationOnDrag,
-			triggerTransformStart,
+			recordStartFrame,
 			triggerTransform,
 			setResizingByEvent,
 			calcHeightWithAspectRatio,
@@ -726,7 +714,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventPhase);
 
 		if (e.eventPhase === "Started") {
-			return triggerTransformStart(e);
+			recordStartFrame();
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
@@ -787,7 +775,7 @@ const TransformativeComponent: React.FC<Props> = ({
 			doKeepProportion,
 			inverseAffineTransformationOnDrag,
 			affineTransformationOnDrag,
-			triggerTransformStart,
+			recordStartFrame,
 			triggerTransform,
 			setResizingByEvent,
 			calcWidthWithAspectRatio,
@@ -797,7 +785,7 @@ const TransformativeComponent: React.FC<Props> = ({
 		setResizingByEvent(e.eventPhase);
 
 		if (e.eventPhase === "Started") {
-			return triggerTransformStart(e);
+			recordStartFrame();
 		}
 
 		const inversedDragPoint = inverseAffineTransformationOnDrag(e.endX, e.endY);
