@@ -13,6 +13,8 @@
 		"format": "prettier --write .",
 		"format:changed": "node scripts/format-changed.mjs",
 		"format:staged": "node scripts/format-changed.mjs --staged",
+		"format:untracked": "node scripts/format-changed.mjs --untracked",
+		"format:all": "node scripts/format-changed.mjs --all",
 		"format:check": "prettier --check .",
 		"preview": "vite preview",
 		"deploy": "vite build && gh-pages -d dist-web",

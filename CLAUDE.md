@@ -11,10 +11,12 @@ npm run dev          # Start development server
 npm run build        # Build for production (runs tsc -b && vite build)
 npm run preview      # Preview production build
 npm run lint         # Run ESLint
-npm run format         # Format all code with Prettier
-npm run format:changed # Format only files changed since last commit (ts,tsx,js,jsx,mjs,json,md)
-npm run format:staged  # Format only staged files (ts,tsx,js,jsx,mjs,json,md)
-npm run format:check # Check code formatting with Prettier
+npm run format           # Format all code with Prettier
+npm run format:changed   # Format files changed since last commit
+npm run format:staged    # Format staged files only
+npm run format:untracked # Format untracked files only
+npm run format:all       # Format changed + staged + untracked files
+npm run format:check     # Check code formatting with Prettier
 npm test             # Run Jest tests
 ```
 
@@ -155,7 +157,7 @@ Key canvas capabilities:
 1. Run `npm run build` to verify that your changes don't introduce build errors
 2. Fix any TypeScript errors or build issues if they occur
 3. Run `npm run lint` to check for ESLint errors and fix any issues
-4. Run `npm run format:changed` to format only the files you modified (avoid formatting all files to prevent unnecessary changes)
+4. Run `npm run format:all` to format all modified files (changed + staged + untracked), or use specific commands like `format:changed` if needed
 5. Ask the user if they want to commit the changes to git
 6. If approved, create a commit with an appropriate commit message
 
