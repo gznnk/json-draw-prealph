@@ -22,14 +22,23 @@ export const calcRectangleVertices = (frame: Frame): RectangleVertices => {
 	// No rotation vertices calculation - optimized path when rotation is 0
 	if (rotation === 0) {
 		return {
-			topLeftPoint: { x: tx - halfWidth, y: ty - halfHeight },
-			bottomLeftPoint: { x: tx - halfWidth, y: ty + halfHeight },
-			topRightPoint: { x: tx + halfWidth, y: ty - halfHeight },
-			bottomRightPoint: { x: tx + halfWidth, y: ty + halfHeight },
-			topCenterPoint: { x: tx, y: ty - halfHeight },
-			leftCenterPoint: { x: tx - halfWidth, y: ty },
-			rightCenterPoint: { x: tx + halfWidth, y: ty },
-			bottomCenterPoint: { x: tx, y: ty + halfHeight },
+			topLeftPoint: { x: tx - scaleX * halfWidth, y: ty - scaleY * halfHeight },
+			bottomLeftPoint: {
+				x: tx - scaleX * halfWidth,
+				y: ty + scaleY * halfHeight,
+			},
+			topRightPoint: {
+				x: tx + scaleX * halfWidth,
+				y: ty - scaleY * halfHeight,
+			},
+			bottomRightPoint: {
+				x: tx + scaleX * halfWidth,
+				y: ty + scaleY * halfHeight,
+			},
+			topCenterPoint: { x: tx, y: ty - scaleY * halfHeight },
+			leftCenterPoint: { x: tx - scaleX * halfWidth, y: ty },
+			rightCenterPoint: { x: tx + scaleX * halfWidth, y: ty },
+			bottomCenterPoint: { x: tx, y: ty + scaleY * halfHeight },
 		};
 	}
 
