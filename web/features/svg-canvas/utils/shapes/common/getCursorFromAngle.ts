@@ -1,13 +1,33 @@
 /**
  * Gets the appropriate cursor style based on an angle.
  * Maps angles to directional resize cursors (n-resize, ne-resize, etc.).
+ * Considers scale inversions to provide correct cursor directions.
  *
  * @param angle - The angle in degrees
+ * @param scaleX - Horizontal scaling factor (negative values indicate horizontal flip)
+ * @param scaleY - Vertical scaling factor (negative values indicate vertical flip)
  * @returns The CSS cursor style name
  */
-export const getCursorFromAngle = (angle: number): string => {
+export const getCursorFromAngle = (
+	angle: number,
+	scaleX: number = 1,
+	scaleY: number = 1,
+): string => {
+	// Adjust angle based on scale inversions
+	let adjustedAngle = angle;
+
+	// If scaleX is negative (horizontal flip), mirror the angle horizontally
+	if (scaleX < 0) {
+		adjustedAngle = 180 - adjustedAngle;
+	}
+
+	// If scaleY is negative (vertical flip), mirror the angle vertically
+	if (scaleY < 0) {
+		adjustedAngle = -adjustedAngle;
+	}
+
 	// Add 360 degrees to angle to make it 0 degrees or more
-	const _angle = (angle + 360) % 360;
+	const _angle = (adjustedAngle + 360) % 360;
 
 	if (-22.5 <= _angle && _angle < 22.5) {
 		return "n-resize";
