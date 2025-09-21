@@ -30,15 +30,16 @@ const StickyComponent: React.FC<StickyProps> = ({
 	scaleX,
 	scaleY,
 	keepProportion,
-	fill = "#fff275",
-	stroke = "#d4af37",
-	strokeWidth = 1,
-	text = "",
-	fontColor = "#000000",
-	fontSize = 14,
-	fontFamily = "Arial",
-	fontWeight = "normal",
-	textAlign = "center",
+	fill,
+	stroke,
+	strokeWidth,
+	text,
+	fontColor,
+	fontSize,
+	fontFamily,
+	fontWeight,
+	textAlign,
+	verticalAlign,
 	isSelected,
 	isAncestorSelected = false,
 	isTextEditEnabled = true,
@@ -138,7 +139,7 @@ const StickyComponent: React.FC<StickyProps> = ({
 				onDoubleClick={onDoubleClick}
 				{...composedProps}
 			/>
-			
+
 			{/* Text content */}
 			{isTextEditEnabled && (
 				<Textable
@@ -148,17 +149,17 @@ const StickyComponent: React.FC<StickyProps> = ({
 					height={height}
 					transform={transform}
 					text={text}
-					textType="text"
+					textType="textarea"
 					fontColor={fontColor}
 					fontSize={fontSize}
 					fontFamily={fontFamily}
 					fontWeight={fontWeight}
 					textAlign={textAlign}
-					verticalAlign="center"
+					verticalAlign={verticalAlign}
 					isTextEditing={isTextEditing}
 				/>
 			)}
-			
+
 			{/* Selection outline */}
 			<Outline
 				x={x}
@@ -170,7 +171,7 @@ const StickyComponent: React.FC<StickyProps> = ({
 				scaleY={scaleY}
 				showOutline={showOutline}
 			/>
-			
+
 			{/* Transform controls */}
 			{showTransformControls && (
 				<Transformative
@@ -191,7 +192,7 @@ const StickyComponent: React.FC<StickyProps> = ({
 					onTransform={onTransform}
 				/>
 			)}
-			
+
 			{/* Position label during drag */}
 			{isDragging && isSelected && (
 				<PositionLabel

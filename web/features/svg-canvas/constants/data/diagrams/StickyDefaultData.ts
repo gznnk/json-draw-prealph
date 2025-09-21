@@ -18,7 +18,7 @@ export const StickyDefaultData: StickyData = CreateDefaultData<StickyData>({
 		fontSize: 14,
 		fontColor: "#000000",
 		fontWeight: "normal",
-		textAlign: "center",
-		verticalAlign: "center",
+		textAlign: "left",
+		verticalAlign: "top",
 	},
 });
