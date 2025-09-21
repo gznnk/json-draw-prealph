@@ -151,10 +151,11 @@ Key canvas capabilities:
 **IMPORTANT**: After completing any task, follow these steps:
 
 1. Run `npm run build` to verify that your changes don't introduce build errors
-2. Run `npm run lint` to check for ESLint errors and fix any issues
-3. Fix any TypeScript errors or build issues before considering the task complete
-4. Ask the user if they want to commit the changes to git
-5. If approved, create a commit with an appropriate commit message
+2. Fix any TypeScript errors or build issues if they occur
+3. Run `npm run lint` to check for ESLint errors and fix any issues
+4. Run `npm run format` to ensure consistent code formatting
+5. Ask the user if they want to commit the changes to git
+6. If approved, create a commit with an appropriate commit message
 
 ## Dependencies Note
 
