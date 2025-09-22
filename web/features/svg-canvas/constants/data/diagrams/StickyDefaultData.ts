@@ -11,6 +11,8 @@ export const StickyDefaultData: StickyData = CreateDefaultData<StickyData>({
 	properties: {
 		width: 160,
 		height: 120,
+		minWidth: 80,
+		minHeight: 60,
 		fill: "#fef9c3",
 		stroke: "#fef9c3",
 		strokeWidth: "1px",
