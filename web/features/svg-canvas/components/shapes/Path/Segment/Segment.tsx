@@ -70,7 +70,7 @@ const SegmentComponent: React.FC<SegmentProps> = ({
 		const degrees = radiansToDegrees(radian);
 		const isX2y = (degrees + 405) % 180 > 90;
 		return isX2y
-			? createLinearX2yFunction(rotateStartPoint, rotateEndPoint)(x)
+			? createLinearX2yFunction(rotateStartPoint, rotateEndPoint)(x, y)
 			: createLinearY2xFunction(rotateStartPoint, rotateEndPoint)(x, y);
 	}, []);
 
