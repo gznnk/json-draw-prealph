@@ -3,7 +3,7 @@ import { LLMNodeDefaultState } from "../../../constants/state/nodes/LLMNodeDefau
 import {
 	HEADER_HEIGHT,
 	HEADER_MARGIN_TOP,
-} from "../../../constants/styling/core/LayoutStyling";
+} from "../../../constants/styling/core/CommonStyling";
 import type { LLMNodeState } from "../../../types/state/nodes/LLMNodeState";
 import { createInputState } from "../../elements/input/createInputState";
 import { createNodeHeaderState } from "../../elements/nodeHeader/createNodeHeaderState";

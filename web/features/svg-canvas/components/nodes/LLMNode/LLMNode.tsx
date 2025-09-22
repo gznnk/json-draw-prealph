@@ -7,7 +7,7 @@ import {
 	BASE_MARGIN,
 	HEADER_HEIGHT,
 	HEADER_MARGIN_TOP,
-} from "../../../constants/styling/core/LayoutStyling";
+} from "../../../constants/styling/core/CommonStyling";
 import {
 	BACKGROUND_COLOR,
 	BORDER_COLOR,

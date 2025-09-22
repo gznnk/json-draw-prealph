@@ -3,7 +3,7 @@ import {
 	HEADER_HEIGHT,
 	HEADER_MARGIN_BOTTOM,
 	HEADER_MARGIN_TOP,
-} from "../../../constants/styling/core/LayoutStyling";
+} from "../../../constants/styling/core/CommonStyling";
 import type { Frame } from "../../../types/core/Frame";
 import { degreesToRadians } from "../../math/common/degreesToRadians";
 import { calculateEffectiveDimensions } from "../../math/geometry/calculateEffectiveDimensions";
