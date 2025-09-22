@@ -47,6 +47,7 @@ export const useAutoEdgeScroll = (
 	const refBusVal = {
 		viewport,
 		doStartEdgeScroll,
+		dragPositioningFunction,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -127,6 +128,8 @@ export const useAutoEdgeScroll = (
 	 */
 	const autoEdgeScroll = useCallback(
 		(cursorPos: Point): boolean => {
+			// Bypass references to avoid function creation in every render.
+			const { viewport, dragPositioningFunction } = refBus.current;
 			// Auto edge scroll if the cursor is near the edges.
 			const { x: cursorX, y: cursorY } = cursorPos;
 
@@ -161,7 +164,7 @@ export const useAutoEdgeScroll = (
 			}
 			return true;
 		},
-		[viewport, startEdgeScroll, clearEdgeScroll],
+		[startEdgeScroll, clearEdgeScroll],
 	);
 
 	return {
