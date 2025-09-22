@@ -1,6 +1,9 @@
 import styled from "@emotion/styled";
 
-import { POPOVER_WIDTH } from "../../../constants/styling/auxiliary/DiagramInfoPopoverStyling";
+import {
+	POPOVER_HEIGHT,
+	POPOVER_WIDTH,
+} from "../../../constants/styling/auxiliary/DiagramInfoPopoverStyling";
 
 export const PopoverContainer = styled.div`
 	position: absolute;
@@ -13,15 +16,17 @@ export const PopoverContainer = styled.div`
 	box-shadow:
 		0 10px 15px -3px rgba(0, 0, 0, 0.1),
 		0 4px 6px -2px rgba(0, 0, 0, 0.05);
-	max-width: ${POPOVER_WIDTH}px;
+	width: ${POPOVER_WIDTH}px;
+	height: ${POPOVER_HEIGHT}px;
 	font-family: Noto Sans JP;
+	overflow: hidden;
 `;
 
 export const PopoverContent = styled.div`
 	padding: 16px;
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
+	gap: 12px;
 `;
 
 export const PopoverFieldContainer = styled.div`
@@ -35,42 +40,15 @@ export const PopoverLabel = styled.label`
 	font-weight: 500;
 	color: #374151;
 	line-height: 1.25;
-	padding-left: 2px;
 	user-select: none;
 `;
 
-const baseInputStyle = `
-	color: #111827;
-	background: rgba(255, 255, 255, 0.8);
-	border: 1px solid #d1d5db;
-	border-radius: 0.375rem;
-	padding: 0.5rem 0.75rem;
+export const PopoverText = styled.div`
 	font-size: 12px;
-	font-family: inherit;
+	color: #737373;
 	line-height: 1.25;
-	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-
-	&:focus {
-		outline: none;
-		border-color: #6b7280;
-		box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.2);
-	}
-
-	&:hover {
-		border-color: #9ca3af;
-	}
-
-	&::placeholder {
-		color: #9ca3af;
-	}
-`;
-
-export const PopoverInput = styled.input`
-	${baseInputStyle}
-`;
-
-export const PopoverTextarea = styled.textarea`
-	${baseInputStyle}
-	resize: vertical;
-	min-height: 4em;
+	background: rgba(255, 255, 255, 0.8);
+	font-family: inherit;
+	min-height: 1.5em;
+	word-wrap: break-word;
 `;

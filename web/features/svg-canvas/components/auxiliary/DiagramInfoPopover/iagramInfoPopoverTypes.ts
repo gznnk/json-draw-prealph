@@ -5,6 +5,4 @@ export type DiagramInfoPopoverProps = {
 	display: boolean;
 	diagram?: Diagram;
 	position: Point;
-	onNameChange: (value: string) => void;
-	onDescriptionChange: (value: string) => void;
 };

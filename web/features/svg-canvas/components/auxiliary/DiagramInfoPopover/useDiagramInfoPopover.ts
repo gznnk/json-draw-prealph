@@ -1,5 +1,3 @@
-import { useCallback } from "react";
-
 import type { DiagramInfoPopoverProps } from "./iagramInfoPopoverTypes";
 import type { SvgCanvasProps } from "../../../canvas/types/SvgCanvasProps";
 import {
@@ -9,7 +7,6 @@ import {
 } from "../../../constants/styling/auxiliary/DiagramInfoPopoverStyling";
 import type { Diagram } from "../../../types/state/core/Diagram";
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
-import { newEventId } from "../../../utils/core/newEventId";
 import { calcDiagramBoundingBox } from "../../../utils/math/geometry/calcDiagramBoundingBox";
 import { isFrame } from "../../../utils/validation/isFrame";
 
@@ -23,44 +20,6 @@ export const useDiagramInfoPopover = (
 	containerWidth: number,
 	containerHeight: number,
 ): DiagramInfoPopoverProps => {
-	const handleNameChange = useCallback(
-		(diagramId: string, name: string) => {
-			if (!canvasProps.onDiagramChange) return;
-
-			const selectedDiagrams = getSelectedDiagrams(canvasProps.items);
-			const selectedDiagram = selectedDiagrams.find((d) => d.id === diagramId);
-			if (!selectedDiagram) return;
-
-			canvasProps.onDiagramChange({
-				eventId: newEventId(),
-				eventPhase: "Ended",
-				id: diagramId,
-				startDiagram: { name: selectedDiagram.name },
-				endDiagram: { name },
-			});
-		},
-		[canvasProps],
-	);
-
-	const handleDescriptionChange = useCallback(
-		(diagramId: string, description: string) => {
-			if (!canvasProps.onDiagramChange) return;
-
-			const selectedDiagrams = getSelectedDiagrams(canvasProps.items);
-			const selectedDiagram = selectedDiagrams.find((d) => d.id === diagramId);
-			if (!selectedDiagram) return;
-
-			canvasProps.onDiagramChange({
-				eventId: newEventId(),
-				eventPhase: "Ended",
-				id: diagramId,
-				startDiagram: { description: selectedDiagram.description },
-				endDiagram: { description },
-			});
-		},
-		[canvasProps],
-	);
-
 	// Get selected diagrams
 	const selectedDiagrams = getSelectedDiagrams(canvasProps.items);
 
@@ -68,12 +27,18 @@ export const useDiagramInfoPopover = (
 		return {
 			display: false,
 			position: { x: 0, y: 0 },
-			onNameChange: () => {},
-			onDescriptionChange: () => {},
 		};
 	}
 
 	const selectedDiagram = selectedDiagrams[0];
+
+	if (!selectedDiagram.name && !selectedDiagram.description) {
+		// Only show popover if there's a name or description
+		return {
+			display: false,
+			position: { x: 0, y: 0 },
+		};
+	}
 
 	// Calculate position for popover display
 	const position = calculatePopoverPosition(
@@ -87,10 +52,6 @@ export const useDiagramInfoPopover = (
 		display: canvasProps.interactionState === "idle",
 		diagram: selectedDiagram,
 		position,
-		onNameChange: (value: string) =>
-			handleNameChange(selectedDiagram.id, value),
-		onDescriptionChange: (value: string) =>
-			handleDescriptionChange(selectedDiagram.id, value),
 	};
 };
 
