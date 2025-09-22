@@ -26,10 +26,12 @@ export type DoStartEdgeScrollArgs = EdgeScrollState & {
  * Custom hook to handle auto edge scrolling in the SVG canvas.
  * @param viewport - The current SVG viewport.
  * @param doStartEdgeScroll - Function to start edge scrolling with new state.
+ * @param dragPositioningFunction - Optional function to modify the calculated scroll delta.
  */
 export const useAutoEdgeScroll = (
 	viewport: SvgViewport,
 	doStartEdgeScroll: (state: DoStartEdgeScrollArgs) => void,
+	dragPositioningFunction?: (delta: Point) => Point,
 ) => {
 	// Internal state for edge scrolling
 	const scrollIntervalRef = useRef<number | null>(null);
@@ -138,10 +140,17 @@ export const useAutoEdgeScroll = (
 			}
 
 			// Calculate scroll delta and update edge scroll state atomically
-			const { deltaX, deltaY } = calculateScrollDelta(
+			let { deltaX, deltaY } = calculateScrollDelta(
 				edgeProximity.horizontal,
 				edgeProximity.vertical,
 			);
+
+			// Apply dragPositioningFunction if provided
+			if (dragPositioningFunction) {
+				const modifiedDelta = dragPositioningFunction({ x: deltaX, y: deltaY });
+				deltaX = modifiedDelta.x;
+				deltaY = modifiedDelta.y;
+			}
 			edgeScrollStateRef.current = {
 				cursorPos,
 				delta: { x: deltaX, y: deltaY },
