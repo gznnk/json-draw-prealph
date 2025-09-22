@@ -9,6 +9,15 @@ import React, {
 } from "react";
 
 import { MULTI_SELECT_GROUP } from "./SvgCanvasConstants";
+import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
+import {
+	Container,
+	HTMLElementsContainer,
+	SelectionRect,
+	Svg,
+	Viewport,
+	ViewportOverlay,
+} from "./SvgCanvasStyled";
 import { InteractionState } from "./types/InteractionState";
 import type { SvgCanvasProps } from "./types/SvgCanvasProps";
 import type { SvgCanvasRef } from "./types/SvgCanvasRef";
@@ -32,22 +41,15 @@ import UserMenu from "../components/menus/UserMenu/UserMenu";
 import { FlashConnectLine } from "../components/shapes/ConnectLine";
 import { Group } from "../components/shapes/Group";
 // Import registry.
-import { DiagramRegistry } from "../registry";
-import { initializeSvgCanvasDiagrams } from "./SvgCanvasRegistry";
-import { newEventId } from "../utils/core/newEventId";
-import { useShortcutKey } from "./hooks/keyboard/useShortcutKey";
-import {
-	Container,
-	HTMLElementsContainer,
-	SelectionRect,
-	Svg,
-	Viewport,
-	ViewportOverlay,
-} from "./SvgCanvasStyled";
 import { EventBusProvider } from "../context/EventBusContext";
 import { SvgCanvasStateProvider } from "../context/SvgCanvasStateContext";
 import { SvgViewportProvider } from "../context/SvgViewportContext";
+import { DiagramRegistry } from "../registry";
 import type { SvgViewport } from "../types/core/SvgViewport";
+import { newEventId } from "../utils/core/newEventId";
+import { useShortcutKey } from "./hooks/keyboard/useShortcutKey";
+import { DiagramInfoPopover , useDiagramInfoPopover } from "../components/auxiliary/DiagramInfoPopover";
+
 
 // TODO: 実行する場所を考える
 // Initialize all diagram types when this module is loaded
@@ -487,6 +489,9 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onZoom?.(resetLevel);
 		}, [onZoom]);
 
+		// Get diagram info popover information
+		const popoverInfo = useDiagramInfoPopover(props);
+
 		// Render diagrams
 		const renderedItems = items.map((item) => {
 			const component = DiagramRegistry.getComponent(item.type);
@@ -630,6 +635,14 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 						onPointerMove={handleCaptureElementPointerMove}
 						onPointerUp={handleCaptureElementPointerUp}
 					/>
+					{/* Diagram info popover for selected diagram name/description */}
+					{popoverInfo && (
+						<DiagramInfoPopover
+							diagram={popoverInfo.diagram}
+							position={popoverInfo.position}
+							canvasProps={props}
+						/>
+					)}
 				</ViewportOverlay>
 			</Viewport>
 		);
