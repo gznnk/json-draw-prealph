@@ -151,7 +151,21 @@ function main() {
 
 		// マージ
 		console.log(`🔀 Merging ${currentBranch} into ${parentBranch}...`);
-		execSync(`git merge ${currentBranch}`, { stdio: "inherit" });
+		try {
+			execSync(`git merge ${currentBranch}`, { stdio: "inherit" });
+		} catch (error) {
+			console.error("❌ Merge conflict occurred!");
+			console.log("🔧 Please resolve conflicts manually:");
+			console.log("1. Fix conflicts in the files");
+			console.log("2. Run: git add .");
+			console.log("3. Run: git commit");
+			console.log(`4. Run: git push origin ${parentBranch}`);
+			console.log(
+				`5. Manually remove worktree: git worktree remove ../${currentBranch}`,
+			);
+			console.log("Or run this script again after resolving conflicts");
+			process.exit(1);
+		}
 
 		// マージ後のpush
 		try {
