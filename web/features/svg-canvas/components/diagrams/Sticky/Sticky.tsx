@@ -167,7 +167,7 @@ const StickyComponent: React.FC<StickyProps> = ({
 			{/* Folded corner shadow */}
 			<polygon
 				points={foldTrianglePoints}
-				fill="rgba(0,0,0,0.15)"
+				fill="rgba(0,0,0,0.1)"
 				stroke="none"
 				transform={transform}
 				pointerEvents="none"
