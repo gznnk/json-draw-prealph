@@ -2,6 +2,11 @@ import type React from "react";
 import { memo, useRef } from "react";
 
 import { Circle } from "./DragPointStyled";
+import {
+	DRAG_POINT_STROKE,
+	DRAG_POINT_FILL,
+	DRAG_POINT_OUTLINE,
+} from "../../../constants/styling/core/DragPointStyling";
 import { useDrag } from "../../../hooks/useDrag";
 import { useHover } from "../../../hooks/useHover";
 import type { DiagramType } from "../../../types/core/DiagramType";
@@ -42,10 +47,10 @@ const DragPointComponent: React.FC<DragPointProps> = ({
 	x,
 	y,
 	radius = 5,
-	stroke = "rgba(107, 114, 128, 0.8)",
-	fill = "rgba(107, 114, 128, 0.8)",
+	stroke = DRAG_POINT_STROKE,
+	fill = DRAG_POINT_FILL,
 	cursor = "move",
-	outline = "1px rgba(107, 114, 128, 0.8) dashed",
+	outline = DRAG_POINT_OUTLINE,
 	isTransparent = false,
 	hidden = false,
 	onDrag,
