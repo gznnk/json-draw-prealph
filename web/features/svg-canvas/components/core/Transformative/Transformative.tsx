@@ -622,7 +622,7 @@ const TransformativeComponent: React.FC<Props> = ({
 				: createLinearX2yFunction(
 						startFrame.current.bottomCenterPoint,
 						startFrame.current.topCenterPoint,
-					)(x),
+					)(x, y),
 		[],
 	);
 	// --- TopCenter End --- //
@@ -689,7 +689,7 @@ const TransformativeComponent: React.FC<Props> = ({
 				? createLinearX2yFunction(
 						startFrame.current.leftCenterPoint,
 						startFrame.current.rightCenterPoint,
-					)(x)
+					)(x, y)
 				: createLinearY2xFunction(
 						startFrame.current.leftCenterPoint,
 						startFrame.current.rightCenterPoint,
@@ -760,7 +760,7 @@ const TransformativeComponent: React.FC<Props> = ({
 				? createLinearX2yFunction(
 						startFrame.current.leftCenterPoint,
 						startFrame.current.rightCenterPoint,
-					)(x)
+					)(x, y)
 				: createLinearY2xFunction(
 						startFrame.current.leftCenterPoint,
 						startFrame.current.rightCenterPoint,
@@ -835,7 +835,7 @@ const TransformativeComponent: React.FC<Props> = ({
 				: createLinearX2yFunction(
 						startFrame.current.bottomCenterPoint,
 						startFrame.current.topCenterPoint,
-					)(x),
+					)(x, y),
 		[],
 	);
 	// --- BottomCenter End --- //
