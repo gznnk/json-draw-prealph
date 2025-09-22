@@ -34,7 +34,7 @@ const TextAreaNodeMinimapComponent: React.FC<TextAreaNodeProps> = (props) => {
 					y={-16}
 					width={32}
 					height={32}
-					fill="#1890ff"
+					fill="#000000"
 					rx="4"
 				/>
 
@@ -57,7 +57,7 @@ const TextAreaNodeMinimapComponent: React.FC<TextAreaNodeProps> = (props) => {
 
 			{/* Send button */}
 			<g transform={`translate(${width / 2 - 40}, ${height / 2 - 20})`}>
-				<rect x={-20} y={-8} width={40} height={16} fill="#1890ff" rx="2" />
+				<rect x={-20} y={-8} width={40} height={16} fill="#000000" rx="8" />
 			</g>
 		</g>
 	);
