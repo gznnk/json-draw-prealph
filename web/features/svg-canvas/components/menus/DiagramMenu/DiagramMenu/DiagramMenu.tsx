@@ -1,5 +1,5 @@
 import type React from "react";
-import { memo, useRef, useEffect, useState } from "react";
+import { memo, useRef, useEffect, useState, useCallback } from "react";
 
 import {
 	MAX_BORDER_RADIUS,
@@ -13,10 +13,28 @@ import {
 	DiagramMenuPositioner,
 	DiagramMenuWrapper,
 } from "./DiagramMenuStyled";
-import type { DiagramMenuProps, DiagramMenuType } from "./DiagramMenuTypes";
+import type { DiagramMenuProps, DiagramMenuType, DiagramMenuStateMap } from "./DiagramMenuTypes";
+import {
+	findFirstCornerRoundableRecursive,
+	findFirstFillableRecursive,
+	findFirstStrokableRecursive,
+	findFirstTextableRecursive,
+} from "./DiagramMenuUtils";
+import { InteractionState } from "../../../../canvas/types/InteractionState";
 import { DISTANCE_FROM_DIAGRAM } from "../../../../constants/styling/menus/DiagramMenuStyling";
 import type { RectangleVertices } from "../../../../types/core/RectangleVertices";
+import type { CornerRoundableData } from "../../../../types/data/core/CornerRoundableData";
+import type { FillableData } from "../../../../types/data/core/FillableData";
+import type { StrokableData } from "../../../../types/data/core/StrokableData";
+import type { TextableData } from "../../../../types/data/core/TextableData";
+import type { DiagramStyleChangeEvent } from "../../../../types/events/DiagramStyleChangeEvent";
+import type { Diagram } from "../../../../types/state/core/Diagram";
+import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams";
+import { newEventId } from "../../../../utils/core/newEventId";
 import { calcRectangleVertices } from "../../../../utils/math/geometry/calcRectangleVertices";
+import { isItemableState } from "../../../../utils/validation/isItemableState";
+import { isTextableState } from "../../../../utils/validation/isTextableState";
+import { isTransformativeState } from "../../../../utils/validation/isTransformativeState";
 import { AlignCenter } from "../../../icons/AlignCenter";
 import { AlignLeft } from "../../../icons/AlignLeft";
 import { AlignRight } from "../../../icons/AlignRight";
@@ -40,52 +58,384 @@ import { DiagramMenuItem } from "../DiagramMenuItem";
 import { NumberStepper } from "../NumberStepper";
 
 const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
-	x,
-	y,
-	width,
-	height,
-	rotation,
-	scaleX,
-	scaleY,
-	isVisible,
-	menuStateMap,
-	bgColor,
-	borderColor,
-	borderRadius,
-	fontSize,
-	fontColor,
-	containerWidth = 0,
-	containerHeight = 0,
-	minX = 0,
-	minY = 0,
-	onMenuClick,
-	onBgColorChange,
-	onBorderColorChange,
-	onBorderRadiusChange,
-	onFontSizeChange,
-	onFontColorChange,
+	canvasProps,
+	containerWidth,
+	containerHeight,
 }) => {
+	// Extract properties from canvasProps.
+	const { items, interactionState, multiSelectGroup, zoom, minX, minY } = canvasProps;
+
 	const menuRef = useRef<HTMLDivElement>(null);
 	const [menuDimensions, setMenuDimensions] = useState({
 		width: 0,
 		height: 40,
 	});
 
+	// Diagram menu controls open/close state.
+	const [isBgColorPickerOpen, setIsBgColorPickerOpen] = useState(false);
+	const [isBorderColorPickerOpen, setIsBorderColorPickerOpen] = useState(false);
+	const [isBorderRadiusSelectorOpen, setIsBorderRadiusSelectorOpen] = useState(false);
+	const [isFontSizeSelectorOpen, setIsFontSizeSelectorOpen] = useState(false);
+	const [isFontColorPickerOpen, setIsFontColorPickerOpen] = useState(false);
+
+	// Get selected items and check if the diagram menu should be shown.
+	const selectedItems = getSelectedDiagrams(items);
+	const showDiagramMenu = selectedItems.length > 0 && interactionState === InteractionState.Idle;
+	const singleSelectedItem = selectedItems[0];
+
+	// Utility functions for changing items
+	const changeItems = useCallback(
+		(
+			items: Diagram[],
+			data: Partial<Diagram>,
+			recursively = true,
+			eventId: string = newEventId(),
+		) => {
+			for (const item of items) {
+				const newItem = { ...item };
+				for (const key of Object.keys(data) as (keyof Diagram)[]) {
+					if (key in newItem) {
+						(newItem[key] as (typeof data)[keyof Diagram]) = data[key];
+					}
+				}
+				canvasProps.onDiagramChange?.({
+					eventId,
+					eventPhase: "Ended",
+					id: item.id,
+					startDiagram: item,
+					endDiagram: newItem,
+				});
+
+				if (recursively && isItemableState(newItem)) {
+					changeItems(newItem.items, data, recursively, eventId);
+				}
+			}
+		},
+		[canvasProps],
+	);
+
+	const changeItemsStyle = useCallback(
+		(
+			items: Diagram[],
+			styleData: Partial<Omit<DiagramStyleChangeEvent, "eventId" | "id">>,
+			recursively = true,
+			eventId: string = newEventId(),
+		) => {
+			for (const item of items) {
+				canvasProps.onStyleChange?.({
+					eventId,
+					id: item.id,
+					...styleData,
+				});
+
+				if (recursively && isItemableState(item)) {
+					changeItemsStyle(item.items, styleData, recursively, eventId);
+				}
+			}
+		},
+		[canvasProps],
+	);
+
+	const openControl = useCallback(
+		(menuType: DiagramMenuType, currentMenuStateMap: DiagramMenuStateMap) => {
+			const newControlsStateMap = {
+				BgColor: false,
+				BorderColor: false,
+				BorderRadius: false,
+				FontSize: false,
+				FontColor: false,
+			} as {
+				[key in DiagramMenuType]: boolean;
+			};
+
+			// Check current state to determine if we should open the control
+			const shouldOpen = currentMenuStateMap[menuType] === "Show";
+			newControlsStateMap[menuType] = shouldOpen;
+
+			setIsBgColorPickerOpen(newControlsStateMap.BgColor);
+			setIsBorderColorPickerOpen(newControlsStateMap.BorderColor);
+			setIsBorderRadiusSelectorOpen(newControlsStateMap.BorderRadius);
+			setIsFontSizeSelectorOpen(newControlsStateMap.FontSize);
+			setIsFontColorPickerOpen(newControlsStateMap.FontColor);
+		},
+		[],
+	);
+
+	// Create a callback that uses the current menuStateMap
+	const createMenuClickHandler = (currentMenuStateMap: DiagramMenuStateMap) => (menuType: string) => {
+		switch (menuType) {
+			case "BgColor":
+				openControl("BgColor", currentMenuStateMap);
+				break;
+			case "BorderColor":
+				openControl("BorderColor", currentMenuStateMap);
+				break;
+			case "BorderRadius":
+				openControl("BorderRadius", currentMenuStateMap);
+				break;
+			case "FontSize":
+				openControl("FontSize", currentMenuStateMap);
+				break;
+			case "Bold":
+				changeItemsStyle(selectedItems, {
+					fontWeight: currentMenuStateMap.Bold === "Active" ? "normal" : "bold",
+				});
+				break;
+			case "FontColor":
+				openControl("FontColor", currentMenuStateMap);
+				break;
+			case "AlignLeft":
+				changeItemsStyle(selectedItems, { textAlign: "left" });
+				break;
+			case "AlignCenter":
+				changeItemsStyle(selectedItems, { textAlign: "center" });
+				break;
+			case "AlignRight":
+				changeItemsStyle(selectedItems, { textAlign: "right" });
+				break;
+			case "AlignTop":
+				changeItemsStyle(selectedItems, { verticalAlign: "top" });
+				break;
+			case "AlignMiddle":
+				changeItemsStyle(selectedItems, { verticalAlign: "center" });
+				break;
+			case "AlignBottom":
+				changeItemsStyle(selectedItems, { verticalAlign: "bottom" });
+				break;
+			case "BringToFront":
+				if (singleSelectedItem) {
+					canvasProps.onStackOrderChange?.({
+						eventId: newEventId(),
+						changeType: "bringToFront",
+						id: singleSelectedItem.id,
+					});
+				}
+				break;
+			case "BringForward":
+				if (singleSelectedItem) {
+					canvasProps.onStackOrderChange?.({
+						eventId: newEventId(),
+						changeType: "bringForward",
+						id: singleSelectedItem.id,
+					});
+				}
+				break;
+			case "SendBackward":
+				if (singleSelectedItem) {
+					canvasProps.onStackOrderChange?.({
+						eventId: newEventId(),
+						changeType: "sendBackward",
+						id: singleSelectedItem.id,
+					});
+				}
+				break;
+			case "SendToBack":
+				if (singleSelectedItem) {
+					canvasProps.onStackOrderChange?.({
+						eventId: newEventId(),
+						changeType: "sendToBack",
+						id: singleSelectedItem.id,
+					});
+				}
+				break;
+			case "KeepAspectRatio":
+				if (multiSelectGroup) {
+					canvasProps.onConstraintChange?.({
+						eventId: newEventId(),
+						id: multiSelectGroup.id,
+						keepProportion: currentMenuStateMap.KeepAspectRatio !== "Active",
+					});
+				} else {
+					for (const item of selectedItems) {
+						canvasProps.onConstraintChange?.({
+							eventId: newEventId(),
+							id: item.id,
+							keepProportion: currentMenuStateMap.KeepAspectRatio !== "Active",
+						});
+					}
+				}
+				break;
+			case "Group":
+				if (currentMenuStateMap.Group === "Show") {
+					canvasProps.onGroup?.();
+				}
+				if (currentMenuStateMap.Group === "Active") {
+					canvasProps.onUngroup?.();
+				}
+				break;
+		}
+	};
+
+	const onBgColorChange = useCallback(
+		(bgColor: string) => {
+			changeItemsStyle(selectedItems, { fill: bgColor });
+		},
+		[selectedItems, changeItemsStyle],
+	);
+
+	const onBorderColorChange = useCallback(
+		(borderColor: string) => {
+			changeItemsStyle(selectedItems, { stroke: borderColor });
+		},
+		[selectedItems, changeItemsStyle],
+	);
+
+	const onBorderRadiusChange = useCallback(
+		(borderRadius: number) => {
+			changeItemsStyle(selectedItems, { cornerRadius: borderRadius });
+		},
+		[selectedItems, changeItemsStyle],
+	);
+
+	const onFontSizeChange = useCallback(
+		(fontSize: number) => {
+			changeItemsStyle(selectedItems, { fontSize });
+		},
+		[selectedItems, changeItemsStyle],
+	);
+
+	const onFontColorChange = useCallback(
+		(fontColor: string) => {
+			changeItemsStyle(selectedItems, { fontColor });
+		},
+		[selectedItems, changeItemsStyle],
+	);
+
+	// If the diagram menu is not shown, close controls.
+	useEffect(() => {
+		if (!showDiagramMenu) {
+			setIsBgColorPickerOpen(false);
+			setIsBorderColorPickerOpen(false);
+			setIsBorderRadiusSelectorOpen(false);
+			setIsFontSizeSelectorOpen(false);
+			setIsFontColorPickerOpen(false);
+		}
+	}, [showDiagramMenu]);
+
 	// Update menu dimensions when DOM changes
 	useEffect(() => {
-		if (menuRef.current && isVisible) {
+		if (menuRef.current && showDiagramMenu) {
 			const rect = menuRef.current.getBoundingClientRect();
 			setMenuDimensions({ width: rect.width, height: rect.height });
 		}
-	}, [isVisible, menuStateMap]);
+	}, [showDiagramMenu]);
 
-	if (!isVisible) return null;
+	if (!showDiagramMenu) return null;
+
+	// Default menu state map.
+	const menuStateMap = {
+		BgColor: "Hidden",
+		BorderColor: "Hidden",
+		BorderRadius: "Hidden",
+		FontSize: "Hidden",
+		Bold: "Hidden",
+		FontColor: "Hidden",
+		AlignLeft: "Hidden",
+		AlignCenter: "Hidden",
+		AlignRight: "Hidden",
+		AlignTop: "Hidden",
+		AlignMiddle: "Hidden",
+		AlignBottom: "Hidden",
+		BringToFront: "Hidden",
+		BringForward: "Hidden",
+		SendBackward: "Hidden",
+		SendToBack: "Hidden",
+		KeepAspectRatio: "Hidden",
+		Group: "Hidden",
+	} as DiagramMenuStateMap;
+
+	// Find diagram items for styling
+	const firstFillableItem = findFirstFillableRecursive(selectedItems) as FillableData | undefined;
+	const firstStrokableItem = findFirstStrokableRecursive(selectedItems) as StrokableData | undefined;
+	const firstCornerRoundableItem = findFirstCornerRoundableRecursive(selectedItems) as CornerRoundableData | undefined;
+	const firstTextableItem = findFirstTextableRecursive(selectedItems) as TextableData | undefined;
+
+	// Set menu state based on selected items
+	if (firstFillableItem) {
+		menuStateMap.BgColor = isBgColorPickerOpen ? "Active" : "Show";
+	}
+	if (firstStrokableItem) {
+		menuStateMap.BorderColor = isBorderColorPickerOpen ? "Active" : "Show";
+	}
+	if (firstCornerRoundableItem) {
+		menuStateMap.BorderRadius = isBorderRadiusSelectorOpen ? "Active" : "Show";
+	}
+	if (firstTextableItem) {
+		menuStateMap.FontSize = isFontSizeSelectorOpen ? "Active" : "Show";
+		menuStateMap.Bold = "Show";
+		menuStateMap.FontColor = isFontColorPickerOpen ? "Active" : "Show";
+		menuStateMap.AlignLeft = "Show";
+		menuStateMap.AlignCenter = "Show";
+		menuStateMap.AlignRight = "Show";
+		menuStateMap.AlignTop = "Show";
+		menuStateMap.AlignMiddle = "Show";
+		menuStateMap.AlignBottom = "Show";
+
+		if (isTextableState(firstTextableItem)) {
+			if (firstTextableItem.fontWeight === "bold") {
+				menuStateMap.Bold = "Active";
+			}
+			if (firstTextableItem.textAlign === "left") {
+				menuStateMap.AlignLeft = "Active";
+			}
+			if (firstTextableItem.textAlign === "center") {
+				menuStateMap.AlignCenter = "Active";
+			}
+			if (firstTextableItem.textAlign === "right") {
+				menuStateMap.AlignRight = "Active";
+			}
+			if (firstTextableItem.verticalAlign === "top") {
+				menuStateMap.AlignTop = "Active";
+			}
+			if (firstTextableItem.verticalAlign === "center") {
+				menuStateMap.AlignMiddle = "Active";
+			}
+			if (firstTextableItem.verticalAlign === "bottom") {
+				menuStateMap.AlignBottom = "Active";
+			}
+		}
+	}
+
+	// Set other menu states
+	if (selectedItems.length === 1) {
+		menuStateMap.BringToFront = "Show";
+		menuStateMap.SendToBack = "Show";
+		menuStateMap.BringForward = "Show";
+		menuStateMap.SendBackward = "Show";
+	}
+
+	// Set the keep aspect ratio state.
+	if (multiSelectGroup) {
+		menuStateMap.KeepAspectRatio = multiSelectGroup.keepProportion ? "Active" : "Show";
+	} else if (isTransformativeState(singleSelectedItem)) {
+		menuStateMap.KeepAspectRatio = singleSelectedItem.keepProportion ? "Active" : "Show";
+	}
+
+	// Set the group menu state.
+	if (multiSelectGroup) {
+		menuStateMap.Group = "Show";
+	} else if (singleSelectedItem && singleSelectedItem.type === "Group") {
+		menuStateMap.Group = "Active";
+	}
+
+	// Get diagram position and size
+	let x, y, width, height, rotation, scaleX, scaleY;
+	if (multiSelectGroup) {
+		({ x, y, width, height, rotation, scaleX, scaleY } = multiSelectGroup);
+	} else if (isTransformativeState(singleSelectedItem)) {
+		({ x, y, width, height, rotation, scaleX, scaleY } = singleSelectedItem);
+	} else {
+		// Default values if no transformative item
+		x = y = width = height = 0;
+		rotation = 0;
+		scaleX = scaleY = 1;
+	}
 
 	const vertices = calcRectangleVertices({
-		x,
-		y,
-		width,
-		height,
+		x: x * zoom,
+		y: y * zoom,
+		width: width * zoom,
+		height: height * zoom,
 		rotation,
 		scaleX,
 		scaleY,
@@ -98,7 +448,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}, Number.NEGATIVE_INFINITY);
 
 	// Get diagram center X position
-	const diagramCenterX = x;
+	const diagramCenterX = x * zoom;
 
 	// Calculate menu position with viewport constraints
 	const calculateMenuPosition = (): { x: number; y: number } => {
@@ -141,6 +491,9 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 
 	const menuPosition = calculateMenuPosition();
 
+	// Create the menu click handler with the current state
+	const onMenuClick = createMenuClickHandler(menuStateMap);
+
 	/**
 	 * Check if the menu section should be shown based on the menu types provided.
 	 *
@@ -172,7 +525,10 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					<BgColor title="Background Color" />
 				</DiagramMenuItem>
 				{menuStateMap.BgColor === "Active" && (
-					<ColorPicker color={bgColor} onColorChange={onBgColorChange} />
+					<ColorPicker
+						color={firstFillableItem?.fill || "transparent"}
+						onColorChange={onBgColorChange}
+					/>
 				)}
 			</DiagramMenuPositioner>,
 		);
@@ -187,7 +543,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				</DiagramMenuItem>
 				{menuStateMap.BorderColor === "Active" && (
 					<ColorPicker
-						color={borderColor}
+						color={firstStrokableItem?.stroke || "transparent"}
 						onColorChange={onBorderColorChange}
 					/>
 				)}
@@ -204,7 +560,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				</DiagramMenuItem>
 				{menuStateMap.BorderRadius === "Active" && (
 					<NumberStepper
-						value={borderRadius}
+						value={firstCornerRoundableItem?.cornerRadius || 0}
 						min={MIN_BORDER_RADIUS}
 						max={MAX_BORDER_RADIUS}
 						minusTooltip="Decrease border radius"
@@ -237,7 +593,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				</DiagramMenuItem>
 				{menuStateMap.FontSize === "Active" && (
 					<NumberStepper
-						value={fontSize}
+						value={firstTextableItem?.fontSize || 0}
 						min={MIN_FONT_SIZE}
 						max={MAX_FONT_SIZE}
 						minusTooltip="Decrease font size"
@@ -257,7 +613,10 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					<FontColor title="Font Color" />
 				</DiagramMenuItem>
 				{menuStateMap.FontColor === "Active" && (
-					<ColorPicker color={fontColor} onColorChange={onFontColorChange} />
+					<ColorPicker
+						color={firstTextableItem?.fontColor || "transparent"}
+						onColorChange={onFontColorChange}
+					/>
 				)}
 			</DiagramMenuPositioner>,
 		);

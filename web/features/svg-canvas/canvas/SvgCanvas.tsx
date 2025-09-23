@@ -36,7 +36,7 @@ import { ZoomControls } from "../components/auxiliary/ZoomControls";
 import { TextEditor } from "../components/core/Textable";
 import { CanvasMenu } from "../components/menus/CanvasMenu";
 import { ContextMenu, useContextMenu } from "../components/menus/ContextMenu";
-import { DiagramMenu, useDiagramMenu } from "../components/menus/DiagramMenu";
+import { DiagramMenu } from "../components/menus/DiagramMenu";
 import UserMenu from "../components/menus/UserMenu/UserMenu";
 import { FlashConnectLine } from "../components/shapes/ConnectLine";
 import { Group } from "../components/shapes/Group";
@@ -192,8 +192,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			contextMenuFunctions,
 		} = useContextMenu(props, containerRef);
 
-		// Use the diagram menu hook to handle diagram menu events.
-		const { diagramMenuProps } = useDiagramMenu(props, containerWidth, containerHeight);
+		// DiagramMenu is now self-contained and doesn't need a hook
 
 
 		// Use the shortcut key hook to handle keyboard shortcuts
@@ -599,7 +598,11 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 									width={containerWidth + minX}
 									height={containerHeight + minY}
 								>
-									<DiagramMenu {...diagramMenuProps} />
+									<DiagramMenu
+										canvasProps={props}
+										containerWidth={containerWidth}
+										containerHeight={containerHeight}
+									/>
 									{/* Diagram info popover for selected diagram name/description */}
 									<DiagramInfoPopover
 										canvasProps={props}
