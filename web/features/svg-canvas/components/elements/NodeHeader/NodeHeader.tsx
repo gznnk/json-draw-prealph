@@ -40,8 +40,9 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 	onTextChange,
 }) => {
 	// Constants for layout
+	const ICON_SCALE = 0.8;
 	const iconSize = height;
-	const iconX = -width / 2 + iconSize / 2; // No left padding
+	const iconCenterX = -width / 2 + iconSize / 2;
 	const textWidth = width - iconSize - ICON_TEXT_MARGIN; // Remaining width minus margin ; // Margin from icon
 	const textCenter = efficientAffineTransformation(
 		textWidth / 2 - (width / 2 - iconSize - ICON_TEXT_MARGIN),
@@ -68,7 +69,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 			<MainContainerGroup transform={transform}>
 				{/* Icon background (rounded rectangle) */}
 				<rect
-					x={iconX - iconSize / 2}
+					x={iconCenterX - iconSize / 2}
 					y={-iconSize / 2}
 					width={iconSize}
 					height={iconSize}
@@ -80,11 +81,11 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 				{/* Icon component */}
 				{icon && (
 					<g
-						transform={`translate(${iconX}, 0)`}
+						transform={`translate(${iconCenterX - (iconSize * ICON_SCALE) / 2}, ${-(iconSize * ICON_SCALE) / 2})`}
 					>
 						{React.createElement(icon, {
-							width: iconSize * 0.6,
-							height: iconSize * 0.6,
+							width: iconSize * ICON_SCALE,
+							height: iconSize * ICON_SCALE,
 							fill: "#ffffff",
 						})}
 					</g>
