@@ -17,6 +17,10 @@ export type DiagramMenuProps = {
 	borderRadius: number;
 	fontSize: number;
 	fontColor: string;
+	containerWidth?: number;
+	containerHeight?: number;
+	minX?: number;
+	minY?: number;
 	onMenuClick: (menuType: DiagramMenuType) => void;
 	onBgColorChange: (bgColor: string) => void;
 	onBorderColorChange: (borderColor: string) => void;

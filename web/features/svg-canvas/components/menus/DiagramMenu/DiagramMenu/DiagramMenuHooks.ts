@@ -26,9 +26,9 @@ import { isTextableState } from "../../../../utils/validation/isTextableState";
 import { isTransformativeState } from "../../../../utils/validation/isTransformativeState";
 // Imports related to this component.
 
-export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
+export const useDiagramMenu = (canvasProps: SvgCanvasProps, containerWidth?: number, containerHeight?: number) => {
 	// Extract properties from canvasProps.
-	const { items, interactionState, multiSelectGroup, zoom } = canvasProps;
+	const { items, interactionState, multiSelectGroup, zoom, minX, minY } = canvasProps;
 
 	// Diagram menu controls open/close state.
 	const [isBgColorPickerOpen, setIsBgColorPickerOpen] = useState(false);
@@ -226,6 +226,10 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 				borderRadius: firstCornerRoundableItem?.cornerRadius || 0,
 				fontSize: firstTextableItem?.fontSize || 0,
 				fontColor: firstTextableItem?.fontColor || "transparent",
+				containerWidth,
+				containerHeight,
+				minX,
+				minY,
 			} as DiagramMenuProps;
 		} else {
 			// When a single item is selected, use the properties of the selected item.
@@ -246,6 +250,10 @@ export const useDiagramMenu = (canvasProps: SvgCanvasProps) => {
 					borderRadius: firstCornerRoundableItem?.cornerRadius || 0,
 					fontSize: firstTextableItem?.fontSize ?? 0,
 					fontColor: firstTextableItem?.fontColor || "transparent",
+					containerWidth,
+					containerHeight,
+					minX,
+					minY,
 				} as DiagramMenuProps;
 			}
 		}

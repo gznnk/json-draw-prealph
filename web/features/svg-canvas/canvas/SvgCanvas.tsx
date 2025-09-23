@@ -193,7 +193,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		} = useContextMenu(props, containerRef);
 
 		// Use the diagram menu hook to handle diagram menu events.
-		const { diagramMenuProps } = useDiagramMenu(props);
+		const { diagramMenuProps } = useDiagramMenu(props, containerWidth, containerHeight);
 
 
 		// Use the shortcut key hook to handle keyboard shortcuts

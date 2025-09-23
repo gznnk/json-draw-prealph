@@ -1,5 +1,5 @@
 import type React from "react";
-import { memo } from "react";
+import { memo, useRef, useEffect, useState } from "react";
 
 import {
 	MAX_BORDER_RADIUS,
@@ -54,6 +54,10 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	borderRadius,
 	fontSize,
 	fontColor,
+	containerWidth = 0,
+	containerHeight = 0,
+	minX = 0,
+	minY = 0,
 	onMenuClick,
 	onBgColorChange,
 	onBorderColorChange,
@@ -61,6 +65,17 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	onFontSizeChange,
 	onFontColorChange,
 }) => {
+	const menuRef = useRef<HTMLDivElement>(null);
+	const [menuDimensions, setMenuDimensions] = useState({ width: 0, height: 40 });
+
+	// Update menu dimensions when DOM changes
+	useEffect(() => {
+		if (menuRef.current && isVisible) {
+			const rect = menuRef.current.getBoundingClientRect();
+			setMenuDimensions({ width: rect.width, height: rect.height });
+		}
+	}, [isVisible, menuStateMap]);
+
 	if (!isVisible) return null;
 
 	const vertices = calcRectangleVertices({
@@ -73,14 +88,56 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		scaleY,
 	});
 
-	// Calculate the menu Y position based on the vertices of the rectangle.
-	// Apply zoom to the offset as well for consistent positioning.
-	const menuY =
-		Object.keys(vertices).reduce((max, key) => {
-			const vertex = vertices[key as keyof RectangleVertices];
-			return Math.max(max, vertex.y);
-		}, Number.NEGATIVE_INFINITY) +
-		20 * zoom;
+	// Get diagram bottom Y position
+	const diagramBottomY = Object.keys(vertices).reduce((max, key) => {
+		const vertex = vertices[key as keyof RectangleVertices];
+		return Math.max(max, vertex.y);
+	}, Number.NEGATIVE_INFINITY);
+
+	// Get diagram center X position
+	const diagramCenterX = x;
+
+	// Calculate menu position with viewport constraints
+	const calculateMenuPosition = (): { x: number; y: number } => {
+		const distanceFromDiagram = 20 * zoom;
+		const menuWidth = menuDimensions.width;
+		const menuHeight = menuDimensions.height;
+
+		// Default position: below the diagram, centered
+		let menuX = diagramCenterX - menuWidth / 2;
+		let menuY = diagramBottomY + distanceFromDiagram;
+
+		// Check if menu overflows viewport horizontally
+		const viewportRight = minX + containerWidth;
+		if (menuX + menuWidth > viewportRight) {
+			// Adjust to fit within right boundary
+			menuX = viewportRight - menuWidth;
+		}
+		if (menuX < minX) {
+			// Adjust to fit within left boundary
+			menuX = minX;
+		}
+
+		// Check if menu overflows viewport vertically (bottom)
+		const viewportBottom = minY + containerHeight;
+		if (menuY + menuHeight > viewportBottom) {
+			// Position above the diagram
+			const diagramTopY = Object.keys(vertices).reduce((min, key) => {
+				const vertex = vertices[key as keyof RectangleVertices];
+				return Math.min(min, vertex.y);
+			}, Number.POSITIVE_INFINITY);
+			menuY = diagramTopY - distanceFromDiagram - menuHeight;
+		}
+
+		// Ensure menu doesn't go above viewport
+		if (menuY < minY) {
+			menuY = minY;
+		}
+
+		return { x: menuX, y: menuY };
+	};
+
+	const menuPosition = calculateMenuPosition();
 
 	/**
 	 * Check if the menu section should be shown based on the menu types provided.
@@ -392,8 +449,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	menuItemComponents.pop();
 
 	return (
-		<DiagramMenuWrapper x={x} y={menuY} zoom={zoom}>
-			<DiagramMenuDiv>
+		<DiagramMenuWrapper x={menuPosition.x} y={menuPosition.y}>
+			<DiagramMenuDiv ref={menuRef}>
 				{menuItemComponents.map((component) => component)}
 			</DiagramMenuDiv>
 		</DiagramMenuWrapper>
