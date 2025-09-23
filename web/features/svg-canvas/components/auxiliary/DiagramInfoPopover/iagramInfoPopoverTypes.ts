@@ -1,8 +1,7 @@
-import type { Point } from "../../../types/core/Point";
-import type { Diagram } from "../../../types/state/core/Diagram";
+import type { SvgCanvasProps } from "../../../canvas/types/SvgCanvasProps";
 
 export type DiagramInfoPopoverProps = {
-	display: boolean;
-	diagram?: Diagram;
-	position: Point;
+	canvasProps: SvgCanvasProps;
+	containerWidth: number;
+	containerHeight: number;
 };

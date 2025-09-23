@@ -48,10 +48,7 @@ import { DiagramRegistry } from "../registry";
 import type { SvgViewport } from "../types/core/SvgViewport";
 import { newEventId } from "../utils/core/newEventId";
 import { useShortcutKey } from "./hooks/keyboard/useShortcutKey";
-import {
-	DiagramInfoPopover,
-	useDiagramInfoPopover,
-} from "../components/auxiliary/DiagramInfoPopover";
+import { DiagramInfoPopover } from "../components/auxiliary/DiagramInfoPopover";
 
 // TODO: 実行する場所を考える
 // Initialize all diagram types when this module is loaded
@@ -198,12 +195,6 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		// Use the diagram menu hook to handle diagram menu events.
 		const { diagramMenuProps } = useDiagramMenu(props);
 
-		// Get diagram info popover information
-		const popoverInfoProps = useDiagramInfoPopover(
-			props,
-			containerWidth,
-			containerHeight,
-		);
 
 		// Use the shortcut key hook to handle keyboard shortcuts
 		useShortcutKey({
@@ -610,7 +601,11 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 								>
 									<DiagramMenu {...diagramMenuProps} />
 									{/* Diagram info popover for selected diagram name/description */}
-									<DiagramInfoPopover {...popoverInfoProps} />
+									<DiagramInfoPopover
+										canvasProps={props}
+										containerWidth={containerWidth}
+										containerHeight={containerHeight}
+									/>
 								</HTMLElementsContainer>
 							</SvgViewportProvider>
 						</SvgCanvasStateProvider>
