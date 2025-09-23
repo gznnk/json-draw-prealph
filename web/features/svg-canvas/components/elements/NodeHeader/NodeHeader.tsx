@@ -31,6 +31,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 	isTextEditing,
 	icon,
 	iconBackgroundColor = NodeHeaderDefaultData.iconBackgroundColor,
+	iconScale = 0.8,
 	isSelected,
 	isAncestorSelected = false,
 	onDrag,
@@ -40,7 +41,6 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 	onTextChange,
 }) => {
 	// Constants for layout
-	const ICON_SCALE = 0.8;
 	const iconSize = height;
 	const iconCenterX = -width / 2 + iconSize / 2;
 	const textWidth = width - iconSize - ICON_TEXT_MARGIN; // Remaining width minus margin ; // Margin from icon
@@ -81,11 +81,11 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 				{/* Icon component */}
 				{icon && (
 					<g
-						transform={`translate(${iconCenterX - (iconSize * ICON_SCALE) / 2}, ${-(iconSize * ICON_SCALE) / 2})`}
+						transform={`translate(${iconCenterX - (iconSize * iconScale) / 2}, ${-(iconSize * iconScale) / 2})`}
 					>
 						{React.createElement(icon, {
-							width: iconSize * ICON_SCALE,
-							height: iconSize * ICON_SCALE,
+							width: iconSize * iconScale,
+							height: iconSize * iconScale,
 							fill: "#ffffff",
 						})}
 					</g>
