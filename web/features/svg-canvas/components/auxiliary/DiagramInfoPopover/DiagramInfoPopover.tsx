@@ -46,7 +46,7 @@ const DiagramInfoPopoverComponent = ({
 			const rect = popoverRef.current.getBoundingClientRect();
 			setPopoverDimensions({ width: rect.width, height: rect.height });
 		}
-	}, [isVisible, selectedDiagrams]);
+	}, [isVisible]);
 
 	if (!isVisible) {
 		return <></>;
