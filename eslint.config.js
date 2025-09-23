@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import prettierConfig from "eslint-config-prettier";
+import boundariesPlugin from "eslint-plugin-boundaries";
 import importPlugin from "eslint-plugin-import";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
@@ -30,11 +31,27 @@ export default tseslint.config(
 			react,
 			"react-hooks": reactHooks,
 			import: importPlugin,
+			boundaries: boundariesPlugin,
 		},
 		settings: {
 			react: {
 				version: "detect",
 			},
+			"boundaries/elements": [
+				{
+					type: "app",
+					pattern: "src/app/**/*",
+				},
+				{
+					type: "features",
+					pattern: "src/features/**/*",
+				},
+				{
+					type: "shared",
+					pattern: "src/shared/**/*",
+				},
+			],
+			"boundaries/ignore": ["**/*.test.*", "**/*.spec.*"],
 		},
 		rules: {
 			// React rules
@@ -89,6 +106,28 @@ export default tseslint.config(
 			"no-var": "error",
 			"object-shorthand": "error",
 			"prefer-template": "error",
+
+			// Boundaries rules
+			"boundaries/element-types": [
+				"error",
+				{
+					default: "disallow",
+					rules: [
+						{
+							from: "app",
+							allow: ["features", "shared"],
+						},
+						{
+							from: "features",
+							allow: ["shared"],
+						},
+						{
+							from: "shared",
+							allow: [],
+						},
+					],
+				},
+			],
 		},
 	},
 );
