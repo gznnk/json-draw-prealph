@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 
+import { BOX_SHADOW } from "../../../constants/styling/core/CommonStyling";
 import {
 	MIN_POPOVER_HEIGHT,
 	MIN_POPOVER_WIDTH,
@@ -13,9 +14,7 @@ export const PopoverContainer = styled.div`
 	backdrop-filter: blur(8px);
 	border: 1px solid #e5e7eb;
 	border-radius: 0.5rem;
-	box-shadow:
-		0 10px 15px -3px rgba(0, 0, 0, 0.1),
-		0 4px 6px -2px rgba(0, 0, 0, 0.05);
+	box-shadow: ${BOX_SHADOW};
 	min-width: ${MIN_POPOVER_WIDTH}px;
 	min-height: ${MIN_POPOVER_HEIGHT}px;
 	width: max-content;
