@@ -1,3 +1,5 @@
+import { resolve } from "node:path";
+
 import js from "@eslint/js";
 import prettierConfig from "eslint-config-prettier";
 import boundariesPlugin from "eslint-plugin-boundaries";
@@ -17,9 +19,9 @@ export default tseslint.config(
 			...tseslint.configs.recommended,
 			prettierConfig,
 		],
-		files: ["**/*.{js,ts,tsx}"],
+		files: ["**/*.{js,jsx,ts,tsx}"],
 		languageOptions: {
-			ecmaVersion: 2020,
+			ecmaVersion: 2023,
 			globals: globals.browser,
 			parserOptions: {
 				ecmaFeatures: {
@@ -37,82 +39,86 @@ export default tseslint.config(
 			react: {
 				version: "detect",
 			},
+			"boundaries/root-path": resolve(import.meta.dirname),
+			"boundaries/include": ["web/**/*.{ts,tsx,js,jsx}"],
+			"boundaries/ignore": [
+				"web/main.tsx",
+				"web/vite-env.d.ts",
+				"**/*.test.*",
+				"**/*.spec.*",
+			],
 			"boundaries/elements": [
+				// svg-canvas internal module boundaries (specific patterns first)
 				{
-					type: "app",
-					pattern: "src/app/**/*",
-				},
-				{
-					type: "features",
-					pattern: "src/features/**/*",
-				},
-				{
-					type: "shared",
-					pattern: "src/shared/**/*",
-				},
-				// svg-canvas internal module boundaries
-				{
-					type: "svg-canvas-types-core",
-					pattern: "src/features/svg-canvas/types/core/**/*",
-				},
-				{
-					type: "svg-canvas-types-data",
-					pattern: "src/features/svg-canvas/types/data/**/*",
-				},
-				{
-					type: "svg-canvas-types-state",
-					pattern: "src/features/svg-canvas/types/state/**/*",
-				},
-				{
-					type: "svg-canvas-types-events",
-					pattern: "src/features/svg-canvas/types/events/**/*",
-				},
-				{
-					type: "svg-canvas-types-props",
-					pattern: "src/features/svg-canvas/types/props/**/*",
+					type: "svg-canvas-types",
+					pattern: "features/svg-canvas/types/*",
+					mode: "folder",
 				},
 				{
 					type: "svg-canvas-constants",
-					pattern: "src/features/svg-canvas/constants/**/*",
+					pattern: "features/svg-canvas/constants/*",
+					mode: "folder",
 				},
 				{
 					type: "svg-canvas-registry",
-					pattern: "src/features/svg-canvas/registry/**/*",
+					pattern: "features/svg-canvas/registry/*",
+					mode: "folder",
 				},
 				{
 					type: "svg-canvas-utils",
-					pattern: "src/features/svg-canvas/utils/**/*",
+					pattern: "features/svg-canvas/utils/*",
+					mode: "folder",
 				},
 				{
 					type: "svg-canvas-hooks",
-					pattern: "src/features/svg-canvas/hooks/**/*",
+					pattern: "features/svg-canvas/hooks/*",
+					mode: "folder",
 				},
 				{
-					type: "svg-canvas-components-icons",
-					pattern: "src/features/svg-canvas/components/icons/**/*",
-				},
-				{
-					type: "svg-canvas-components-core",
-					pattern: "src/features/svg-canvas/components/core/**/*",
-				},
-				{
-					type: "svg-canvas-components-shapes",
-					pattern: "src/features/svg-canvas/components/shapes/**/*",
-				},
-				{
-					type: "svg-canvas-components-nodes",
-					pattern: "src/features/svg-canvas/components/nodes/**/*",
-				},
-				{
-					type: "svg-canvas-components-menus",
-					pattern: "src/features/svg-canvas/components/menus/**/*",
+					type: "svg-canvas-components",
+					pattern: "features/svg-canvas/components/*",
+					mode: "folder",
 				},
 				{
 					type: "svg-canvas-canvas",
-					pattern: "src/features/svg-canvas/canvas/**/*",
+					pattern: "features/svg-canvas/canvas/*",
+					mode: "folder",
+				},
+
+				// Feature boundaries
+				{
+					type: "features-llm-chat-ui",
+					pattern: "features/llm-chat-ui/*",
+					mode: "folder",
+				},
+				{
+					type: "features-markdown-editor",
+					pattern: "features/markdown-editor/*",
+					mode: "folder",
+				},
+				{
+					type: "features-svg-canvas",
+					pattern: "features/svg-canvas/*",
+					mode: "folder",
+				},
+
+				// General boundaries (broader patterns last)
+				{
+					type: "app",
+					pattern: "web/app/*",
+					mode: "folder",
+				},
+				{
+					type: "shared",
+					pattern: "web/shared/*",
+					mode: "folder",
+				},
+				{
+					type: "utils",
+					pattern: "web/utils/*",
+					mode: "folder",
 				},
 			],
-			"boundaries/ignore": ["**/*.test.*", "**/*.spec.*"],
 		},
 		rules: {
 			// React rules
@@ -169,6 +175,7 @@ export default tseslint.config(
 			"prefer-template": "error",
 
 			// Boundaries rules
+			// "boundaries/no-unknown-files": "error",
 			"boundaries/element-types": [
 				"error",
 				{
@@ -176,77 +183,69 @@ export default tseslint.config(
 					rules: [
 						{
 							from: "app",
-							allow: ["features", "shared"],
-						},
-						{
-							from: "features",
-							allow: ["shared"],
+							allow: [
+								"features-llm-chat-ui",
+								"features-markdown-editor",
+								"svg-canvas-components",
+								"svg-canvas-constants",
+								"svg-canvas-types",
+								"svg-canvas-hooks",
+								"svg-canvas-registry",
+								"svg-canvas-utils",
+								"shared",
+								"utils",
+							],
 						},
 						{
 							from: "shared",
 							allow: [],
 						},
-						// svg-canvas internal module rules
-						// types module rules
-						{
-							from: "svg-canvas-types-data",
-							allow: ["svg-canvas-types-core"],
-						},
-						{
-							from: "svg-canvas-types-state",
-							allow: ["svg-canvas-types-core", "svg-canvas-types-data"],
-						},
-						{
-							from: "svg-canvas-types-events",
-							allow: ["svg-canvas-types-core", "svg-canvas-types-data", "svg-canvas-types-state"],
-						},
-						{
-							from: "svg-canvas-types-props",
-							allow: ["svg-canvas-types-core", "svg-canvas-types-data", "svg-canvas-types-state", "svg-canvas-types-events"],
-						},
-						// General rules (constants, registry, utils, hooks, components, canvas)
+						// svg-canvas internal module rules (based on dependency-rules.md)
 						{
 							from: "svg-canvas-constants",
-							allow: ["svg-canvas-types-core", "svg-canvas-types-data", "svg-canvas-types-state", "svg-canvas-types-events", "svg-canvas-types-props"],
+							allow: ["svg-canvas-types"],
 						},
 						{
 							from: "svg-canvas-registry",
-							allow: ["svg-canvas-types-core", "svg-canvas-types-data", "svg-canvas-types-state", "svg-canvas-types-events", "svg-canvas-types-props"],
+							allow: ["svg-canvas-types"],
 						},
 						{
 							from: "svg-canvas-utils",
-							allow: ["svg-canvas-constants", "svg-canvas-registry", "svg-canvas-types-core", "svg-canvas-types-data", "svg-canvas-types-state", "svg-canvas-types-events", "svg-canvas-types-props"],
+							allow: [
+								"svg-canvas-constants",
+								"svg-canvas-types",
+								"svg-canvas-registry",
+							],
 						},
 						{
 							from: "svg-canvas-hooks",
-							allow: ["svg-canvas-constants", "svg-canvas-registry", "svg-canvas-utils", "svg-canvas-types-core", "svg-canvas-types-data", "svg-canvas-types-state", "svg-canvas-types-events", "svg-canvas-types-props"],
-						},
-						// components module rules
-						{
-							from: "svg-canvas-components-core",
-							allow: ["svg-canvas-components-icons"],
-						},
-						{
-							from: "svg-canvas-components-shapes",
-							allow: ["svg-canvas-components-core", "svg-canvas-components-icons"],
+							allow: [
+								"svg-canvas-constants",
+								"svg-canvas-types",
+								"svg-canvas-registry",
+								"svg-canvas-utils",
+							],
 						},
 						{
-							from: "svg-canvas-components-nodes",
-							allow: ["svg-canvas-components-shapes", "svg-canvas-components-core", "svg-canvas-components-icons"],
+							from: "svg-canvas-components",
+							allow: [
+								"svg-canvas-constants",
+								"svg-canvas-types",
+								"svg-canvas-hooks",
+								"svg-canvas-registry",
+								"svg-canvas-utils",
+							],
 						},
-						{
-							from: "svg-canvas-components-menus",
-							allow: ["svg-canvas-components-icons"],
-						},
-						// General components rules (allow access to lower layers)
-						{
-							from: ["svg-canvas-components-icons", "svg-canvas-components-core", "svg-canvas-components-shapes", "svg-canvas-components-nodes", "svg-canvas-components-menus"],
-							allow: ["svg-canvas-constants", "svg-canvas-registry", "svg-canvas-utils", "svg-canvas-hooks", "svg-canvas-types-core", "svg-canvas-types-data", "svg-canvas-types-state", "svg-canvas-types-events", "svg-canvas-types-props"],
-						},
-						// canvas module rules
 						{
 							from: "svg-canvas-canvas",
-							allow: ["svg-canvas-components-icons", "svg-canvas-components-core", "svg-canvas-components-shapes", "svg-canvas-components-nodes", "svg-canvas-components-menus", "svg-canvas-constants", "svg-canvas-registry", "svg-canvas-utils", "svg-canvas-hooks", "svg-canvas-types-core", "svg-canvas-types-data", "svg-canvas-types-state", "svg-canvas-types-events", "svg-canvas-types-props"],
+							allow: [
+								"svg-canvas-components",
+								"svg-canvas-constants",
+								"svg-canvas-types",
+								"svg-canvas-hooks",
+								"svg-canvas-registry",
+								"svg-canvas-utils",
+							],
 						},
 					],
 				},
