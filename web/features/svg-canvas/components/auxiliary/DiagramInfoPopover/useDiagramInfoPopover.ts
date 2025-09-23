@@ -84,18 +84,20 @@ const calculatePopoverPosition = (
 			POPOVER_WIDTH;
 	}
 
-	let popoverY = (diagram.y - POPOVER_HEIGHT / 2) * canvasProps.zoom;
+	// Ensure the popover does not go below the bottom edge of the diagram
+	let popoverY = diagram.y * canvasProps.zoom - POPOVER_HEIGHT / 2;
 	const diagramBottomY = boundingBox.bottom * canvasProps.zoom;
-	if (diagramBottomY < popoverY + POPOVER_HEIGHT * canvasProps.zoom) {
-		popoverY = diagramBottomY - POPOVER_HEIGHT * canvasProps.zoom;
+	if (diagramBottomY < popoverY + POPOVER_HEIGHT) {
+		popoverY = diagramBottomY - POPOVER_HEIGHT;
 	}
+	// Ensure popover is within vertical bounds of the viewport
 	if (popoverY < canvasProps.minY) {
 		popoverY = canvasProps.minY;
 	}
-	const popoverBottomY = popoverY + POPOVER_HEIGHT * canvasProps.zoom;
+	const popoverBottomY = popoverY + POPOVER_HEIGHT;
 	const viewportBottomY = canvasProps.minY + containerHeight;
 	if (viewportBottomY < popoverBottomY) {
-		popoverY = viewportBottomY - POPOVER_HEIGHT * canvasProps.zoom;
+		popoverY = viewportBottomY - POPOVER_HEIGHT;
 	}
 
 	return {

@@ -7,9 +7,9 @@ import {
 
 export const PopoverContainer = styled.div`
 	position: absolute;
-	z-index: 50;
+	z-index: 1050;
 	pointer-events: auto;
-	background: rgba(255, 255, 255, 0.95);
+	background: rgba(255, 255, 255, 1);
 	backdrop-filter: blur(8px);
 	border: 1px solid #e5e7eb;
 	border-radius: 0.5rem;
