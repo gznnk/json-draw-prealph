@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useRef, useEffect, useState } from "react";
 
 import {
 	PopoverContainer,
@@ -11,8 +11,8 @@ import type { DiagramInfoPopoverProps } from "./iagramInfoPopoverTypes";
 import type { SvgCanvasProps } from "../../../canvas/types/SvgCanvasProps";
 import {
 	DISTANCE_FROM_DIAGRAM,
-	POPOVER_HEIGHT,
-	POPOVER_WIDTH,
+	MIN_POPOVER_HEIGHT,
+	MIN_POPOVER_WIDTH,
 } from "../../../constants/styling/auxiliary/DiagramInfoPopoverStyling";
 import type { Diagram } from "../../../types/state/core/Diagram";
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
@@ -24,22 +24,31 @@ const DiagramInfoPopoverComponent = ({
 	containerWidth,
 	containerHeight,
 }: DiagramInfoPopoverProps): React.JSX.Element => {
+	const popoverRef = useRef<HTMLDivElement>(null);
+	const [popoverDimensions, setPopoverDimensions] = useState({
+		width: MIN_POPOVER_WIDTH,
+		height: MIN_POPOVER_HEIGHT,
+	});
+
 	// Get selected diagrams
 	const selectedDiagrams = getSelectedDiagrams(canvasProps.items);
-
-	if (selectedDiagrams.length === 0) {
-		return <></>;
-	}
-
 	const selectedDiagram = selectedDiagrams[0];
 
-	if (!selectedDiagram.name && !selectedDiagram.description) {
-		// Only show popover if there's a name or description
-		return <></>;
-	}
+	const isVisible =
+		selectedDiagrams.length > 0 &&
+		canvasProps.interactionState === "idle" &&
+		selectedDiagram &&
+		(selectedDiagram.name || selectedDiagram.description);
 
-	// Only display when interaction state is idle
-	if (canvasProps.interactionState !== "idle") {
+	// Update popover dimensions when DOM changes
+	useEffect(() => {
+		if (popoverRef.current && isVisible) {
+			const rect = popoverRef.current.getBoundingClientRect();
+			setPopoverDimensions({ width: rect.width, height: rect.height });
+		}
+	}, [isVisible, selectedDiagrams]);
+
+	if (!isVisible) {
 		return <></>;
 	}
 
@@ -49,10 +58,12 @@ const DiagramInfoPopoverComponent = ({
 		containerWidth,
 		containerHeight,
 		selectedDiagram,
+		popoverDimensions,
 	);
 
 	return (
 		<PopoverContainer
+			ref={popoverRef}
 			style={{
 				left: position.x,
 				top: position.y,
@@ -66,7 +77,9 @@ const DiagramInfoPopoverComponent = ({
 
 				<PopoverFieldContainer>
 					<PopoverLabel>Description</PopoverLabel>
-					<PopoverText>{selectedDiagram.description || "No description"}</PopoverText>
+					<PopoverText>
+						{selectedDiagram.description || "No description"}
+					</PopoverText>
 				</PopoverFieldContainer>
 			</PopoverContent>
 		</PopoverContainer>
@@ -83,6 +96,7 @@ const calculatePopoverPosition = (
 	containerWidth: number,
 	containerHeight: number,
 	diagram?: Diagram,
+	popoverDimensions?: { width: number; height: number },
 ): { x: number; y: number } => {
 	if (!diagram) {
 		return { x: 0, y: 0 }; // Default position if no diagram
@@ -92,30 +106,32 @@ const calculatePopoverPosition = (
 	}
 
 	const boundingBox = calcDiagramBoundingBox(diagram);
+	const popoverWidth = popoverDimensions?.width || MIN_POPOVER_WIDTH;
+	const popoverHeight = popoverDimensions?.height || MIN_POPOVER_HEIGHT;
 
 	let popoverX = boundingBox.right * canvasProps.zoom + DISTANCE_FROM_DIAGRAM;
-	if (canvasProps.minX + containerWidth < popoverX + POPOVER_WIDTH) {
+	if (canvasProps.minX + containerWidth < popoverX + popoverWidth) {
 		// Not enough space on the right, fallback to left
 		popoverX =
 			boundingBox.left * canvasProps.zoom -
 			DISTANCE_FROM_DIAGRAM -
-			POPOVER_WIDTH;
+			popoverWidth;
 	}
 
 	// Ensure the popover does not go below the bottom edge of the diagram
-	let popoverY = diagram.y * canvasProps.zoom - POPOVER_HEIGHT / 2;
+	let popoverY = diagram.y * canvasProps.zoom - popoverHeight / 2;
 	const diagramBottomY = boundingBox.bottom * canvasProps.zoom;
-	if (diagramBottomY < popoverY + POPOVER_HEIGHT) {
-		popoverY = diagramBottomY - POPOVER_HEIGHT;
+	if (diagramBottomY < popoverY + popoverHeight) {
+		popoverY = diagramBottomY - popoverHeight;
 	}
 	// Ensure popover is within vertical bounds of the viewport
 	if (popoverY < canvasProps.minY) {
 		popoverY = canvasProps.minY;
 	}
-	const popoverBottomY = popoverY + POPOVER_HEIGHT;
+	const popoverBottomY = popoverY + popoverHeight;
 	const viewportBottomY = canvasProps.minY + containerHeight;
 	if (viewportBottomY < popoverBottomY) {
-		popoverY = viewportBottomY - POPOVER_HEIGHT;
+		popoverY = viewportBottomY - popoverHeight;
 	}
 
 	return {

@@ -38,7 +38,7 @@ export const DiagramMenuDiv = styled.div`
 		0 2px 4px -1px rgba(0, 0, 0, 0.06);
 	pointer-events: auto;
 	user-select: none;
-	z-index: 1000;
+	z-index: 1060;
 `;
 
 /**

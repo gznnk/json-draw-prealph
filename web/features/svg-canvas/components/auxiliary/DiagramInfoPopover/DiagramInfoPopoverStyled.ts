@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
 
 import {
-	POPOVER_HEIGHT,
-	POPOVER_WIDTH,
+	MIN_POPOVER_HEIGHT,
+	MIN_POPOVER_WIDTH,
 } from "../../../constants/styling/auxiliary/DiagramInfoPopoverStyling";
 
 export const PopoverContainer = styled.div`
@@ -16,8 +16,10 @@ export const PopoverContainer = styled.div`
 	box-shadow:
 		0 10px 15px -3px rgba(0, 0, 0, 0.1),
 		0 4px 6px -2px rgba(0, 0, 0, 0.05);
-	width: ${POPOVER_WIDTH}px;
-	height: ${POPOVER_HEIGHT}px;
+	min-width: ${MIN_POPOVER_WIDTH}px;
+	min-height: ${MIN_POPOVER_HEIGHT}px;
+	width: max-content;
+	max-width: 300px;
 	font-family: Noto Sans JP;
 	overflow: hidden;
 `;
