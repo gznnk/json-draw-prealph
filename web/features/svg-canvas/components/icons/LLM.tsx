@@ -23,40 +23,43 @@ const LLMComponent: React.FC<IconProps> = ({
 			width={width}
 			height={height}
 			viewBox="0 0 24 24"
+			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 		>
 			<title>{title}</title>
-			<g fill={fill}>
-				{/* Brain outline */}
-				<path
-					d="M12 2c-2.5 0-4.5 1-6 2.5-1 1-1.5 2.5-1.5 4 0 1 0.2 2 0.5 3-0.3 0.5-0.5 1-0.5 1.5 0 1.5 1 3 2.5 4 1.5 1.5 3.5 2.5 6 2.5s4.5-1 6-2.5c1.5-1 2.5-2.5 2.5-4 0-0.5-0.2-1-0.5-1.5 0.3-1 0.5-2 0.5-3 0-1.5-0.5-3-1.5-4C16.5 3 14.5 2 12 2z"
-					fill="none"
-					stroke={fill}
-					strokeWidth="1.5"
-				/>
-				{/* Neural connections - left hemisphere */}
-				<circle cx="8" cy="8" r="1" fill={fill} />
-				<circle cx="6" cy="12" r="1" fill={fill} />
-				<circle cx="9" cy="15" r="1" fill={fill} />
-				<line x1="8" y1="8" x2="6" y2="12" stroke={fill} strokeWidth="0.8" />
-				<line x1="6" y1="12" x2="9" y2="15" stroke={fill} strokeWidth="0.8" />
-
-				{/* Neural connections - right hemisphere */}
-				<circle cx="16" cy="8" r="1" fill={fill} />
-				<circle cx="18" cy="12" r="1" fill={fill} />
-				<circle cx="15" cy="15" r="1" fill={fill} />
-				<line x1="16" y1="8" x2="18" y2="12" stroke={fill} strokeWidth="0.8" />
-				<line x1="18" y1="12" x2="15" y2="15" stroke={fill} strokeWidth="0.8" />
-
-				{/* Central processing connections */}
-				<circle cx="12" cy="10" r="1" fill={fill} />
-				<circle cx="12" cy="14" r="1" fill={fill} />
-				<line x1="8" y1="8" x2="12" y2="10" stroke={fill} strokeWidth="0.8" />
-				<line x1="16" y1="8" x2="12" y2="10" stroke={fill} strokeWidth="0.8" />
-				<line x1="12" y1="10" x2="12" y2="14" stroke={fill} strokeWidth="0.8" />
-				<line x1="12" y1="14" x2="9" y2="15" stroke={fill} strokeWidth="0.8" />
-				<line x1="12" y1="14" x2="15" y2="15" stroke={fill} strokeWidth="0.8" />
-			</g>
+			<path
+				d="M12 22C8 22 4 19 4 16C2 14 2 10 4 8C6 4 9 2 12 3C15 2 18 4 20 8C22 10 22 14 20 16C20 19 16 22 12 22Z"
+				stroke={fill}
+				strokeWidth="2"
+				fill="none"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M8 9L12 11L16 10"
+				stroke={fill}
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M9 15L12 16L15 15"
+				stroke={fill}
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M12 6C10 7 10 10 12 11C14 12 14 15 12 17"
+				stroke={fill}
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<circle cx="8" cy="9" r="1.5" fill={fill} />
+			<circle cx="16" cy="10" r="1.5" fill={fill} />
+			<circle cx="9" cy="15" r="1.5" fill={fill} />
+			<circle cx="15" cy="15" r="1.5" fill={fill} />
 		</svg>
 	);
 };

@@ -4,11 +4,6 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 import {
-	BASE_MARGIN,
-	HEADER_HEIGHT,
-	HEADER_MARGIN_TOP,
-} from "../../../constants/styling/nodes/NodeStyling";
-import {
 	BACKGROUND_COLOR,
 	BORDER_COLOR,
 	BORDER_WIDTH,
@@ -18,6 +13,11 @@ import {
 	MIN_HEIGHT,
 	MIN_WIDTH,
 } from "../../../constants/styling/nodes/LLMNodeStyling";
+import {
+	BASE_MARGIN,
+	HEADER_HEIGHT,
+	HEADER_MARGIN_TOP,
+} from "../../../constants/styling/nodes/NodeStyling";
 import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
@@ -252,6 +252,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				iconBackgroundColor={
 					processIdList.length > 0 ? ICON_COLOR_PROCESSING : ICON_COLOR_IDLE
 				}
+				iconScale={0.9}
 				onDrag={handleDrag}
 				onSelect={handleSelect}
 				onClick={handleClick}

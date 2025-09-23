@@ -13,6 +13,8 @@ export type NodeHeaderProps = Optional<
 		typeof NodeHeaderFeatures,
 		{
 			icon: React.ComponentType<IconProps>;
+			/** Scale factor for the icon (0.0 to 1.0) */
+			iconScale?: number;
 		}
 	>,
 	| "height"
