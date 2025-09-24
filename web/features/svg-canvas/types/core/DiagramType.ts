@@ -22,6 +22,7 @@ export type DiagramType =
 	| "Sticky"
 	// Nodes
 	| "AgentNode"
+	| "HtmlGenNode"
 	| "HubNode"
 	| "ImageGenNode"
 	| "LLMNode"

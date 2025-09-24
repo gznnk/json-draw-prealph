@@ -210,6 +210,17 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({
 				onClick={() =>
 					onAddDiagramByType?.({
 						eventId: newEventId(),
+						diagramType: "HtmlGenNode",
+						isSelected: true,
+					})
+				}
+			>
+				HTML
+			</CanvasMenuItem>
+			<CanvasMenuItem
+				onClick={() =>
+					onAddDiagramByType?.({
+						eventId: newEventId(),
 						diagramType: "SvgToDiagramNode",
 						isSelected: true,
 					})

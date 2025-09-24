@@ -13,7 +13,11 @@ import {
 	DiagramMenuPositioner,
 	DiagramMenuWrapper,
 } from "./DiagramMenuStyled";
-import type { DiagramMenuProps, DiagramMenuType, DiagramMenuStateMap } from "./DiagramMenuTypes";
+import type {
+	DiagramMenuProps,
+	DiagramMenuType,
+	DiagramMenuStateMap,
+} from "./DiagramMenuTypes";
 import {
 	findFirstCornerRoundableRecursive,
 	findFirstFillableRecursive,
@@ -56,6 +60,7 @@ import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
 import { ColorPicker } from "../ColorPicker";
 import { DiagramMenuItem } from "../DiagramMenuItem";
 import { NumberStepper } from "../NumberStepper";
+import { isFrame } from "../../../../utils/validation/isFrame";
 
 const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	canvasProps,
@@ -63,7 +68,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	containerHeight,
 }) => {
 	// Extract properties from canvasProps.
-	const { items, interactionState, multiSelectGroup, zoom, minX, minY } = canvasProps;
+	const { items, interactionState, multiSelectGroup, zoom, minX, minY } =
+		canvasProps;
 
 	const menuRef = useRef<HTMLDivElement>(null);
 	const [menuDimensions, setMenuDimensions] = useState({
@@ -74,13 +80,15 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	// Diagram menu controls open/close state.
 	const [isBgColorPickerOpen, setIsBgColorPickerOpen] = useState(false);
 	const [isBorderColorPickerOpen, setIsBorderColorPickerOpen] = useState(false);
-	const [isBorderRadiusSelectorOpen, setIsBorderRadiusSelectorOpen] = useState(false);
+	const [isBorderRadiusSelectorOpen, setIsBorderRadiusSelectorOpen] =
+		useState(false);
 	const [isFontSizeSelectorOpen, setIsFontSizeSelectorOpen] = useState(false);
 	const [isFontColorPickerOpen, setIsFontColorPickerOpen] = useState(false);
 
 	// Get selected items and check if the diagram menu should be shown.
 	const selectedItems = getSelectedDiagrams(items);
-	const showDiagramMenu = selectedItems.length > 0 && interactionState === InteractionState.Idle;
+	const showDiagramMenu =
+		selectedItems.length > 0 && interactionState === InteractionState.Idle;
 	const singleSelectedItem = selectedItems[0];
 
 	// Utility functions for changing items
@@ -162,109 +170,112 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	);
 
 	// Create a callback that uses the current menuStateMap
-	const createMenuClickHandler = (currentMenuStateMap: DiagramMenuStateMap) => (menuType: string) => {
-		switch (menuType) {
-			case "BgColor":
-				openControl("BgColor", currentMenuStateMap);
-				break;
-			case "BorderColor":
-				openControl("BorderColor", currentMenuStateMap);
-				break;
-			case "BorderRadius":
-				openControl("BorderRadius", currentMenuStateMap);
-				break;
-			case "FontSize":
-				openControl("FontSize", currentMenuStateMap);
-				break;
-			case "Bold":
-				changeItemsStyle(selectedItems, {
-					fontWeight: currentMenuStateMap.Bold === "Active" ? "normal" : "bold",
-				});
-				break;
-			case "FontColor":
-				openControl("FontColor", currentMenuStateMap);
-				break;
-			case "AlignLeft":
-				changeItemsStyle(selectedItems, { textAlign: "left" });
-				break;
-			case "AlignCenter":
-				changeItemsStyle(selectedItems, { textAlign: "center" });
-				break;
-			case "AlignRight":
-				changeItemsStyle(selectedItems, { textAlign: "right" });
-				break;
-			case "AlignTop":
-				changeItemsStyle(selectedItems, { verticalAlign: "top" });
-				break;
-			case "AlignMiddle":
-				changeItemsStyle(selectedItems, { verticalAlign: "center" });
-				break;
-			case "AlignBottom":
-				changeItemsStyle(selectedItems, { verticalAlign: "bottom" });
-				break;
-			case "BringToFront":
-				if (singleSelectedItem) {
-					canvasProps.onStackOrderChange?.({
-						eventId: newEventId(),
-						changeType: "bringToFront",
-						id: singleSelectedItem.id,
+	const createMenuClickHandler =
+		(currentMenuStateMap: DiagramMenuStateMap) => (menuType: string) => {
+			switch (menuType) {
+				case "BgColor":
+					openControl("BgColor", currentMenuStateMap);
+					break;
+				case "BorderColor":
+					openControl("BorderColor", currentMenuStateMap);
+					break;
+				case "BorderRadius":
+					openControl("BorderRadius", currentMenuStateMap);
+					break;
+				case "FontSize":
+					openControl("FontSize", currentMenuStateMap);
+					break;
+				case "Bold":
+					changeItemsStyle(selectedItems, {
+						fontWeight:
+							currentMenuStateMap.Bold === "Active" ? "normal" : "bold",
 					});
-				}
-				break;
-			case "BringForward":
-				if (singleSelectedItem) {
-					canvasProps.onStackOrderChange?.({
-						eventId: newEventId(),
-						changeType: "bringForward",
-						id: singleSelectedItem.id,
-					});
-				}
-				break;
-			case "SendBackward":
-				if (singleSelectedItem) {
-					canvasProps.onStackOrderChange?.({
-						eventId: newEventId(),
-						changeType: "sendBackward",
-						id: singleSelectedItem.id,
-					});
-				}
-				break;
-			case "SendToBack":
-				if (singleSelectedItem) {
-					canvasProps.onStackOrderChange?.({
-						eventId: newEventId(),
-						changeType: "sendToBack",
-						id: singleSelectedItem.id,
-					});
-				}
-				break;
-			case "KeepAspectRatio":
-				if (multiSelectGroup) {
-					canvasProps.onConstraintChange?.({
-						eventId: newEventId(),
-						id: multiSelectGroup.id,
-						keepProportion: currentMenuStateMap.KeepAspectRatio !== "Active",
-					});
-				} else {
-					for (const item of selectedItems) {
-						canvasProps.onConstraintChange?.({
+					break;
+				case "FontColor":
+					openControl("FontColor", currentMenuStateMap);
+					break;
+				case "AlignLeft":
+					changeItemsStyle(selectedItems, { textAlign: "left" });
+					break;
+				case "AlignCenter":
+					changeItemsStyle(selectedItems, { textAlign: "center" });
+					break;
+				case "AlignRight":
+					changeItemsStyle(selectedItems, { textAlign: "right" });
+					break;
+				case "AlignTop":
+					changeItemsStyle(selectedItems, { verticalAlign: "top" });
+					break;
+				case "AlignMiddle":
+					changeItemsStyle(selectedItems, { verticalAlign: "center" });
+					break;
+				case "AlignBottom":
+					changeItemsStyle(selectedItems, { verticalAlign: "bottom" });
+					break;
+				case "BringToFront":
+					if (singleSelectedItem) {
+						canvasProps.onStackOrderChange?.({
 							eventId: newEventId(),
-							id: item.id,
-							keepProportion: currentMenuStateMap.KeepAspectRatio !== "Active",
+							changeType: "bringToFront",
+							id: singleSelectedItem.id,
 						});
 					}
-				}
-				break;
-			case "Group":
-				if (currentMenuStateMap.Group === "Show") {
-					canvasProps.onGroup?.();
-				}
-				if (currentMenuStateMap.Group === "Active") {
-					canvasProps.onUngroup?.();
-				}
-				break;
-		}
-	};
+					break;
+				case "BringForward":
+					if (singleSelectedItem) {
+						canvasProps.onStackOrderChange?.({
+							eventId: newEventId(),
+							changeType: "bringForward",
+							id: singleSelectedItem.id,
+						});
+					}
+					break;
+				case "SendBackward":
+					if (singleSelectedItem) {
+						canvasProps.onStackOrderChange?.({
+							eventId: newEventId(),
+							changeType: "sendBackward",
+							id: singleSelectedItem.id,
+						});
+					}
+					break;
+				case "SendToBack":
+					if (singleSelectedItem) {
+						canvasProps.onStackOrderChange?.({
+							eventId: newEventId(),
+							changeType: "sendToBack",
+							id: singleSelectedItem.id,
+						});
+					}
+					break;
+				case "KeepAspectRatio":
+					if (multiSelectGroup) {
+						canvasProps.onConstraintChange?.({
+							eventId: newEventId(),
+							id: multiSelectGroup.id,
+							keepProportion: currentMenuStateMap.KeepAspectRatio !== "Active",
+						});
+					} else {
+						for (const item of selectedItems) {
+							canvasProps.onConstraintChange?.({
+								eventId: newEventId(),
+								id: item.id,
+								keepProportion:
+									currentMenuStateMap.KeepAspectRatio !== "Active",
+							});
+						}
+					}
+					break;
+				case "Group":
+					if (currentMenuStateMap.Group === "Show") {
+						canvasProps.onGroup?.();
+					}
+					if (currentMenuStateMap.Group === "Active") {
+						canvasProps.onUngroup?.();
+					}
+					break;
+			}
+		};
 
 	const onBgColorChange = useCallback(
 		(bgColor: string) => {
@@ -318,7 +329,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			const rect = menuRef.current.getBoundingClientRect();
 			setMenuDimensions({ width: rect.width, height: rect.height });
 		}
-	}, [showDiagramMenu]);
+	}, [showDiagramMenu]); // TODO: Consider adding dependencies for controls that affect menu size
 
 	if (!showDiagramMenu) return null;
 
@@ -345,10 +356,18 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	} as DiagramMenuStateMap;
 
 	// Find diagram items for styling
-	const firstFillableItem = findFirstFillableRecursive(selectedItems) as FillableData | undefined;
-	const firstStrokableItem = findFirstStrokableRecursive(selectedItems) as StrokableData | undefined;
-	const firstCornerRoundableItem = findFirstCornerRoundableRecursive(selectedItems) as CornerRoundableData | undefined;
-	const firstTextableItem = findFirstTextableRecursive(selectedItems) as TextableData | undefined;
+	const firstFillableItem = findFirstFillableRecursive(selectedItems) as
+		| FillableData
+		| undefined;
+	const firstStrokableItem = findFirstStrokableRecursive(selectedItems) as
+		| StrokableData
+		| undefined;
+	const firstCornerRoundableItem = findFirstCornerRoundableRecursive(
+		selectedItems,
+	) as CornerRoundableData | undefined;
+	const firstTextableItem = findFirstTextableRecursive(selectedItems) as
+		| TextableData
+		| undefined;
 
 	// Set menu state based on selected items
 	if (firstFillableItem) {
@@ -406,9 +425,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 
 	// Set the keep aspect ratio state.
 	if (multiSelectGroup) {
-		menuStateMap.KeepAspectRatio = multiSelectGroup.keepProportion ? "Active" : "Show";
+		menuStateMap.KeepAspectRatio = multiSelectGroup.keepProportion
+			? "Active"
+			: "Show";
 	} else if (isTransformativeState(singleSelectedItem)) {
-		menuStateMap.KeepAspectRatio = singleSelectedItem.keepProportion ? "Active" : "Show";
+		menuStateMap.KeepAspectRatio = singleSelectedItem.keepProportion
+			? "Active"
+			: "Show";
 	}
 
 	// Set the group menu state.
@@ -422,7 +445,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	let x, y, width, height, rotation, scaleX, scaleY;
 	if (multiSelectGroup) {
 		({ x, y, width, height, rotation, scaleX, scaleY } = multiSelectGroup);
-	} else if (isTransformativeState(singleSelectedItem)) {
+	} else if (isFrame(singleSelectedItem)) {
 		({ x, y, width, height, rotation, scaleX, scaleY } = singleSelectedItem);
 	} else {
 		// Default values if no transformative item
