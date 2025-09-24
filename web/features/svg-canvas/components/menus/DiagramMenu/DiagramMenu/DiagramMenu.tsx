@@ -36,6 +36,7 @@ import type { Diagram } from "../../../../types/state/core/Diagram";
 import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams";
 import { newEventId } from "../../../../utils/core/newEventId";
 import { calcRectangleVertices } from "../../../../utils/math/geometry/calcRectangleVertices";
+import { isFrame } from "../../../../utils/validation/isFrame";
 import { isItemableState } from "../../../../utils/validation/isItemableState";
 import { isTextableState } from "../../../../utils/validation/isTextableState";
 import { isTransformativeState } from "../../../../utils/validation/isTransformativeState";
@@ -60,7 +61,6 @@ import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
 import { ColorPicker } from "../ColorPicker";
 import { DiagramMenuItem } from "../DiagramMenuItem";
 import { NumberStepper } from "../NumberStepper";
-import { isFrame } from "../../../../utils/validation/isFrame";
 
 const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	canvasProps,

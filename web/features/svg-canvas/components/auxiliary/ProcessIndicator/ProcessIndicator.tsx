@@ -97,6 +97,7 @@ const ProcessIndicatorComponent = ({
 						r={8}
 						statusColor={getStatusColor(process.status)}
 						isProcessing={process.status === "processing"}
+						isDisappearing={process.status !== "processing"}
 					/>
 				);
 			})}
