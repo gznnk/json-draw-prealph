@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
 
-import { BOX_SHADOW } from "../../../constants/styling/core/CommonStyling";
 import {
 	MIN_POPOVER_HEIGHT,
 	MIN_POPOVER_WIDTH,
 } from "../../../constants/styling/auxiliary/DiagramInfoPopoverStyling";
+import { BOX_SHADOW } from "../../../constants/styling/core/CommonStyling";
 
 export const PopoverContainer = styled.div`
 	position: absolute;

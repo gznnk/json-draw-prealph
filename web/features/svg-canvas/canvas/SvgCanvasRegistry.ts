@@ -2,6 +2,7 @@ import { StickyAtlas } from "../atlas/diagrams/StickyAtlas";
 import { ButtonAtlas } from "../atlas/elements/ButtonAtlas";
 import { InputAtlas } from "../atlas/elements/InputAtlas";
 import { AgentNodeAtlas } from "../atlas/nodes/AgentNodeAtlas";
+import { HtmlGenNodeAtlas } from "../atlas/nodes/HtmlGenNodeAtlas";
 import { HubNodeAtlas } from "../atlas/nodes/HubNodeAtlas";
 import { ImageGenNodeAtlas } from "../atlas/nodes/ImageGenNodeAtlas";
 import { LLMNodeAtlas } from "../atlas/nodes/LLMNodeAtlas";
@@ -55,6 +56,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	// Node Atlas Registration
 	// ============================================================================
 	DiagramRegistry.register(AgentNodeAtlas);
+	DiagramRegistry.register(HtmlGenNodeAtlas);
 	DiagramRegistry.register(HubNodeAtlas);
 	DiagramRegistry.register(ImageGenNodeAtlas);
 	DiagramRegistry.register(LLMNodeAtlas);
