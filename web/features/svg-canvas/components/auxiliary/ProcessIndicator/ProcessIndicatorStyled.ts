@@ -29,9 +29,11 @@ export const StyledCircle = styled.circle<{
 	statusColor: string;
 	isProcessing: boolean;
 	isDisappearing: boolean;
+	translateX: number;
 }>`
 	fill: ${(props) => props.statusColor};
-	transition: fill 0.5s linear;
+	transform: translateX(${(props) => props.translateX}px);
+	transition: fill 0.5s linear, transform 0.3s ease-out;
 	${({ isProcessing }) =>
 		isProcessing &&
 		css`

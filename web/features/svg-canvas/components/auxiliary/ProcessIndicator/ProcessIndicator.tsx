@@ -41,26 +41,24 @@ const calculatePositions = (
 	if (count === 0) return [];
 
 	const positions: Array<{ x: number; y: number }> = [];
-	const radius = 8; // アイコンの半径
-	const padding = 6; // ノードとアイコンの間の余白
-	const iconSpacing = radius * 2 + 4; // アイコン間の間隔
+	const radius = 8; // Icon radius
+	const padding = 6; // Padding between node and icon
+	const iconSpacing = radius * 2 + 4; // Spacing between icons
 
-	// 下辺に左側から順番に配置（幅を超える分は非表示）
-	const maxCount = Math.floor((width - iconSpacing) / iconSpacing) + 1;
-	const visibleCount = Math.min(count, maxCount);
+	// Calculate base position (left edge of bottom side)
+	const baseX = centerX - width / 2 + iconSpacing / 2;
+	const baseY = centerY + height / 2 + padding + radius;
+	const baseRotated = rotatePoint(
+		baseX,
+		baseY,
+		centerX,
+		centerY,
+		degreesToRadians(rotation),
+	);
 
-	for (let i = 0; i < visibleCount; i++) {
-		const x = centerX - width / 2 + iconSpacing / 2 + i * iconSpacing;
-		const y = centerY + height / 2 + padding + radius;
-
-		const rotated = rotatePoint(
-			x,
-			y,
-			centerX,
-			centerY,
-			degreesToRadians(rotation),
-		);
-		positions.push(rotated);
+	// Set base position for all processes
+	for (let i = 0; i < count; i++) {
+		positions.push(baseRotated);
 	}
 
 	return positions;
@@ -82,12 +80,17 @@ const ProcessIndicatorComponent = ({
 		rotation,
 		processes.length,
 	);
+	const iconSpacing = 16 + 4; // radius * 2 + 4
+	const maxCount = Math.floor((width - iconSpacing) / iconSpacing) + 1;
 
 	return (
 		<g>
-			{processes.map((process, index) => {
+			{processes.slice(0, maxCount).map((process, index) => {
 				const position = positions[index];
 				if (!position) return null;
+
+				// Calculate X coordinate offset (used for translateX)
+				const translateX = index * iconSpacing;
 
 				return (
 					<StyledCircle
@@ -98,6 +101,7 @@ const ProcessIndicatorComponent = ({
 						statusColor={getStatusColor(process.status)}
 						isProcessing={process.status === "processing"}
 						isDisappearing={process.status !== "processing"}
+						translateX={translateX}
 					/>
 				);
 			})}
