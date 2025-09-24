@@ -36,6 +36,7 @@ import type { Diagram } from "../../../../types/state/core/Diagram";
 import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams";
 import { newEventId } from "../../../../utils/core/newEventId";
 import { calcRectangleVertices } from "../../../../utils/math/geometry/calcRectangleVertices";
+import { isFrame } from "../../../../utils/validation/isFrame";
 import { isItemableState } from "../../../../utils/validation/isItemableState";
 import { isTextableState } from "../../../../utils/validation/isTextableState";
 import { isTransformativeState } from "../../../../utils/validation/isTransformativeState";
@@ -60,7 +61,6 @@ import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
 import { ColorPicker } from "../ColorPicker";
 import { DiagramMenuItem } from "../DiagramMenuItem";
 import { NumberStepper } from "../NumberStepper";
-import { isFrame } from "../../../../utils/validation/isFrame";
 
 const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	canvasProps,
@@ -72,6 +72,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		canvasProps;
 
 	const menuRef = useRef<HTMLDivElement>(null);
+	const [previousSelectedItemsId, setPreviousSelectedItemsId] =
+		useState<string>("");
 	const [menuDimensions, setMenuDimensions] = useState({
 		width: 0,
 		height: 40,
@@ -90,6 +92,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const showDiagramMenu =
 		selectedItems.length > 0 && interactionState === InteractionState.Idle;
 	const singleSelectedItem = selectedItems[0];
+	// Create selected items ID string for dependency tracking
+	const selectedItemsId = selectedItems.map((item) => item.id).join(",");
 
 	// Utility functions for changing items
 	const changeItems = useCallback(
@@ -323,13 +327,15 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		}
 	}, [showDiagramMenu]);
 
-	// Update menu dimensions when DOM changes
+	// Update menu dimensions when DOM changes or selected items change
 	useEffect(() => {
 		if (menuRef.current && showDiagramMenu) {
 			const rect = menuRef.current.getBoundingClientRect();
 			setMenuDimensions({ width: rect.width, height: rect.height });
 		}
-	}, [showDiagramMenu]); // TODO: Consider adding dependencies for controls that affect menu size
+		// Update the state for tracking
+		setPreviousSelectedItemsId(selectedItemsId);
+	}, [showDiagramMenu, selectedItemsId]);
 
 	if (!showDiagramMenu) return null;
 
@@ -832,8 +838,15 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	// Remove the last divider.
 	menuItemComponents.pop();
 
+	// Check if selected items have changed to control z-index
+	const isItemsChanged = previousSelectedItemsId !== selectedItemsId;
+
 	return (
-		<DiagramMenuWrapper x={menuPosition.x} y={menuPosition.y}>
+		<DiagramMenuWrapper
+			x={menuPosition.x}
+			y={menuPosition.y}
+			zIndex={isItemsChanged ? -1 : 1060}
+		>
 			<DiagramMenuDiv ref={menuRef}>
 				{menuItemComponents.map((component) => component)}
 			</DiagramMenuDiv>
