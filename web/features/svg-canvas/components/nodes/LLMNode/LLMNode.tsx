@@ -18,6 +18,7 @@ import {
 	HEADER_HEIGHT,
 	HEADER_MARGIN_TOP,
 } from "../../../constants/styling/nodes/NodeStyling";
+import { useProcessManager } from "../../../hooks/useProcessManager";
 import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
@@ -29,6 +30,7 @@ import type { NodeHeaderState } from "../../../types/state/elements/NodeHeaderSt
 import { newEventId } from "../../../utils/core/newEventId";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { efficientAffineTransformation } from "../../../utils/math/transform/efficientAffineTransformation";
+import { ProcessIndicator } from "../../auxiliary/ProcessIndicator";
 import { Frame } from "../../elements/Frame";
 import { Input } from "../../elements/Input";
 import { NodeHeader } from "../../elements/NodeHeader";
@@ -66,8 +68,9 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 	const inputState = items[1] as InputState;
 
 	const [apiKey, setApiKey] = useState<string>("");
-	const [processIdList, setProcessIdList] = useState<string[]>([]);
 	const [instructions, setInstructions] = useState<string>(inputState.text);
+	const { processes, addProcess, setProcessSuccess, setProcessError } =
+		useProcessManager();
 
 	// Apply the props.text to the state when the component mounts or when props.text changes.
 	useEffect(() => {
@@ -139,7 +142,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 			const { id, instructions, onExecute } = refBus.current;
 
 			const processId = newEventId();
-			setProcessIdList((prev) => [...prev, processId]);
+			addProcess(processId);
 
 			const openai = new OpenAI({
 				apiKey,
@@ -190,16 +193,16 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 								text: fullOutput,
 							},
 						});
+						setProcessSuccess(processId);
 					}
 				}
 			} catch (error) {
 				console.error("Error fetching data from OpenAI API:", error);
 				alert("An error occurred during the API request.");
+				setProcessError(processId);
 			}
-
-			setProcessIdList((prev) => prev.filter((id) => id !== processId));
 		},
-		[apiKey],
+		[apiKey, addProcess, setProcessError, setProcessSuccess],
 	);
 
 	// Handle propagation events from child components
@@ -250,7 +253,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				isAncestorSelected={isAncestorSelected}
 				icon={LLM}
 				iconBackgroundColor={
-					processIdList.length > 0 ? ICON_COLOR_PROCESSING : ICON_COLOR_IDLE
+					processes.length > 0 ? ICON_COLOR_PROCESSING : ICON_COLOR_IDLE
 				}
 				iconScale={0.9}
 				onDrag={handleDrag}
@@ -274,6 +277,14 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				onSelect={handleSelect}
 				onClick={handleClick}
 				onTextChange={onTextChange}
+			/>
+			<ProcessIndicator
+				x={x}
+				y={y}
+				width={width}
+				height={height}
+				rotation={rotation}
+				processes={processes}
 			/>
 		</>
 	);
