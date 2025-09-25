@@ -15,6 +15,8 @@ export type NodeHeaderProps = Optional<
 			icon: React.ComponentType<IconProps>;
 			/** Scale factor for the icon (0.0 to 1.0) */
 			iconScale?: number;
+			/** Whether to apply blink animation to the icon background */
+			blinkIcon?: boolean;
 		}
 	>,
 	| "height"

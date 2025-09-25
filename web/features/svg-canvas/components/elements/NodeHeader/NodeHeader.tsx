@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 
 import { ICON_TEXT_MARGIN } from "./NodeHeaderConstants";
-import { MainContainerGroup } from "./NodeHeaderStyled";
+import { MainContainerGroup, IconBackgroundRect } from "./NodeHeaderStyled";
 import { NodeHeaderDefaultData } from "../../../constants/data/elements/NodeHeaderDefaultData";
 import type { NodeHeaderProps } from "../../../types/props/elements/NodeHeaderProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
@@ -32,6 +32,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 	icon,
 	iconBackgroundColor = NodeHeaderDefaultData.iconBackgroundColor,
 	iconScale = 0.8,
+	blinkIcon = false,
 	isSelected,
 	isAncestorSelected = false,
 	onDrag,
@@ -68,7 +69,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 			{/* Main container group */}
 			<MainContainerGroup transform={transform}>
 				{/* Icon background (rounded rectangle) */}
-				<rect
+				<IconBackgroundRect
 					x={iconCenterX - iconSize / 2}
 					y={-iconSize / 2}
 					width={iconSize}
@@ -76,6 +77,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 					rx={iconSize * 0.2}
 					ry={iconSize * 0.2}
 					fill={iconBackgroundColor}
+					blinkIcon={blinkIcon}
 				/>
 
 				{/* Icon component */}

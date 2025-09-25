@@ -14,5 +14,4 @@ export const BACKGROUND_COLOR = "#ffffff";
 export const CORNER_RADIUS = 8;
 
 // Icon styling constants
-export const ICON_COLOR_IDLE = "#6b7280";
-export const ICON_COLOR_PROCESSING = "#374151";
+export const ICON_COLOR = "#6b7280";

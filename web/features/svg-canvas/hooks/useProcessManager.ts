@@ -67,8 +67,11 @@ export const useProcessManager = () => {
 		};
 	}, []);
 
+	const hasActiveProcess = !!processes.find((p) => p.status === "processing");
+
 	return {
 		processes,
+		hasActiveProcess,
 		addProcess,
 		setProcessSuccess,
 		setProcessError,
