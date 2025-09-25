@@ -17,6 +17,5 @@ export const NodeHeaderDefaultData: NodeHeaderData =
 			fontWeight: "400",
 			textAlign: "left",
 			verticalAlign: "center",
-			iconBackgroundColor: "#E6E6E6",
 		},
 	});

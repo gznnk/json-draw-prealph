@@ -8,7 +8,6 @@ import {
 	BORDER_COLOR,
 	BORDER_WIDTH,
 	CORNER_RADIUS,
-	ICON_COLOR,
 	MIN_HEIGHT,
 	MIN_WIDTH,
 } from "../../../constants/styling/nodes/LLMNodeStyling";
@@ -68,8 +67,13 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 
 	const [apiKey, setApiKey] = useState<string>("");
 	const [instructions, setInstructions] = useState<string>(inputState.text);
-	const { processes, hasActiveProcess, addProcess, setProcessSuccess, setProcessError } =
-		useProcessManager();
+	const {
+		processes,
+		hasActiveProcess,
+		addProcess,
+		setProcessSuccess,
+		setProcessError,
+	} = useProcessManager();
 
 	// Apply the props.text to the state when the component mounts or when props.text changes.
 	useEffect(() => {
@@ -251,9 +255,9 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				isSelected={isSelected}
 				isAncestorSelected={isAncestorSelected}
 				icon={LLM}
-				iconBackgroundColor={ICON_COLOR}
 				iconScale={0.9}
 				blinkIcon={hasActiveProcess}
+				blinkIconColor="#06b6d4"
 				onDrag={handleDrag}
 				onSelect={handleSelect}
 				onClick={handleClick}

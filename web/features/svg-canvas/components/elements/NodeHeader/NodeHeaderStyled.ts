@@ -28,10 +28,13 @@ export const MainContainerGroup = styled.g`
 /**
  * Styled rect for icon background with optional blink animation
  */
-export const IconBackgroundRect = styled.rect<{ blinkIcon?: boolean }>`
+export const IconBackgroundRect = styled.rect<{
+	blinkIcon?: boolean;
+}>`
+	transition: fill 0.5s linear;
 	${({ blinkIcon }) =>
 		blinkIcon &&
 		css`
 			animation: ${blinkAnimation} 1s ease-in-out infinite;
-		`}
+		`};
 `;

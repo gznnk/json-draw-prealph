@@ -15,8 +15,12 @@ export type NodeHeaderProps = Optional<
 			icon: React.ComponentType<IconProps>;
 			/** Scale factor for the icon (0.0 to 1.0) */
 			iconScale?: number;
+			/** Background color for the icon container */
+			iconBackgroundColor?: string;
 			/** Whether to apply blink animation to the icon background */
 			blinkIcon?: boolean;
+			/** Color to use for the icon background during blink animation */
+			blinkIconColor?: string;
 		}
 	>,
 	| "height"
@@ -26,5 +30,4 @@ export type NodeHeaderProps = Optional<
 	| "fontWeight"
 	| "textAlign"
 	| "verticalAlign"
-	| "iconBackgroundColor"
 >;

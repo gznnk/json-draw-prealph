@@ -18,6 +18,3 @@ export const BORDER_COLOR = "#e5e7eb";
 export const BORDER_WIDTH = "1px";
 export const BACKGROUND_COLOR = "#ffffff";
 export const CORNER_RADIUS = 8;
-
-// Icon styling constants
-export const ICON_COLOR = "#6b7280";

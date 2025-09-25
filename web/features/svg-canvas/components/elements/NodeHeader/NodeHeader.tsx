@@ -30,9 +30,10 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 	verticalAlign = NodeHeaderDefaultData.verticalAlign,
 	isTextEditing,
 	icon,
-	iconBackgroundColor = NodeHeaderDefaultData.iconBackgroundColor,
+	iconBackgroundColor = "#6b7280",
 	iconScale = 0.8,
 	blinkIcon = false,
+	blinkIconColor = "#06b6d4",
 	isSelected,
 	isAncestorSelected = false,
 	onDrag,
@@ -76,7 +77,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 					height={iconSize}
 					rx={iconSize * 0.2}
 					ry={iconSize * 0.2}
-					fill={iconBackgroundColor}
+					fill={blinkIcon ? blinkIconColor : iconBackgroundColor}
 					blinkIcon={blinkIcon}
 				/>
 

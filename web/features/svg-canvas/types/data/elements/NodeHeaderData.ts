@@ -25,8 +25,6 @@ export const NodeHeaderFeatures = {
 export type NodeHeaderData = CreateDataType<
 	typeof NodeHeaderFeatures,
 	{
-		/** Background color for the icon container */
-		iconBackgroundColor?: string;
 		/** Icon component to display */
 		iconComponent?: React.ComponentType<{ size: number; color: string }>;
 	}

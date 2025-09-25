@@ -16,7 +16,6 @@ import {
 	BUTTON_MARGIN_TOP,
 	BUTTON_WIDTH,
 	CORNER_RADIUS,
-	ICON_COLOR,
 	MIN_HEIGHT,
 	MIN_WIDTH,
 } from "../../../constants/styling/nodes/TextAreaNodeStyling";
@@ -263,7 +262,6 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 				isSelected={isSelected}
 				isAncestorSelected={isAncestorSelected}
 				icon={TextArea}
-				iconBackgroundColor={ICON_COLOR}
 				onDrag={handleDrag}
 				onSelect={handleSelect}
 				onClick={handleClick}
