@@ -13,6 +13,7 @@ export const EVENT_NAME_SVG_CANVAS_SCROLL = "SvgCanvasScroll" as const;
 // Tool events
 export const ADD_NEW_DIAGRAM_EVENT_NAME = "AddNewDiagram" as const;
 export const APPEND_DIAGRAMS_EVENT_NAME = "AppendDiagrams" as const;
+export const APPEND_SELECTED_DIAGRAMS_EVENT_NAME = "AppendSelectedDiagrams" as const;
 
 // Connection events
 export const EVENT_NAME_FLASH_CONNECT_LINE = "FlashConnectLine" as const;

@@ -13,6 +13,7 @@ import { useStyleChange } from "./hooks/actions/useStyleChange";
 import { useUngroup } from "./hooks/actions/useUngroup";
 import { useOnAddDiagram } from "./hooks/diagram/useOnAddDiagram";
 import { useOnAppendDiagrams } from "./hooks/diagram/useOnAppendDiagrams";
+import { useOnAppendSelectedDiagrams } from "./hooks/diagram/useOnAppendSelectedDiagrams";
 import { useOnClick } from "./hooks/diagram/useOnClick";
 import { useOnConnect } from "./hooks/diagram/useOnConnect";
 import { useOnDiagramChange } from "./hooks/diagram/useOnDiagramChange";
@@ -135,6 +136,9 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// Hook for appending diagrams via D&D.
 	useOnAppendDiagrams(canvasHooksProps);
+
+	// Hook for appending selected diagrams via D&D.
+	useOnAppendSelectedDiagrams(canvasHooksProps);
 
 	// Handler for the click event.
 	const onClick = useOnClick(canvasHooksProps, isCtrlPressed);

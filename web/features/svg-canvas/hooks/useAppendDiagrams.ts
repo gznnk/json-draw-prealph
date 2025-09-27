@@ -7,7 +7,7 @@ import type { Diagram } from "../types/state/core/Diagram";
 import { newEventId } from "../utils/core/newEventId";
 
 /**
- * Hook for appending multiple diagrams to a CanvasFrame via drag and drop.
+ * Hook for appending multiple diagrams to a target diagram via drag and drop.
  * Dispatches AppendDiagramsEvent to the event bus.
  */
 export const useAppendDiagrams = () => {
@@ -16,10 +16,10 @@ export const useAppendDiagrams = () => {
 
 	// Function to dispatch a new AppendDiagramsEvent
 	return useCallback(
-		(targetFrameId: string, diagrams: Diagram[]) => {
+		(targetId: string, diagrams: Diagram[]) => {
 			const event: AppendDiagramsEvent = {
 				eventId: newEventId(),
-				targetFrameId,
+				targetId,
 				diagrams,
 			};
 

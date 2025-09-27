@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 
-import { APPEND_DIAGRAMS_EVENT_NAME } from "../../../constants/core/EventNames";
-import type { AppendDiagramsEvent } from "../../../types/events/AppendDiagramsEvent";
+import { APPEND_SELECTED_DIAGRAMS_EVENT_NAME } from "../../../constants/core/EventNames";
+import type { AppendSelectedDiagramsEvent } from "../../../types/events/AppendSelectedDiagramsEvent";
 import { getDiagramById } from "../../../utils/core/getDiagramById";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 import { appendDiagrams } from "../../utils/appendDiagrams";
 import { cleanupGroups } from "../../utils/cleanupGroups";
@@ -10,12 +11,11 @@ import { removeDiagramsById } from "../../utils/removeDiagramsById";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 import { useAddHistory } from "../history/useAddHistory";
 
-
 /**
- * Custom hook to handle AppendDiagramsEvent on the canvas.
- * Listens for the event and updates the canvas state accordingly.
+ * Custom hook to handle AppendSelectedDiagramsEvent on the canvas.
+ * Listens for the event, retrieves currently selected diagrams, and updates the canvas state accordingly.
  */
-export const useOnAppendDiagrams = (props: SvgCanvasSubHooksProps) => {
+export const useOnAppendSelectedDiagrams = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler
 	const addHistory = useAddHistory(props);
 
@@ -31,35 +31,42 @@ export const useOnAppendDiagrams = (props: SvgCanvasSubHooksProps) => {
 		// Bypass references to avoid function creation in every render
 		const { eventBus } = refBus.current.props;
 
-		// Listener for AppendDiagramsEvent
-		const appendDiagramsListener = (e: Event) => {
+		// Listener for AppendSelectedDiagramsEvent
+		const appendSelectedDiagramsListener = (e: Event) => {
 			// Bypass references to avoid function creation in every render
 			const {
 				props: { setCanvasState },
 				addHistory,
 			} = refBus.current;
 
-			const event = (e as CustomEvent<AppendDiagramsEvent>).detail;
+			const event = (e as CustomEvent<AppendSelectedDiagramsEvent>).detail;
 
 			// Update the canvas state
 			setCanvasState((prevState) => {
-				// 1. Get target diagram
-				const targetDiagram = getDiagramById(prevState.items, event.targetId);
-				if (!targetDiagram) {
-					console.warn(`Target diagram with id ${event.targetId} not found`);
+				// 1. Get target frame
+				const targetFrame = getDiagramById(prevState.items, event.targetId);
+				if (!targetFrame) {
+					console.warn(`Target frame with id ${event.targetId} not found`);
+					return prevState;
+				}
+
+				// 2. Get currently selected diagrams
+				const selectedDiagrams = getSelectedDiagrams(prevState.items);
+				if (selectedDiagrams.length === 0) {
+					console.warn("No diagrams are currently selected");
 					return prevState;
 				}
 
 				// Extract IDs of diagrams to move
-				const diagramIds = event.diagrams.map(diagram => diagram.id);
+				const diagramIds = selectedDiagrams.map(diagram => diagram.id);
 
-				// 2. Remove source diagrams from their current locations
+				// 3. Remove source diagrams from their current locations
 				const diagramsRemovedItems = removeDiagramsById(prevState.items, diagramIds);
 
-				// 3. Append diagrams to target diagram
-				const diagramsAppendedItems = appendDiagrams(diagramsRemovedItems, event.targetId, event.diagrams);
+				// 4. Append diagrams to target frame
+				const diagramsAppendedItems = appendDiagrams(diagramsRemovedItems, event.targetId, selectedDiagrams);
 
-				// 4. Clean up empty groups
+				// 5. Clean up empty groups
 				const groupsCleanedUpItems = cleanupGroups(diagramsAppendedItems);
 
 				// Update outlines
@@ -79,13 +86,13 @@ export const useOnAppendDiagrams = (props: SvgCanvasSubHooksProps) => {
 		};
 
 		// Add the event listener
-		eventBus.addEventListener(APPEND_DIAGRAMS_EVENT_NAME, appendDiagramsListener);
+		eventBus.addEventListener(APPEND_SELECTED_DIAGRAMS_EVENT_NAME, appendSelectedDiagramsListener);
 
 		// Cleanup the event listener on component unmount
 		return () => {
 			eventBus.removeEventListener(
-				APPEND_DIAGRAMS_EVENT_NAME,
-				appendDiagramsListener,
+				APPEND_SELECTED_DIAGRAMS_EVENT_NAME,
+				appendSelectedDiagramsListener,
 			);
 		};
 	}, []);

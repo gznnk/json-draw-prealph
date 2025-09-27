@@ -7,8 +7,7 @@ import {
 	BORDER_WIDTH,
 	CORNER_RADIUS,
 } from "../../../constants/styling/diagrams/CanvasFrameStyling";
-import { useSvgCanvasState } from "../../../context/SvgCanvasStateContext";
-import { useAppendDiagrams } from "../../../hooks/useAppendDiagrams";
+import { useAppendSelectedDiagrams } from "../../../hooks/useAppendSelectedDiagrams";
 import { useClick } from "../../../hooks/useClick";
 import { useDrag } from "../../../hooks/useDrag";
 import { useHover } from "../../../hooks/useHover";
@@ -17,7 +16,6 @@ import { DiagramRegistry } from "../../../registry";
 import type { DiagramData } from "../../../types/data/core/DiagramData";
 import type { DiagramDragDropEvent } from "../../../types/events/DiagramDragDropEvent";
 import type { CanvasFrameProps } from "../../../types/props/diagrams/CanvasFrameProps";
-import { getDiagramById } from "../../../utils/core/getDiagramById";
 import { mergeProps } from "../../../utils/core/mergeProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
@@ -68,11 +66,8 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	// Reference to the SVG element for interaction
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
-	// Hook for appending diagrams to this frame
-	const appendDiagrams = useAppendDiagrams();
-
-	// Reference to the canvas state
-	const canvasStateRef = useSvgCanvasState();
+	// Hook for appending selected diagrams to this frame
+	const appendSelectedDiagrams = useAppendSelectedDiagrams();
 
 	/**
 	 * Event handler when diagrams are dropped on this CanvasFrame
@@ -81,19 +76,11 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		(e: DiagramDragDropEvent) => {
 			// Only handle diagram drops (not ConnectPoint drops)
 			if (e.dropItem.type !== "ConnectPoint") {
-				const dropItem = getDiagramById(
-					canvasStateRef.current.items,
-					e.dropItem.id,
-				);
-
-				if (!dropItem) return;
-
-				// Trigger append diagrams event
-				appendDiagrams(id, [dropItem]);
+				// Trigger append selected diagrams event
+				appendSelectedDiagrams(id);
 			}
 		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[appendDiagrams, id],
+		[appendSelectedDiagrams, id],
 	);
 
 	// Use individual interaction hooks
