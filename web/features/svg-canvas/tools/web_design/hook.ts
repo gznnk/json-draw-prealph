@@ -22,7 +22,7 @@ import {
 import { groupShapesToolDefinition, useGroupShapesTool } from "../group_shapes";
 import WEB_DESIGN_INSTRUCTIONS from "./prompts/instructions.md?raw";
 
-export const useWebDesignTool = (eventBus: EventBus): ((targetId: string) => FunctionCallHandler) => {
+export const useWebDesignTool = (eventBus: EventBus): ((targetId: string, offsetX?: number, offsetY?: number) => FunctionCallHandler) => {
 	// 各ツールのhandlerをhookで生成
 	const appendRectangleShapeHandler = useAppendRectangleShapeTool(eventBus);
 	const appendCircleShapeHandler = useAppendCircleShapeTool(eventBus);
@@ -30,8 +30,8 @@ export const useWebDesignTool = (eventBus: EventBus): ((targetId: string) => Fun
 	const groupShapesHandler = useGroupShapesTool(eventBus);
 
 	// handler本体をuseMemoで生成
-	return useMemo<(targetId: string) => FunctionCallHandler>(() => {
-		return (targetId: string) => {
+	return useMemo<(targetId: string, offsetX?: number, offsetY?: number) => FunctionCallHandler>(() => {
+		return (targetId: string, offsetX = 0, offsetY = 0) => {
 			const WEB_DESIGN_TOOLS = [
 				appendRectangleShapeToolDefinition,
 				appendCircleShapeToolDefinition,
@@ -40,9 +40,9 @@ export const useWebDesignTool = (eventBus: EventBus): ((targetId: string) => Fun
 			];
 
 			const functionHandlerMap = {
-				append_rectangle_shape: appendRectangleShapeHandler(targetId),
-				append_circle_shape: appendCircleShapeHandler(targetId),
-				append_text_element: appendTextElementHandler(targetId),
+				append_rectangle_shape: appendRectangleShapeHandler(targetId, offsetX, offsetY),
+				append_circle_shape: appendCircleShapeHandler(targetId, offsetX, offsetY),
+				append_text_element: appendTextElementHandler(targetId, offsetX, offsetY),
 				group_shapes: groupShapesHandler,
 			};
 

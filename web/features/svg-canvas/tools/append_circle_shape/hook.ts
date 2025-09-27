@@ -10,11 +10,11 @@ import { createEllipseState } from "../../utils/shapes/ellipse/createEllipseStat
 
 export const useAppendCircleShapeTool = (
 	eventBus: EventBus,
-): ((targetId: string) => FunctionCallHandler) => {
+): ((targetId: string, offsetX?: number, offsetY?: number) => FunctionCallHandler) => {
 	const appendDiagrams = useAppendDiagramsWithBus(eventBus);
 
 	return useCallback(
-		(targetId: string) => {
+		(targetId: string, offsetX = 0, offsetY = 0) => {
 			return (functionCall: FunctionCallInfo) => {
 				const args = functionCall.arguments as {
 					cx: number;
@@ -34,8 +34,8 @@ export const useAppendCircleShapeTool = (
 					typeof args.fill === "string"
 				) {
 					const data = createEllipseState({
-						x: args.cx,
-						y: args.cy,
+						x: args.cx + offsetX,
+						y: args.cy + offsetY,
 						width: args.r * 2,
 						height: args.r * 2,
 						fill: args.fill,

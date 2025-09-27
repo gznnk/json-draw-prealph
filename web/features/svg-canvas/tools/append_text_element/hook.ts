@@ -10,11 +10,11 @@ import { createRectangleState } from "../../utils/shapes/rectangle/createRectang
 
 export const useAppendTextElementTool = (
 	eventBus: EventBus,
-): ((targetId: string) => FunctionCallHandler) => {
+): ((targetId: string, offsetX?: number, offsetY?: number) => FunctionCallHandler) => {
 	const appendDiagrams = useAppendDiagramsWithBus(eventBus);
 
 	return useCallback(
-		(targetId: string) => {
+		(targetId: string, offsetX = 0, offsetY = 0) => {
 			return (functionCall: FunctionCallInfo) => {
 				const args = functionCall.arguments as {
 					x: number;
@@ -40,9 +40,9 @@ export const useAppendTextElementTool = (
 					typeof args.fontSize === "number" &&
 					typeof args.fill === "string"
 				) {
-					// Convert top-left coordinates to center coordinates
-					const centerX = args.x + args.width / 2;
-					const centerY = args.y + args.height / 2;
+					// Convert top-left coordinates to center coordinates and apply offset
+					const centerX = args.x + args.width / 2 + offsetX;
+					const centerY = args.y + args.height / 2 + offsetY;
 
 					const data = createRectangleState({
 						x: centerX,
