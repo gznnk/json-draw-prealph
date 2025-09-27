@@ -11,6 +11,8 @@ export const CanvasFrameFeatures = {
 	cornerRoundable: false,
 	selectable: true,
 	connectable: true,
+	fillable: false,
+	strokable: false,
 } as const satisfies DiagramFeatures;
 
 /**

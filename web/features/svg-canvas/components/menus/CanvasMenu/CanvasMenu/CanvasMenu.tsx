@@ -294,6 +294,42 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({
 			>
 				VS
 			</CanvasMenuItem>
+			<CanvasMenuItem
+				onClick={() =>
+					onAddDiagramByType?.({
+						eventId: newEventId(),
+						diagramType: "CanvasFrame",
+						isSelected: true,
+					})
+				}
+			>
+				<svg width="20" height="20" viewBox="0 0 24 24">
+					<title>Add Canvas Frame</title>
+					<rect
+						x="2"
+						y="2"
+						width="20"
+						height="20"
+						rx="2"
+						ry="2"
+						fill="none"
+						stroke="#D0D4E0"
+						strokeWidth="2"
+					/>
+					<rect
+						x="5"
+						y="5"
+						width="14"
+						height="14"
+						rx="1"
+						ry="1"
+						fill="none"
+						stroke="#D0D4E0"
+						strokeWidth="1"
+						strokeDasharray="2,2"
+					/>
+				</svg>
+			</CanvasMenuItem>
 		</CanvasMenuDiv>
 	);
 };

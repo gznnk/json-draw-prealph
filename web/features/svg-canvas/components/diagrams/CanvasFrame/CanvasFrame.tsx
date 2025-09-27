@@ -1,5 +1,12 @@
 import React, { memo } from "react";
 
+import { CanvasFrameElement } from "./CanvasFrameStyled";
+import {
+	BACKGROUND_COLOR,
+	BORDER_COLOR,
+	BORDER_WIDTH,
+	CORNER_RADIUS,
+} from "../../../constants/styling/diagrams/CanvasFrameStyling";
 import { DiagramRegistry } from "../../../registry";
 import type { DiagramData } from "../../../types/data/core/DiagramData";
 import type { CanvasFrameProps } from "../../../types/props/diagrams/CanvasFrameProps";
@@ -30,6 +37,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	showOutline = false,
 	showTransformControls = false,
 	isTransforming = false,
+	isTransparent,
 	onDrag,
 	onClick,
 	onSelect,
@@ -77,6 +85,18 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 
 	return (
 		<>
+			<CanvasFrameElement
+				x={x - width / 2}
+				y={y - height / 2}
+				width={width}
+				height={height}
+				rx={CORNER_RADIUS}
+				ry={CORNER_RADIUS}
+				fill={BACKGROUND_COLOR}
+				stroke={BORDER_COLOR}
+				strokeWidth={BORDER_WIDTH}
+				isTransparent={isTransparent}
+			/>
 			{children}
 			<Outline
 				x={x}

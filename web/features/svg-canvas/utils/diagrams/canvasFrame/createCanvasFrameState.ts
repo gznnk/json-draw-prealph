@@ -1,3 +1,4 @@
+import { CanvasFrameDefaultData } from "../../../constants/data/diagrams/CanvasFrameDefaultData";
 import { CanvasFrameDefaultState } from "../../../constants/state/diagrams/CanvasFrameDefaultState";
 import type { CanvasFrameState } from "../../../types/state/diagrams/CanvasFrameState";
 import { newId } from "../../shapes/common/newId";
@@ -9,8 +10,8 @@ import { createRectangleConnectPoint } from "../../shapes/rectangle/createRectan
 export const createCanvasFrameState = ({
 	x,
 	y,
-	width = 300,
-	height = 200,
+	width = CanvasFrameDefaultData.width,
+	height = CanvasFrameDefaultData.height,
 	rotation = 0,
 	scaleX = 1,
 	scaleY = 1,

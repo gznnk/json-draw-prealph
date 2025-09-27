@@ -9,5 +9,10 @@ import { CreateDefaultData } from "../shapes/CreateDefaultData";
 export const CanvasFrameDefaultData = CreateDefaultData<CanvasFrameData>({
 	type: "CanvasFrame",
 	options: CanvasFrameFeatures,
-	properties: {},
+	properties: {
+		width: 500,
+		height: 500,
+		minWidth: 500,
+		mihHeight: 500,
+	},
 });
