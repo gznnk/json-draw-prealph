@@ -13,6 +13,6 @@ export const CanvasFrameDefaultData = CreateDefaultData<CanvasFrameData>({
 		width: 500,
 		height: 500,
 		minWidth: 500,
-		mihHeight: 500,
+		minHeight: 500,
 	},
 });

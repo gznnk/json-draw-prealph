@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useMemo, useRef } from "react";
 
 import { CanvasFrameElement } from "./CanvasFrameStyled";
 import {
@@ -7,9 +7,16 @@ import {
 	BORDER_WIDTH,
 	CORNER_RADIUS,
 } from "../../../constants/styling/diagrams/CanvasFrameStyling";
+import { useClick } from "../../../hooks/useClick";
+import { useDrag } from "../../../hooks/useDrag";
+import { useHover } from "../../../hooks/useHover";
+import { useSelect } from "../../../hooks/useSelect";
 import { DiagramRegistry } from "../../../registry";
 import type { DiagramData } from "../../../types/data/core/DiagramData";
 import type { CanvasFrameProps } from "../../../types/props/diagrams/CanvasFrameProps";
+import { mergeProps } from "../../../utils/core/mergeProps";
+import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 import { Outline } from "../../core/Outline";
 import { PositionLabel } from "../../core/PositionLabel";
 import { Transformative } from "../../core/Transformative";
@@ -24,11 +31,14 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	y,
 	width,
 	height,
+	minWidth,
+	minHeight,
 	rotation,
 	scaleX,
 	scaleY,
 	keepProportion,
 	isSelected,
+	isAncestorSelected,
 	items,
 	connectPoints,
 	showConnectPoints = false,
@@ -51,6 +61,74 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	onTextChange,
 	onExecute,
 }) => {
+	// Reference to the SVG element for interaction
+	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
+
+	// Use individual interaction hooks
+	const dragProps = useDrag({
+		id,
+		type: "CanvasFrame",
+		x,
+		y,
+		ref: svgRef,
+		onDrag,
+		onDragOver,
+		onDragLeave,
+	});
+
+	const clickProps = useClick({
+		id,
+		x,
+		y,
+		isSelected,
+		isAncestorSelected,
+		ref: svgRef,
+		onClick,
+	});
+
+	const selectProps = useSelect({
+		id,
+		onSelect,
+	});
+
+	const hoverProps = useHover({
+		id,
+		onHoverChange,
+	});
+
+	// Compose props for the background element using mergeProps
+	const composedProps = mergeProps(
+		dragProps,
+		clickProps,
+		selectProps,
+		hoverProps,
+	);
+
+	// Generate rect transform attribute
+	const transform = createSvgTransform(
+		scaleX,
+		scaleY,
+		degreesToRadians(rotation),
+		x,
+		y,
+	);
+
+	// Suppress ConnectPoint re-rendering by memoization
+	// If separated by key and passed as individual props, each ConnectPoint side
+	// performs comparison processing for each key which is inefficient, so detect Shape differences collectively here
+	const ownerFrame = useMemo(
+		() => ({
+			x,
+			y,
+			width,
+			height,
+			rotation,
+			scaleX,
+			scaleY,
+		}),
+		[x, y, width, height, rotation, scaleX, scaleY],
+	);
+
 	// Create shapes within the canvas frame
 	const children = items.map((item: DiagramData) => {
 		// Ensure that item.type is of DiagramType
@@ -86,8 +164,9 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	return (
 		<>
 			<CanvasFrameElement
-				x={x - width / 2}
-				y={y - height / 2}
+				id={id}
+				x={-width / 2}
+				y={-height / 2}
 				width={width}
 				height={height}
 				rx={CORNER_RADIUS}
@@ -96,6 +175,11 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 				stroke={BORDER_COLOR}
 				strokeWidth={BORDER_WIDTH}
 				isTransparent={isTransparent}
+				tabIndex={0}
+				cursor="move"
+				transform={transform}
+				ref={svgRef}
+				{...composedProps}
 			/>
 			{children}
 			<Outline
@@ -116,6 +200,8 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 					y={y}
 					width={width}
 					height={height}
+					minWidth={minWidth}
+					minHeight={minHeight}
 					rotation={rotation}
 					scaleX={scaleX}
 					scaleY={scaleY}
@@ -128,7 +214,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 			{connectPoints && (
 				<ConnectPoints
 					ownerId={id}
-					ownerFrame={{ x, y, width, height, rotation, scaleX, scaleY }}
+					ownerFrame={ownerFrame}
 					connectPoints={connectPoints}
 					showConnectPoints={showConnectPoints}
 					shouldRender={!isDragging && !isTransforming && !isSelected}
