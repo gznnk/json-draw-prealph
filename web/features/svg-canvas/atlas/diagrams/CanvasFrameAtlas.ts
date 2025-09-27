@@ -8,11 +8,11 @@ import type { CanvasFrameState } from "../../types/state/diagrams/CanvasFrameSta
 import { createCanvasFrameState } from "../../utils/diagrams/canvasFrame/createCanvasFrameState";
 import { mapCanvasFrameDataToState } from "../../utils/diagrams/canvasFrame/mapCanvasFrameDataToState";
 import { canvasFrameStateToData } from "../../utils/diagrams/canvasFrame/mapCanvasFrameStateToData";
+import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
 import {
 	type DiagramAtlas,
 	type DataToStateMapper,
 	type StateToDataMapper,
-	dummyImplementation,
 } from "../DiagramAtlas";
 
 /**
@@ -62,7 +62,7 @@ export const CanvasFrameAtlas: CanvasFrameAtlas = {
 
 	createState: createCanvasFrameState,
 	export: undefined,
-	calcConnectPointPosition: dummyImplementation,
+	calcConnectPointPosition: calcRectangleConnectPointPosition,
 	transformItems: undefined,
 	dataToState: mapCanvasFrameDataToState as DataToStateMapper,
 	stateToData: canvasFrameStateToData as StateToDataMapper,

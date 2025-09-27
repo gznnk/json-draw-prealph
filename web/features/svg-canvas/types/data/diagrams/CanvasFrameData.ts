@@ -10,6 +10,7 @@ export const CanvasFrameFeatures = {
 	itemable: true,
 	cornerRoundable: false,
 	selectable: true,
+	connectable: true,
 } as const satisfies DiagramFeatures;
 
 /**

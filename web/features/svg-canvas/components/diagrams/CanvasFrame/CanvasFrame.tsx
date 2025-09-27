@@ -6,6 +6,7 @@ import type { CanvasFrameProps } from "../../../types/props/diagrams/CanvasFrame
 import { Outline } from "../../core/Outline";
 import { PositionLabel } from "../../core/PositionLabel";
 import { Transformative } from "../../core/Transformative";
+import { ConnectPoints } from "../../shapes/ConnectPoints";
 
 /**
  * CanvasFrame component.
@@ -22,6 +23,9 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	keepProportion,
 	isSelected,
 	items,
+	connectPoints,
+	showConnectPoints = false,
+	connectEnabled = true,
 	isDragging = false,
 	showOutline = false,
 	showTransformControls = false,
@@ -99,6 +103,18 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 					showTransformControls={showTransformControls}
 					isTransforming={isTransforming}
 					onTransform={onTransform}
+				/>
+			)}
+			{connectPoints && (
+				<ConnectPoints
+					ownerId={id}
+					ownerFrame={{ x, y, width, height, rotation, scaleX, scaleY }}
+					connectPoints={connectPoints}
+					showConnectPoints={showConnectPoints}
+					shouldRender={!isDragging && !isTransforming && !isSelected}
+					connectEnabled={connectEnabled}
+					onConnect={onConnect}
+					onPreviewConnectLine={onPreviewConnectLine}
 				/>
 			)}
 			{isSelected && isDragging && (

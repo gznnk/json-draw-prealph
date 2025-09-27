@@ -7,5 +7,7 @@ export const CanvasFrameDefaultState = CreateDefaultState<CanvasFrameState>({
 	type: "CanvasFrame",
 	options: CanvasFrameFeatures,
 	baseData: CanvasFrameDefaultData,
-	properties: {},
+	properties: {
+		itemableType: "concrete",
+	},
 });
