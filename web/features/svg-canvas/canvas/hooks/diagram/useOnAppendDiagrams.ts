@@ -2,11 +2,8 @@ import { useEffect, useRef } from "react";
 
 import { APPEND_DIAGRAMS_EVENT_NAME } from "../../../constants/core/EventNames";
 import type { AppendDiagramsEvent } from "../../../types/events/AppendDiagramsEvent";
+import { adjustTargetDiagramSize } from "../../../utils/core/adjustTargetDiagramSize";
 import { getDiagramById } from "../../../utils/core/getDiagramById";
-import { calcDiagramBoundingBox } from "../../../utils/math/geometry/calcDiagramBoundingBox";
-import { calcDiagramsBoundingBox } from "../../../utils/math/geometry/calcDiagramsBoundingBox";
-import { isFrame } from "../../../utils/validation/isFrame";
-import { isItemableState } from "../../../utils/validation/isItemableState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 import { appendDiagrams } from "../../utils/appendDiagrams";
 import { cleanupGroups } from "../../utils/cleanupGroups";
@@ -64,56 +61,11 @@ export const useOnAppendDiagrams = (props: SvgCanvasSubHooksProps) => {
 				let diagramsAppendedItems = appendDiagrams(diagramsRemovedItems, event.targetId, event.diagrams);
 
 				// 4. Adjust target diagram size if appended diagrams extend beyond bounds
-				if (isFrame(targetDiagram)) {
-					const updatedTargetDiagram = getDiagramById(diagramsAppendedItems, event.targetId);
-					if (updatedTargetDiagram && isFrame(updatedTargetDiagram) &&
-						isItemableState(updatedTargetDiagram) && updatedTargetDiagram.items) {
-
-						// Calculate current target diagram bounds
-						const targetBounds = calcDiagramBoundingBox(targetDiagram);
-
-						// Calculate bounds of all items inside target diagram
-						const childrenBounds = calcDiagramsBoundingBox(updatedTargetDiagram.items);
-
-						if (childrenBounds) {
-							// Check if children extend beyond target bounds
-							const needsResize =
-								childrenBounds.left < targetBounds.left ||
-								childrenBounds.right > targetBounds.right ||
-								childrenBounds.top < targetBounds.top ||
-								childrenBounds.bottom > targetBounds.bottom;
-
-							if (needsResize) {
-								// Calculate new bounds that contain all children with some padding
-								const padding = 20;
-								const newLeft = Math.min(targetBounds.left, childrenBounds.left - padding);
-								const newTop = Math.min(targetBounds.top, childrenBounds.top - padding);
-								const newRight = Math.max(targetBounds.right, childrenBounds.right + padding);
-								const newBottom = Math.max(targetBounds.bottom, childrenBounds.bottom + padding);
-
-								// Calculate new center, width, and height
-								const newCenterX = (newLeft + newRight) / 2;
-								const newCenterY = (newTop + newBottom) / 2;
-								const newWidth = newRight - newLeft;
-								const newHeight = newBottom - newTop;
-
-								// Update target diagram with new dimensions
-								diagramsAppendedItems = diagramsAppendedItems.map(item => {
-									if (item.id === event.targetId) {
-										return {
-											...item,
-											x: newCenterX,
-											y: newCenterY,
-											width: newWidth,
-											height: newHeight,
-										};
-									}
-									return item;
-								});
-							}
-						}
-					}
-				}
+				diagramsAppendedItems = adjustTargetDiagramSize(
+					diagramsAppendedItems,
+					event.targetId,
+					targetDiagram,
+				);
 
 				// 5. Clean up empty groups
 				const groupsCleanedUpItems = cleanupGroups(diagramsAppendedItems);
