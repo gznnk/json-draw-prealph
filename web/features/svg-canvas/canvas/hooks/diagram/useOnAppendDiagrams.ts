@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 
-import { ADD_DIAGRAMS_TO_FRAME_EVENT_NAME } from "../../../constants/core/EventNames";
-import type { AddDiagramsToFrameEvent } from "../../../types/events/AddDiagramsToFrameEvent";
+import { APPEND_DIAGRAMS_EVENT_NAME } from "../../../constants/core/EventNames";
+import type { AppendDiagramsEvent } from "../../../types/events/AppendDiagramsEvent";
 import { getDiagramById } from "../../../utils/core/getDiagramById";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
-import { appendDiagramsToFrame } from "../../utils/appendDiagramsToFrame";
+import { appendDiagrams } from "../../utils/appendDiagrams";
 import { cleanupGroups } from "../../utils/cleanupGroups";
 import { removeDiagramsById } from "../../utils/removeDiagramsById";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
@@ -12,10 +12,10 @@ import { useAddHistory } from "../history/useAddHistory";
 
 
 /**
- * Custom hook to handle AddDiagramsToFrameEvent on the canvas.
+ * Custom hook to handle AppendDiagramsEvent on the canvas.
  * Listens for the event and updates the canvas state accordingly.
  */
-export const useOnAddDiagramsToFrame = (props: SvgCanvasSubHooksProps) => {
+export const useOnAppendDiagrams = (props: SvgCanvasSubHooksProps) => {
 	// Get the data change handler
 	const addHistory = useAddHistory(props);
 
@@ -31,15 +31,15 @@ export const useOnAddDiagramsToFrame = (props: SvgCanvasSubHooksProps) => {
 		// Bypass references to avoid function creation in every render
 		const { eventBus } = refBus.current.props;
 
-		// Listener for AddDiagramsToFrameEvent
-		const addDiagramsToFrameListener = (e: Event) => {
+		// Listener for AppendDiagramsEvent
+		const appendDiagramsListener = (e: Event) => {
 			// Bypass references to avoid function creation in every render
 			const {
 				props: { setCanvasState },
 				addHistory,
 			} = refBus.current;
 
-			const event = (e as CustomEvent<AddDiagramsToFrameEvent>).detail;
+			const event = (e as CustomEvent<AppendDiagramsEvent>).detail;
 
 			// Update the canvas state
 			setCanvasState((prevState) => {
@@ -57,7 +57,7 @@ export const useOnAddDiagramsToFrame = (props: SvgCanvasSubHooksProps) => {
 				const diagramsRemovedItems = removeDiagramsById(prevState.items, diagramIds);
 
 				// 3. Append diagrams to target frame
-				const diagramsAppendedItems = appendDiagramsToFrame(diagramsRemovedItems, event.targetFrameId, event.diagrams);
+				const diagramsAppendedItems = appendDiagrams(diagramsRemovedItems, event.targetFrameId, event.diagrams);
 
 				// 4. Clean up empty groups
 				const groupsCleanedUpItems = cleanupGroups(diagramsAppendedItems);
@@ -79,13 +79,13 @@ export const useOnAddDiagramsToFrame = (props: SvgCanvasSubHooksProps) => {
 		};
 
 		// Add the event listener
-		eventBus.addEventListener(ADD_DIAGRAMS_TO_FRAME_EVENT_NAME, addDiagramsToFrameListener);
+		eventBus.addEventListener(APPEND_DIAGRAMS_EVENT_NAME, appendDiagramsListener);
 
 		// Cleanup the event listener on component unmount
 		return () => {
 			eventBus.removeEventListener(
-				ADD_DIAGRAMS_TO_FRAME_EVENT_NAME,
-				addDiagramsToFrameListener,
+				APPEND_DIAGRAMS_EVENT_NAME,
+				appendDiagramsListener,
 			);
 		};
 	}, []);

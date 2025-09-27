@@ -9,7 +9,7 @@ import { isItemableState } from "../../utils/validation/isItemableState";
  * @param diagramsToAppend - Array of diagrams to append
  * @returns New array with diagrams appended to the target frame
  */
-export const appendDiagramsToFrame = (
+export const appendDiagrams = (
 	diagrams: Diagram[],
 	targetFrameId: string,
 	diagramsToAppend: Diagram[]
@@ -27,7 +27,7 @@ export const appendDiagramsToFrame = (
 
 		// If this item has children, recursively process them
 		if (isItemableState(item) && item.items) {
-			const updatedItems = appendDiagramsToFrame(item.items, targetFrameId, diagramsToAppend);
+			const updatedItems = appendDiagrams(item.items, targetFrameId, diagramsToAppend);
 			if (updatedItems !== item.items) {
 				isChanged = true;
 				return {
