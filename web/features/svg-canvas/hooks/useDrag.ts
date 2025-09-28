@@ -543,6 +543,7 @@ export const useDrag = (props: DragProps) => {
 				};
 
 				if (
+					customEvent.detail.type !== undefined &&
 					customEvent.detail.id !== id &&
 					isPointerOver(
 						ref,
