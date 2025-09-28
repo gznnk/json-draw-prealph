@@ -1,101 +1,100 @@
 import { useMemo } from "react";
 
-import type { EventBus } from "../../../../shared/event-bus/EventBus";
+import WEB_DESIGN_INSTRUCTIONS from "./prompts/instructions.md?raw";
 import { LLMClientFactory } from "../../../../shared/llm-client";
 import type {
 	FunctionCallHandler,
 	FunctionCallInfo,
 } from "../../../../shared/llm-client/types";
 import { OpenAiKeyManager } from "../../../../utils/KeyManager";
+import type { Diagram } from "../../types/state/core/Diagram";
 import {
-	appendCircleShapeToolDefinition,
-	useAppendCircleShapeTool,
-} from "../append_circle_shape";
+	circleShapeWithHandlerToolDefinition,
+	useAddCircleShapeWithHandlerTool,
+} from "../add_circle_shape_with_handler";
 import {
-	appendRectangleShapeToolDefinition,
-	useAppendRectangleShapeTool,
-} from "../append_rectangle_shape";
+	rectangleShapeWithHandlerToolDefinition,
+	useAddRectangleShapeWithHandlerTool,
+} from "../add_rectangle_shape_with_handler";
 import {
-	appendTextElementToolDefinition,
-	useAppendTextElementTool,
-} from "../append_text_element";
-import { groupShapesToolDefinition, useGroupShapesTool } from "../group_shapes";
-import WEB_DESIGN_INSTRUCTIONS from "./prompts/instructions.md?raw";
+	textElementWithHandlerToolDefinition,
+	useAddTextElementWithHandlerTool,
+} from "../add_text_element_with_handler";
 
-export const useWebDesignTool = (eventBus: EventBus): ((targetId: string, offsetX?: number, offsetY?: number) => FunctionCallHandler) => {
-	// 各ツールのhandlerをhookで生成
-	const appendRectangleShapeHandler = useAppendRectangleShapeTool(eventBus);
-	const appendCircleShapeHandler = useAppendCircleShapeTool(eventBus);
-	const appendTextElementHandler = useAppendTextElementTool(eventBus);
-	const groupShapesHandler = useGroupShapesTool(eventBus);
+type ShapeHandler = (diagram: Diagram) => void;
+
+export const useWebDesignTool = (): ((
+	shapeHandler: ShapeHandler,
+) => FunctionCallHandler) => {
+	// 各_with_handlerツールを取得
+	const rectangleShapeWithHandlerTool = useAddRectangleShapeWithHandlerTool();
+	const circleShapeWithHandlerTool = useAddCircleShapeWithHandlerTool();
+	const textElementWithHandlerTool = useAddTextElementWithHandlerTool();
 
 	// handler本体をuseMemoで生成
-	return useMemo<(targetId: string, offsetX?: number, offsetY?: number) => FunctionCallHandler>(() => {
-		return (targetId: string, offsetX = 0, offsetY = 0) => {
+	return useMemo<(shapeHandler: ShapeHandler) => FunctionCallHandler>(() => {
+		return (shapeHandler: ShapeHandler) => {
 			const WEB_DESIGN_TOOLS = [
-				appendRectangleShapeToolDefinition,
-				appendCircleShapeToolDefinition,
-				appendTextElementToolDefinition,
-				groupShapesToolDefinition,
+				rectangleShapeWithHandlerToolDefinition,
+				circleShapeWithHandlerToolDefinition,
+				textElementWithHandlerToolDefinition,
 			];
 
 			const functionHandlerMap = {
-				append_rectangle_shape: appendRectangleShapeHandler(targetId, offsetX, offsetY),
-				append_circle_shape: appendCircleShapeHandler(targetId, offsetX, offsetY),
-				append_text_element: appendTextElementHandler(targetId, offsetX, offsetY),
-				group_shapes: groupShapesHandler,
+				add_rectangle_shape: rectangleShapeWithHandlerTool(shapeHandler),
+				add_circle_shape: circleShapeWithHandlerTool(shapeHandler),
+				add_text_element: textElementWithHandlerTool(shapeHandler),
 			};
 
-		const handler: FunctionCallHandler = async (
-			functionCall: FunctionCallInfo,
-		) => {
-			const args = functionCall.arguments as { design_request: string };
-			if (typeof args.design_request === "string") {
-				const storedApiKey = OpenAiKeyManager.loadKey();
-				if (!storedApiKey)
-					return { success: false, content: "API key not found." };
+			const handler: FunctionCallHandler = async (
+				functionCall: FunctionCallInfo,
+			) => {
+				const args = functionCall.arguments as { design_request: string };
+				if (typeof args.design_request === "string") {
+					const storedApiKey = OpenAiKeyManager.loadKey();
+					if (!storedApiKey)
+						return { success: false, content: "API key not found." };
 
-				let outputContent = "";
-				try {
-					const llmClient = LLMClientFactory.createClient(storedApiKey, {
-						tools: WEB_DESIGN_TOOLS,
-						systemPrompt: WEB_DESIGN_INSTRUCTIONS,
-						functionHandlers: functionHandlerMap,
-						maxAttempts: 500,
-					});
+					let outputContent = "";
+					try {
+						const llmClient = LLMClientFactory.createClient(storedApiKey, {
+							tools: WEB_DESIGN_TOOLS,
+							systemPrompt: WEB_DESIGN_INSTRUCTIONS,
+							functionHandlers: functionHandlerMap,
+							maxAttempts: 500,
+						});
 
-					const userMessage = `${args.design_request}\n\nCreate the web page design using the available tools. Start with background elements and work your way up to text elements for proper layering.`;
+						const userMessage = `${args.design_request}\n\nCreate the web page design using the available tools. Start with background elements and work your way up to text elements for proper layering.`;
 
-					await llmClient.chat({
-						message: userMessage,
-						onTextChunk: (textChunk: string) => {
-							outputContent += textChunk;
-						},
-					});
+						await llmClient.chat({
+							message: userMessage,
+							onTextChunk: (textChunk: string) => {
+								outputContent += textChunk;
+							},
+						});
 
-					return {
-						success: true,
-						content: outputContent || "Web design creation completed.",
-					};
-				} catch (error) {
-					console.error("Error in web design agent:", error);
-					return {
-						success: false,
-						content: "Error creating web design.",
-					};
+						return {
+							success: true,
+							content: outputContent || "Web design creation completed.",
+						};
+					} catch (error) {
+						console.error("Error in web design agent:", error);
+						return {
+							success: false,
+							content: "Error creating web design.",
+						};
+					}
 				}
-			}
-			return {
-				success: false,
-				content: "Invalid arguments: design_request is required.",
+				return {
+					success: false,
+					content: "Invalid arguments: design_request is required.",
+				};
 			};
-		};
 			return handler;
 		};
 	}, [
-		appendRectangleShapeHandler,
-		appendCircleShapeHandler,
-		appendTextElementHandler,
-		groupShapesHandler,
+		rectangleShapeWithHandlerTool,
+		circleShapeWithHandlerTool,
+		textElementWithHandlerTool,
 	]);
 };

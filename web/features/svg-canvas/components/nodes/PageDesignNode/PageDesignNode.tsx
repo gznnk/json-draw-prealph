@@ -2,15 +2,11 @@ import type React from "react";
 import { memo, useState } from "react";
 
 import { RectangleDefaultState } from "../../../constants/state/shapes/RectangleDefaultState";
-import { useEventBus } from "../../../context/EventBusContext";
-import { useConnectedDiagrams } from "../../../hooks/useConnectedDiagrams";
-import { useDiagramById } from "../../../hooks/useDiagramById";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 import { useWebDesignTool } from "../../../tools/web_design";
 import type { PageDesignNodeProps } from "../../../types/props/nodes/PageDesignNodeProps";
+import type { Diagram } from "../../../types/state/core/Diagram";
 import { isPlainTextPayload } from "../../../utils/execution/isPlainTextPayload";
-import { calcDiagramBoundingBox } from "../../../utils/math/geometry/calcDiagramBoundingBox";
-import { isFrame } from "../../../utils/validation/isFrame";
 import { IconContainer } from "../../core/IconContainer";
 import { PageDesign } from "../../icons/PageDesign";
 import { Rectangle } from "../../shapes/Rectangle";
@@ -20,26 +16,7 @@ import { Rectangle } from "../../shapes/Rectangle";
  */
 const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 	const [isProcessing, setIsProcessing] = useState(false);
-	const eventBus = useEventBus();
-	const connectedDiagrams = useConnectedDiagrams(props.id);
-	const webDesignHandler = useWebDesignTool(eventBus);
-
-	// Find the first CanvasFrame type diagram
-	const canvasFrame = connectedDiagrams.find(
-		(diagram) => diagram.type === "CanvasFrame",
-	);
-	const targetId = canvasFrame?.id;
-	const targetDiagram = useDiagramById(targetId);
-
-	// Calculate offset values based on target diagram bounding box
-	let offsetX = 0;
-	let offsetY = 0;
-	if (targetDiagram && isFrame(targetDiagram)) {
-		const boundingBox = calcDiagramBoundingBox(targetDiagram);
-		// Use the top-left corner of the bounding box as offset
-		offsetX = boundingBox.left;
-		offsetY = boundingBox.top;
-	}
+	const webDesignHandler = useWebDesignTool();
 
 	useExecutionChain({
 		id: props.id,
@@ -50,6 +27,7 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 			if (e.eventPhase !== "Ended") return;
 
 			setIsProcessing(true);
+
 			props.onExecute?.({
 				id: props.id,
 				eventId: e.eventId,
@@ -64,30 +42,24 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 			});
 
 			try {
-				if (!targetId) {
-					throw new Error("No CanvasFrame connected to PageDesignNode");
-				}
+				// Create shape handler that sends each shape immediately via onExecute
+				const shapeHandler = (diagram: Diagram) => {
+					// Send each generated shape immediately via onExecute
+					props.onExecute?.({
+						id: props.id,
+						eventId: e.eventId,
+						eventPhase: "Ended",
+						payload: {
+							format: "object",
+							data: diagram,
+						},
+					});
+				};
 
-				const result = await webDesignHandler(
-					targetId,
-					offsetX,
-					offsetY,
-				)({
+				await webDesignHandler(shapeHandler)({
 					name: "web_design",
 					arguments: { design_request: textData },
 					callId: e.eventId,
-				});
-				props.onExecute?.({
-					id: props.id,
-					eventId: e.eventId,
-					eventPhase: "Ended",
-					payload: {
-						format: "text",
-						data: typeof result?.content === "string" ? result.content : "",
-						metadata: {
-							contentType: "plain",
-						},
-					},
 				});
 			} catch (error) {
 				console.error("Error in PageDesignNode web design:", error);
