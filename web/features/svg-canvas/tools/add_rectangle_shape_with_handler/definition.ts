@@ -1,7 +1,7 @@
 import type { ToolDefinition } from "../../../../shared/llm-client/types";
 
 /**
- * Description text for the add_rectangle_shape_with_handler tool.
+ * Description text for the add_rectangle_shape tool.
  * Explains the purpose and behavior of the rectangle shape.
  */
 const TOOL_DESCRIPTION = `
