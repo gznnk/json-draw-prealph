@@ -2,15 +2,14 @@ import { useEffect, useRef } from "react";
 
 import { APPEND_DIAGRAMS_EVENT_NAME } from "../../../constants/core/EventNames";
 import type { AppendDiagramsEvent } from "../../../types/events/AppendDiagramsEvent";
-import { adjustTargetDiagramSize } from "../../../utils/core/adjustTargetDiagramSize";
 import { getDiagramById } from "../../../utils/core/getDiagramById";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+import { adjustTargetDiagramSize } from "../../utils/adjustTargetDiagramSize";
 import { appendDiagrams } from "../../utils/appendDiagrams";
 import { cleanupGroups } from "../../utils/cleanupGroups";
 import { removeDiagramsById } from "../../utils/removeDiagramsById";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 import { useAddHistory } from "../history/useAddHistory";
-
 
 /**
  * Custom hook to handle AppendDiagramsEvent on the canvas.
@@ -52,23 +51,32 @@ export const useOnAppendDiagrams = (props: SvgCanvasSubHooksProps) => {
 				}
 
 				// Extract IDs of diagrams to move
-				const diagramIds = event.diagrams.map(diagram => diagram.id);
+				const diagramIds = event.diagrams.map((diagram) => diagram.id);
 
 				// 2. Remove source diagrams from their current locations
-				const diagramsRemovedItems = removeDiagramsById(prevState.items, diagramIds);
+				const diagramsRemovedItems = removeDiagramsById(
+					prevState.items,
+					diagramIds,
+				);
 
 				// 3. Append diagrams to target diagram
-				let diagramsAppendedItems = appendDiagrams(diagramsRemovedItems, event.targetId, event.diagrams);
+				const diagramsAppendedItems = appendDiagrams(
+					diagramsRemovedItems,
+					event.targetId,
+					event.diagrams,
+				);
 
 				// 4. Adjust target diagram size if appended diagrams extend beyond bounds
-				diagramsAppendedItems = adjustTargetDiagramSize(
+				const targetDiagramSizeAdjustedItems = adjustTargetDiagramSize(
 					diagramsAppendedItems,
 					event.targetId,
 					targetDiagram,
 				);
 
 				// 5. Clean up empty groups
-				const groupsCleanedUpItems = cleanupGroups(diagramsAppendedItems);
+				const groupsCleanedUpItems = cleanupGroups(
+					targetDiagramSizeAdjustedItems,
+				);
 
 				// Update outlines
 				const updatedItems = updateOutlineOfAllItemables(groupsCleanedUpItems);
@@ -87,7 +95,10 @@ export const useOnAppendDiagrams = (props: SvgCanvasSubHooksProps) => {
 		};
 
 		// Add the event listener
-		eventBus.addEventListener(APPEND_DIAGRAMS_EVENT_NAME, appendDiagramsListener);
+		eventBus.addEventListener(
+			APPEND_DIAGRAMS_EVENT_NAME,
+			appendDiagramsListener,
+		);
 
 		// Cleanup the event listener on component unmount
 		return () => {

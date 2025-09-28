@@ -1,9 +1,9 @@
-import { getDiagramById } from "./getDiagramById";
 import type { Diagram } from "../../types/state/core/Diagram";
-import { calcDiagramBoundingBox } from "../math/geometry/calcDiagramBoundingBox";
-import { calcDiagramsBoundingBox } from "../math/geometry/calcDiagramsBoundingBox";
-import { isFrame } from "../validation/isFrame";
-import { isItemableState } from "../validation/isItemableState";
+import { getDiagramById } from "../../utils/core/getDiagramById";
+import { calcDiagramBoundingBox } from "../../utils/math/geometry/calcDiagramBoundingBox";
+import { calcDiagramsBoundingBox } from "../../utils/math/geometry/calcDiagramsBoundingBox";
+import { isFrame } from "../../utils/validation/isFrame";
+import { isItemableState } from "../../utils/validation/isItemableState";
 
 /**
  * Options for adjusting target diagram size
