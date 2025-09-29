@@ -4,11 +4,13 @@ import { APPEND_DIAGRAMS_EVENT_NAME } from "../../../constants/core/EventNames";
 import type { AppendDiagramsEvent } from "../../../types/events/AppendDiagramsEvent";
 import { getDiagramById } from "../../../utils/core/getDiagramById";
 import { transformRelativeToAbsoluteCoordinates } from "../../../utils/math/transform/transformRelativeToAbsoluteCoordinates";
+import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 import { adjustTargetDiagramSize } from "../../utils/adjustTargetDiagramSize";
 import { appendDiagrams } from "../../utils/appendDiagrams";
 import { cleanupGroups } from "../../utils/cleanupGroups";
 import { removeDiagramsById } from "../../utils/removeDiagramsById";
+import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 import { useAddHistory } from "../history/useAddHistory";
 
@@ -79,9 +81,19 @@ export const useOnAppendDiagrams = (props: SvgCanvasSubHooksProps) => {
 					targetDiagram,
 				);
 
-				// 6. Clean up empty groups
+				// 6. Update connect points for the resized target diagram
+				const targetAfterResize = getDiagramById(targetDiagramSizeAdjustedItems, event.targetId);
+				let connectPointsUpdatedItems = targetDiagramSizeAdjustedItems;
+				if (targetAfterResize) {
+					const updatedTarget = updateDiagramConnectPoints(targetAfterResize);
+					connectPointsUpdatedItems = targetDiagramSizeAdjustedItems.map(item =>
+						item.id === event.targetId ? updatedTarget : item
+					);
+				}
+
+				// 7. Clean up empty groups
 				const groupsCleanedUpItems = cleanupGroups(
-					targetDiagramSizeAdjustedItems,
+					connectPointsUpdatedItems,
 				);
 
 				// Update outlines
@@ -92,6 +104,15 @@ export const useOnAppendDiagrams = (props: SvgCanvasSubHooksProps) => {
 					...prevState,
 					items: updatedItems,
 				};
+
+				// 8. Refresh connect lines if target diagram was resized
+				if (targetAfterResize) {
+					newState = refreshConnectLines(
+						[targetAfterResize],
+						newState,
+						prevState,
+					);
+				}
 
 				// Add history
 				newState = addHistory(event.eventId, newState);
