@@ -10,4 +10,8 @@ export const StickyDefaultState: StickyState = CreateDefaultState<StickyState>({
 	type: "Sticky",
 	options: StickyFeatures,
 	baseData: StickyDefaultData,
+	properties: {
+		minWidth: 80,
+		minHeight: 60,
+	},
 });

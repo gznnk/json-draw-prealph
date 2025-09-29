@@ -20,7 +20,7 @@ export function CreateDefaultState<T>(config: {
 	type: DiagramType;
 	options: DiagramFeatures;
 	baseData: Record<string, unknown>;
-	properties?: Record<string, unknown>;
+	properties?: Partial<T>;
 }): T {
 	const { type, options, baseData, properties } = config;
 
