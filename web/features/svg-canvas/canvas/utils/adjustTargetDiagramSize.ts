@@ -46,8 +46,8 @@ export const adjustTargetDiagramSize = (
 		return diagrams;
 	}
 
-	// Calculate bounds of all items inside target diagram in the target's coordinate system
-	// This accounts for the target's rotation and scale transformations
+	// Step 1: Calculate children bounds in unrotated space
+	// calcUnrotatedItemableBoundingBox already handles the rotation transformation
 	const childrenBounds = calcUnrotatedItemableBoundingBox(
 		updatedTargetDiagram.items,
 		updatedTargetDiagram.x,
@@ -55,17 +55,19 @@ export const adjustTargetDiagramSize = (
 		updatedTargetDiagram.rotation,
 	);
 
-	// Calculate current target diagram bounds in unrotated space
-	const halfWidth = originalTargetDiagram.width / 2;
-	const halfHeight = originalTargetDiagram.height / 2;
+	// Step 2: Calculate target bounds in unrotated space
+	const targetCenterX = updatedTargetDiagram.x;
+	const targetCenterY = updatedTargetDiagram.y;
+	const halfWidth = updatedTargetDiagram.width / 2;
+	const halfHeight = updatedTargetDiagram.height / 2;
 	const targetBounds = {
-		left: originalTargetDiagram.x - halfWidth,
-		top: originalTargetDiagram.y - halfHeight,
-		right: originalTargetDiagram.x + halfWidth,
-		bottom: originalTargetDiagram.y + halfHeight,
+		left: targetCenterX - halfWidth,
+		top: targetCenterY - halfHeight,
+		right: targetCenterX + halfWidth,
+		bottom: targetCenterY + halfHeight,
 	};
 
-	// Check if children extend beyond target bounds
+	// Step 3: Check if children extend beyond target bounds
 	const needsResize =
 		childrenBounds.left < targetBounds.left ||
 		childrenBounds.right > targetBounds.right ||
@@ -76,7 +78,7 @@ export const adjustTargetDiagramSize = (
 		return diagrams;
 	}
 
-	// Calculate new bounds that contain all children with padding
+	// Step 4: Calculate new bounds that contain all children with padding
 	const newLeft = Math.min(targetBounds.left, childrenBounds.left - padding);
 	const newTop = Math.min(targetBounds.top, childrenBounds.top - padding);
 	const newRight = Math.max(targetBounds.right, childrenBounds.right + padding);
