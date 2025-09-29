@@ -10,6 +10,7 @@ import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { calculateEffectiveDimensions } from "../../../utils/math/geometry/calculateEffectiveDimensions";
 import { rotatePoint } from "../../../utils/math/points/rotatePoint";
 import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
+import { hasRotateDisabledItem } from "../../../utils/shapes/group/hasRotateDisabledItem";
 import { isConnectableState } from "../../../utils/validation/isConnectableState";
 import { isItemableState } from "../../../utils/validation/isItemableState";
 import { isTransformativeState } from "../../../utils/validation/isTransformativeState";
@@ -123,8 +124,12 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 				newItemFrame.width = effectiveWidth;
 				newItemFrame.height = effectiveHeight;
 
+				// Handle rotation based on rotateEnabled flag and child items
 				if (!initialItem.rotateEnabled) {
-					newItemFrame.rotation = 0;
+					newItemFrame.rotation = initialItem.rotation;
+				} else if (isItemableState(initialItem) && hasRotateDisabledItem(initialItem.items || [])) {
+					// If group contains rotate-disabled items, preserve original rotation
+					newItemFrame.rotation = initialItem.rotation;
 				}
 
 				let newItems: Diagram[] | undefined;

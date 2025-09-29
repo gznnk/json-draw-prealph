@@ -6,6 +6,7 @@ import type { Diagram } from "../../../types/state/core/Diagram";
 import type { GroupState } from "../../../types/state/shapes/GroupState";
 import { calcUnrotatedItemableBoundingBox } from "../../../utils/core/calcUnrotatedItemableBoundingBox";
 import { getDiagramById } from "../../../utils/core/getDiagramById";
+import { hasRotateDisabledItem } from "../../../utils/shapes/group/hasRotateDisabledItem";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 import { bringConnectLinesForward } from "../../utils/bringConnectLinesForward";
@@ -53,6 +54,9 @@ export const useOnGroupShapes = (props: SvgCanvasSubHooksProps) => {
 				// Calculate bounding box for the group
 				const boundingBox = calcUnrotatedItemableBoundingBox(targetDiagrams);
 
+				// Check if any target diagram has rotation disabled
+				const groupRotateEnabled = !hasRotateDisabledItem(targetDiagrams);
+
 				// Create a new group data.
 				const group: GroupState = {
 					id: event.groupId,
@@ -67,7 +71,7 @@ export const useOnGroupShapes = (props: SvgCanvasSubHooksProps) => {
 					scaleX: 1,
 					scaleY: 1,
 					keepProportion: true,
-					rotateEnabled: true,
+					rotateEnabled: groupRotateEnabled,
 					itemableType: "group",
 					isSelected: false,
 					showOutline: false,

@@ -1,6 +1,7 @@
 import type { Diagram } from "../../types/state/core/Diagram";
 import type { GroupState } from "../../types/state/shapes/GroupState";
 import { calcUnrotatedItemableBoundingBox } from "../../utils/core/calcUnrotatedItemableBoundingBox";
+import { hasRotateDisabledItem } from "../../utils/shapes/group/hasRotateDisabledItem";
 import { MULTI_SELECT_GROUP } from "../SvgCanvasConstants";
 
 /**
@@ -16,6 +17,9 @@ export const createMultiSelectGroup = (
 ): GroupState => {
 	const boundingBox = calcUnrotatedItemableBoundingBox(selectedItems);
 
+	// Check if any selected item has rotation disabled
+	const rotateEnabled = !hasRotateDisabledItem(selectedItems);
+
 	return {
 		id: MULTI_SELECT_GROUP,
 		type: "Group",
@@ -27,7 +31,7 @@ export const createMultiSelectGroup = (
 		scaleX: 1,
 		scaleY: 1,
 		keepProportion: previousKeepProportion,
-		rotateEnabled: true,
+		rotateEnabled,
 		isSelected: true,
 		showOutline: true,
 		showTransformControls: true,
