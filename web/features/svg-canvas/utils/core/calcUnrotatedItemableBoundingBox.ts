@@ -3,27 +3,27 @@ import type { Diagram } from "../../types/state/core/Diagram";
 import { isItemableState } from "../validation/isItemableState";
 
 /**
- * Calculates the bounding box of a group when its rotation is reset
+ * Calculates the bounding box of an itemable container when its rotation is reset
  *
- * @param items - List of shapes in the group
- * @param groupCenterX - Group center X coordinate
- * @param groupCenterY - Group center Y coordinate
- * @param groupRotation - Group rotation angle
- * @param changeItem - Changed shape within the group
- * @returns Group bounding box
+ * @param items - List of shapes in the itemable container
+ * @param itemableCenterX - Itemable center X coordinate
+ * @param itemableCenterY - Itemable center Y coordinate
+ * @param itemableRotation - Itemable rotation angle
+ * @param changeItem - Changed shape within the itemable
+ * @returns Itemable bounding box
  */
 export const calcUnrotatedItemableBoundingBox = (
 	items: Diagram[],
-	groupCenterX = 0,
-	groupCenterY = 0,
-	groupRotation = 0,
+	itemableCenterX = 0,
+	itemableCenterY = 0,
+	itemableRotation = 0,
 	changeItem?: Diagram,
 ) => {
 	if (items.length === 0) {
 		throw new Error("Unsupported itemable state");
 	}
 
-	// Recursively process shapes in the group and calculate the coordinates of the group's four sides
+	// Recursively process shapes in the itemable and calculate the coordinates of the itemable's four sides
 	let top = Number.POSITIVE_INFINITY;
 	let left = Number.POSITIVE_INFINITY;
 	let bottom = Number.NEGATIVE_INFINITY;
@@ -38,23 +38,23 @@ export const calcUnrotatedItemableBoundingBox = (
 			isItemableState(item) &&
 			item.itemableType === "abstract"
 		) {
-			const groupBoundingBox = calcUnrotatedItemableBoundingBox(
+			const itemableBoundingBox = calcUnrotatedItemableBoundingBox(
 				itemItems,
-				groupCenterX,
-				groupCenterY,
-				groupRotation,
+				itemableCenterX,
+				itemableCenterY,
+				itemableRotation,
 				changeItem,
 			);
-			top = Math.min(top, groupBoundingBox.top);
-			bottom = Math.max(bottom, groupBoundingBox.bottom);
-			left = Math.min(left, groupBoundingBox.left);
-			right = Math.max(right, groupBoundingBox.right);
+			top = Math.min(top, itemableBoundingBox.top);
+			bottom = Math.max(bottom, itemableBoundingBox.bottom);
+			left = Math.min(left, itemableBoundingBox.left);
+			right = Math.max(right, itemableBoundingBox.right);
 		} else {
 			const boundingBox = calcDiagramBoundingBoxInUnrotatedGroup(
 				item.id === changeItem?.id ? changeItem : item,
-				groupCenterX,
-				groupCenterY,
-				groupRotation,
+				itemableCenterX,
+				itemableCenterY,
+				itemableRotation,
 			);
 			top = Math.min(top, boundingBox.top);
 			bottom = Math.max(bottom, boundingBox.bottom);
