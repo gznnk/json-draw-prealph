@@ -15,13 +15,10 @@ export const updateOutlineOfItemable = (itemable: Diagram): Diagram => {
 	if (
 		!isFrame(itemable) ||
 		!isItemableState(itemable) ||
-		itemable.itemableType === "concrete"
+		itemable.itemableType === "composite"
 	) {
 		return itemable;
 	}
-
-	// Calculate the bounds of the itemable.
-	const box = calcItemableOrientedBox(itemable);
 
 	// Update child itemables recursively
 	let updatedItems = itemable.items;
@@ -29,7 +26,7 @@ export const updateOutlineOfItemable = (itemable: Diagram): Diagram => {
 
 	if (itemable.items) {
 		const newItems = itemable.items.map((item) => {
-			if (isItemableState(item) && item.itemableType === "abstract") {
+			if (isItemableState(item)) {
 				const updatedItem = updateOutlineOfItemable(item);
 				if (updatedItem !== item) {
 					itemsChanged = true;
@@ -43,6 +40,16 @@ export const updateOutlineOfItemable = (itemable: Diagram): Diagram => {
 			updatedItems = newItems;
 		}
 	}
+
+	if (itemsChanged && itemable.itemableType === "canvas") {
+		return {
+			...itemable,
+			items: updatedItems,
+		} as Diagram;
+	}
+
+	// Calculate the bounds of the itemable.
+	const box = calcItemableOrientedBox(itemable);
 
 	// Check if bounds changed
 	const boundsChanged =

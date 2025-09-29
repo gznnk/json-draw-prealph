@@ -1,3 +1,4 @@
+import type { ItemableType } from "../../../types/core/ItemableType";
 import { CanvasFrameFeatures } from "../../../types/data/diagrams/CanvasFrameData";
 import type { CanvasFrameState } from "../../../types/state/diagrams/CanvasFrameState";
 import { CanvasFrameDefaultData } from "../../data/diagrams/CanvasFrameDefaultData";
@@ -8,6 +9,6 @@ export const CanvasFrameDefaultState = CreateDefaultState<CanvasFrameState>({
 	options: CanvasFrameFeatures,
 	baseData: CanvasFrameDefaultData,
 	properties: {
-		itemableType: "concrete",
+		itemableType: "canvas" as ItemableType,
 	},
 });

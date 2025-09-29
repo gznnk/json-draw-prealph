@@ -1,3 +1,4 @@
+import type { ItemableType } from "../../../types/core/ItemableType";
 import { LLMNodeFeatures } from "../../../types/data/nodes/LLMNodeData";
 import type { LLMNodeState } from "../../../types/state/nodes/LLMNodeState";
 import { LLMNodeDefaultData } from "../../data/nodes/LLMNodeDefaultData";
@@ -12,7 +13,7 @@ export const LLMNodeDefaultState = CreateDefaultState<LLMNodeState>({
 	options: LLMNodeFeatures,
 	baseData: LLMNodeDefaultData,
 	properties: {
-		itemableType: "concrete",
+		itemableType: "composite" as ItemableType,
 		minWidth: MIN_WIDTH,
 		minHeight: MIN_HEIGHT,
 	},

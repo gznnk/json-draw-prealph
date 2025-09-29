@@ -36,7 +36,7 @@ export const calcUnrotatedItemableBoundingBox = (
 		if (
 			0 < itemItems.length &&
 			isItemableState(item) &&
-			item.itemableType === "abstract"
+			item.itemableType === "group"
 		) {
 			const itemableBoundingBox = calcUnrotatedItemableBoundingBox(
 				itemItems,

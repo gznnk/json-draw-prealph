@@ -3,5 +3,5 @@ import { ItemableDefaultData } from "../../data/core/ItemableDefaultData";
 
 export const ItemableDefaultState = {
 	...ItemableDefaultData,
-	itemableType: "abstract",
+	itemableType: "group",
 } as const satisfies ItemableState;

@@ -1,3 +1,4 @@
+import type { ItemableType } from "../../../types/core/ItemableType";
 import { TextAreaNodeFeatures } from "../../../types/data/nodes/TextAreaNodeData";
 import type { TextAreaNodeState } from "../../../types/state/nodes/TextAreaNodeState";
 import { TextAreaNodeDefaultData } from "../../data/nodes/TextAreaNodeDefaultData";
@@ -12,7 +13,7 @@ export const TextAreaNodeDefaultState = CreateDefaultState<TextAreaNodeState>({
 	options: TextAreaNodeFeatures,
 	baseData: TextAreaNodeDefaultData,
 	properties: {
-		itemableType: "concrete",
+		itemableType: "composite" as ItemableType,
 		minWidth: MIN_WIDTH,
 		minHeight: MIN_HEIGHT,
 	},

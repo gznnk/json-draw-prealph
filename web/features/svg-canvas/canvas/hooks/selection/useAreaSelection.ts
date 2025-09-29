@@ -43,7 +43,7 @@ const updateItemsWithOutline = (
 		if (
 			ancestors.some(
 				(ancestor) =>
-					isItemableState(ancestor) && ancestor.itemableType === "concrete",
+					isItemableState(ancestor) && ancestor.itemableType === "composite",
 			)
 		) {
 			return item;

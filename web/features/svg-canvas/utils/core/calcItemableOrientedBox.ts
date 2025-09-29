@@ -26,7 +26,11 @@ export const calcItemableOrientedBox = (itemable: ItemableState): Bounds => {
 
 	// Calculate bounding box without rotation applied
 	let boundingBox: Box;
-	if (items.length === 0 || itemable.itemableType === "concrete") {
+	if (
+		items.length === 0 ||
+		itemable.itemableType === "composite" ||
+		itemable.itemableType === "canvas"
+	) {
 		if (isFrame(itemable)) {
 			const halfWidth = itemable.width / 2;
 			const halfHeight = itemable.height / 2;
