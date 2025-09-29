@@ -42,6 +42,11 @@ export const createRoundedDValue = (
 		const toPrevLength = Math.sqrt(toPrev.x * toPrev.x + toPrev.y * toPrev.y);
 		const toNextLength = Math.sqrt(toNext.x * toNext.x + toNext.y * toNext.y);
 
+		// Skip if any vector has zero length (identical points)
+		if (toPrevLength === 0 || toNextLength === 0) {
+			continue;
+		}
+
 		// Normalize vectors
 		const toPrevNorm = {
 			x: toPrev.x / toPrevLength,
