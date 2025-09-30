@@ -10,6 +10,7 @@ import { isTransformativeState } from "../../../utils/validation/isTransformativ
 import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+import { adjustCanvasFrameSizesAndRefreshConnections } from "../../utils/adjustCanvasFrameSizesAndRefreshConnections";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { createItemMap } from "../../utils/createItemMap";
 import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
@@ -207,6 +208,12 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				});
 				// Update outline of all groups.
 				newState.items = updateOutlineOfAllItemables(newState.items);
+
+				// Adjust canvas frame sizes and refresh connections
+				newState = adjustCanvasFrameSizesAndRefreshConnections(
+					newState,
+					startCanvasState.current,
+				);
 
 				// Add history and get updated state
 				newState = addHistory(e.eventId, newState);
