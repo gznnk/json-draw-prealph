@@ -6,9 +6,7 @@ import type { EventPhase } from "../../../types/events/EventPhase";
 import type { Diagram } from "../../../types/state/core/Diagram";
 import { calcUnrotatedItemableBoundingBox } from "../../../utils/core/calcUnrotatedItemableBoundingBox";
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
-import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { calculateEffectiveDimensions } from "../../../utils/math/geometry/calculateEffectiveDimensions";
-import { rotatePoint } from "../../../utils/math/points/rotatePoint";
 import { refreshConnectLines } from "../../../utils/shapes/connectLine/refreshConnectLines";
 import { hasRotateDisabledItem } from "../../../utils/shapes/group/hasRotateDisabledItem";
 import { isConnectableState } from "../../../utils/validation/isConnectableState";
@@ -17,6 +15,7 @@ import { isTransformativeState } from "../../../utils/validation/isTransformativ
 import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+import { calculateTransformedCenter } from "../../utils/calculateTransformedCenter";
 import { createItemMap } from "../../utils/createItemMap";
 import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
 import { updateOutlineOfItemable } from "../../utils/updateOutlineOfItemable";
@@ -65,64 +64,45 @@ export const useOnTransform = (props: SvgCanvasSubHooksProps) => {
 				// If the item is not found in the initial items map, return the child item as is.
 				return item;
 			}
-			const groupScaleX = event.endFrame.width / event.startFrame.width;
-			const groupScaleY = event.endFrame.height / event.startFrame.height;
-			const inversedItemCenter = rotatePoint(
+
+			// Calculate the transformed center position of the item
+			const newCenter = calculateTransformedCenter(
 				initialItem.x,
 				initialItem.y,
-				event.startFrame.x,
-				event.startFrame.y,
-				degreesToRadians(-event.startFrame.rotation),
-			);
-			const dx =
-				(inversedItemCenter.x - event.startFrame.x) *
-				event.startFrame.scaleX *
-				event.endFrame.scaleX;
-			const dy =
-				(inversedItemCenter.y - event.startFrame.y) *
-				event.startFrame.scaleY *
-				event.endFrame.scaleY;
-
-			const newDx = dx * groupScaleX;
-			const newDy = dy * groupScaleY;
-
-			let newCenter = {
-				x: event.endFrame.x + newDx,
-				y: event.endFrame.y + newDy,
-			};
-			newCenter = rotatePoint(
-				newCenter.x,
-				newCenter.y,
-				event.endFrame.x,
-				event.endFrame.y,
-				degreesToRadians(event.endFrame.rotation),
+				event.startFrame,
+				event.endFrame,
 			);
 
 			let newItem: Diagram;
 			if (isTransformativeState(initialItem)) {
-				const rotationDiff =
-					event.endFrame.rotation - event.startFrame.rotation;
-				const newRotation = initialItem.rotation + rotationDiff;
-				const newItemFrame = {
-					x: newCenter.x,
-					y: newCenter.y,
-					width: initialItem.width * groupScaleX,
-					height: initialItem.height * groupScaleY,
-					rotation: newRotation,
-					scaleX: event.endFrame.scaleX,
-					scaleY: event.endFrame.scaleY,
-				};
+				const groupScaleX = event.endFrame.width / event.startFrame.width;
+				const groupScaleY = event.endFrame.height / event.startFrame.height;
+
+				const newWidth = initialItem.width * groupScaleX;
+				const newHeight = initialItem.height * groupScaleY;
 
 				// Apply minWidth and minHeight constraints
 				const { effectiveWidth, effectiveHeight } =
 					calculateEffectiveDimensions(
-						newItemFrame.width,
-						newItemFrame.height,
+						newWidth,
+						newHeight,
 						initialItem.minWidth,
 						initialItem.minHeight,
 					);
-				newItemFrame.width = effectiveWidth;
-				newItemFrame.height = effectiveHeight;
+
+				const newRotation =
+					initialItem.rotation +
+					(event.endFrame.rotation - event.startFrame.rotation);
+
+				const newItemFrame = {
+					x: newCenter.x,
+					y: newCenter.y,
+					width: effectiveWidth,
+					height: effectiveHeight,
+					rotation: newRotation,
+					scaleX: event.endFrame.scaleX,
+					scaleY: event.endFrame.scaleY,
+				};
 
 				// Handle rotation based on rotateEnabled flag and child items
 				if (!initialItem.rotateEnabled) {
