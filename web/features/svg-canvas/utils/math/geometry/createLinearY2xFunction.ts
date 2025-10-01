@@ -1,3 +1,4 @@
+import { calculateClosestIntersection } from "./calculateClosestIntersection";
 import type { Point } from "../../../types/core/Point";
 
 /**
@@ -14,21 +15,10 @@ export const createLinearY2xFunction = (p1: Point, p2: Point) => {
 	const b = p1.y - a * p1.x;
 
 	return (x: number, y: number) => {
-		// Calculate intersection with vertical line at x
-		const lineY = Number.isFinite(a) ? a * x + b : p1.y;
-		const verticalIntersection = { x, y: lineY };
-
-		// Calculate intersection with horizontal line at y
-		const lineX = Number.isFinite(a) && a !== 0 ? (y - b) / a : p1.x;
-		const horizontalIntersection = { x: lineX, y };
-
-		// Calculate distances from original point (x, y)
-		const verticalDistance = Math.abs(lineY - y);
-		const horizontalDistance = Math.abs(lineX - x);
-
-		// Return the closer intersection point
-		return verticalDistance <= horizontalDistance
-			? verticalIntersection
-			: horizontalIntersection;
+		// For vertical lines (slope = ∞), prioritize horizontal intersection (Y-axis direction)
+		if (!Number.isFinite(a)) {
+			return { x: p1.x, y };
+		}
+		return calculateClosestIntersection(a, b, p1, x, y);
 	};
 };
