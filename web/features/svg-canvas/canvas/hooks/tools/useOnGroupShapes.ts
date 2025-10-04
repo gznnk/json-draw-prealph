@@ -9,8 +9,10 @@ import { getDiagramById } from "../../../utils/core/getDiagramById";
 import { hasRotateDisabledItem } from "../../../utils/shapes/group/hasRotateDisabledItem";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+import { addDiagramToParentOrRoot } from "../../utils/addDiagramToParentOrRoot";
 import { bringConnectLinesForward } from "../../utils/bringConnectLinesForward";
 import { cleanupGroups } from "../../utils/cleanupGroups";
+import { findParentCanvasContainingAllDiagrams } from "../../utils/findParentCanvasContainingAllDiagrams";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 import { useAddHistory } from "../history/useAddHistory";
 
@@ -85,7 +87,19 @@ export const useOnGroupShapes = (props: SvgCanvasSubHooksProps) => {
 					(item) => !event.shapeIds.includes(item.id),
 				);
 				const groupsCleanedUpItems = cleanupGroups(remainingItems);
-				const mergedItems = [...groupsCleanedUpItems, group];
+
+				// Find parent canvas that contains all target diagrams
+				const parentCanvas = findParentCanvasContainingAllDiagrams(
+					prevState.items,
+					targetDiagrams,
+				);
+
+				// Add group to parent canvas or root level
+				const mergedItems = addDiagramToParentOrRoot(
+					groupsCleanedUpItems,
+					group,
+					parentCanvas,
+				);
 
 				// Bring connect lines forward that are connected to grouped components.
 				const orderedItems = bringConnectLinesForward(
