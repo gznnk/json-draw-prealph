@@ -14,6 +14,7 @@ import { bringConnectLinesForward } from "../../utils/bringConnectLinesForward";
 import { cleanupGroups } from "../../utils/cleanupGroups";
 import { findParentCanvasContainingAllDiagrams } from "../../utils/findParentCanvasContainingAllDiagrams";
 import { removeDiagramsById } from "../../utils/removeDiagramsById";
+import { removeItemsFromDiagram } from "../../utils/removeItemsFromDiagram";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 import { useAddHistory } from "../history/useAddHistory";
 
@@ -53,6 +54,7 @@ export const useOnGroupShapes = (props: SvgCanvasSubHooksProps) => {
 					console.error("Not enough valid shapes found for grouping.");
 					return prevState;
 				}
+				const targetDiagramIds = targetDiagrams.map((d) => d.id);
 
 				// Calculate bounding box for the group
 				const boundingBox = calcUnrotatedItemableBoundingBox(targetDiagrams);
@@ -83,29 +85,35 @@ export const useOnGroupShapes = (props: SvgCanvasSubHooksProps) => {
 					items: targetDiagrams,
 				};
 
+				// Find parent canvas that contains all target diagrams
+				let parentCanvas = findParentCanvasContainingAllDiagrams(
+					prevState.items,
+					targetDiagrams,
+				);
+				// If found, remove selected diagrams from it
+				if (parentCanvas) {
+					parentCanvas = removeItemsFromDiagram(parentCanvas, targetDiagramIds);
+				}
+
 				// Remove target diagrams from items recursively
 				const remainingItems = removeDiagramsById(
 					prevState.items,
 					event.shapeIds,
 				);
-				const groupsCleanedUpItems = cleanupGroups(remainingItems);
-
-				// Find parent canvas that contains all target diagrams
-				const parentCanvas = findParentCanvasContainingAllDiagrams(
-					prevState.items,
-					targetDiagrams,
-				);
 
 				// Add group to parent canvas or root level
 				const mergedItems = addDiagramToParentOrRoot(
-					groupsCleanedUpItems,
+					remainingItems,
 					group,
 					parentCanvas,
 				);
 
+				// Clean up empty groups
+				const groupsCleanedUpItems = cleanupGroups(mergedItems);
+
 				// Bring connect lines forward that are connected to grouped components.
 				const orderedItems = bringConnectLinesForward(
-					mergedItems,
+					groupsCleanedUpItems,
 					targetDiagrams,
 				);
 
