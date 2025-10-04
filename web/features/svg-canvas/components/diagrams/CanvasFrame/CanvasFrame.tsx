@@ -180,6 +180,21 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		onHoverChange,
 	});
 
+	// Handler to propagate child hover events to this frame
+	const handleChildHoverChange = useCallback(
+		(e: { eventId: string; id: string; isHovered: boolean }) => {
+			// Propagate child hover event to parent
+			onHoverChange?.(e);
+			// Also fire hover event for this frame when child is hovered
+			onHoverChange?.({
+				eventId: e.eventId,
+				id,
+				isHovered: e.isHovered,
+			});
+		},
+		[id, onHoverChange],
+	);
+
 	// Compose props for the background element using mergeProps
 	const composedProps = mergeProps(
 		dragProps,
@@ -234,7 +249,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 			onTransform,
 			onDragOver,
 			onDragLeave,
-			onHoverChange,
+			onHoverChange: handleChildHoverChange,
 			onDiagramChange,
 			onConnect,
 			onPreviewConnectLine,
