@@ -14,5 +14,5 @@ export type AppendDiagramsEvent = {
 	 * - false: Coordinates are already relative to the target (no transformation needed)
 	 * @default true
 	 */
-	useAbsoluteCoordinates?: boolean;
+	useAbsoluteCoordinates?: boolean; // TODO: 不要なら削除
 };
