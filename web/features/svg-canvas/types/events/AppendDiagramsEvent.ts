@@ -12,7 +12,7 @@ export type AppendDiagramsEvent = {
 	 * Whether diagram coordinates are absolute or relative to the target.
 	 * - true: Coordinates are absolute and should be transformed to relative
 	 * - false: Coordinates are already relative to the target (no transformation needed)
-	 * @default true
+	 * @default false
 	 */
 	useAbsoluteCoordinates?: boolean; // TODO: 不要なら削除
 };

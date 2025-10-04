@@ -20,6 +20,7 @@ import { useExecutionChain } from "../../../hooks/useExecutionChain";
 import { useHover } from "../../../hooks/useHover";
 import { useSelect } from "../../../hooks/useSelect";
 import { DiagramRegistry } from "../../../registry";
+import type { Point } from "../../../types/core/Point";
 import type { DiagramData } from "../../../types/data/core/DiagramData";
 import type { ItemableData } from "../../../types/data/core/ItemableData";
 import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEvent";
@@ -91,7 +92,11 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	// Hook for appending diagrams to this frame
 	const appendDiagrams = useAppendDiagrams();
 
+	// State for managing drop target visual feedback
 	const [isDropTarget, setIsDropTarget] = useState(false);
+
+	// Create reference to store the origin point for diagram placement
+	const origin = useRef<Point>({ x: 0, y: 0 });
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
@@ -274,6 +279,13 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		id,
 		onPropagation: async (e) => {
 			if (e.eventPhase === "Started") {
+				// Set origin for placing incoming diagrams
+				origin.current = {
+					x: x - width / 2,
+					y: y - height / 2,
+				};
+
+				// Notify start of execution
 				onExecute?.({
 					id,
 					eventId: e.eventId,
@@ -283,6 +295,8 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 						data: "",
 					},
 				});
+
+				// Clean up existing items
 				const changeDiagramEvent: DiagramChangeEvent<ItemableData> = {
 					id,
 					eventId: e.eventId,
@@ -309,7 +323,17 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 					// Validate that it's a valid diagram object
 					if (shapeData && shapeData.id && shapeData.type) {
 						// Append the received shape to this CanvasFrame
-						appendDiagrams(id, [shapeData]);
+						appendDiagrams(
+							id,
+							[
+								{
+									...shapeData,
+									x: shapeData.x + origin.current.x,
+									y: shapeData.y + origin.current.y,
+								},
+							],
+							true,
+						);
 					}
 				} else if (isToolPayload(e.payload)) {
 					// TODO: カスタムフック化
