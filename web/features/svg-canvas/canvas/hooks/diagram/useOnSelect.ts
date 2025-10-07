@@ -273,7 +273,8 @@ export const useOnSelect = (
 								updatedItems.length > 0 && // Ensure the group has children
 								updatedItems.every(
 									(child) => isSelectableState(child) && child.isSelected,
-								)
+								) && // All children are selected
+								item.itemableType !== "canvas" // Exclude the canvas itself
 							) {
 								// Deselect all children when the group is selected
 								const deselectedItems = updatedItems.map((child) => {

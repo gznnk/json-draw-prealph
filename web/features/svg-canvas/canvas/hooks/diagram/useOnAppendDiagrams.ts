@@ -57,11 +57,15 @@ export const useOnAppendDiagrams = (props: SvgCanvasSubHooksProps) => {
 				// Extract IDs of diagrams to move
 				const diagramIds = event.diagrams.map((diagram) => diagram.id);
 
-				// 2. Transform diagram coordinates from relative to absolute
-				const transformedDiagrams = transformRelativeToAbsoluteCoordinates(
-					event.diagrams,
-					targetDiagram,
-				);
+				// TODO: 不要なら削除
+				// 2. Transform diagram coordinates from relative to absolute if needed
+				const transformedDiagrams =
+					event.useAbsoluteCoordinates === true
+						? event.diagrams
+						: transformRelativeToAbsoluteCoordinates(
+								event.diagrams,
+								targetDiagram,
+							);
 
 				// 3. Remove source diagrams from their current locations
 				const diagramsRemovedItems = removeDiagramsById(

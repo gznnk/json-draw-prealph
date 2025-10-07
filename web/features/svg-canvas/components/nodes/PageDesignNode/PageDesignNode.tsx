@@ -50,13 +50,35 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 						eventId: e.eventId,
 						eventPhase: "InProgress",
 						payload: {
-							format: "object",
+							format: "diagram",
 							data: diagram,
 						},
 					});
 				};
 
-				const result = await webDesignHandler(shapeHandler)({
+				// Create group shapes handler that sends grouping result via onExecute
+				const groupShapesHandler = (result: {
+					shapeIds: string[];
+					groupId: string;
+					name?: string;
+					description?: string;
+				}) => {
+					props.onExecute?.({
+						id: props.id,
+						eventId: e.eventId,
+						eventPhase: "InProgress",
+						// TODO: Define a proper payload format for tool results
+						payload: {
+							format: "tool",
+							data: result,
+						},
+					});
+				};
+
+				const result = await webDesignHandler(
+					shapeHandler,
+					groupShapesHandler,
+				)({
 					name: "web_design",
 					arguments: { design_request: textData },
 					callId: e.eventId,

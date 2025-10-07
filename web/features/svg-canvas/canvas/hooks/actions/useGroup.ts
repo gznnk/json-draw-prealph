@@ -7,10 +7,13 @@ import { newId } from "../../../utils/shapes/common/newId";
 import { isSelectableState } from "../../../utils/validation/isSelectableState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+import { addDiagramToParentOrRoot } from "../../utils/addDiagramToParentOrRoot";
 import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 import { bringConnectLinesForward } from "../../utils/bringConnectLinesForward";
 import { cleanupGroups } from "../../utils/cleanupGroups";
-import { removeSelectedDiagrams } from "../../utils/removeSelectedDiagrams";
+import { findParentCanvasContainingAllDiagrams } from "../../utils/findParentCanvasContainingAllDiagrams";
+import { removeDiagramsById } from "../../utils/removeDiagramsById";
+import { removeItemsFromDiagram } from "../../utils/removeItemsFromDiagram";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 import { useAddHistory } from "../history/useAddHistory";
 
@@ -44,6 +47,7 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 				console.error("Invalid selection count for group.");
 				return prevState;
 			}
+			const selectedDiagramIds = selectedDiagrams.map((d) => d.id);
 
 			if (!prevState.multiSelectGroup) {
 				// Type checking for multiSelectGroup.
@@ -71,14 +75,36 @@ export const useGroup = (props: SvgCanvasSubHooksProps) => {
 					};
 				}),
 			};
-			// Create next state items.
-			const selectedRemovedItems = removeSelectedDiagrams(prevState.items);
-			const groupsCleanedUpItems = cleanupGroups(selectedRemovedItems);
-			const mergedItems = [...groupsCleanedUpItems, group];
+
+			// Find parent canvas that contains all selected diagrams
+			let parentCanvas = findParentCanvasContainingAllDiagrams(
+				prevState.items,
+				selectedDiagrams,
+			);
+			// If found, remove selected diagrams from it
+			if (parentCanvas) {
+				parentCanvas = removeItemsFromDiagram(parentCanvas, selectedDiagramIds);
+			}
+
+			// Remove selected diagrams from the current items
+			const selectedRemovedItems = removeDiagramsById(
+				prevState.items,
+				selectedDiagramIds,
+			);
+
+			// Add group to parent canvas or root level
+			const mergedItems = addDiagramToParentOrRoot(
+				selectedRemovedItems,
+				group,
+				parentCanvas,
+			);
+
+			// Clean up groups (remove empty groups, flatten single-item groups)
+			const groupsCleanedUpItems = cleanupGroups(mergedItems);
 
 			// Bring connect lines forward that are connected to grouped components.
 			const orderedItems = bringConnectLinesForward(
-				mergedItems,
+				groupsCleanedUpItems,
 				selectedDiagrams,
 			);
 

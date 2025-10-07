@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "react";
 
+import type { DiagramPathIndex } from "../../../types/core/DiagramPath";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { Diagram } from "../../../types/state/core/Diagram";
 import type { GroupState } from "../../../types/state/shapes/GroupState";
@@ -11,9 +12,10 @@ import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 import { adjustCanvasFrameSizesAndRefreshConnections } from "../../utils/adjustCanvasFrameSizesAndRefreshConnections";
-import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
+import { createDiagramPathIndex } from "../../utils/createDiagramPathIndex";
 import { createItemMap } from "../../utils/createItemMap";
 import { updateDiagramConnectPoints } from "../../utils/updateDiagramConnectPoints";
+import { updateDiagramsByPath } from "../../utils/updateDiagramsByPath";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 import { useAddHistory } from "../history/useAddHistory";
 
@@ -31,14 +33,15 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
+
 	// Reference to store the canvas state at the start of drag for connect line updates.
 	const startCanvasState = useRef<SvgCanvasState | undefined>(undefined);
-	// Reference to store selected item IDs at the start of drag for performance.
-	const selectedItemIds = useRef<Set<string>>(new Set());
 	// Reference to store initial items at the start of drag.
 	const initialItemsMap = useRef<Map<string, Diagram>>(new Map());
 	// Reference to store initial multi select group
 	const initialMultiSelectGroup = useRef<GroupState | undefined>(undefined);
+	// Reference to store path index for efficient updates
+	const pathIndex = useRef<DiagramPathIndex>(new Map());
 
 	// Return a callback function to handle the drag event.
 	return useCallback((e: DiagramDragEvent) => {
@@ -58,105 +61,75 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 			if (e.eventPhase === "Started") {
 				startCanvasState.current = prevState;
 
-				// Store selected item IDs for performance
-				const selectedItems = getSelectedDiagrams(prevState.items);
-				selectedItemIds.current = new Set(selectedItems.map((item) => item.id));
 				// Store initial items map
 				initialItemsMap.current = createItemMap(prevState.items);
+
 				// Store initial multi select group
 				if (prevState.multiSelectGroup) {
 					initialMultiSelectGroup.current = prevState.multiSelectGroup;
 				}
+
+				// Create path index for selected diagrams only (children will be updated recursively)
+				const selectedItems = getSelectedDiagrams(prevState.items);
+				const selectedIds = new Set(selectedItems.map((item) => item.id));
+
+				// Create path index for efficient updates
+				pathIndex.current = createDiagramPathIndex(prevState.items, selectedIds);
 			}
 
 			// Calculate the movement delta
 			const dx = e.endX - e.startX;
 			const dy = e.endY - e.startY;
 
-			// Get selected item IDs from ref (stored at drag start)
-			const selectedIds = selectedItemIds.current;
 			// Get initial items from ref (stored at drag start)
 			const initialItems = initialItemsMap.current;
 
 			// Collect all diagrams that will be moved (for connect point updates)
 			const movedDiagrams: Diagram[] = [];
 
-			// Function to recursively move items and update their positions
-			const moveRecursively = (items: Diagram[]): Diagram[] => {
-				return items.map((item) => {
-					// If this item is selected, move it
-					if (selectedIds.has(item.id)) {
-						const initialItem = initialItems.get(item.id);
-						if (!initialItem) {
-							// If no initial item found, return item unchanged
-							return item;
-						}
+			// Recursively update diagram and all its descendants
+			const updateDiagramRecursively = (diagram: Diagram): Diagram => {
+				const initialItem = initialItems.get(diagram.id);
+				if (!initialItem) return diagram;
 
-						let newItem = {
-							...item,
-							x: initialItem.x + dx,
-							y: initialItem.y + dy,
-							isDragging,
-						} as Diagram;
+				// Update position and dragging state
+				let newItem = {
+					...diagram,
+					x: initialItem.x + dx,
+					y: initialItem.y + dy,
+					isDragging,
+				} as Diagram;
 
-						// Hide transform controls during drag for transformative items
-						if (isTransformativeState(newItem) && isDragging) {
-							newItem.showTransformControls = false;
-						}
+				// Hide transform controls during drag for transformative items
+				if (isTransformativeState(newItem) && isDragging) {
+					newItem.showTransformControls = false;
+				}
 
-						// Update connect points
-						newItem = updateDiagramConnectPoints(newItem);
+				// Update connect points
+				newItem = updateDiagramConnectPoints(newItem);
 
-						// Add the moved item to the list
-						movedDiagrams.push(newItem);
+				// Add the moved item to the list
+				movedDiagrams.push(newItem);
 
-						// If the item has children, move them recursively
-						if (isItemableState(newItem)) {
-							newItem.items = applyFunctionRecursively(
-								newItem.items,
-								(childItem) => {
-									// Move child items by the same delta
-									const childInitialItem = initialItems.get(childItem.id);
-									if (childInitialItem) {
-										let newChildItem = {
-											...childItem,
-											x: childInitialItem.x + dx,
-											y: childInitialItem.y + dy,
-											isDragging,
-										} as Diagram;
+				// Recursively update children if this diagram has them
+				if (isItemableState(newItem)) {
+					newItem = {
+						...newItem,
+						items: newItem.items.map(updateDiagramRecursively),
+					} as Diagram;
+				}
 
-										// Hide transform controls during drag for transformative items
-										if (isTransformativeState(newChildItem) && isDragging) {
-											newChildItem.showTransformControls = false;
-										}
-
-										// Update connect points
-										newChildItem = updateDiagramConnectPoints(newChildItem);
-
-										// Add the moved item to the list
-										movedDiagrams.push(newChildItem);
-
-										return newChildItem;
-									}
-									return childItem; // If no initial item, return unchanged
-								},
-							);
-						}
-
-						return newItem;
-					}
-					if (isItemableState(item)) {
-						// If the item is not selected, recursively move its children
-						item.items = moveRecursively(item.items);
-					}
-					return item; // If not selected, return item unchanged
-				});
+				return newItem;
 			};
 
-			// Create the new state
+			// Create the new state using path-based updates (only for selected diagrams, children updated recursively)
 			let newState: SvgCanvasState = {
 				...prevState,
-				items: moveRecursively(prevState.items),
+				items: updateDiagramsByPath(
+					prevState.items,
+					pathIndex.current,
+					updateDiagramRecursively,
+				),
 				interactionState:
 					e.eventPhase === "Started" || e.eventPhase === "InProgress"
 						? InteractionState.Dragging
@@ -193,19 +166,36 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 
 			// If the drag event is ended
 			if (e.eventPhase === "Ended") {
-				// Restore showTransformControls from initial state for transformative items
-				newState.items = applyFunctionRecursively(newState.items, (item) => {
-					if (selectedIds.has(item.id) && isTransformativeState(item)) {
-						const initialItem = initialItems.get(item.id);
+				// Restore showTransformControls from initial state for transformative items (recursively)
+				const restoreTransformControls = (diagram: Diagram): Diagram => {
+					let updated = diagram;
+
+					if (isTransformativeState(diagram)) {
+						const initialItem = initialItems.get(diagram.id);
 						if (initialItem && isTransformativeState(initialItem)) {
-							return {
-								...item,
+							updated = {
+								...diagram,
 								showTransformControls: initialItem.showTransformControls,
-							};
+							} as Diagram;
 						}
 					}
-					return item;
-				});
+
+					// Recursively restore for children
+					if (isItemableState(updated)) {
+						updated = {
+							...updated,
+							items: updated.items.map(restoreTransformControls),
+						} as Diagram;
+					}
+
+					return updated;
+				};
+
+				newState.items = updateDiagramsByPath(
+					newState.items,
+					pathIndex.current,
+					restoreTransformControls,
+				);
 
 				// Adjust canvas frame sizes and refresh connections
 				newState = adjustCanvasFrameSizesAndRefreshConnections(
@@ -219,13 +209,11 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				// Add history and get updated state
 				newState = addHistory(e.eventId, newState);
 
-				// Clean up the canvas state reference.
+				// Clean up references
 				startCanvasState.current = undefined;
-				// Clean up the selected item IDs and initial items map.
-				selectedItemIds.current.clear();
 				initialItemsMap.current.clear();
-				// Clean up initial multi select group
 				initialMultiSelectGroup.current = undefined;
+				pathIndex.current.clear();
 			}
 
 			return newState;

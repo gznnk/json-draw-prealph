@@ -9,8 +9,12 @@ import { getDiagramById } from "../../../utils/core/getDiagramById";
 import { hasRotateDisabledItem } from "../../../utils/shapes/group/hasRotateDisabledItem";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+import { addDiagramToParentOrRoot } from "../../utils/addDiagramToParentOrRoot";
 import { bringConnectLinesForward } from "../../utils/bringConnectLinesForward";
 import { cleanupGroups } from "../../utils/cleanupGroups";
+import { findParentCanvasContainingAllDiagrams } from "../../utils/findParentCanvasContainingAllDiagrams";
+import { removeDiagramsById } from "../../utils/removeDiagramsById";
+import { removeItemsFromDiagram } from "../../utils/removeItemsFromDiagram";
 import { updateOutlineOfAllItemables } from "../../utils/updateOutlineOfAllItemables";
 import { useAddHistory } from "../history/useAddHistory";
 
@@ -50,6 +54,7 @@ export const useOnGroupShapes = (props: SvgCanvasSubHooksProps) => {
 					console.error("Not enough valid shapes found for grouping.");
 					return prevState;
 				}
+				const targetDiagramIds = targetDiagrams.map((d) => d.id);
 
 				// Calculate bounding box for the group
 				const boundingBox = calcUnrotatedItemableBoundingBox(targetDiagrams);
@@ -80,16 +85,35 @@ export const useOnGroupShapes = (props: SvgCanvasSubHooksProps) => {
 					items: targetDiagrams,
 				};
 
-				// Remove target diagrams from items
-				const remainingItems = prevState.items.filter(
-					(item) => !event.shapeIds.includes(item.id),
+				// Find parent canvas that contains all target diagrams
+				let parentCanvas = findParentCanvasContainingAllDiagrams(
+					prevState.items,
+					targetDiagrams,
 				);
-				const groupsCleanedUpItems = cleanupGroups(remainingItems);
-				const mergedItems = [...groupsCleanedUpItems, group];
+				// If found, remove selected diagrams from it
+				if (parentCanvas) {
+					parentCanvas = removeItemsFromDiagram(parentCanvas, targetDiagramIds);
+				}
+
+				// Remove target diagrams from items recursively
+				const remainingItems = removeDiagramsById(
+					prevState.items,
+					event.shapeIds,
+				);
+
+				// Add group to parent canvas or root level
+				const mergedItems = addDiagramToParentOrRoot(
+					remainingItems,
+					group,
+					parentCanvas,
+				);
+
+				// Clean up empty groups
+				const groupsCleanedUpItems = cleanupGroups(mergedItems);
 
 				// Bring connect lines forward that are connected to grouped components.
 				const orderedItems = bringConnectLinesForward(
-					mergedItems,
+					groupsCleanedUpItems,
 					targetDiagrams,
 				);
 

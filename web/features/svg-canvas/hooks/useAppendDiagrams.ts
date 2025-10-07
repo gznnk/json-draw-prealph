@@ -16,11 +16,12 @@ export const useAppendDiagrams = () => {
 
 	// Function to dispatch a new AppendDiagramsEvent
 	return useCallback(
-		(targetId: string, diagrams: Diagram[]) => {
+		(targetId: string, diagrams: Diagram[], useAbsoluteCoordinates = false) => {
 			const event: AppendDiagramsEvent = {
 				eventId: newEventId(),
 				targetId,
 				diagrams,
+				useAbsoluteCoordinates,
 			};
 
 			// Dispatch the AppendDiagramsEvent to the EventBus
