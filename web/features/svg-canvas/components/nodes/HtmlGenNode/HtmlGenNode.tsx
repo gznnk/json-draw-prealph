@@ -62,21 +62,21 @@ const HtmlGenNodeComponent: React.FC<HtmlGenNodeProps> = (props) => {
 	}, []);
 
 	// Handler for executing HTML generation
-	const handleExecution = useCallback(async () => {
+	const handleExecution = useCallback(async (data?: unknown) => {
 		const {
 			id,
 			// connectedDiagrams,
 			onExecute,
 		} = refBus.current;
 
-		// Get connected diagram data (use first connected diagram if multiple)
-		// const connectedDiagram =
-		// 	connectedDiagrams.length > 0 ? connectedDiagrams[0] : null;
-		// const diagramData = connectedDiagram
-		// 	? JSON.stringify(connectedDiagram, null, 2)
-		// 	: "No diagram connected";
-		const targetd = getDiagramById(canvasRef.current.items, target);
-		const diagramData = JSON.stringify(targetd);
+		// Use propagated data if available, otherwise fallback to target diagram
+		let diagramData: string;
+		if (data !== undefined) {
+			diagramData = JSON.stringify(data, null, 2);
+		} else {
+			const targetd = getDiagramById(canvasRef.current.items, target);
+			diagramData = JSON.stringify(targetd);
+		}
 
 		const processId = newEventId();
 		setProcessIdList((prev) => [...prev, processId]);
@@ -172,8 +172,11 @@ Please generate a complete HTML document that represents or visualizes the diagr
 	const onPropagation = useCallback(
 		(e: ExecutionPropagationEvent) => {
 			if (e.eventPhase === "Ended") {
-				// Handle execution
-				handleExecution();
+				// Extract data from the propagation event payload
+				const propagatedData = e.payload?.data;
+
+				// Handle execution with the propagated data
+				handleExecution(propagatedData);
 			}
 		},
 		[handleExecution],
