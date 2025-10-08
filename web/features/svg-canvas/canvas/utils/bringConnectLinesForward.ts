@@ -22,8 +22,8 @@ export const bringConnectLinesForward = (
 	for (const diagram of items) {
 		if (
 			isConnectLineState(diagram) &&
-			(groupedDiagramIds.includes(diagram.startOwnerId) ||
-				groupedDiagramIds.includes(diagram.endOwnerId))
+			(groupedDiagramIds.has(diagram.startOwnerId) ||
+				groupedDiagramIds.has(diagram.endOwnerId))
 		) {
 			targetConnectLines.push(diagram);
 		}

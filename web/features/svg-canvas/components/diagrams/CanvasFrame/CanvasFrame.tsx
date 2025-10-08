@@ -122,7 +122,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		}
 
 		const allChildIds = collectDiagramDataIds(currentItems);
-		return !allChildIds.includes(event.dropItem.id);
+		return !allChildIds.has(event.dropItem.id);
 	}, []);
 
 	/**

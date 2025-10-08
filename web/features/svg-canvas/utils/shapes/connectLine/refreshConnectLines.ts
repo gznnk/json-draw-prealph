@@ -28,7 +28,7 @@ export const refreshConnectLines = (
 
 	// Update the collected ConnectLines
 	return updateConnectLinesByIds(
-		new Set(connectLineIds),
+		connectLineIds,
 		updatingCanvasState,
 		startCanvasState,
 	);

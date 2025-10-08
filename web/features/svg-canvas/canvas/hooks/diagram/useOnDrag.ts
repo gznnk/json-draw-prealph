@@ -81,14 +81,14 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				pathIndex.current = createDiagramPathIndex(prevState.items, selectedIds);
 
 				// Collect all diagram IDs that will be moved (selected + their descendants)
-				const allMovedDiagramIds = new Set(collectDiagramIds(selectedItems));
+				const allMovedDiagramIds = collectDiagramIds(selectedItems);
 
 				// Collect ConnectLine IDs that are connected to any of the moved diagrams
 				const connectLineIds = collectConnectedConnectLines(
 					prevState.items,
 					allMovedDiagramIds,
 				);
-				connectedConnectLineIds.current = new Set(connectLineIds);
+				connectedConnectLineIds.current = connectLineIds;
 			}
 
 			// Calculate the movement delta

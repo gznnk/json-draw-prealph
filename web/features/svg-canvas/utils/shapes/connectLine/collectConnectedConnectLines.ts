@@ -7,13 +7,13 @@ import type { ConnectLineState } from "../../../types/state/shapes/ConnectLineSt
  *
  * @param items - Top level diagrams array
  * @param diagramIds - Set of diagram IDs to check connections for
- * @returns Array of ConnectLine IDs that are connected to any of the specified diagrams
+ * @returns Set of ConnectLine IDs that are connected to any of the specified diagrams
  */
 export const collectConnectedConnectLines = (
 	items: Diagram[],
 	diagramIds: Set<string>,
-): string[] => {
-	const connectLineIds: string[] = [];
+): Set<string> => {
+	const connectLineIds = new Set<string>();
 
 	// Find ConnectLines at top level that connect to any of the target diagrams
 	for (const item of items) {
@@ -25,7 +25,7 @@ export const collectConnectedConnectLines = (
 				diagramIds.has(connectLine.startOwnerId) ||
 				diagramIds.has(connectLine.endOwnerId)
 			) {
-				connectLineIds.push(connectLine.id);
+				connectLineIds.add(connectLine.id);
 			}
 		}
 	}
