@@ -57,10 +57,6 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 
 		// Update the canvas state based on the drag event.
 		setCanvasState((prevState) => {
-			// Check if currently dragging
-			const isDragging =
-				e.eventPhase === "Started" || e.eventPhase === "InProgress";
-
 			// Store the current canvas state for connect line updates on drag start
 			if (e.eventPhase === "Started") {
 				startCanvasState.current = prevState;
@@ -94,6 +90,10 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 			// Calculate the movement delta
 			const dx = e.endX - e.startX;
 			const dy = e.endY - e.startY;
+
+			// Check if currently dragging
+			const isDragging =
+				e.eventPhase === "Started" || e.eventPhase === "InProgress";
 
 			// Get initial items from ref (stored at drag start)
 			const initialItems = initialItemsMap.current;
@@ -138,10 +138,9 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 					pathIndex.current,
 					updateDiagramRecursively,
 				),
-				interactionState:
-					e.eventPhase === "Started" || e.eventPhase === "InProgress"
-						? InteractionState.Dragging
-						: InteractionState.Idle,
+				interactionState: isDragging
+					? InteractionState.Dragging
+					: InteractionState.Idle,
 			};
 
 			// If the event has minX and minY, update the canvas state
