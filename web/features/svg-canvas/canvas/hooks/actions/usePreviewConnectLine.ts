@@ -29,7 +29,11 @@ export const usePreviewConnectLine = (props: SvgCanvasSubHooksProps) => {
 
 		setCanvasState((prevState) => {
 			// Clear all selections and create path index when connection preview starts
+			let baseItems = prevState.items;
+
 			if (e.eventPhase === "Started") {
+				// Clear all selections
+				baseItems = clearSelectionRecursively(prevState.items);
 				// Create path index for the owner diagram
 				pathIndex.current = createDiagramPathIndex(
 					prevState.items,
@@ -39,9 +43,7 @@ export const usePreviewConnectLine = (props: SvgCanvasSubHooksProps) => {
 
 			// Update connect point position using path-based update
 			const updatedItems = updateDiagramsByPath(
-				e.eventPhase === "Started"
-					? clearSelectionRecursively(prevState.items)
-					: prevState.items,
+				baseItems,
 				pathIndex.current,
 				(item) => {
 					if (isConnectableState(item) && item.id === e.ownerId) {
