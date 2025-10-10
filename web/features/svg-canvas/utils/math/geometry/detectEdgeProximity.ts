@@ -45,7 +45,7 @@ export const detectEdgeProximity = (
 	let vertical: "top" | "bottom" | null = null;
 
 	// Calculate zoom-adjusted threshold for more consistent behavior across zoom levels
-	const adjustedThreshold = AUTO_SCROLL_THRESHOLD * zoom;
+	const adjustedThreshold = AUTO_SCROLL_THRESHOLD / zoom;
 
 	// Check horizontal edges
 	if (distFromLeft < adjustedThreshold) {
