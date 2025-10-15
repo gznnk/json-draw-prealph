@@ -45,8 +45,8 @@ export const useDelete = (props: SvgCanvasSubHooksProps) => {
 					if (item.type === "ConnectLine") {
 						const connectLine = item as ConnectLineState;
 						return (
-							!deletedItemIds.includes(connectLine.startOwnerId) &&
-							!deletedItemIds.includes(connectLine.endOwnerId)
+							!deletedItemIds.has(connectLine.startOwnerId) &&
+							!deletedItemIds.has(connectLine.endOwnerId)
 						);
 					}
 					return true;

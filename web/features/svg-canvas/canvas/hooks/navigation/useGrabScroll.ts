@@ -1,7 +1,11 @@
 import { useCallback, useRef } from "react";
 
-import { EVENT_NAME_SVG_CANVAS_SCROLL } from "../../../constants/core/EventNames";
-import type { SvgCanvasScrollEvent } from "../../../types/events/SvgCanvasScrollEvent";
+import {
+	INERTIA_DECELERATION,
+	INERTIA_MAX_VELOCITY,
+	INERTIA_MIN_VELOCITY,
+	INERTIA_VELOCITY_THRESHOLD,
+} from "../../../constants/core/Constants";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 /**
@@ -25,7 +29,6 @@ export const useGrabScroll = (
 	const {
 		canvasState: { minX, minY, grabScrollState, zoom },
 		setCanvasState,
-		eventBus,
 		onPanZoomChange,
 	} = props;
 
@@ -37,6 +40,85 @@ export const useGrabScroll = (
 		minY: number;
 	} | null>(null);
 
+	// Velocity tracking for inertia scrolling
+	const velocityTracker = useRef<{
+		lastClientX: number;
+		lastClientY: number;
+		lastTime: number;
+		velocityX: number;
+		velocityY: number;
+	} | null>(null);
+
+	// Animation frame reference for inertia
+	const inertiaAnimationFrame = useRef<number | null>(null);
+
+	/**
+	 * Start inertia scrolling animation with given initial velocity
+	 *
+	 * @param initialVelocityX - Initial velocity in X direction (pixels per millisecond)
+	 * @param initialVelocityY - Initial velocity in Y direction (pixels per millisecond)
+	 */
+	const startInertiaAnimation = useCallback(
+		(initialVelocityX: number, initialVelocityY: number): void => {
+			let velocityX = initialVelocityX;
+			let velocityY = initialVelocityY;
+			let lastTime = performance.now();
+
+			const animate = (): void => {
+				const currentTime = performance.now();
+				const deltaTime = currentTime - lastTime;
+				lastTime = currentTime;
+
+				// Apply deceleration
+				velocityX *= INERTIA_DECELERATION;
+				velocityY *= INERTIA_DECELERATION;
+
+				// Check if we should continue animating
+				if (
+					Math.abs(velocityX) < INERTIA_MIN_VELOCITY &&
+					Math.abs(velocityY) < INERTIA_MIN_VELOCITY
+				) {
+					inertiaAnimationFrame.current = null;
+					return;
+				}
+
+				// Calculate scroll delta
+				const deltaX = velocityX * deltaTime;
+				const deltaY = velocityY * deltaTime;
+
+				// Update canvas position
+				const { setCanvasState, zoom, onPanZoomChange, minX, minY } =
+					refBus.current;
+
+				const newMinX = minX - deltaX;
+				const newMinY = minY - deltaY;
+
+				setCanvasState((prevState) => {
+					const newState = {
+						...prevState,
+						minX: newMinX,
+						minY: newMinY,
+					};
+
+					onPanZoomChange?.({
+						minX: newMinX,
+						minY: newMinY,
+						zoom,
+					});
+
+					return newState;
+				});
+
+				// Continue animation
+				inertiaAnimationFrame.current = requestAnimationFrame(animate);
+			};
+
+			// Start the animation
+			inertiaAnimationFrame.current = requestAnimationFrame(animate);
+		},
+		[],
+	);
+
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		minX,
@@ -44,8 +126,8 @@ export const useGrabScroll = (
 		zoom,
 		isGrabScrolling: grabScrollState?.isGrabScrolling,
 		setCanvasState,
-		eventBus,
 		onPanZoomChange,
+		startInertiaAnimation,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -70,6 +152,12 @@ export const useGrabScroll = (
 				},
 			}));
 
+			// Cancel any ongoing inertia animation
+			if (inertiaAnimationFrame.current !== null) {
+				cancelAnimationFrame(inertiaAnimationFrame.current);
+				inertiaAnimationFrame.current = null;
+			}
+
 			// Check for right click and if the target is the SVG element
 			if (e.button === 2 && e.target === e.currentTarget) {
 				// Store the initial drag start state
@@ -78,6 +166,15 @@ export const useGrabScroll = (
 					clientY: e.clientY,
 					minX,
 					minY,
+				};
+
+				// Initialize velocity tracker
+				velocityTracker.current = {
+					lastClientX: e.clientX,
+					lastClientY: e.clientY,
+					lastTime: performance.now(),
+					velocityX: 0,
+					velocityY: 0,
 				};
 
 				// Capture the pointer to keep receiving events
@@ -101,7 +198,34 @@ export const useGrabScroll = (
 			if (!dragStartState.current) return;
 
 			// Bypass references to avoid function creation in every render.
-			const { setCanvasState, eventBus, zoom, onPanZoomChange } = refBus.current;
+			const { setCanvasState, zoom, onPanZoomChange } = refBus.current;
+
+			// Update velocity tracker
+			if (velocityTracker.current) {
+				const currentTime = performance.now();
+				const deltaTime = currentTime - velocityTracker.current.lastTime;
+
+				if (deltaTime > 0) {
+					const deltaX = e.clientX - velocityTracker.current.lastClientX;
+					const deltaY = e.clientY - velocityTracker.current.lastClientY;
+
+					// Calculate velocity in pixels per millisecond and clamp to max velocity
+					const rawVelocityX = deltaX / deltaTime;
+					const rawVelocityY = deltaY / deltaTime;
+
+					velocityTracker.current.velocityX = Math.max(
+						-INERTIA_MAX_VELOCITY,
+						Math.min(INERTIA_MAX_VELOCITY, rawVelocityX),
+					);
+					velocityTracker.current.velocityY = Math.max(
+						-INERTIA_MAX_VELOCITY,
+						Math.min(INERTIA_MAX_VELOCITY, rawVelocityY),
+					);
+					velocityTracker.current.lastClientX = e.clientX;
+					velocityTracker.current.lastClientY = e.clientY;
+					velocityTracker.current.lastTime = currentTime;
+				}
+			}
 
 			// Calculate total movement from the start position
 			const totalDeltaX = e.clientX - dragStartState.current.clientX;
@@ -131,21 +255,6 @@ export const useGrabScroll = (
 
 				return newState;
 			});
-
-			// Emit scroll event for other components to handle
-			const scrollEvent: SvgCanvasScrollEvent = {
-				newMinX,
-				newMinY,
-				clientX: e.clientX,
-				clientY: e.clientY,
-				deltaX: -totalDeltaX,
-				deltaY: -totalDeltaY,
-			};
-			eventBus.dispatchEvent(
-				new CustomEvent(EVENT_NAME_SVG_CANVAS_SCROLL, {
-					detail: scrollEvent,
-				}),
-			);
 		},
 		[],
 	);
@@ -160,7 +269,7 @@ export const useGrabScroll = (
 			// If grab scrolling is active, reset the state
 			if (refBus.current.isGrabScrolling) {
 				// Bypass references to avoid function creation in every render.
-				const { setCanvasState } = refBus.current;
+				const { setCanvasState, startInertiaAnimation } = refBus.current;
 
 				setCanvasState((prevState) => ({
 					...prevState,
@@ -169,10 +278,23 @@ export const useGrabScroll = (
 						grabScrollOccurred: true,
 					},
 				}));
+
+				// Start inertia animation if there's sufficient velocity
+				if (velocityTracker.current) {
+					const { velocityX, velocityY } = velocityTracker.current;
+					const hasVelocity =
+						Math.abs(velocityX) > INERTIA_VELOCITY_THRESHOLD ||
+						Math.abs(velocityY) > INERTIA_VELOCITY_THRESHOLD;
+
+					if (hasVelocity) {
+						startInertiaAnimation(velocityX, velocityY);
+					}
+				}
 			}
 
 			// Reset drag start state
 			dragStartState.current = null;
+			velocityTracker.current = null;
 			e.currentTarget.releasePointerCapture(e.pointerId);
 		},
 		[],

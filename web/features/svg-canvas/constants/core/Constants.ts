@@ -19,3 +19,15 @@ export const AUTO_SCROLL_STEP_SIZE = 10;
 
 /** Interval duration for continuous auto-scrolling when cursor is at edge (in milliseconds) */
 export const AUTO_SCROLL_INTERVAL_MS = 20;
+
+/** Deceleration factor for inertia scrolling (lower = faster stop, higher = longer coast) */
+export const INERTIA_DECELERATION = 0.93;
+
+/** Minimum velocity threshold for inertia scrolling (pixels per millisecond) */
+export const INERTIA_MIN_VELOCITY = 0.01;
+
+/** Velocity threshold for starting inertia animation (pixels per millisecond) */
+export const INERTIA_VELOCITY_THRESHOLD = 0.1;
+
+/** Maximum velocity for inertia scrolling (pixels per millisecond) */
+export const INERTIA_MAX_VELOCITY = 4.0;

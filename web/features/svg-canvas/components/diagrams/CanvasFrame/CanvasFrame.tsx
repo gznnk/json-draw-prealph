@@ -55,6 +55,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	scaleY,
 	keepProportion,
 	rotateEnabled,
+	inversionEnabled,
 	isSelected,
 	isAncestorSelected,
 	items,
@@ -122,7 +123,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		}
 
 		const allChildIds = collectDiagramDataIds(currentItems);
-		return !allChildIds.includes(event.dropItem.id);
+		return !allChildIds.has(event.dropItem.id);
 	}, []);
 
 	/**
@@ -381,6 +382,10 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		},
 	});
 
+	// Calculate viewBox for clipping content to frame bounds
+	// Using absolute coordinates: x - width/2, y - height/2, width, height
+	const viewBox = `${x - width / 2} ${y - height / 2} ${width} ${height}`;
+
 	return (
 		<>
 			<CanvasFrameElement
@@ -412,7 +417,17 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 				transform={transform}
 				isActive={isDropTarget}
 			/>
-			{children}
+			<svg
+				x={-width / 2}
+				y={-height / 2}
+				width={width}
+				height={height}
+				viewBox={viewBox}
+				transform={transform}
+				overflow="hidden"
+			>
+				{children}
+			</svg>
 			<Outline
 				x={x}
 				y={y}
@@ -438,6 +453,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 					scaleY={scaleY}
 					keepProportion={keepProportion}
 					rotateEnabled={rotateEnabled}
+					inversionEnabled={inversionEnabled}
 					showTransformControls={showTransformControls}
 					isTransforming={isTransforming}
 					onTransform={onTransform}
