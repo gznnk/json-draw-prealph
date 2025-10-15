@@ -1,5 +1,11 @@
 import { useCallback, useRef } from "react";
 
+import {
+	INERTIA_DECELERATION,
+	INERTIA_MAX_VELOCITY,
+	INERTIA_MIN_VELOCITY,
+	INERTIA_VELOCITY_THRESHOLD,
+} from "../../../constants/core/Constants";
 import { EVENT_NAME_SVG_CANVAS_SCROLL } from "../../../constants/core/EventNames";
 import type { SvgCanvasScrollEvent } from "../../../types/events/SvgCanvasScrollEvent";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
@@ -61,23 +67,19 @@ export const useGrabScroll = (
 			let velocityY = initialVelocityY;
 			let lastTime = performance.now();
 
-			// Deceleration factor (lower = faster stop, higher = longer coast)
-			const deceleration = 0.93;
-			const minVelocity = 0.01; // Stop when velocity is below this threshold
-
 			const animate = (): void => {
 				const currentTime = performance.now();
 				const deltaTime = currentTime - lastTime;
 				lastTime = currentTime;
 
 				// Apply deceleration
-				velocityX *= deceleration;
-				velocityY *= deceleration;
+				velocityX *= INERTIA_DECELERATION;
+				velocityY *= INERTIA_DECELERATION;
 
 				// Check if we should continue animating
 				if (
-					Math.abs(velocityX) < minVelocity &&
-					Math.abs(velocityY) < minVelocity
+					Math.abs(velocityX) < INERTIA_MIN_VELOCITY &&
+					Math.abs(velocityY) < INERTIA_MIN_VELOCITY
 				) {
 					inertiaAnimationFrame.current = null;
 					return;
@@ -227,9 +229,18 @@ export const useGrabScroll = (
 					const deltaX = e.clientX - velocityTracker.current.lastClientX;
 					const deltaY = e.clientY - velocityTracker.current.lastClientY;
 
-					// Calculate velocity in pixels per millisecond
-					velocityTracker.current.velocityX = deltaX / deltaTime;
-					velocityTracker.current.velocityY = deltaY / deltaTime;
+					// Calculate velocity in pixels per millisecond and clamp to max velocity
+					const rawVelocityX = deltaX / deltaTime;
+					const rawVelocityY = deltaY / deltaTime;
+
+					velocityTracker.current.velocityX = Math.max(
+						-INERTIA_MAX_VELOCITY,
+						Math.min(INERTIA_MAX_VELOCITY, rawVelocityX),
+					);
+					velocityTracker.current.velocityY = Math.max(
+						-INERTIA_MAX_VELOCITY,
+						Math.min(INERTIA_MAX_VELOCITY, rawVelocityY),
+					);
 					velocityTracker.current.lastClientX = e.clientX;
 					velocityTracker.current.lastClientY = e.clientY;
 					velocityTracker.current.lastTime = currentTime;
@@ -306,10 +317,9 @@ export const useGrabScroll = (
 				// Start inertia animation if there's sufficient velocity
 				if (velocityTracker.current) {
 					const { velocityX, velocityY } = velocityTracker.current;
-					const velocityThreshold = 0.1; // pixels per millisecond
 					const hasVelocity =
-						Math.abs(velocityX) > velocityThreshold ||
-						Math.abs(velocityY) > velocityThreshold;
+						Math.abs(velocityX) > INERTIA_VELOCITY_THRESHOLD ||
+						Math.abs(velocityY) > INERTIA_VELOCITY_THRESHOLD;
 
 					if (hasVelocity) {
 						startInertiaAnimation(velocityX, velocityY);
