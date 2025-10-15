@@ -13,4 +13,6 @@ export enum InteractionState {
 	Changing = "changing",
 	/** Area selection state - user is selecting multiple elements by drawing a rectangle */
 	AreaSelection = "areaSelection",
+	/** Grab scroll state - user is scrolling the canvas with grab (including inertia) */
+	GrabScroll = "grabScroll",
 }

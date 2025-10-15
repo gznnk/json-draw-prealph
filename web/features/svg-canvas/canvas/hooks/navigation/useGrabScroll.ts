@@ -6,6 +6,7 @@ import {
 	INERTIA_MIN_VELOCITY,
 	INERTIA_VELOCITY_THRESHOLD,
 } from "../../../constants/core/Constants";
+import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
 /**
@@ -65,6 +66,9 @@ export const useGrabScroll = (
 			let lastTime = performance.now();
 
 			const animate = (): void => {
+				const { setCanvasState, zoom, onPanZoomChange, minX, minY } =
+					refBus.current;
+
 				const currentTime = performance.now();
 				const deltaTime = currentTime - lastTime;
 				lastTime = currentTime;
@@ -79,6 +83,11 @@ export const useGrabScroll = (
 					Math.abs(velocityY) < INERTIA_MIN_VELOCITY
 				) {
 					inertiaAnimationFrame.current = null;
+					// Reset interaction state to Idle when inertia animation completes
+					setCanvasState((prevState) => ({
+						...prevState,
+						interactionState: InteractionState.Idle,
+					}));
 					return;
 				}
 
@@ -86,13 +95,10 @@ export const useGrabScroll = (
 				const deltaX = velocityX * deltaTime;
 				const deltaY = velocityY * deltaTime;
 
-				// Update canvas position
-				const { setCanvasState, zoom, onPanZoomChange, minX, minY } =
-					refBus.current;
-
 				const newMinX = minX - deltaX;
 				const newMinY = minY - deltaY;
 
+				// Update canvas position
 				setCanvasState((prevState) => {
 					const newState = {
 						...prevState,
@@ -160,6 +166,12 @@ export const useGrabScroll = (
 
 			// Check for right click
 			if (e.button === 2) {
+				// Set interaction state to GrabScroll
+				setCanvasState((prevState) => ({
+					...prevState,
+					interactionState: InteractionState.GrabScroll,
+				}));
+
 				// Store the initial drag start state
 				dragStartState.current = {
 					clientX: e.clientX,
@@ -280,6 +292,7 @@ export const useGrabScroll = (
 				}));
 
 				// Start inertia animation if there's sufficient velocity
+				let hasInertia = false;
 				if (velocityTracker.current) {
 					const { velocityX, velocityY } = velocityTracker.current;
 					const hasVelocity =
@@ -288,7 +301,16 @@ export const useGrabScroll = (
 
 					if (hasVelocity) {
 						startInertiaAnimation(velocityX, velocityY);
+						hasInertia = true;
 					}
+				}
+
+				// If no inertia, reset interaction state to Idle immediately
+				if (!hasInertia) {
+					setCanvasState((prevState) => ({
+						...prevState,
+						interactionState: InteractionState.Idle,
+					}));
 				}
 			}
 
