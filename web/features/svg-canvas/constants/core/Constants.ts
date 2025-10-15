@@ -14,11 +14,8 @@ export const MINIMAP_VIEWPORT_MARGIN = 20000;
 /** The threshold from the edge of the canvas to trigger auto-expansion */
 export const AUTO_SCROLL_THRESHOLD = 20;
 
-/** The amount of space to scroll each time when auto-scrolling at canvas edge */
-export const AUTO_SCROLL_STEP_SIZE = 10;
-
-/** Interval duration for continuous auto-scrolling when cursor is at edge (in milliseconds) */
-export const AUTO_SCROLL_INTERVAL_MS = 20;
+/** The amount of space to scroll per millisecond when auto-scrolling at canvas edge (pixels/ms) */
+export const AUTO_SCROLL_STEP_SIZE = 0.7; // 7 pixels/frame at 60fps ≈ 0.7 pixel/ms (7 * 60 / 1000)
 
 /** Deceleration factor for inertia scrolling (lower = faster stop, higher = longer coast) */
 export const INERTIA_DECELERATION = 0.93;

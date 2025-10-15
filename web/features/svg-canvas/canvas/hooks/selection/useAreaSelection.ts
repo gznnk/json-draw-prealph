@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 
 import { useClearAllSelection } from "./useClearAllSelection";
-import type { DoStartEdgeScrollArgs } from "../../../hooks/useAutoEdgeScroll";
+import type { HandleEdgeScrollArgs } from "../../../hooks/useAutoEdgeScroll";
 import { useAutoEdgeScroll } from "../../../hooks/useAutoEdgeScroll";
 import type { Box } from "../../../types/core/Box";
 import type { AreaSelectionEvent } from "../../../types/events/AreaSelectionEvent";
@@ -243,9 +243,9 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 	}, []);
 
 	/**
-	 * Handle edge scroll start with custom logic for area selection
+	 * Handle edge scrolling with custom logic for area selection
 	 */
-	const doStartEdgeScroll = useCallback((state: DoStartEdgeScrollArgs) => {
+	const handleEdgeScroll = useCallback((state: HandleEdgeScrollArgs) => {
 		const {
 			setCanvasState,
 			canvasState: { areaSelectionState },
@@ -283,7 +283,7 @@ export const useAreaSelection = (props: SvgCanvasSubHooksProps) => {
 			containerHeight:
 				canvasRef?.containerRef?.current?.getBoundingClientRect()?.height ?? 0,
 		},
-		doStartEdgeScroll,
+		handleEdgeScroll,
 	);
 
 	/**

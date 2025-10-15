@@ -1,7 +1,6 @@
 import { useCallback, useRef } from "react";
 import type { RefObject } from "react";
 
-import { AUTO_SCROLL_INTERVAL_MS } from "../constants/core/Constants";
 import type { Point } from "../types/core/Point";
 import type { SvgViewport } from "../types/core/SvgViewport";
 import { calculateScrollDelta } from "../utils/math/geometry/calculateScrollDelta";
@@ -16,9 +15,9 @@ export type EdgeScrollState = {
 };
 
 /**
- * Type for the function to start edge scrolling.
+ * Type for the function to handle edge scrolling.
  */
-export type DoStartEdgeScrollArgs = EdgeScrollState & {
+export type HandleEdgeScrollArgs = EdgeScrollState & {
 	minX: number;
 	minY: number;
 };
@@ -62,15 +61,16 @@ const resolveInitialViewport = (source: ViewportSource): SvgViewport => {
 /**
  * Custom hook to handle auto edge scrolling in the SVG canvas.
  * @param viewportSource - The current SVG viewport or a ref that can provide it.
- * @param doStartEdgeScroll - Function to start edge scrolling with new state.
+ * @param handleEdgeScroll - Function to handle edge scrolling with new state.
  */
 export const useAutoEdgeScroll = (
 	viewportSource: ViewportSource,
-	doStartEdgeScroll: (state: DoStartEdgeScrollArgs) => void,
+	handleEdgeScroll: (state: HandleEdgeScrollArgs) => void,
 ) => {
 	// Internal state for edge scrolling
-	const scrollIntervalRef = useRef<number | null>(null);
+	const scrollAnimationFrameRef = useRef<number | null>(null);
 	const isScrollingRef = useRef(false);
+	const lastTimestampRef = useRef<number>(0);
 
 	// Internal state for edge scrolling
 	const edgeScrollStateRef = useRef<EdgeScrollState>({
@@ -96,19 +96,20 @@ export const useAutoEdgeScroll = (
 	// Use ref to hold referenced values to avoid frequent handler generation
 	const refBusVal = {
 		resolveViewport,
-		doStartEdgeScroll,
+		handleEdgeScroll,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
 	/**
-	 * Clear the edge scroll interval if it exists
+	 * Clear the edge scroll animation if it exists
 	 */
 	const clearEdgeScroll = useCallback(() => {
-		if (scrollIntervalRef.current) {
-			clearInterval(scrollIntervalRef.current);
-			scrollIntervalRef.current = null;
+		if (scrollAnimationFrameRef.current !== null) {
+			cancelAnimationFrame(scrollAnimationFrameRef.current);
+			scrollAnimationFrameRef.current = null;
 			isScrollingRef.current = false;
+			lastTimestampRef.current = 0;
 		}
 
 		return () => {
@@ -122,11 +123,28 @@ export const useAutoEdgeScroll = (
 	const startEdgeScroll = useCallback(() => {
 		// Mark scrolling as active
 		isScrollingRef.current = true;
+		lastTimestampRef.current = 0; // Reset timestamp on start
 
-		// Execute scroll processing immediately
-		const executeScroll = () => {
+		// Animation loop using requestAnimationFrame with time-based movement
+		const animate = (timestamp: number): void => {
+			// Continue animation if still scrolling
+			if (!isScrollingRef.current) {
+				return;
+			}
+
+			// Initialize lastTimestamp on first frame
+			if (lastTimestampRef.current === 0) {
+				lastTimestampRef.current = timestamp;
+				scrollAnimationFrameRef.current = requestAnimationFrame(animate);
+				return;
+			}
+
+			// Calculate elapsed time in milliseconds
+			const deltaTime = timestamp - lastTimestampRef.current;
+			lastTimestampRef.current = timestamp;
+
 			// Bypass references to avoid function creation in every render.
-			const { resolveViewport, doStartEdgeScroll } = refBus.current;
+			const { resolveViewport, handleEdgeScroll } = refBus.current;
 			const viewport = resolveViewport();
 
 			// Auto edge scroll if the cursor is near the edges.
@@ -135,8 +153,10 @@ export const useAutoEdgeScroll = (
 			const minY = viewport.minY;
 
 			const { cursorPos, delta } = edgeScrollStateRef.current;
-			const deltaX = delta.x / zoom;
-			const deltaY = delta.y / zoom;
+
+			// Apply time-based movement: delta (pixels/ms) * elapsed time (ms)
+			const deltaX = (delta.x / zoom) * deltaTime;
+			const deltaY = (delta.y / zoom) * deltaTime;
 
 			const newCursorPos = {
 				x: cursorPos.x + deltaX,
@@ -149,26 +169,25 @@ export const useAutoEdgeScroll = (
 				delta,
 			};
 
-			// Calculate new scroll positions
-			const newMinX = minX + delta.x;
-			const newMinY = minY + delta.y;
+			// Calculate new scroll positions (time-adjusted)
+			const scrollDeltaX = delta.x * deltaTime;
+			const scrollDeltaY = delta.y * deltaTime;
+			const newMinX = minX + scrollDeltaX;
+			const newMinY = minY + scrollDeltaY;
 
-			doStartEdgeScroll({
+			handleEdgeScroll({
 				cursorPos: newCursorPos,
 				delta: { x: deltaX, y: deltaY },
 				minX: newMinX,
 				minY: newMinY,
 			});
+
+			// Request next frame
+			scrollAnimationFrameRef.current = requestAnimationFrame(animate);
 		};
 
-		// Execute immediately
-		executeScroll();
-
-		// Continue with interval
-		scrollIntervalRef.current = window.setInterval(
-			executeScroll,
-			AUTO_SCROLL_INTERVAL_MS,
-		);
+		// Start the animation
+		scrollAnimationFrameRef.current = requestAnimationFrame(animate);
 	}, []);
 
 	/**

@@ -1,7 +1,7 @@
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { DoStartEdgeScrollArgs } from "./useAutoEdgeScroll";
+import type { HandleEdgeScrollArgs } from "./useAutoEdgeScroll";
 import { useAutoEdgeScroll } from "./useAutoEdgeScroll";
 import { DRAG_DEAD_ZONE } from "../constants/core/Constants";
 import { EVENT_NAME_BROADCAST_DRAG } from "../constants/core/EventNames";
@@ -194,9 +194,9 @@ export const useDrag = (props: DragProps) => {
 	};
 
 	/**
-	 * Handle edge scroll start with custom logic for drag events
+	 * Handle edge scrolling with custom logic for drag events
 	 */
-	const doStartEdgeScroll = useCallback((state: DoStartEdgeScrollArgs) => {
+	const handleEdgeScroll = useCallback((state: HandleEdgeScrollArgs) => {
 		// Bypass references to avoid function creation in every render
 		const { id, onDrag, getPointOnDrag } = refBus.current;
 
@@ -224,7 +224,7 @@ export const useDrag = (props: DragProps) => {
 	// Use the shared auto edge scroll hook
 	const { autoEdgeScroll, clearEdgeScroll } = useAutoEdgeScroll(
 		svgViewport,
-		doStartEdgeScroll,
+		handleEdgeScroll,
 	);
 
 	/**
