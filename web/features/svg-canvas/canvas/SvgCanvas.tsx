@@ -379,7 +379,11 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 
 				const delta = e.deltaY > 0 ? 0.9 : 1.1;
 				const newZoom = refBus.current.zoom * delta;
-				refBus.current.onZoom?.(newZoom);
+				// Pass cursor position for cursor-centered zoom
+				refBus.current.onZoom?.(newZoom, {
+					clientX: e.clientX,
+					clientY: e.clientY,
+				});
 			};
 
 			document.addEventListener("wheel", onDocumentWheel, {

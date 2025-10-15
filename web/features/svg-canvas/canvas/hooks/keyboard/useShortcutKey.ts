@@ -28,7 +28,7 @@ export type UseShortcutKeyProps = {
 	/** Handler for paste operation */
 	onPaste?: () => void;
 	/** Function to handle zooming in or out */
-	onZoom?: (zoom: number) => void;
+	onZoom?: (zoom: number, options?: { clientX?: number; clientY?: number }) => void;
 };
 
 /** * Custom hook to handle keyboard shortcuts for the SVG canvas.

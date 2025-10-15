@@ -57,7 +57,10 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onGrabMove?: (e: React.PointerEvent<SVGSVGElement>) => void;
 	onGrabEnd?: (e: React.PointerEvent<SVGSVGElement>) => void;
 	onNavigate?: (minX: number, minY: number) => void;
-	onZoom?: (zoom: number) => void;
+	onZoom?: (
+		zoom: number,
+		options?: { clientX?: number; clientY?: number },
+	) => void;
 	// selection
 	onAreaSelection?: (event: AreaSelectionEvent) => void;
 	onCancelAreaSelection?: () => void;
