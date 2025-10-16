@@ -25,6 +25,7 @@ import type { DiagramData } from "../../../types/data/core/DiagramData";
 import type { ItemableData } from "../../../types/data/core/ItemableData";
 import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEvent";
 import type { DiagramDragDropEvent } from "../../../types/events/DiagramDragDropEvent";
+import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../../types/events/DiagramHoverChangeEvent";
 import type { GroupShapesEvent } from "../../../types/events/GroupShapesEvent";
 import type { CanvasFrameProps } from "../../../types/props/diagrams/CanvasFrameProps";
@@ -96,8 +97,8 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 
 	// State for managing drop target visual feedback
 	const [isDropTarget, setIsDropTarget] = useState(false);
-	// Reference to track the ID of the item being dragged from this frame's children
-	const draggingItemIdRef = useRef<string | null>(null);
+	// Reference to track all child IDs of this frame
+	const allChildIdsRef = useRef<Set<string>>(new Set());
 
 	// Create reference to store the origin point for diagram placement
 	const origin = useRef<Point>({ x: 0, y: 0 });
@@ -144,15 +145,11 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 			}
 
 			// Only hide ghost if the dropped item is one of this frame's children
-			const shouldControlGhost =
-				draggingItemIdRef.current === event.dropItem.id;
+			const shouldControlGhost = allChildIdsRef.current.has(event.dropItem.id);
 			onDrop?.({
 				...event,
 				showGhost: shouldControlGhost ? false : undefined,
 			});
-
-			// Clear the dragging item ID when drop completes
-			draggingItemIdRef.current = null;
 		},
 		[canAcceptDrop],
 	);
@@ -163,8 +160,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 			setIsDropTarget(droppable);
 
 			// Only hide ghost if the dragged item is one of this frame's children
-			const shouldControlGhost =
-				draggingItemIdRef.current === event.dropItem.id;
+			const shouldControlGhost = allChildIdsRef.current.has(event.dropItem.id);
 			refBus.current.onDragOver?.({
 				...event,
 				showGhost: shouldControlGhost ? false : undefined,
@@ -177,32 +173,12 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		setIsDropTarget(false);
 
 		// Only show ghost if the leaving item is one of this frame's children
-		const shouldControlGhost = draggingItemIdRef.current === event.dropItem.id;
+		const shouldControlGhost = allChildIdsRef.current.has(event.dropItem.id);
 		refBus.current.onDragLeave?.({
 			...event,
 			showGhost: shouldControlGhost ? true : undefined,
 		});
 	}, []);
-
-	/**
-	 * Wrapped onDrag handler for child elements to track which item is being dragged
-	 */
-	const handleChildDrag = useCallback(
-		(e: Parameters<NonNullable<typeof onDrag>>[0]) => {
-			// Track the dragging item ID when drag starts
-			if (e.eventPhase === "Started") {
-				draggingItemIdRef.current = e.id;
-			}
-			// Clear the dragging item ID when drag ends
-			else if (e.eventPhase === "Ended") {
-				draggingItemIdRef.current = null;
-			}
-
-			// Propagate the drag event
-			refBus.current.onDrag?.(e);
-		},
-		[],
-	);
 
 	// Use individual interaction hooks
 	const dragProps = useDrag({
@@ -236,6 +212,24 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		id,
 		onHoverChange,
 	});
+
+	/**
+	 * Wrapped onDrag handler for child elements to track child IDs when drag starts
+	 */
+	const handleChildDrag = useCallback((e: DiagramDragEvent) => {
+		// Update allChildIdsRef when drag starts
+		if (e.eventPhase === "Started") {
+			const { items } = refBus.current;
+			allChildIdsRef.current = collectDiagramDataIds(items);
+		}
+		// Clear the child IDs when drag ends
+		else if (e.eventPhase === "Ended") {
+			allChildIdsRef.current = new Set();
+		}
+
+		// Propagate the drag event
+		refBus.current.onDrag?.(e);
+	}, []);
 
 	// Handler to propagate child hover events to this frame
 	const handleChildHoverChange = useCallback(
