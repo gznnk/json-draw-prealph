@@ -19,4 +19,6 @@ export type DiagramDragDropEvent = {
 		x: number;
 		y: number;
 	};
+	/** Optional flag to show ghost image when drag leaves the drop target */
+	showGhost?: boolean;
 };

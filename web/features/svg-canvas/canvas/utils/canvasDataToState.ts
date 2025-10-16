@@ -37,6 +37,7 @@ export const canvasDataToState = (
 		textEditorState: { isActive: false } as TextEditorState,
 		interactionState: InteractionState.Idle,
 		suppressContextMenu: false,
+		showDragGhost: false,
 		areaSelectionState: {
 			startX: 0,
 			startY: 0,

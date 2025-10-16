@@ -27,6 +27,7 @@ import {
 	getPreviousZoomLevel,
 	getResetZoomLevel,
 } from "./utils/zoomLevels";
+import { DragGhost } from "../components/auxiliary/DragGhost";
 import { GridBackground } from "../components/auxiliary/GridBackground";
 import { GridPattern } from "../components/auxiliary/GridPattern";
 import { MiniMap } from "../components/auxiliary/MiniMap";
@@ -46,6 +47,7 @@ import { SvgCanvasStateProvider } from "../context/SvgCanvasStateContext";
 import { SvgViewportProvider } from "../context/SvgViewportContext";
 import { DiagramRegistry } from "../registry";
 import type { SvgViewport } from "../types/core/SvgViewport";
+import { getSelectedDiagrams } from "../utils/core/getSelectedDiagrams";
 import { newEventId } from "../utils/core/newEventId";
 import { useShortcutKey } from "./hooks/keyboard/useShortcutKey";
 import { DiagramInfoPopover } from "../components/auxiliary/DiagramInfoPopover";
@@ -75,6 +77,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			selectionState,
 			interactionState,
 			suppressContextMenu,
+			showDragGhost,
 			// actions
 			onClick,
 			onConnect,
@@ -154,6 +157,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			grabScrollState,
 			interactionState,
 			suppressContextMenu,
+			showDragGhost,
 			areaSelectionState: selectionState || {
 				startX: 0,
 				startY: 0,
@@ -176,6 +180,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			grabScrollState,
 			interactionState,
 			suppressContextMenu,
+			showDragGhost,
 			areaSelectionState: selectionState || {
 				startX: 0,
 				startY: 0,
@@ -544,6 +549,10 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 									<PreviewConnectLine pathData={previewConnectLineState} />
 									{/* Render flash connect lines */}
 									<FlashConnectLine />
+									{/* Render drag ghost for items dragged outside viewBox */}
+									{showDragGhost && (
+										<DragGhost selectedDiagrams={getSelectedDiagrams(items)} />
+									)}
 									{/* Render area selection rectangle */}
 									{selectionState && (
 										<SelectionRect

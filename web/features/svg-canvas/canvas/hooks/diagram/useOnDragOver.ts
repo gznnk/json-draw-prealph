@@ -20,11 +20,11 @@ export const useOnDragOver = (props: SvgCanvasSubHooksProps) => {
 	refBus.current = refBusVal;
 
 	return useCallback((e: DiagramDragDropEvent) => {
+		// Bypass references to avoid function creation in every render.
+		const { setCanvasState } = refBus.current.props;
+
 		// Only show connect points if dragging a ConnectPoint
 		if (e.dropItem.type === "ConnectPoint") {
-			// Bypass references to avoid function creation in every render.
-			const { setCanvasState } = refBus.current.props;
-
 			setCanvasState((prevState) => {
 				// Update items to show connect points for connectable elements
 				const items = applyFunctionRecursively(
@@ -47,6 +47,14 @@ export const useOnDragOver = (props: SvgCanvasSubHooksProps) => {
 					items,
 				};
 			});
+		}
+
+		// Hide ghost image when showGhost flag is false
+		if (e.showGhost === false) {
+			setCanvasState((prevState) => ({
+				...prevState,
+				showDragGhost: false,
+			}));
 		}
 	}, []);
 };

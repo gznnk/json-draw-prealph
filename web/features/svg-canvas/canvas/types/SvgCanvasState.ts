@@ -27,5 +27,7 @@ export type SvgCanvasState = Prettify<
 		areaSelectionState: AreaSelectionState;
 		/** Whether to suppress context menu (e.g., after grab scroll or drag operations) */
 		suppressContextMenu: boolean;
+		/** Whether to show ghost image for dragged items */
+		showDragGhost: boolean;
 	}
 >;

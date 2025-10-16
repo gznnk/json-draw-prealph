@@ -209,6 +209,9 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 				// Update outline of all groups.
 				newState.items = updateOutlineOfAllItemables(newState.items);
 
+				// Hide drag ghost when drag ends
+				newState.showDragGhost = false;
+
 				// Add history and get updated state
 				newState = addHistory(e.eventId, newState);
 
