@@ -21,7 +21,6 @@ import { useExtractSelectedDiagramsToTopLevel } from "../../../hooks/useExtractS
 import { useHover } from "../../../hooks/useHover";
 import { useSelect } from "../../../hooks/useSelect";
 import { DiagramRegistry } from "../../../registry";
-import type { Point } from "../../../types/core/Point";
 import type { DiagramData } from "../../../types/data/core/DiagramData";
 import type { ItemableData } from "../../../types/data/core/ItemableData";
 import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEvent";
@@ -62,6 +61,8 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	isSelected,
 	isAncestorSelected,
 	items,
+	originX,
+	originY,
 	connectPoints,
 	showConnectPoints = false,
 	connectEnabled = true,
@@ -106,9 +107,6 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	const allChildIdsRef = useRef<Set<string>>(new Set());
 	// Reference to track IDs of child items that have left this frame during drag
 	const dragLeavingItemIdsRef = useRef<Set<string>>(new Set());
-
-	// Create reference to store the origin point for diagram placement
-	const origin = useRef<Point>({ x: 0, y: 0 });
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
@@ -346,12 +344,6 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		id,
 		onPropagation: async (e) => {
 			if (e.eventPhase === "Started") {
-				// Set origin for placing incoming diagrams
-				origin.current = {
-					x: x - width / 2,
-					y: y - height / 2,
-				};
-
 				// Notify start of execution
 				onExecute?.({
 					id,
@@ -395,8 +387,8 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 							[
 								{
 									...shapeData,
-									x: shapeData.x + origin.current.x,
-									y: shapeData.y + origin.current.y,
+									x: shapeData.x + originX,
+									y: shapeData.y + originY,
 								},
 							],
 							true,
@@ -443,9 +435,18 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 						typeof toolData.width === "number" &&
 						typeof toolData.height === "number"
 					) {
+						// Calculate new origin (top-left corner) based on new dimensions
+						const newOriginX = x - toolData.width / 2;
+						const newOriginY = y - toolData.height / 2;
+
 						// Use onDiagramChange to notify the resize for this connected CanvasFrame
 						const changeDiagramEvent: DiagramChangeEvent<
-							ItemableData & { width: number; height: number }
+							ItemableData & {
+								width: number;
+								height: number;
+								originX: number;
+								originY: number;
+							}
 						> = {
 							id,
 							eventId: e.eventId,
@@ -454,11 +455,15 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 								items,
 								width,
 								height,
+								originX,
+								originY,
 							},
 							endDiagram: {
 								items,
 								width: toolData.width,
 								height: toolData.height,
+								originX: newOriginX,
+								originY: newOriginY,
 							},
 						};
 						onDiagramChange?.(changeDiagramEvent);

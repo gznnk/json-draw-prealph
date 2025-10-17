@@ -9,6 +9,7 @@ import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { collectConnectedConnectLines } from "../../../utils/shapes/connectLine/collectConnectedConnectLines";
 import { updateConnectLinesByIds } from "../../../utils/shapes/connectLine/updateConnectLinesByIds";
 import { isItemableState } from "../../../utils/validation/isItemableState";
+import { isOriginableState } from "../../../utils/validation/isOriginableState";
 import { isTransformativeState } from "../../../utils/validation/isTransformativeState";
 import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
@@ -120,6 +121,16 @@ export const useOnDrag = (props: SvgCanvasSubHooksProps) => {
 
 				// Update connect points
 				newItem = updateDiagramConnectPoints(newItem);
+
+				// Update origin for diagrams with origin properties
+				if (isOriginableState(newItem) && isOriginableState(initialItem)) {
+					// Update origin by adding dx/dy to initial origin
+					newItem = {
+						...newItem,
+						originX: initialItem.originX + dx,
+						originY: initialItem.originY + dy,
+					} as Diagram;
+				}
 
 				// Recursively update children if this diagram has them
 				if (isItemableState(newItem)) {
