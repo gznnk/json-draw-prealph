@@ -1,13 +1,23 @@
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
+import {
+	LLMClientFactory,
+	type LLMClient,
+} from "../../../../../shared/llm-client";
+import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
+import { useProcessManager } from "../../../hooks/useProcessManager";
 import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEvent";
+import type { ExecutionPropagationEvent } from "../../../types/events/ExecutionPropagationEvent";
 import type { AiProps } from "../../../types/props/diagrams/AiProps";
 import type { InputState } from "../../../types/state/elements/InputState";
+import { newEventId } from "../../../utils/core/newEventId";
+import { isPlainTextPayload } from "../../../utils/execution/isPlainTextPayload";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { efficientAffineTransformation } from "../../../utils/math/transform/efficientAffineTransformation";
+import { ProcessIndicator } from "../../auxiliary/ProcessIndicator";
 import { Frame } from "../../elements/Frame";
 import { Input } from "../../elements/Input";
 import { AiAssistant } from "../../icons/AiAssistant";
@@ -38,14 +48,48 @@ const AiComponent: React.FC<AiProps> = (props) => {
 		onClick,
 		onHoverChange,
 		onTextChange,
+		onExecute,
+		onAiMessageChange,
 	} = props;
 
 	const inputState = items[0] as InputState;
 	const [text, setText] = useState<string>(inputState?.text || "");
+	const [currentMessage, setCurrentMessage] = useState<string>(aiMessage);
+	const [apiKey, setApiKey] = useState<string>("");
+	const [llmClient, setLlmClient] = useState<LLMClient | null>(null);
+
+	const { processes, addProcess, setProcessSuccess, setProcessError } =
+		useProcessManager();
 
 	useEffect(() => {
 		setText(inputState?.text || "");
 	}, [inputState?.text]);
+
+	useEffect(() => {
+		setCurrentMessage(aiMessage);
+	}, [aiMessage]);
+
+	// Load API key and initialize LLM client
+	useEffect(() => {
+		const storedApiKey = OpenAiKeyManager.loadKey();
+		if (storedApiKey) {
+			setApiKey(storedApiKey);
+			const client = LLMClientFactory.createClient(storedApiKey, {
+				systemPrompt: "You are a helpful AI assistant.",
+			});
+			setLlmClient(client);
+		}
+	}, []);
+
+	// Update LLM client when API key changes
+	useEffect(() => {
+		if (apiKey) {
+			const client = LLMClientFactory.createClient(apiKey, {
+				systemPrompt: "You are a helpful AI assistant.",
+			});
+			setLlmClient(client);
+		}
+	}, [apiKey]);
 
 	// Create references to avoid function creation in every render
 	const refBusVal = {
@@ -56,7 +100,10 @@ const AiComponent: React.FC<AiProps> = (props) => {
 		onClick,
 		onHoverChange,
 		onTextChange,
+		onExecute,
+		onAiMessageChange,
 		setText,
+		setCurrentMessage,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -87,6 +134,101 @@ const AiComponent: React.FC<AiProps> = (props) => {
 			id,
 		});
 	}, []);
+
+	// Handler for executing the LLM with streaming response
+	const handleExecution = useCallback(
+		async (inputText: string) => {
+			if (inputText === "" || !llmClient) return;
+
+			const { id, onExecute, onAiMessageChange, setCurrentMessage } =
+				refBus.current;
+
+			const processId = newEventId();
+			addProcess(processId);
+
+			try {
+				let fullOutput = "";
+				const eventId = newEventId();
+
+				onExecute?.({
+					id,
+					eventId,
+					eventPhase: "Started",
+					payload: {
+						format: "text",
+						data: "",
+						metadata: {
+							contentType: "plain",
+						},
+					},
+				});
+
+				// Use LLMClient's chat method with streaming callback
+				await llmClient.chat({
+					message: inputText,
+					onTextChunk: (textChunk: string) => {
+						fullOutput += textChunk;
+						setCurrentMessage(fullOutput);
+
+						onExecute?.({
+							id,
+							eventId,
+							eventPhase: "InProgress",
+							payload: {
+								format: "text",
+								data: fullOutput,
+								metadata: {
+									contentType: "plain",
+								},
+							},
+						});
+					},
+				});
+
+				// Update the AI message state
+				onAiMessageChange?.({
+					id,
+					eventId,
+					eventPhase: "Ended",
+					aiMessage: fullOutput,
+				});
+
+				// Send completion event
+				onExecute?.({
+					id,
+					eventId,
+					eventPhase: "Ended",
+					payload: {
+						format: "text",
+						data: fullOutput,
+						metadata: {
+							contentType: "plain",
+						},
+					},
+				});
+
+				setProcessSuccess(processId);
+			} catch (error) {
+				console.error("Error fetching data from LLM API:", error);
+				alert("An error occurred during the API request.");
+				setProcessError(processId);
+			}
+		},
+		[llmClient, addProcess, setProcessError, setProcessSuccess],
+	);
+
+	// Handle propagation events from child components
+	const onPropagation = useCallback(
+		(e: ExecutionPropagationEvent) => {
+			if (e.eventPhase === "Ended") {
+				if (!isPlainTextPayload(e.payload)) return;
+				// Handle execution
+				const textData = e.payload.data;
+				handleExecution(textData);
+			}
+		},
+		[handleExecution],
+	);
 
 	// Layout constants
 	const avatarSize = 60;
@@ -135,6 +277,7 @@ const AiComponent: React.FC<AiProps> = (props) => {
 				connectEnabled={false}
 				connectPoints={[]}
 				showConnectPoints={false}
+				onPropagation={onPropagation}
 			>
 				{/* Avatar circle */}
 				<circle
@@ -215,10 +358,18 @@ const AiComponent: React.FC<AiProps> = (props) => {
 							wordWrap: "break-word",
 						}}
 					>
-						{aiMessage}
+						{currentMessage}
 					</div>
 				</foreignObject>
 			</Frame>
+			<ProcessIndicator
+				x={x}
+				y={y}
+				width={width}
+				height={height}
+				rotation={rotation}
+				processes={processes}
+			/>
 			{inputState && (
 				<Input
 					{...inputState}

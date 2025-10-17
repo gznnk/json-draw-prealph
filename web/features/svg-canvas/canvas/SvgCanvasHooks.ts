@@ -12,6 +12,7 @@ import { useStackOrderChange } from "./hooks/actions/useStackOrderChange";
 import { useStyleChange } from "./hooks/actions/useStyleChange";
 import { useUngroup } from "./hooks/actions/useUngroup";
 import { useOnAddDiagram } from "./hooks/diagram/useOnAddDiagram";
+import { useOnAiMessageChange } from "./hooks/diagram/useOnAiMessageChange";
 import { useOnAppendDiagrams } from "./hooks/diagram/useOnAppendDiagrams";
 import { useOnAppendSelectedDiagrams } from "./hooks/diagram/useOnAppendSelectedDiagrams";
 import { useOnClick } from "./hooks/diagram/useOnClick";
@@ -134,6 +135,9 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Hooks for the add diagram tool.
 	useOnAddDiagram(canvasHooksProps);
 
+	// Handler for AI message change event.
+	const onAiMessageChange = useOnAiMessageChange(canvasHooksProps);
+
 	// Hook for appending diagrams via D&D.
 	useOnAppendDiagrams(canvasHooksProps);
 
@@ -232,6 +236,7 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onGroup,
 		onHoverChange,
 		onAddDiagramByType,
+		onAiMessageChange,
 		onPaste,
 		onPreviewConnectLine,
 		onStackOrderChange,
