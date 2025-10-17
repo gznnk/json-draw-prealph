@@ -21,6 +21,7 @@ import { useOnDrag } from "./hooks/diagram/useOnDrag";
 import { useOnDragLeave } from "./hooks/diagram/useOnDragLeave";
 import { useOnDragOver } from "./hooks/diagram/useOnDragOver";
 import { useOnExecute } from "./hooks/diagram/useOnExecute";
+import { useOnExtractSelectedDiagramsToTopLevel } from "./hooks/diagram/useOnExtractSelectedDiagramsToTopLevel";
 import { useOnHoverChange } from "./hooks/diagram/useOnHoverChange";
 import { useOnSelect } from "./hooks/diagram/useOnSelect";
 import { useOnTextChange } from "./hooks/diagram/useOnTextChange";
@@ -138,6 +139,9 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// Hook for appending selected diagrams via D&D.
 	useOnAppendSelectedDiagrams(canvasHooksProps);
+
+	// Hook for extracting selected diagrams to top level when dragged out of CanvasFrame.
+	useOnExtractSelectedDiagramsToTopLevel(canvasHooksProps);
 
 	// Handler for the click event.
 	const onClick = useOnClick(canvasHooksProps, isCtrlPressed);

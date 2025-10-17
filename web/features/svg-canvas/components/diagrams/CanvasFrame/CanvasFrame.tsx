@@ -17,6 +17,7 @@ import { useAppendSelectedDiagrams } from "../../../hooks/useAppendSelectedDiagr
 import { useClick } from "../../../hooks/useClick";
 import { useDrag } from "../../../hooks/useDrag";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
+import { useExtractSelectedDiagramsToTopLevel } from "../../../hooks/useExtractSelectedDiagramsToTopLevel";
 import { useHover } from "../../../hooks/useHover";
 import { useSelect } from "../../../hooks/useSelect";
 import { DiagramRegistry } from "../../../registry";
@@ -95,10 +96,16 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	// Hook for appending diagrams to this frame
 	const appendDiagrams = useAppendDiagrams();
 
+	// Hook for extracting selected diagrams to top level
+	const extractSelectedDiagramsToTopLevel =
+		useExtractSelectedDiagramsToTopLevel();
+
 	// State for managing drop target visual feedback
 	const [isDropTarget, setIsDropTarget] = useState(false);
 	// Reference to track all child IDs of this frame
 	const allChildIdsRef = useRef<Set<string>>(new Set());
+	// Reference to track IDs of child items that have left this frame during drag
+	const dragLeavingItemIdsRef = useRef<Set<string>>(new Set());
 
 	// Create reference to store the origin point for diagram placement
 	const origin = useRef<Point>({ x: 0, y: 0 });
@@ -112,6 +119,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		onDragLeave,
 		onDrop,
 		onDrag,
+		extractSelectedDiagramsToTopLevel,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -161,6 +169,11 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 
 			const isChildItem = allChildIdsRef.current.has(event.dropItem.id);
 
+			if (isChildItem) {
+				// Child item has returned to the frame, remove from leaving items
+				dragLeavingItemIdsRef.current.delete(event.dropItem.id);
+			}
+
 			// Only set showGhost to true for external items entering the frame
 			// For child items, use undefined to avoid overwriting other handlers
 			refBus.current.onDragOver?.({
@@ -175,6 +188,12 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		setIsDropTarget(false);
 
 		const isChildItem = allChildIdsRef.current.has(event.dropItem.id);
+
+		if (isChildItem) {
+			// Record that this child item has left the frame
+			dragLeavingItemIdsRef.current.add(event.dropItem.id);
+		}
+
 		// Only set showGhost to true for child items leaving the frame
 		// For external items, use undefined to avoid overwriting other handlers
 		refBus.current.onDragLeave?.({
@@ -225,13 +244,21 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 			const { items } = refBus.current;
 			allChildIdsRef.current = collectDiagramDataIds(items);
 		}
-		// Clear the child IDs when drag ends
-		else if (e.eventPhase === "Ended") {
-			allChildIdsRef.current = new Set();
-		}
 
 		// Propagate the drag event
 		refBus.current.onDrag?.(e);
+
+		// Clear the child IDs when drag ends
+		if (e.eventPhase === "Ended") {
+			// Extract selected items to top level if any child left the frame during drag
+			if (dragLeavingItemIdsRef.current.size > 0) {
+				refBus.current.extractSelectedDiagramsToTopLevel();
+			}
+
+			// Clean up references
+			allChildIdsRef.current = new Set();
+			dragLeavingItemIdsRef.current = new Set();
+		}
 	}, []);
 
 	// Handler to propagate child hover events to this frame
