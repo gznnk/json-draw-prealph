@@ -19,6 +19,7 @@ export type DiagramType =
 	| "Input"
 	| "NodeHeader"
 	// Diagrams
+	| "Ai"
 	| "CanvasFrame"
 	| "Sticky"
 	// Nodes

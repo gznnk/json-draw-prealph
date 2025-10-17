@@ -140,6 +140,57 @@ const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({
 				onClick={() =>
 					onAddDiagramByType?.({
 						eventId: newEventId(),
+						diagramType: "Ai",
+						isSelected: true,
+					})
+				}
+			>
+				<svg width="20" height="20" viewBox="0 0 24 24">
+					<title>Add AI Chat</title>
+					{/* Avatar circle */}
+					<circle
+						cx="12"
+						cy="7"
+						r="3.5"
+						fill="#4A90E2"
+						stroke="#333"
+						strokeWidth="0.5"
+					/>
+					{/* Robot emoji representation */}
+					<text
+						x="12"
+						y="8"
+						fontSize="4"
+						textAnchor="middle"
+						dominantBaseline="central"
+					>
+						🤖
+					</text>
+					{/* Speech bubble */}
+					<rect
+						x="5"
+						y="12"
+						width="14"
+						height="8"
+						rx="2"
+						ry="2"
+						fill="#F0F0F0"
+						stroke="#999"
+						strokeWidth="0.5"
+					/>
+					{/* Bubble tail */}
+					<polygon
+						points="12,12 10,10 14,10"
+						fill="#F0F0F0"
+						stroke="#999"
+						strokeWidth="0.5"
+					/>
+				</svg>
+			</CanvasMenuItem>
+			<CanvasMenuItem
+				onClick={() =>
+					onAddDiagramByType?.({
+						eventId: newEventId(),
 						diagramType: "Sticky",
 						isSelected: true,
 					})
