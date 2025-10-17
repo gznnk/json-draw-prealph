@@ -404,17 +404,22 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 					}
 				} else if (isToolPayload(e.payload)) {
 					// TODO: カスタムフック化
-					// Handle tool execution results (e.g., group_shapes)
-					const toolData = e.payload.data as {
-						shapeIds: string[];
-						groupId: string;
-						name?: string;
-						description?: string;
-					};
+					// Handle tool execution results (e.g., group_shapes, resize_canvas_frame)
+					const toolData = e.payload.data as
+						| {
+								shapeIds: string[];
+								groupId: string;
+								name?: string;
+								description?: string;
+						  }
+						| {
+								width: number;
+								height: number;
+						  };
 
-					// Dispatch GROUP_SHAPES event to group the shapes
+					// Check if this is a group_shapes result
 					if (
-						toolData &&
+						"shapeIds" in toolData &&
 						Array.isArray(toolData.shapeIds) &&
 						toolData.shapeIds.length >= 2 &&
 						toolData.groupId
@@ -430,6 +435,37 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 						eventBus.dispatchEvent(
 							new CustomEvent(EVENT_NAME_GROUP_SHAPES, { detail: groupEvent }),
 						);
+					}
+					// Check if this is a resize_canvas_frame result
+					else if (
+						"width" in toolData &&
+						"height" in toolData &&
+						typeof toolData.width === "number" &&
+						typeof toolData.height === "number"
+					) {
+						// Use onDiagramChange to notify the resize for this connected CanvasFrame
+						const changeDiagramEvent: DiagramChangeEvent<
+							ItemableData & { width: number; height: number }
+						> = {
+							id,
+							eventId: e.eventId,
+							eventPhase: "Started",
+							startDiagram: {
+								items,
+								width,
+								height,
+							},
+							endDiagram: {
+								items,
+								width: toolData.width,
+								height: toolData.height,
+							},
+						};
+						onDiagramChange?.(changeDiagramEvent);
+						onDiagramChange?.({
+							...changeDiagramEvent,
+							eventPhase: "Ended",
+						});
 					}
 				}
 			}

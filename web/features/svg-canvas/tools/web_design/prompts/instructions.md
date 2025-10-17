@@ -7,6 +7,13 @@ You have access to the following tools for creating web page designs:
 
 ## Available Tools
 
+### resize_canvas_frame
+
+- **FIRST STEP - ALWAYS USE THIS FIRST**: Before creating any shapes, resize the canvas to fit your web design dimensions
+- Adjust the canvas size to accommodate your complete page layout (typically 1200-1600px wide, and as tall as needed)
+- This ensures your design has adequate space and proper proportions
+- Call this tool once at the beginning with appropriate width and height values
+
 ### add_rectangle_shape
 
 - PREFERRED METHOD for creating buttons, cards, navigation items, form fields, badges, and any interactive element that combines a shape with text
@@ -40,14 +47,15 @@ You have access to the following tools for creating web page designs:
 
 ### PLACEMENT STRATEGY - CRITICAL
 
-**Create page background first, then build components systematically:**
+**Resize canvas first, then create page background, then build components systematically:**
 
-1. **Start with page background**: Create a large background rectangle that covers the entire page area
-2. **Work left to right, top to bottom**: Build UI components in natural reading order
-3. **Complete each component fully**: Create component background + content + text before moving to next
-4. **Follow systematic layout order**: page background → header → navigation → hero → content sections → footer
-5. **Maintain proper spacing**: Ensure adequate spacing between components to prevent overlap
-6. **Layer management**: Page background first, then component backgrounds, then interactive elements with text
+1. **FIRST: Resize the canvas**: Use resize_canvas_frame to set appropriate dimensions for your design (e.g., 1400px × 2000px for a full landing page)
+2. **Start with page background**: Create a large background rectangle that covers the entire canvas area
+3. **Work left to right, top to bottom**: Build UI components in natural reading order
+4. **Complete each component fully**: Create component background + content + text before moving to next
+5. **Follow systematic layout order**: resize canvas → page background → header → navigation → hero → content sections → footer
+6. **Maintain proper spacing**: Ensure adequate spacing between components to prevent overlap
+7. **Layer management**: Canvas resize first, then page background, then component backgrounds, then interactive elements with text
 
 ### TEXT PLACEMENT STRATEGY - CRITICAL
 
@@ -92,13 +100,14 @@ After creating all UI components in a page section, group them together:
 
 ### WORKFLOW APPROACH
 
-1. **Plan the layout**: Identify all UI components needed (header, navigation, hero, content cards, footer, etc.)
-2. **Create page background first**: Add a large background rectangle covering the entire page area
-3. **Create components systematically**: Work from top-left to bottom-right
-4. **Complete each component fully**: Create component background + content + text before moving to the next
-5. **Group immediately**: After creating each logical UI component, group its elements (Level 1)
-6. **Group sections**: When a page section is complete, group all its components (Level 2)
-7. **Final page group**: At the very end, group all section groups into one master page group (Level 3)
+1. **Plan the layout**: Identify all UI components needed (header, navigation, hero, content cards, footer, etc.) and determine required canvas dimensions
+2. **FIRST: Resize canvas**: Use resize_canvas_frame to set appropriate width and height for your complete design
+3. **Create page background**: Add a large background rectangle covering the entire canvas area
+4. **Create components systematically**: Work from top-left to bottom-right
+5. **Complete each component fully**: Create component background + content + text before moving to the next
+6. **Group immediately**: After creating each logical UI component, group its elements (Level 1)
+7. **Group sections**: When a page section is complete, group all its components (Level 2)
+8. **Final page group**: At the very end, group all section groups into one master page group (Level 3)
 
 ## Design Principles
 

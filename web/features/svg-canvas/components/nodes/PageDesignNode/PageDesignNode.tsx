@@ -75,9 +75,27 @@ const PageDesignNodeComponent: React.FC<PageDesignNodeProps> = (props) => {
 					});
 				};
 
+				// Create resize canvas frame handler that sends resize result via onExecute
+				const resizeCanvasFrameHandler = (result: {
+					width: number;
+					height: number;
+				}) => {
+					props.onExecute?.({
+						id: props.id,
+						eventId: e.eventId,
+						eventPhase: "InProgress",
+						// TODO: Define a proper payload format for tool results
+						payload: {
+							format: "tool",
+							data: result,
+						},
+					});
+				};
+
 				const result = await webDesignHandler(
 					shapeHandler,
 					groupShapesHandler,
+					resizeCanvasFrameHandler,
 				)({
 					name: "web_design",
 					arguments: { design_request: textData },
