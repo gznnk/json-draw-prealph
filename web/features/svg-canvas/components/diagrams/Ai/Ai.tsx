@@ -242,16 +242,17 @@ const AiComponent: React.FC<AiProps> = (props) => {
 	const avatarSize = 60;
 	const buttonWidth = 60;
 	const buttonHeight = 36;
-	const bubbleHeight = height - avatarSize - 110; // Space for avatar, input, and padding
 	const inputHeight = 40;
 	const padding = 0;
 	const bubblePadding = 15;
+	const avatarOverlap = 30; // How much avatar overlaps below the bubble
 
-	// Avatar position (top center)
-	const avatarY = -(height / 2 - (avatarSize / 2 + padding));
+	// Speech bubble position (top)
+	const bubbleHeight = height - inputHeight - avatarSize + avatarOverlap - 10;
+	const bubbleY = -(height / 2 - bubbleHeight / 2) + 5;
 
-	// Speech bubble position (below avatar)
-	const bubbleY = avatarY + avatarSize / 2 + padding + bubbleHeight / 2;
+	// Avatar position (below bubble, overlapping)
+	const avatarY = bubbleY + (bubbleHeight / 2) + (avatarSize / 2) - avatarOverlap;
 
 	// Input position (bottom left)
 	const inputWidth = width - padding * 2 - buttonWidth - 5; // 5px gap between input and button
@@ -279,8 +280,6 @@ const AiComponent: React.FC<AiProps> = (props) => {
 	// Calculate positions for transform
 	const left = -width / 2;
 	const bubbleTop = bubbleY - bubbleHeight / 2;
-	const tailWidth = 20;
-	const tailHeight = 15;
 	const bubbleWidth = width - padding * 2;
 
 	return (
@@ -301,51 +300,6 @@ const AiComponent: React.FC<AiProps> = (props) => {
 				showConnectPoints={false}
 				onPropagation={onPropagation}
 			>
-				{/* Avatar circle */}
-				<circle
-					cx={0}
-					cy={avatarY}
-					r={avatarSize / 2}
-					fill={avatarBgColor}
-					pointerEvents="none"
-				/>
-
-				{/* Avatar image or icon */}
-				{avatarUrl ? (
-					<image
-						href={avatarUrl}
-						x={-avatarSize / 2}
-						y={avatarY - avatarSize / 2}
-						width={avatarSize}
-						height={avatarSize}
-						clipPath={`circle(${avatarSize / 2}px at center)`}
-						pointerEvents="none"
-					/>
-				) : (
-					<g
-						transform={`translate(${-avatarSize / 2}, ${avatarY - avatarSize / 2})`}
-					>
-						<AiAssistant
-							width={avatarSize}
-							height={avatarSize}
-							animation={true}
-						/>
-					</g>
-				)}
-
-				{/* Speech bubble tail (triangle pointing to avatar) */}
-				<polygon
-					points={`
-						${0},${bubbleTop}
-						${-tailWidth / 2},${bubbleTop - tailHeight}
-						${tailWidth / 2},${bubbleTop - tailHeight}
-					`}
-					fill={bubbleBgColor}
-					stroke="#ccc"
-					strokeWidth="1"
-					pointerEvents="none"
-				/>
-
 				{/* Main bubble rectangle */}
 				<rect
 					x={left + padding}
@@ -383,6 +337,38 @@ const AiComponent: React.FC<AiProps> = (props) => {
 						{currentMessage}
 					</div>
 				</foreignObject>
+
+				{/* Avatar circle (drawn after bubble to appear on top) */}
+				<circle
+					cx={0}
+					cy={avatarY}
+					r={avatarSize / 2}
+					fill={avatarBgColor}
+					pointerEvents="none"
+				/>
+
+				{/* Avatar image or icon */}
+				{avatarUrl ? (
+					<image
+						href={avatarUrl}
+						x={-avatarSize / 2}
+						y={avatarY - avatarSize / 2}
+						width={avatarSize}
+						height={avatarSize}
+						clipPath={`circle(${avatarSize / 2}px at center)`}
+						pointerEvents="none"
+					/>
+				) : (
+					<g
+						transform={`translate(${-avatarSize / 2}, ${avatarY - avatarSize / 2})`}
+					>
+						<AiAssistant
+							width={avatarSize}
+							height={avatarSize}
+							animation={true}
+						/>
+					</g>
+				)}
 			</Frame>
 			<ProcessIndicator
 				x={x}
