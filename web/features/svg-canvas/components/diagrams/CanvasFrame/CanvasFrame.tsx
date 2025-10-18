@@ -219,7 +219,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 			// For child items, use undefined to avoid overwriting other handlers
 			refBus.current.onDragOver?.({
 				...event,
-				showGhost: isChildItem ? undefined : true,
+				showGhost: !isChildItem && droppable ? true : undefined,
 			});
 		},
 		[canAcceptDrop],
