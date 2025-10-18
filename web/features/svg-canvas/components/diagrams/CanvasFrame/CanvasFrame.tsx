@@ -12,6 +12,7 @@ import {
 	CORNER_RADIUS,
 } from "../../../constants/styling/diagrams/CanvasFrameStyling";
 import { useEventBus } from "../../../context/EventBusContext";
+import { useSvgCanvasState } from "../../../context/SvgCanvasStateContext";
 import { useAppendDiagrams } from "../../../hooks/useAppendDiagrams";
 import { useAppendSelectedDiagrams } from "../../../hooks/useAppendSelectedDiagrams";
 import { useClick } from "../../../hooks/useClick";
@@ -31,11 +32,13 @@ import type { GroupShapesEvent } from "../../../types/events/GroupShapesEvent";
 import type { CanvasFrameProps } from "../../../types/props/diagrams/CanvasFrameProps";
 import type { Diagram } from "../../../types/state/core/Diagram";
 import { collectDiagramDataIds } from "../../../utils/core/collectDiagramDataIds";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { mergeProps } from "../../../utils/core/mergeProps";
 import { isDiagramPayload } from "../../../utils/execution/isDiagramPayload";
 import { isToolPayload } from "../../../utils/execution/isToolPayload";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
+import { isItemableState } from "../../../utils/validation/isItemableState";
 import { Outline } from "../../core/Outline";
 import { PositionLabel } from "../../core/PositionLabel";
 import { Transformative } from "../../core/Transformative";
@@ -88,6 +91,9 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	// Reference to the SVG element for interaction
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
+	// Get canvas state ref from context
+	const canvasStateRef = useSvgCanvasState();
+
 	// Get EventBus instance from context
 	const eventBus = useEventBus();
 
@@ -112,6 +118,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	const refBusVal = {
 		id,
 		items,
+		canvasStateRef,
 		appendSelectedDiagrams,
 		onDragOver,
 		onDragLeave,
@@ -127,14 +134,50 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 			return false;
 		}
 
-		const { id: currentId, items: currentItems } = refBus.current;
+		const {
+			id: currentId,
+			items: currentItems,
+			canvasStateRef,
+		} = refBus.current;
 
 		if (event.dropItem.id === currentId) {
 			return false;
 		}
 
+		// Get selected diagrams from canvas state
+		const allDiagrams = canvasStateRef.current?.items || [];
+		const selectedDiagrams = getSelectedDiagrams(allDiagrams);
+
+		// Collect all child IDs of this frame
 		const allChildIds = collectDiagramDataIds(currentItems);
-		return !allChildIds.has(event.dropItem.id);
+
+		// Recursively check selected diagrams for canvas type or matching dropItem.id
+		const checkDiagrams = (diagrams: Diagram[]): boolean => {
+			for (const diagram of diagrams) {
+				// Check if diagram is a child of this frame
+				if (allChildIds.has(diagram.id)) {
+					return false;
+				}
+
+				// Check if diagram has itemableType === "canvas"
+				if (isItemableState(diagram)) {
+					if (diagram.itemableType === "canvas") {
+						return false;
+					}
+					if (!checkDiagrams(diagram.items)) {
+						return false;
+					}
+				}
+			}
+			return true;
+		};
+
+		// Check all selected diagrams recursively
+		if (!checkDiagrams(selectedDiagrams)) {
+			return false;
+		}
+
+		return true;
 	}, []);
 
 	/**
