@@ -1,4 +1,11 @@
-import React, { memo, useMemo, useRef, useCallback, useState } from "react";
+import React, {
+	memo,
+	useMemo,
+	useRef,
+	useCallback,
+	useState,
+	useEffect,
+} from "react";
 
 import {
 	CanvasFrameElement,
@@ -117,6 +124,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	const innerSvgRef = useRef<SVGSVGElement>(null);
 	// Reference to store drag start position for calculating offset
 	const dragStartPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+	if (!isDragging) dragStartPosRef.current = { x, y };
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
@@ -136,6 +144,26 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
+
+	// Manage caching of innerHTML
+	useEffect(() => {
+		if (isRootSelected && innerSvgRef.current) {
+			cachedInnerHTMLRef.current = innerSvgRef.current.innerHTML;
+		} else if (!isRootSelected) {
+			// Clear cache when not root selected
+			cachedInnerHTMLRef.current = "";
+		}
+	}, [isRootSelected]);
+	useEffect(() => {
+		if (!isDragging && innerSvgRef.current) {
+			cachedInnerHTMLRef.current = innerSvgRef.current.innerHTML;
+		}
+	}, [isDragging]);
+	useEffect(() => {
+		if (!isSelected) {
+			cachedInnerHTMLRef.current = "";
+		}
+	}, [isSelected]);
 
 	const canAcceptDrop = useCallback((event: DiagramDragDropEvent) => {
 		if (event.dropItem.type === "ConnectPoint") {
@@ -186,26 +214,6 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		}
 
 		return true;
-	}, []);
-
-	/**
-	 * Handle drag events and cache innerHTML on drag start
-	 */
-	const handleDrag = useCallback((e: DiagramDragEvent) => {
-		const { x, y, isRootSelected, onDrag } = refBus.current;
-		// Cache innerHTML and start position on drag start
-		if (e.eventPhase === "Started" && isRootSelected && innerSvgRef.current) {
-			cachedInnerHTMLRef.current = innerSvgRef.current.innerHTML;
-			dragStartPosRef.current = { x, y };
-		}
-
-		// Clear cache on drag end
-		if (e.eventPhase === "Ended") {
-			cachedInnerHTMLRef.current = "";
-		}
-
-		// Propagate the drag event
-		onDrag?.(e);
 	}, []);
 
 	/**
@@ -288,7 +296,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		x,
 		y,
 		ref: svgRef,
-		onDrag: handleDrag,
+		onDrag,
 		onDragOver: handleDragOver,
 		onDragLeave: handleDragLeave,
 		onDrop: handleDrop,
@@ -316,25 +324,13 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 
 	/**
 	 * Wrapped onDrag handler for child elements to track child IDs when drag starts
+	 * Note: innerHTML is now cached in useEffect when isRootSelected becomes true
 	 */
 	const handleChildDrag = useCallback((e: DiagramDragEvent) => {
-		const {
-			x,
-			y,
-			isRootSelected,
-			items,
-			canvasStateRef,
-			extractDiagramsToTopLevel,
-		} = refBus.current;
+		const { items, canvasStateRef, extractDiagramsToTopLevel } = refBus.current;
 		// Update allChildIdsRef when drag starts
 		if (e.eventPhase === "Started") {
 			allChildIdsRef.current = collectDiagramIds(items);
-
-			// Cache innerHTML and start position for performance
-			if (isRootSelected && innerSvgRef.current) {
-				cachedInnerHTMLRef.current = innerSvgRef.current.innerHTML;
-				dragStartPosRef.current = { x, y };
-			}
 		}
 
 		// Propagate the drag event
@@ -357,7 +353,6 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 			// Clean up references
 			allChildIdsRef.current = new Set();
 			dragLeavingItemIdsRef.current = new Set();
-			cachedInnerHTMLRef.current = "";
 		}
 	}, []);
 
@@ -411,13 +406,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 
 	// Create shapes within the canvas frame
 	// When dragging, extract only the tree containing the drag-triggered diagram
-	const renderItems = useMemo(() => {
-		if (!isDragging) {
-			return items;
-		}
-
-		return filterDragTriggeredTree(items);
-	}, [items, isDragging]);
+	const renderItems = isDragging ? filterDragTriggeredTree(items) : items;
 
 	const children = renderItems.map((item: DiagramData) => {
 		// Ensure that item.type is of DiagramType
