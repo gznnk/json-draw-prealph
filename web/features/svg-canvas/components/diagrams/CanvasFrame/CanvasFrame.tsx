@@ -1,4 +1,11 @@
-import React, { memo, useMemo, useRef, useCallback, useState } from "react";
+import React, {
+	memo,
+	useMemo,
+	useRef,
+	useCallback,
+	useState,
+	useEffect,
+} from "react";
 
 import {
 	CanvasFrameElement,
@@ -12,16 +19,15 @@ import {
 	CORNER_RADIUS,
 } from "../../../constants/styling/diagrams/CanvasFrameStyling";
 import { useEventBus } from "../../../context/EventBusContext";
+import { useSvgCanvasState } from "../../../context/SvgCanvasStateContext";
 import { useAppendDiagrams } from "../../../hooks/useAppendDiagrams";
-import { useAppendSelectedDiagrams } from "../../../hooks/useAppendSelectedDiagrams";
 import { useClick } from "../../../hooks/useClick";
 import { useDrag } from "../../../hooks/useDrag";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
-import { useExtractSelectedDiagramsToTopLevel } from "../../../hooks/useExtractSelectedDiagramsToTopLevel";
+import { useExtractDiagramsToTopLevel } from "../../../hooks/useExtractDiagramsToTopLevel";
 import { useHover } from "../../../hooks/useHover";
 import { useSelect } from "../../../hooks/useSelect";
 import { DiagramRegistry } from "../../../registry";
-import type { Point } from "../../../types/core/Point";
 import type { DiagramData } from "../../../types/data/core/DiagramData";
 import type { ItemableData } from "../../../types/data/core/ItemableData";
 import type { DiagramChangeEvent } from "../../../types/events/DiagramChangeEvent";
@@ -32,11 +38,15 @@ import type { GroupShapesEvent } from "../../../types/events/GroupShapesEvent";
 import type { CanvasFrameProps } from "../../../types/props/diagrams/CanvasFrameProps";
 import type { Diagram } from "../../../types/state/core/Diagram";
 import { collectDiagramDataIds } from "../../../utils/core/collectDiagramDataIds";
+import { collectDiagramIds } from "../../../utils/core/collectDiagramIds";
+import { filterDragTriggeredTree } from "../../../utils/core/filterDragTriggeredTree";
+import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { mergeProps } from "../../../utils/core/mergeProps";
 import { isDiagramPayload } from "../../../utils/execution/isDiagramPayload";
 import { isToolPayload } from "../../../utils/execution/isToolPayload";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
+import { isItemableState } from "../../../utils/validation/isItemableState";
 import { Outline } from "../../core/Outline";
 import { PositionLabel } from "../../core/PositionLabel";
 import { Transformative } from "../../core/Transformative";
@@ -60,8 +70,11 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	rotateEnabled,
 	inversionEnabled,
 	isSelected,
+	isRootSelected,
 	isAncestorSelected,
 	items,
+	originX,
+	originY,
 	connectPoints,
 	showConnectPoints = false,
 	connectEnabled = true,
@@ -87,18 +100,17 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	// Reference to the SVG element for interaction
 	const svgRef = useRef<SVGRectElement>({} as SVGRectElement);
 
+	// Get canvas state ref from context
+	const canvasStateRef = useSvgCanvasState();
+
 	// Get EventBus instance from context
 	const eventBus = useEventBus();
-
-	// Hook for appending selected diagrams to this frame
-	const appendSelectedDiagrams = useAppendSelectedDiagrams();
 
 	// Hook for appending diagrams to this frame
 	const appendDiagrams = useAppendDiagrams();
 
-	// Hook for extracting selected diagrams to top level
-	const extractSelectedDiagramsToTopLevel =
-		useExtractSelectedDiagramsToTopLevel();
+	// Hook for extracting diagrams to top level
+	const extractDiagramsToTopLevel = useExtractDiagramsToTopLevel();
 
 	// State for managing drop target visual feedback
 	const [isDropTarget, setIsDropTarget] = useState(false);
@@ -106,37 +118,102 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	const allChildIdsRef = useRef<Set<string>>(new Set());
 	// Reference to track IDs of child items that have left this frame during drag
 	const dragLeavingItemIdsRef = useRef<Set<string>>(new Set());
-
-	// Create reference to store the origin point for diagram placement
-	const origin = useRef<Point>({ x: 0, y: 0 });
+	// Reference to cache innerHTML during drag for performance
+	const cachedInnerHTMLRef = useRef<string>("");
+	// Reference to the inner svg element containing children
+	const innerSvgRef = useRef<SVGSVGElement>(null);
+	// Reference to store drag start position for calculating offset
+	const dragStartPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+	if (!isDragging) dragStartPosRef.current = { x, y };
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		id,
+		x,
+		y,
+		isRootSelected,
 		items,
-		appendSelectedDiagrams,
+		isDragging,
+		canvasStateRef,
+		appendDiagrams,
+		onDrag,
 		onDragOver,
 		onDragLeave,
 		onDrop,
-		onDrag,
-		extractSelectedDiagramsToTopLevel,
+		extractDiagramsToTopLevel,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
+
+	// Manage caching of innerHTML
+	useEffect(() => {
+		if (isRootSelected && innerSvgRef.current) {
+			cachedInnerHTMLRef.current = innerSvgRef.current.innerHTML;
+		} else if (!isRootSelected) {
+			// Clear cache when not root selected
+			cachedInnerHTMLRef.current = "";
+		}
+	}, [isRootSelected]);
+	useEffect(() => {
+		if (!isDragging && innerSvgRef.current) {
+			cachedInnerHTMLRef.current = innerSvgRef.current.innerHTML;
+		}
+	}, [isDragging]);
+	useEffect(() => {
+		if (!isSelected) {
+			cachedInnerHTMLRef.current = "";
+		}
+	}, [isSelected]);
 
 	const canAcceptDrop = useCallback((event: DiagramDragDropEvent) => {
 		if (event.dropItem.type === "ConnectPoint") {
 			return false;
 		}
 
-		const { id: currentId, items: currentItems } = refBus.current;
+		const {
+			id: currentId,
+			items: currentItems,
+			canvasStateRef,
+		} = refBus.current;
 
 		if (event.dropItem.id === currentId) {
 			return false;
 		}
 
+		// Get selected diagrams from canvas state
+		const allDiagrams = canvasStateRef.current?.items || [];
+		const selectedDiagrams = getSelectedDiagrams(allDiagrams);
+
+		// Collect all child IDs of this frame
 		const allChildIds = collectDiagramDataIds(currentItems);
-		return !allChildIds.has(event.dropItem.id);
+
+		// Recursively check selected diagrams for canvas type or matching dropItem.id
+		const checkDiagrams = (diagrams: Diagram[]): boolean => {
+			for (const diagram of diagrams) {
+				// Check if diagram is a child of this frame
+				if (allChildIds.has(diagram.id)) {
+					return false;
+				}
+
+				// Check if diagram has itemableType === "canvas"
+				if (isItemableState(diagram)) {
+					if (diagram.itemableType === "canvas") {
+						return false;
+					}
+					if (!checkDiagrams(diagram.items)) {
+						return false;
+					}
+				}
+			}
+			return true;
+		};
+
+		// Check all selected diagrams recursively
+		if (!checkDiagrams(selectedDiagrams)) {
+			return false;
+		}
+
+		return true;
 	}, []);
 
 	/**
@@ -144,12 +221,22 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	 */
 	const handleDrop = useCallback(
 		(event: DiagramDragDropEvent) => {
-			const { id: currentId, appendSelectedDiagrams, onDrop } = refBus.current;
+			const {
+				id: currentId,
+				canvasStateRef,
+				appendDiagrams,
+				onDrop,
+			} = refBus.current;
 
 			setIsDropTarget(false);
 
 			if (canAcceptDrop(event)) {
-				appendSelectedDiagrams(currentId);
+				// Get selected diagrams from canvas state
+				const allDiagrams = canvasStateRef.current?.items || [];
+				const selectedDiagrams = getSelectedDiagrams(allDiagrams);
+
+				// Append selected diagrams to this frame
+				appendDiagrams(currentId, selectedDiagrams);
 			}
 
 			// Only hide ghost if the dropped item is one of this frame's children
@@ -178,7 +265,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 			// For child items, use undefined to avoid overwriting other handlers
 			refBus.current.onDragOver?.({
 				...event,
-				showGhost: isChildItem ? undefined : true,
+				showGhost: !isChildItem && droppable ? true : undefined,
 			});
 		},
 		[canAcceptDrop],
@@ -198,7 +285,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		// For external items, use undefined to avoid overwriting other handlers
 		refBus.current.onDragLeave?.({
 			...event,
-			showGhost: isChildItem ? true : undefined,
+			showGhost: isChildItem && !refBus.current.isDragging ? true : undefined,
 		});
 	}, []);
 
@@ -237,12 +324,13 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 
 	/**
 	 * Wrapped onDrag handler for child elements to track child IDs when drag starts
+	 * Note: innerHTML is now cached in useEffect when isRootSelected becomes true
 	 */
 	const handleChildDrag = useCallback((e: DiagramDragEvent) => {
+		const { items, canvasStateRef, extractDiagramsToTopLevel } = refBus.current;
 		// Update allChildIdsRef when drag starts
 		if (e.eventPhase === "Started") {
-			const { items } = refBus.current;
-			allChildIdsRef.current = collectDiagramDataIds(items);
+			allChildIdsRef.current = collectDiagramIds(items);
 		}
 
 		// Propagate the drag event
@@ -252,7 +340,14 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		if (e.eventPhase === "Ended") {
 			// Extract selected items to top level if any child left the frame during drag
 			if (dragLeavingItemIdsRef.current.size > 0) {
-				refBus.current.extractSelectedDiagramsToTopLevel();
+				// Get selected diagrams from the canvas state
+				const selectedDiagrams = getSelectedDiagrams(
+					canvasStateRef.current?.items ?? [],
+				);
+
+				if (selectedDiagrams.length > 0) {
+					extractDiagramsToTopLevel(selectedDiagrams);
+				}
 			}
 
 			// Clean up references
@@ -310,7 +405,10 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	);
 
 	// Create shapes within the canvas frame
-	const children = items.map((item: DiagramData) => {
+	// When dragging, extract only the tree containing the drag-triggered diagram
+	const renderItems = isDragging ? filterDragTriggeredTree(items) : items;
+
+	const children = renderItems.map((item: DiagramData) => {
 		// Ensure that item.type is of DiagramType
 		if (!item.type) {
 			console.error("Item has no type", item);
@@ -346,12 +444,6 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 		id,
 		onPropagation: async (e) => {
 			if (e.eventPhase === "Started") {
-				// Set origin for placing incoming diagrams
-				origin.current = {
-					x: x - width / 2,
-					y: y - height / 2,
-				};
-
 				// Notify start of execution
 				onExecute?.({
 					id,
@@ -390,31 +482,32 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 					// Validate that it's a valid diagram object
 					if (shapeData && shapeData.id && shapeData.type) {
 						// Append the received shape to this CanvasFrame
-						appendDiagrams(
-							id,
-							[
-								{
-									...shapeData,
-									x: shapeData.x + origin.current.x,
-									y: shapeData.y + origin.current.y,
-								},
-							],
-							true,
-						);
+						appendDiagrams(id, [
+							{
+								...shapeData,
+								x: shapeData.x + originX,
+								y: shapeData.y + originY,
+							},
+						]);
 					}
 				} else if (isToolPayload(e.payload)) {
 					// TODO: カスタムフック化
-					// Handle tool execution results (e.g., group_shapes)
-					const toolData = e.payload.data as {
-						shapeIds: string[];
-						groupId: string;
-						name?: string;
-						description?: string;
-					};
+					// Handle tool execution results (e.g., group_shapes, resize_canvas_frame)
+					const toolData = e.payload.data as
+						| {
+								shapeIds: string[];
+								groupId: string;
+								name?: string;
+								description?: string;
+						  }
+						| {
+								width: number;
+								height: number;
+						  };
 
-					// Dispatch GROUP_SHAPES event to group the shapes
+					// Check if this is a group_shapes result
 					if (
-						toolData &&
+						"shapeIds" in toolData &&
 						Array.isArray(toolData.shapeIds) &&
 						toolData.shapeIds.length >= 2 &&
 						toolData.groupId
@@ -430,6 +523,50 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 						eventBus.dispatchEvent(
 							new CustomEvent(EVENT_NAME_GROUP_SHAPES, { detail: groupEvent }),
 						);
+					}
+					// Check if this is a resize_canvas_frame result
+					else if (
+						"width" in toolData &&
+						"height" in toolData &&
+						typeof toolData.width === "number" &&
+						typeof toolData.height === "number"
+					) {
+						// Calculate new origin (top-left corner) based on new dimensions
+						const newOriginX = x - toolData.width / 2;
+						const newOriginY = y - toolData.height / 2;
+
+						// Use onDiagramChange to notify the resize for this connected CanvasFrame
+						const changeDiagramEvent: DiagramChangeEvent<
+							ItemableData & {
+								width: number;
+								height: number;
+								originX: number;
+								originY: number;
+							}
+						> = {
+							id,
+							eventId: e.eventId,
+							eventPhase: "Started",
+							startDiagram: {
+								items,
+								width,
+								height,
+								originX,
+								originY,
+							},
+							endDiagram: {
+								items,
+								width: toolData.width,
+								height: toolData.height,
+								originX: newOriginX,
+								originY: newOriginY,
+							},
+						};
+						onDiagramChange?.(changeDiagramEvent);
+						onDiagramChange?.({
+							...changeDiagramEvent,
+							eventPhase: "Ended",
+						});
 					}
 				}
 			}
@@ -451,6 +588,10 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	// Calculate viewBox for clipping content to frame bounds
 	// Using absolute coordinates: x - width/2, y - height/2, width, height
 	const viewBox = `${x - width / 2} ${y - height / 2} ${width} ${height}`;
+
+	// Calculate drag offset for cached HTML
+	const dragOffsetX = x - dragStartPosRef.current.x;
+	const dragOffsetY = y - dragStartPosRef.current.y;
 
 	return (
 		<>
@@ -491,8 +632,15 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 				viewBox={viewBox}
 				transform={transform}
 				overflow="hidden"
+				ref={innerSvgRef}
 			>
 				{children}
+				{isDragging && cachedInnerHTMLRef.current && (
+					<g
+						transform={`translate(${dragOffsetX}, ${dragOffsetY})`}
+						dangerouslySetInnerHTML={{ __html: cachedInnerHTMLRef.current }}
+					/>
+				)}
 			</svg>
 			<Outline
 				x={x}

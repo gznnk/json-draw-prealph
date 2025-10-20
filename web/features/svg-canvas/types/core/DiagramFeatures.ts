@@ -26,4 +26,6 @@ export type DiagramFeatures = {
 	executable?: boolean;
 	/** File drop handling */
 	fileDroppable?: boolean;
+	/** Origin point (originX, originY) for child diagram placement */
+	originable?: boolean;
 };

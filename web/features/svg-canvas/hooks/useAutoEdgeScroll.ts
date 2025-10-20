@@ -1,6 +1,7 @@
 import { useCallback, useRef } from "react";
 import type { RefObject } from "react";
 
+import { AUTO_SCROLL_INTERVAL_MS } from "../constants/core/Constants";
 import type { Point } from "../types/core/Point";
 import type { SvgViewport } from "../types/core/SvgViewport";
 import { calculateScrollDelta } from "../utils/math/geometry/calculateScrollDelta";
@@ -68,9 +69,8 @@ export const useAutoEdgeScroll = (
 	handleEdgeScroll: (state: HandleEdgeScrollArgs) => void,
 ) => {
 	// Internal state for edge scrolling
-	const scrollAnimationFrameRef = useRef<number | null>(null);
+	const scrollIntervalRef = useRef<number | null>(null);
 	const isScrollingRef = useRef(false);
-	const lastTimestampRef = useRef<number>(0);
 
 	// Internal state for edge scrolling
 	const edgeScrollStateRef = useRef<EdgeScrollState>({
@@ -102,14 +102,13 @@ export const useAutoEdgeScroll = (
 	refBus.current = refBusVal;
 
 	/**
-	 * Clear the edge scroll animation if it exists
+	 * Clear the edge scroll interval if it exists
 	 */
 	const clearEdgeScroll = useCallback(() => {
-		if (scrollAnimationFrameRef.current !== null) {
-			cancelAnimationFrame(scrollAnimationFrameRef.current);
-			scrollAnimationFrameRef.current = null;
+		if (scrollIntervalRef.current) {
+			clearInterval(scrollIntervalRef.current);
+			scrollIntervalRef.current = null;
 			isScrollingRef.current = false;
-			lastTimestampRef.current = 0;
 		}
 
 		return () => {
@@ -123,26 +122,9 @@ export const useAutoEdgeScroll = (
 	const startEdgeScroll = useCallback(() => {
 		// Mark scrolling as active
 		isScrollingRef.current = true;
-		lastTimestampRef.current = 0; // Reset timestamp on start
 
-		// Animation loop using requestAnimationFrame with time-based movement
-		const animate = (timestamp: number): void => {
-			// Continue animation if still scrolling
-			if (!isScrollingRef.current) {
-				return;
-			}
-
-			// Initialize lastTimestamp on first frame
-			if (lastTimestampRef.current === 0) {
-				lastTimestampRef.current = timestamp;
-				scrollAnimationFrameRef.current = requestAnimationFrame(animate);
-				return;
-			}
-
-			// Calculate elapsed time in milliseconds
-			const deltaTime = timestamp - lastTimestampRef.current;
-			lastTimestampRef.current = timestamp;
-
+		// Execute scroll processing immediately
+		const executeScroll = () => {
 			// Bypass references to avoid function creation in every render.
 			const { resolveViewport, handleEdgeScroll } = refBus.current;
 			const viewport = resolveViewport();
@@ -153,18 +135,12 @@ export const useAutoEdgeScroll = (
 			const minY = viewport.minY;
 
 			const { cursorPos, delta } = edgeScrollStateRef.current;
-
-			// Calculate time-adjusted scroll delta (pixels/ms * ms)
-			const scrollDeltaX = delta.x * deltaTime;
-			const scrollDeltaY = delta.y * deltaTime;
-
-			// Apply zoom adjustment for cursor position delta
-			const cursorDeltaX = scrollDeltaX / zoom;
-			const cursorDeltaY = scrollDeltaY / zoom;
+			const deltaX = delta.x / zoom;
+			const deltaY = delta.y / zoom;
 
 			const newCursorPos = {
-				x: cursorPos.x + cursorDeltaX,
-				y: cursorPos.y + cursorDeltaY,
+				x: cursorPos.x + deltaX,
+				y: cursorPos.y + deltaY,
 			};
 
 			// Update edgeScrollStateRef
@@ -173,19 +149,26 @@ export const useAutoEdgeScroll = (
 				delta,
 			};
 
+			// Calculate new scroll positions
+			const newMinX = minX + delta.x;
+			const newMinY = minY + delta.y;
+
 			handleEdgeScroll({
 				cursorPos: newCursorPos,
-				delta: { x: cursorDeltaX, y: cursorDeltaY },
-				minX: minX + scrollDeltaX,
-				minY: minY + scrollDeltaY,
+				delta: { x: deltaX, y: deltaY },
+				minX: newMinX,
+				minY: newMinY,
 			});
-
-			// Request next frame
-			scrollAnimationFrameRef.current = requestAnimationFrame(animate);
 		};
 
-		// Start the animation
-		scrollAnimationFrameRef.current = requestAnimationFrame(animate);
+		// Execute immediately
+		executeScroll();
+
+		// Continue with interval
+		scrollIntervalRef.current = window.setInterval(
+			executeScroll,
+			AUTO_SCROLL_INTERVAL_MS,
+		);
 	}, []);
 
 	/**

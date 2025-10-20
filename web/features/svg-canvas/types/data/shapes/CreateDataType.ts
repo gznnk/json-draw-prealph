@@ -6,6 +6,7 @@ import type { DiagramBaseData } from "../core/DiagramBaseData";
 import type { FillableData } from "../core/FillableData";
 import type { FrameableData } from "../core/FrameableData";
 import type { ItemableData } from "../core/ItemableData";
+import type { OriginableData } from "../core/OriginableData";
 import type { StrokableData } from "../core/StrokableData";
 import type { TextableData } from "../core/TextableData";
 import type { TransformativeData } from "../core/TransformativeData";
@@ -27,5 +28,6 @@ export type CreateDataType<T extends DiagramFeatures, P = object> = Prettify<
 		(T["fillable"] extends true ? FillableData : object) &
 		(T["cornerRoundable"] extends true ? CornerRoundableData : object) &
 		(T["textable"] extends true ? TextableData : object) &
+		(T["originable"] extends true ? OriginableData : object) &
 		P
 >;
