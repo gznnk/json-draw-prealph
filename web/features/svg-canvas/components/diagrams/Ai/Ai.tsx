@@ -6,20 +6,22 @@ import {
 	type LLMClient,
 } from "../../../../../shared/llm-client";
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
+import { useClick } from "../../../hooks/useClick";
+import { useDrag } from "../../../hooks/useDrag";
+import { useHover } from "../../../hooks/useHover";
 import { useProcessManager } from "../../../hooks/useProcessManager";
+import { useSelect } from "../../../hooks/useSelect";
 import type { DiagramClickEvent } from "../../../types/events/DiagramClickEvent";
 import type { DiagramDragEvent } from "../../../types/events/DiagramDragEvent";
 import type { DiagramSelectEvent } from "../../../types/events/DiagramSelectEvent";
-import type { ExecutionPropagationEvent } from "../../../types/events/ExecutionPropagationEvent";
 import type { AiProps } from "../../../types/props/diagrams/AiProps";
 import type { InputState } from "../../../types/state/elements/InputState";
+import { mergeProps } from "../../../utils/core/mergeProps";
 import { newEventId } from "../../../utils/core/newEventId";
-import { isPlainTextPayload } from "../../../utils/execution/isPlainTextPayload";
-import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { efficientAffineTransformation } from "../../../utils/math/transform/efficientAffineTransformation";
 import { ProcessIndicator } from "../../auxiliary/ProcessIndicator";
+import { IconContainer } from "../../core/IconContainer";
 import { Button } from "../../elements/Button";
-import { Frame } from "../../elements/Frame";
 import { Input } from "../../elements/Input";
 import { AiAssistant } from "../../icons/AiAssistant";
 
@@ -31,12 +33,6 @@ const AiComponent: React.FC<AiProps> = (props) => {
 		id,
 		x,
 		y,
-		width,
-		height,
-		scaleX,
-		scaleY,
-		rotation,
-		rotateEnabled,
 		avatarUrl,
 		avatarBgColor,
 		bubbleBgColor,
@@ -61,6 +57,9 @@ const AiComponent: React.FC<AiProps> = (props) => {
 
 	const { processes, addProcess, setProcessSuccess, setProcessError } =
 		useProcessManager();
+
+	// Create ref for the Avatar circle element
+	const groupRef = useRef<SVGCircleElement>(null);
 
 	useEffect(() => {
 		setText(inputState?.text || "");
@@ -109,8 +108,8 @@ const AiComponent: React.FC<AiProps> = (props) => {
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	// Handler for drag events
-	const handleDrag = useCallback((e: DiagramDragEvent) => {
+	// Handler for drag events (for child components)
+	const handleChildDrag = useCallback((e: DiagramDragEvent) => {
 		const { id, onDrag } = refBus.current;
 		onDrag?.({
 			...e,
@@ -118,8 +117,8 @@ const AiComponent: React.FC<AiProps> = (props) => {
 		});
 	}, []);
 
-	// Handler for select events
-	const handleSelect = useCallback((e: DiagramSelectEvent) => {
+	// Handler for select events (for child components)
+	const handleChildSelect = useCallback((e: DiagramSelectEvent) => {
 		const { id, onSelect } = refBus.current;
 		onSelect?.({
 			...e,
@@ -127,14 +126,49 @@ const AiComponent: React.FC<AiProps> = (props) => {
 		});
 	}, []);
 
-	// Handler for click events
-	const handleClick = useCallback((e: DiagramClickEvent) => {
+	// Handler for click events (for child components)
+	const handleChildClick = useCallback((e: DiagramClickEvent) => {
 		const { id, onClick } = refBus.current;
 		onClick?.({
 			...e,
 			id,
 		});
 	}, []);
+
+	// Use interaction hooks
+	const dragProps = useDrag({
+		id,
+		x,
+		y,
+		ref: groupRef as React.RefObject<SVGElement>,
+		onDrag,
+	});
+
+	const clickProps = useClick({
+		id,
+		x,
+		y,
+		ref: groupRef as React.RefObject<SVGElement>,
+		onClick,
+	});
+
+	const selectProps = useSelect({
+		id,
+		onSelect,
+	});
+
+	const hoverProps = useHover({
+		id,
+		onHoverChange,
+	});
+
+	// Compose props for the SVG element
+	const composedProps = mergeProps(
+		dragProps,
+		clickProps,
+		selectProps,
+		hoverProps,
+	);
 
 	// Handler for executing the LLM with streaming response
 	const handleExecution = useCallback(
@@ -225,157 +259,140 @@ const AiComponent: React.FC<AiProps> = (props) => {
 		handleExecution(text);
 	}, [handleExecution]);
 
-	// Handle propagation events from child components
-	const onPropagation = useCallback(
-		(e: ExecutionPropagationEvent) => {
-			if (e.eventPhase === "Ended") {
-				if (!isPlainTextPayload(e.payload)) return;
-				// Handle execution
-				const textData = e.payload.data;
-				handleExecution(textData);
-			}
-		},
-		[handleExecution],
-	);
-
 	// Layout constants
-	const avatarSize = 60;
+	const avatarSize = 80;
 	const buttonWidth = 60;
 	const buttonHeight = 36;
 	const inputHeight = 40;
-	const padding = 0;
 	const bubblePadding = 15;
 	const avatarOverlap = 30; // How much avatar overlaps below the bubble
 
-	// Speech bubble position (top)
-	const bubbleHeight = height - inputHeight - avatarSize + avatarOverlap - 10;
-	const bubbleY = -(height / 2 - bubbleHeight / 2) + 5;
+	// Bubble and input dimensions (fixed, not dependent on component size)
+	const bubbleWidth = 300;
+	const bubbleHeight = 200;
+	const inputWidth = bubbleWidth - buttonWidth - 5; // 5px gap between input and button
 
-	// Avatar position (below bubble, overlapping)
-	const avatarY = bubbleY + (bubbleHeight / 2) + (avatarSize / 2) - avatarOverlap;
+	// Avatar position (center of component)
+	const avatarY = 0;
 
-	// Input position (bottom left)
-	const inputWidth = width - padding * 2 - buttonWidth - 5; // 5px gap between input and button
+	// Speech bubble position (above avatar)
+	const bubbleY = -(avatarSize / 2 + bubbleHeight / 2 - avatarOverlap);
+
+	// Input position (below avatar, absolute positioning)
+	const inputY = avatarSize / 2 + inputHeight / 2 + 5;
 	const inputCenter = efficientAffineTransformation(
 		-(buttonWidth / 2 + 2.5), // Shift left to make room for button
-		height / 2 - (inputHeight / 2 + padding),
-		scaleX,
-		scaleY,
-		degreesToRadians(rotation),
+		inputY,
+		1, // scaleX fixed at 1
+		1, // scaleY fixed at 1
+		0, // rotation fixed at 0
 		x,
 		y,
 	);
 
-	// Send button position (bottom right)
+	// Send button position (below avatar, right side, absolute positioning)
 	const buttonCenter = efficientAffineTransformation(
-		width / 2 - (buttonWidth / 2 + padding),
-		height / 2 - (buttonHeight / 2 + padding + 2), // Align with input vertically
-		scaleX,
-		scaleY,
-		degreesToRadians(rotation),
+		bubbleWidth / 2 - buttonWidth / 2,
+		inputY,
+		1, // scaleX fixed at 1
+		1, // scaleY fixed at 1
+		0, // rotation fixed at 0
 		x,
 		y,
 	);
 
-	// Calculate positions for transform
-	const left = -width / 2;
+	// Calculate positions for bubble
+	const bubbleLeft = -bubbleWidth / 2;
 	const bubbleTop = bubbleY - bubbleHeight / 2;
-	const bubbleWidth = width - padding * 2;
 
 	return (
 		<>
-			<Frame
-				{...props}
-				width={width}
-				height={height}
-				minWidth={250}
-				minHeight={350}
-				stroke="none"
-				strokeWidth="0px"
-				fill="transparent"
-				cornerRadius={0}
-				rotateEnabled={rotateEnabled}
-				connectEnabled={false}
-				connectPoints={[]}
-				showConnectPoints={false}
-				onPropagation={onPropagation}
+			{/* Main bubble rectangle */}
+			<rect
+				x={x + bubbleLeft}
+				y={y + bubbleTop}
+				width={bubbleWidth}
+				height={bubbleHeight}
+				rx="10"
+				ry="10"
+				fill={bubbleBgColor}
+				stroke="#ccc"
+				strokeWidth="1"
+				pointerEvents="none"
+			/>
+
+			{/* Bubble content */}
+			<foreignObject
+				x={x + bubbleLeft + bubblePadding}
+				y={y + bubbleTop + bubblePadding}
+				width={bubbleWidth - bubblePadding * 2}
+				height={bubbleHeight - bubblePadding * 2}
+				pointerEvents="none"
 			>
-				{/* Main bubble rectangle */}
-				<rect
-					x={left + padding}
-					y={bubbleTop}
-					width={bubbleWidth}
-					height={bubbleHeight}
-					rx="10"
-					ry="10"
-					fill={bubbleBgColor}
-					stroke="#ccc"
-					strokeWidth="1"
+				<div
+					style={{
+						width: "100%",
+						height: "100%",
+						overflow: "auto",
+						fontSize: "14px",
+						color: "#333",
+						fontFamily: "Arial, sans-serif",
+						whiteSpace: "pre-wrap",
+						wordWrap: "break-word",
+						userSelect: "none",
+					}}
+				>
+					{currentMessage}
+				</div>
+			</foreignObject>
+
+			{/* Avatar circle */}
+			<circle
+				ref={groupRef}
+				id={id}
+				cx={x}
+				cy={y + avatarY}
+				r={avatarSize / 2}
+				fill={avatarBgColor}
+				tabIndex={0}
+				{...composedProps}
+			/>
+
+			{/* Avatar image or icon */}
+			{avatarUrl ? (
+				<image
+					href={avatarUrl}
+					x={x - avatarSize / 2}
+					y={y + avatarY - avatarSize / 2}
+					width={avatarSize}
+					height={avatarSize}
+					clipPath={`circle(${avatarSize / 2}px at center)`}
 					pointerEvents="none"
 				/>
-
-				{/* Bubble content */}
-				<foreignObject
-					x={left + padding + bubblePadding}
-					y={bubbleTop + bubblePadding}
-					width={bubbleWidth - bubblePadding * 2}
-					height={bubbleHeight - bubblePadding * 2}
+			) : (
+				<IconContainer
+					x={x}
+					y={y}
+					width={avatarSize}
+					height={avatarSize}
+					rotation={0}
+					scaleX={1}
+					scaleY={1}
 					pointerEvents="none"
 				>
-					<div
-						style={{
-							width: "100%",
-							height: "100%",
-							overflow: "auto",
-							fontSize: "14px",
-							color: "#333",
-							fontFamily: "Arial, sans-serif",
-							whiteSpace: "pre-wrap",
-							wordWrap: "break-word",
-						}}
-					>
-						{currentMessage}
-					</div>
-				</foreignObject>
-
-				{/* Avatar circle (drawn after bubble to appear on top) */}
-				<circle
-					cx={0}
-					cy={avatarY}
-					r={avatarSize / 2}
-					fill={avatarBgColor}
-					pointerEvents="none"
-				/>
-
-				{/* Avatar image or icon */}
-				{avatarUrl ? (
-					<image
-						href={avatarUrl}
-						x={-avatarSize / 2}
-						y={avatarY - avatarSize / 2}
+					<AiAssistant
 						width={avatarSize}
 						height={avatarSize}
-						clipPath={`circle(${avatarSize / 2}px at center)`}
-						pointerEvents="none"
+						animation={true}
 					/>
-				) : (
-					<g
-						transform={`translate(${-avatarSize / 2}, ${avatarY - avatarSize / 2})`}
-					>
-						<AiAssistant
-							width={avatarSize}
-							height={avatarSize}
-							animation={true}
-						/>
-					</g>
-				)}
-			</Frame>
+				</IconContainer>
+			)}
 			<ProcessIndicator
 				x={x}
 				y={y}
-				width={width}
-				height={height}
-				rotation={rotation}
+				width={avatarSize}
+				height={avatarSize}
+				rotation={0}
 				processes={processes}
 			/>
 			{inputState && (
@@ -385,19 +402,19 @@ const AiComponent: React.FC<AiProps> = (props) => {
 					y={inputCenter.y}
 					width={inputWidth}
 					height={inputHeight}
-					scaleX={scaleX}
-					scaleY={scaleY}
-					rotation={rotation}
+					scaleX={1}
+					scaleY={1}
+					rotation={0}
 					text={text}
 					isSelected={isSelected}
 					isAncestorSelected={isAncestorSelected}
-					rotateEnabled={rotateEnabled}
+					rotateEnabled={false}
 					showOutline={false}
 					isTransforming={false}
 					showTransformControls={false}
-					onDrag={handleDrag}
-					onSelect={handleSelect}
-					onClick={handleClick}
+					onDrag={handleChildDrag}
+					onSelect={handleChildSelect}
+					onClick={handleChildClick}
 					onTextChange={onTextChange}
 				/>
 			)}
@@ -423,7 +440,7 @@ const AiComponent: React.FC<AiProps> = (props) => {
 				text="Send"
 				isTextEditing={false}
 				effectsEnabled
-				onDrag={handleDrag}
+				onDrag={handleChildDrag}
 				onClick={handleSendClick}
 			/>
 		</>
