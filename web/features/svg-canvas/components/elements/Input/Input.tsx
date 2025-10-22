@@ -13,6 +13,7 @@ import { mergeProps } from "../../../utils/core/mergeProps";
 import { isPlainTextPayload } from "../../../utils/execution/isPlainTextPayload";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
 import { negativeToZero } from "../../../utils/math/common/negativeToZero";
+import { convertStrokeDashTypeToArray } from "../../../utils/shapes/common/convertStrokeDashTypeToArray";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 import { Outline } from "../../core/Outline";
 import { Textable } from "../../core/Textable";
@@ -39,6 +40,7 @@ const InputComponent: React.FC<InputProps> = ({
 	fill = InputDefaultData.fill,
 	stroke = InputDefaultData.stroke,
 	strokeWidth = InputDefaultData.strokeWidth,
+	strokeDashType = InputDefaultData.strokeDashType,
 	cornerRadius = InputDefaultData.cornerRadius,
 	text,
 	textType,
@@ -222,6 +224,7 @@ const InputComponent: React.FC<InputProps> = ({
 				fill={fill}
 				stroke={stroke}
 				strokeWidth={strokeWidth}
+				strokeDasharray={convertStrokeDashTypeToArray(strokeDashType)}
 				tabIndex={0}
 				cursor="move"
 				transform={transform}

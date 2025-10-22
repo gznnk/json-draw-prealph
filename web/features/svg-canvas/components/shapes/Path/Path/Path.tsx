@@ -20,6 +20,7 @@ import { useClick } from "../../../../hooks/useClick";
 import { useDrag } from "../../../../hooks/useDrag";
 import { useSelect } from "../../../../hooks/useSelect";
 import { calcOrientedFrameFromPoints } from "../../../../utils/math/geometry/calcOrientedFrameFromPoints";
+import { convertStrokeDashTypeToArray } from "../../../../utils/shapes/common/convertStrokeDashTypeToArray";
 import { isPointerOver } from "../../../../utils/shapes/common/isPointerOver";
 import {
 	createEndPointArrowHead,
@@ -46,6 +47,7 @@ const PathComponent: React.FC<PathProps> = ({
 	inversionEnabled,
 	stroke = "black",
 	strokeWidth = "1px",
+	strokeDashType = "solid",
 	isSelected = false,
 	isAncestorSelected = false,
 	isDragging = false,
@@ -333,6 +335,9 @@ const PathComponent: React.FC<PathProps> = ({
 		endArrowHead,
 	} as PathData);
 
+	// Convert strokeDashType to strokeDasharray value
+	const strokeDasharray = convertStrokeDashTypeToArray(strokeDashType);
+
 	return (
 		<>
 			{/* Path for drawing */}
@@ -341,6 +346,7 @@ const PathComponent: React.FC<PathProps> = ({
 				fill="none"
 				stroke={stroke}
 				strokeWidth={strokeWidth}
+				strokeDasharray={strokeDasharray}
 				isTransparent={false}
 			/>
 			{/* Path for dragging */}

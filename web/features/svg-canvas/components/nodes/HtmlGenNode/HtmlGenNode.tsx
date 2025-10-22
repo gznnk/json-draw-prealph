@@ -197,6 +197,7 @@ Please generate a complete HTML document that represents or visualizes the diagr
 				height={height}
 				stroke={BORDER_COLOR}
 				strokeWidth={BORDER_WIDTH}
+				strokeDashType="solid"
 				fill={BACKGROUND_COLOR}
 				cornerRadius={CORNER_RADIUS}
 				keepProportion={false}
@@ -218,6 +219,7 @@ Please generate a complete HTML document that represents or visualizes the diagr
 					keepProportion={false}
 					rotateEnabled={true}
 					inversionEnabled={true}
+					strokeDashType="solid"
 					isSelected={false}
 					isAncestorSelected={false}
 					showConnectPoints={false}

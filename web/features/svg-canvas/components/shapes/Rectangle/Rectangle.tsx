@@ -7,6 +7,7 @@ import { useFileDrop } from "../../../hooks/useFileDrop";
 import type { RectangleProps } from "../../../types/props/shapes/RectangleProps";
 import { mergeProps } from "../../../utils/core/mergeProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { convertStrokeDashTypeToArray } from "../../../utils/shapes/common/convertStrokeDashTypeToArray";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 import { BaseShape } from "../BaseShape";
 
@@ -29,6 +30,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 	fill,
 	stroke,
 	strokeWidth,
+	strokeDashType,
 	isSelected,
 	isAncestorSelected = false,
 	connectPoints,
@@ -146,6 +148,7 @@ const RectangleComponent: React.FC<RectangleProps> = ({
 				fill={fill}
 				stroke={stroke}
 				strokeWidth={strokeWidth}
+				strokeDasharray={convertStrokeDashTypeToArray(strokeDashType)}
 				tabIndex={0}
 				cursor="move"
 				isTransparent={isTransparent}

@@ -15,6 +15,7 @@ export const ButtonDefaultData: ButtonData = CreateDefaultData<ButtonData>({
 		fill: "#000000",
 		stroke: "#000000",
 		strokeWidth: "1px",
+		strokeDashType: "solid",
 		text: "Button",
 		fontSize: 14,
 		fontColor: "#ffffff",

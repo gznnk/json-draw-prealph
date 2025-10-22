@@ -1,3 +1,4 @@
+import type { StrokeDashType } from "../core/StrokeDashType";
 import type { TextAlign } from "../core/TextAlign";
 import type { VerticalAlign } from "../core/VerticalAlign";
 
@@ -7,6 +8,7 @@ export type DiagramStyleChangeEvent = {
 	cornerRadius?: number;
 	stroke?: string;
 	strokeWidth?: string;
+	strokeDashType?: StrokeDashType;
 	fill?: string;
 	fontColor?: string;
 	fontSize?: number;

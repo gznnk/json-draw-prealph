@@ -239,6 +239,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 				minHeight={minHeight}
 				stroke={BORDER_COLOR}
 				strokeWidth={BORDER_WIDTH}
+				strokeDashType="solid"
 				fill={BACKGROUND_COLOR}
 				cornerRadius={CORNER_RADIUS}
 				rotateEnabled={rotateEnabled}
@@ -256,6 +257,7 @@ const TextAreaNodeComponent: React.FC<TextAreaNodeProps> = (props) => {
 					keepProportion={false}
 					rotateEnabled={rotateEnabled}
 					inversionEnabled={inversionEnabled}
+					strokeDashType="solid"
 					isSelected={false}
 					isAncestorSelected={false}
 					showConnectPoints={false}

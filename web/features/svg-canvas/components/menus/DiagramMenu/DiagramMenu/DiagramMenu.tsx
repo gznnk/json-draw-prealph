@@ -27,6 +27,7 @@ import {
 import { InteractionState } from "../../../../canvas/types/InteractionState";
 import { DISTANCE_FROM_DIAGRAM } from "../../../../constants/styling/menus/DiagramMenuStyling";
 import type { RectangleVertices } from "../../../../types/core/RectangleVertices";
+import type { StrokeDashType } from "../../../../types/core/StrokeDashType";
 import type { CornerRoundableData } from "../../../../types/data/core/CornerRoundableData";
 import type { FillableData } from "../../../../types/data/core/FillableData";
 import type { StrokableData } from "../../../../types/data/core/StrokableData";
@@ -55,9 +56,11 @@ import { FontSize } from "../../../icons/FontSize";
 import { Group } from "../../../icons/Group";
 import { SendBackward } from "../../../icons/SendBackward";
 import { SendToBack } from "../../../icons/SendToBack";
+import { StrokeDash } from "../../../icons/StrokeDash";
 import { VerticalAlignBottom } from "../../../icons/VerticalAlignBottom";
 import { VerticalAlignMiddle } from "../../../icons/VerticalAlignMiddle";
 import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
+import { StrokeDashSelector } from "../../StrokeDashSelector";
 import { ColorPicker } from "../ColorPicker";
 import { DiagramMenuItem } from "../DiagramMenuItem";
 import { NumberStepper } from "../NumberStepper";
@@ -83,6 +86,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const [isBgColorPickerOpen, setIsBgColorPickerOpen] = useState(false);
 	const [isBorderColorPickerOpen, setIsBorderColorPickerOpen] = useState(false);
 	const [isBorderRadiusSelectorOpen, setIsBorderRadiusSelectorOpen] =
+		useState(false);
+	const [isStrokeDashSelectorOpen, setIsStrokeDashSelectorOpen] =
 		useState(false);
 	const [isFontSizeSelectorOpen, setIsFontSizeSelectorOpen] = useState(false);
 	const [isFontColorPickerOpen, setIsFontColorPickerOpen] = useState(false);
@@ -154,6 +159,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				BgColor: false,
 				BorderColor: false,
 				BorderRadius: false,
+				StrokeDash: false,
 				FontSize: false,
 				FontColor: false,
 			} as {
@@ -167,6 +173,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			setIsBgColorPickerOpen(newControlsStateMap.BgColor);
 			setIsBorderColorPickerOpen(newControlsStateMap.BorderColor);
 			setIsBorderRadiusSelectorOpen(newControlsStateMap.BorderRadius);
+			setIsStrokeDashSelectorOpen(newControlsStateMap.StrokeDash);
 			setIsFontSizeSelectorOpen(newControlsStateMap.FontSize);
 			setIsFontColorPickerOpen(newControlsStateMap.FontColor);
 		},
@@ -185,6 +192,9 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					break;
 				case "BorderRadius":
 					openControl("BorderRadius", currentMenuStateMap);
+					break;
+				case "StrokeDash":
+					openControl("StrokeDash", currentMenuStateMap);
 					break;
 				case "FontSize":
 					openControl("FontSize", currentMenuStateMap);
@@ -302,6 +312,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		[selectedItems, changeItemsStyle],
 	);
 
+	const onStrokeDashChange = useCallback(
+		(strokeDashType: StrokeDashType) => {
+			changeItemsStyle(selectedItems, { strokeDashType });
+		},
+		[selectedItems, changeItemsStyle],
+	);
+
 	const onFontSizeChange = useCallback(
 		(fontSize: number) => {
 			changeItemsStyle(selectedItems, { fontSize });
@@ -322,6 +339,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			setIsBgColorPickerOpen(false);
 			setIsBorderColorPickerOpen(false);
 			setIsBorderRadiusSelectorOpen(false);
+			setIsStrokeDashSelectorOpen(false);
 			setIsFontSizeSelectorOpen(false);
 			setIsFontColorPickerOpen(false);
 		}
@@ -344,6 +362,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		BgColor: "Hidden",
 		BorderColor: "Hidden",
 		BorderRadius: "Hidden",
+		StrokeDash: "Hidden",
 		FontSize: "Hidden",
 		Bold: "Hidden",
 		FontColor: "Hidden",
@@ -381,6 +400,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 	if (firstStrokableItem) {
 		menuStateMap.BorderColor = isBorderColorPickerOpen ? "Active" : "Show";
+		menuStateMap.StrokeDash = isStrokeDashSelectorOpen ? "Active" : "Show";
 	}
 	if (firstCornerRoundableItem) {
 		menuStateMap.BorderRadius = isBorderRadiusSelectorOpen ? "Active" : "Show";
@@ -542,6 +562,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		"BgColor",
 		"BorderColor",
 		"BorderRadius",
+		"StrokeDash",
 	);
 	if (showFillableAndStrokableSection) {
 		menuItemComponents.push(
@@ -595,6 +616,23 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 						minusTooltip="Decrease border radius"
 						plusTooltip="Increase border radius"
 						onChange={onBorderRadiusChange}
+					/>
+				)}
+			</DiagramMenuPositioner>,
+		);
+		menuItemComponents.push(
+			<DiagramMenuPositioner key="StrokeDash">
+				<DiagramMenuItem
+					menuType="StrokeDash"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<StrokeDash title="Stroke Dash" />
+				</DiagramMenuItem>
+				{menuStateMap.StrokeDash === "Active" && (
+					<StrokeDashSelector
+						value={firstStrokableItem?.strokeDashType || "solid"}
+						onChange={onStrokeDashChange}
 					/>
 				)}
 			</DiagramMenuPositioner>,

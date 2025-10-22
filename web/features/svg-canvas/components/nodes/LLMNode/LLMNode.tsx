@@ -1,7 +1,10 @@
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
-import { LLMClientFactory, type LLMClient } from "../../../../../shared/llm-client";
+import {
+	LLMClientFactory,
+	type LLMClient,
+} from "../../../../../shared/llm-client";
 import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 import {
 	BACKGROUND_COLOR,
@@ -256,6 +259,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 				minHeight={minHeight}
 				stroke={BORDER_COLOR}
 				strokeWidth={BORDER_WIDTH}
+				strokeDashType="solid"
 				fill={BACKGROUND_COLOR}
 				cornerRadius={CORNER_RADIUS}
 				onPropagation={onPropagation}
