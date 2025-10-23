@@ -17,6 +17,7 @@ export type DiagramMenuType =
 	| "BorderColor"
 	| "BorderRadius"
 	| "StrokeDash"
+	| "PathType"
 	| "FontSize"
 	| "Bold"
 	| "FontColor"

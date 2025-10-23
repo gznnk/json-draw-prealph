@@ -88,3 +88,20 @@ export const findFirstTextableRecursive = (
 	}
 	return undefined;
 };
+
+export const findFirstPathableRecursive = (
+	items: Diagram[],
+): Diagram | undefined => {
+	for (const item of items) {
+		if ("pathType" in item) {
+			return item;
+		}
+		if (isItemableState(item)) {
+			const foundItem = findFirstPathableRecursive(item.items);
+			if (foundItem) {
+				return foundItem;
+			}
+		}
+	}
+	return undefined;
+};

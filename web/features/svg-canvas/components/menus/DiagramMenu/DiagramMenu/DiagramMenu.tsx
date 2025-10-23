@@ -21,11 +21,13 @@ import type {
 import {
 	findFirstCornerRoundableRecursive,
 	findFirstFillableRecursive,
+	findFirstPathableRecursive,
 	findFirstStrokableRecursive,
 	findFirstTextableRecursive,
 } from "./DiagramMenuUtils";
 import { InteractionState } from "../../../../canvas/types/InteractionState";
 import { DISTANCE_FROM_DIAGRAM } from "../../../../constants/styling/menus/DiagramMenuStyling";
+import type { PathType } from "../../../../types/core/PathType";
 import type { RectangleVertices } from "../../../../types/core/RectangleVertices";
 import type { StrokeDashType } from "../../../../types/core/StrokeDashType";
 import type { CornerRoundableData } from "../../../../types/data/core/CornerRoundableData";
@@ -54,12 +56,14 @@ import { Edit } from "../../../icons/Edit";
 import { FontColor } from "../../../icons/FontColor";
 import { FontSize } from "../../../icons/FontSize";
 import { Group } from "../../../icons/Group";
+import { PathTypeIcon } from "../../../icons/PathType";
 import { SendBackward } from "../../../icons/SendBackward";
 import { SendToBack } from "../../../icons/SendToBack";
 import { StrokeDash } from "../../../icons/StrokeDash";
 import { VerticalAlignBottom } from "../../../icons/VerticalAlignBottom";
 import { VerticalAlignMiddle } from "../../../icons/VerticalAlignMiddle";
 import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
+import { PathTypeSelector } from "../../PathTypeSelector";
 import { StrokeDashSelector } from "../../StrokeDashSelector";
 import { ColorPicker } from "../ColorPicker";
 import { DiagramMenuItem } from "../DiagramMenuItem";
@@ -89,6 +93,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		useState(false);
 	const [isStrokeDashSelectorOpen, setIsStrokeDashSelectorOpen] =
 		useState(false);
+	const [isPathTypeSelectorOpen, setIsPathTypeSelectorOpen] = useState(false);
 	const [isFontSizeSelectorOpen, setIsFontSizeSelectorOpen] = useState(false);
 	const [isFontColorPickerOpen, setIsFontColorPickerOpen] = useState(false);
 
@@ -160,6 +165,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				BorderColor: false,
 				BorderRadius: false,
 				StrokeDash: false,
+				PathType: false,
 				FontSize: false,
 				FontColor: false,
 			} as {
@@ -174,6 +180,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			setIsBorderColorPickerOpen(newControlsStateMap.BorderColor);
 			setIsBorderRadiusSelectorOpen(newControlsStateMap.BorderRadius);
 			setIsStrokeDashSelectorOpen(newControlsStateMap.StrokeDash);
+			setIsPathTypeSelectorOpen(newControlsStateMap.PathType);
 			setIsFontSizeSelectorOpen(newControlsStateMap.FontSize);
 			setIsFontColorPickerOpen(newControlsStateMap.FontColor);
 		},
@@ -195,6 +202,9 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					break;
 				case "StrokeDash":
 					openControl("StrokeDash", currentMenuStateMap);
+					break;
+				case "PathType":
+					openControl("PathType", currentMenuStateMap);
 					break;
 				case "FontSize":
 					openControl("FontSize", currentMenuStateMap);
@@ -319,6 +329,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		[selectedItems, changeItemsStyle],
 	);
 
+	const onPathTypeChange = useCallback(
+		(pathType: PathType) => {
+			changeItemsStyle(selectedItems, { pathType });
+		},
+		[selectedItems, changeItemsStyle],
+	);
+
 	const onFontSizeChange = useCallback(
 		(fontSize: number) => {
 			changeItemsStyle(selectedItems, { fontSize });
@@ -340,6 +357,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			setIsBorderColorPickerOpen(false);
 			setIsBorderRadiusSelectorOpen(false);
 			setIsStrokeDashSelectorOpen(false);
+			setIsPathTypeSelectorOpen(false);
 			setIsFontSizeSelectorOpen(false);
 			setIsFontColorPickerOpen(false);
 		}
@@ -363,6 +381,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		BorderColor: "Hidden",
 		BorderRadius: "Hidden",
 		StrokeDash: "Hidden",
+		PathType: "Hidden",
 		FontSize: "Hidden",
 		Bold: "Hidden",
 		FontColor: "Hidden",
@@ -393,6 +412,9 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const firstTextableItem = findFirstTextableRecursive(selectedItems) as
 		| TextableData
 		| undefined;
+	const firstPathableItem = findFirstPathableRecursive(selectedItems) as
+		| { pathType: PathType }
+		| undefined;
 
 	// Set menu state based on selected items
 	if (firstFillableItem) {
@@ -401,6 +423,9 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	if (firstStrokableItem) {
 		menuStateMap.BorderColor = isBorderColorPickerOpen ? "Active" : "Show";
 		menuStateMap.StrokeDash = isStrokeDashSelectorOpen ? "Active" : "Show";
+	}
+	if (firstPathableItem) {
+		menuStateMap.PathType = isPathTypeSelectorOpen ? "Active" : "Show";
 	}
 	if (firstCornerRoundableItem) {
 		menuStateMap.BorderRadius = isBorderRadiusSelectorOpen ? "Active" : "Show";
@@ -563,6 +588,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		"BorderColor",
 		"BorderRadius",
 		"StrokeDash",
+		"PathType",
 	);
 	if (showFillableAndStrokableSection) {
 		menuItemComponents.push(
@@ -633,6 +659,23 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					<StrokeDashSelector
 						value={firstStrokableItem?.strokeDashType || "solid"}
 						onChange={onStrokeDashChange}
+					/>
+				)}
+			</DiagramMenuPositioner>,
+		);
+		menuItemComponents.push(
+			<DiagramMenuPositioner key="PathType">
+				<DiagramMenuItem
+					menuType="PathType"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<PathTypeIcon title="Path Type" />
+				</DiagramMenuItem>
+				{menuStateMap.PathType === "Active" && (
+					<PathTypeSelector
+						value={firstPathableItem?.pathType || "Linear"}
+						onChange={onPathTypeChange}
 					/>
 				)}
 			</DiagramMenuPositioner>,

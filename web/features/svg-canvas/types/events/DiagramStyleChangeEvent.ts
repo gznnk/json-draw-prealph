@@ -1,3 +1,4 @@
+import type { PathType } from "../core/PathType";
 import type { StrokeDashType } from "../core/StrokeDashType";
 import type { TextAlign } from "../core/TextAlign";
 import type { VerticalAlign } from "../core/VerticalAlign";
@@ -9,6 +10,7 @@ export type DiagramStyleChangeEvent = {
 	stroke?: string;
 	strokeWidth?: string;
 	strokeDashType?: StrokeDashType;
+	pathType?: PathType;
 	fill?: string;
 	fontColor?: string;
 	fontSize?: number;
