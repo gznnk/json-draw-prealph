@@ -1,14 +1,19 @@
 import styled from "@emotion/styled";
 
 export const LineStyleMenuWrapper = styled.div`
-	display: grid;
-	grid-template-columns: repeat(4, 32px);
-	gap: 4px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 	padding: 8px;
 	background-color: #fff;
 	border-radius: 4px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 	pointer-events: auto;
+`;
+
+export const LineStyleSection = styled.div`
+	display: flex;
+	gap: 4px;
 `;
 
 type LineStyleButtonProps = {
