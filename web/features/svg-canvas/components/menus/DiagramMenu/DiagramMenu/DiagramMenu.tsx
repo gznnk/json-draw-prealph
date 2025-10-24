@@ -50,15 +50,12 @@ import { AspectRatio } from "../../../icons/AspectRatio";
 import { BgColor } from "../../../icons/BgColor";
 import { Bold } from "../../../icons/Bold";
 import { BorderRadius } from "../../../icons/BorderRadius";
-import { BringForward } from "../../../icons/BringForward";
 import { BringToFront } from "../../../icons/BringToFront";
 import { Edit } from "../../../icons/Edit";
 import { FontColor } from "../../../icons/FontColor";
 import { FontSize } from "../../../icons/FontSize";
 import { Group } from "../../../icons/Group";
 import { LineStyle } from "../../../icons/LineStyle";
-import { SendBackward } from "../../../icons/SendBackward";
-import { SendToBack } from "../../../icons/SendToBack";
 import { VerticalAlignBottom } from "../../../icons/VerticalAlignBottom";
 import { VerticalAlignMiddle } from "../../../icons/VerticalAlignMiddle";
 import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
@@ -66,6 +63,7 @@ import { ColorPicker } from "../ColorPicker";
 import { DiagramMenuItem } from "../DiagramMenuItem";
 import { LineStyleMenu } from "../LineStyleMenu";
 import { NumberStepper } from "../NumberStepper";
+import { StackOrderMenu } from "../StackOrderMenu/StackOrderMenu";
 
 const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	canvasProps,
@@ -92,6 +90,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const [isLineStyleMenuOpen, setIsLineStyleMenuOpen] = useState(false);
 	const [isFontSizeSelectorOpen, setIsFontSizeSelectorOpen] = useState(false);
 	const [isFontColorPickerOpen, setIsFontColorPickerOpen] = useState(false);
+	const [isStackOrderMenuOpen, setIsStackOrderMenuOpen] = useState(false);
 
 	// Get selected items and check if the diagram menu should be shown.
 	const selectedItems = getSelectedDiagrams(items);
@@ -163,6 +162,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				LineStyle: false,
 				FontSize: false,
 				FontColor: false,
+				StackOrder: false,
 			} as {
 				[key in DiagramMenuType]: boolean;
 			};
@@ -177,6 +177,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			setIsLineStyleMenuOpen(newControlsStateMap.LineStyle);
 			setIsFontSizeSelectorOpen(newControlsStateMap.FontSize);
 			setIsFontColorPickerOpen(newControlsStateMap.FontColor);
+			setIsStackOrderMenuOpen(newControlsStateMap.StackOrder);
 		},
 		[],
 	);
@@ -227,41 +228,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				case "AlignBottom":
 					changeItemsStyle(selectedItems, { verticalAlign: "bottom" });
 					break;
-				case "BringToFront":
-					if (singleSelectedItem) {
-						canvasProps.onStackOrderChange?.({
-							eventId: newEventId(),
-							changeType: "bringToFront",
-							id: singleSelectedItem.id,
-						});
-					}
-					break;
-				case "BringForward":
-					if (singleSelectedItem) {
-						canvasProps.onStackOrderChange?.({
-							eventId: newEventId(),
-							changeType: "bringForward",
-							id: singleSelectedItem.id,
-						});
-					}
-					break;
-				case "SendBackward":
-					if (singleSelectedItem) {
-						canvasProps.onStackOrderChange?.({
-							eventId: newEventId(),
-							changeType: "sendBackward",
-							id: singleSelectedItem.id,
-						});
-					}
-					break;
-				case "SendToBack":
-					if (singleSelectedItem) {
-						canvasProps.onStackOrderChange?.({
-							eventId: newEventId(),
-							changeType: "sendToBack",
-							id: singleSelectedItem.id,
-						});
-					}
+				case "StackOrder":
+					openControl("StackOrder", currentMenuStateMap);
 					break;
 				case "KeepAspectRatio":
 					if (multiSelectGroup) {
@@ -350,6 +318,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			setIsLineStyleMenuOpen(false);
 			setIsFontSizeSelectorOpen(false);
 			setIsFontColorPickerOpen(false);
+			setIsStackOrderMenuOpen(false);
 		}
 	}, [showDiagramMenu]);
 
@@ -380,10 +349,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		AlignTop: "Hidden",
 		AlignMiddle: "Hidden",
 		AlignBottom: "Hidden",
-		BringToFront: "Hidden",
-		BringForward: "Hidden",
-		SendBackward: "Hidden",
-		SendToBack: "Hidden",
+		StackOrder: "Hidden",
 		KeepAspectRatio: "Hidden",
 		Group: "Hidden",
 	} as DiagramMenuStateMap;
@@ -456,10 +422,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 
 	// Set other menu states
 	if (selectedItems.length === 1) {
-		menuStateMap.BringToFront = "Show";
-		menuStateMap.SendToBack = "Show";
-		menuStateMap.BringForward = "Show";
-		menuStateMap.SendBackward = "Show";
+		menuStateMap.StackOrder = isStackOrderMenuOpen ? "Active" : "Show";
 	}
 
 	// Set the keep aspect ratio state.
@@ -805,56 +768,62 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		);
 	}
 
-	// Create a section for bring to front and send to back items.
-	const showBringToFrontSection = showSection(
-		"BringToFront",
-		"BringForward",
-		"SendBackward",
-		"SendToBack",
-	);
-	if (showBringToFrontSection) {
+	// Create a section for stack order items.
+	const showStackOrderSection = showSection("StackOrder");
+	if (showStackOrderSection) {
 		menuItemComponents.push(
-			<DiagramMenuItem
-				key="BringToFront"
-				menuType="BringToFront"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<BringToFront title="Bring to Front" />
-			</DiagramMenuItem>,
+			<DiagramMenuPositioner key="StackOrder">
+				<DiagramMenuItem
+					menuType="StackOrder"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<BringToFront title="Stack Order" />
+				</DiagramMenuItem>
+				{menuStateMap.StackOrder === "Active" && (
+					<StackOrderMenu
+						onBringToFront={() => {
+							if (singleSelectedItem) {
+								canvasProps.onStackOrderChange?.({
+									eventId: newEventId(),
+									changeType: "bringToFront",
+									id: singleSelectedItem.id,
+								});
+							}
+						}}
+						onBringForward={() => {
+							if (singleSelectedItem) {
+								canvasProps.onStackOrderChange?.({
+									eventId: newEventId(),
+									changeType: "bringForward",
+									id: singleSelectedItem.id,
+								});
+							}
+						}}
+						onSendBackward={() => {
+							if (singleSelectedItem) {
+								canvasProps.onStackOrderChange?.({
+									eventId: newEventId(),
+									changeType: "sendBackward",
+									id: singleSelectedItem.id,
+								});
+							}
+						}}
+						onSendToBack={() => {
+							if (singleSelectedItem) {
+								canvasProps.onStackOrderChange?.({
+									eventId: newEventId(),
+									changeType: "sendToBack",
+									id: singleSelectedItem.id,
+								});
+							}
+						}}
+					/>
+				)}
+			</DiagramMenuPositioner>,
 		);
 		menuItemComponents.push(
-			<DiagramMenuItem
-				key="BringForward"
-				menuType="BringForward"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<BringForward title="Bring Forward" />
-			</DiagramMenuItem>,
-		);
-		menuItemComponents.push(
-			<DiagramMenuItem
-				key="SendBackward"
-				menuType="SendBackward"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<SendBackward title="Send Backward" />
-			</DiagramMenuItem>,
-		);
-		menuItemComponents.push(
-			<DiagramMenuItem
-				key="SendToBack"
-				menuType="SendToBack"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<SendToBack title="Send to Back" />
-			</DiagramMenuItem>,
-		);
-		menuItemComponents.push(
-			<DiagramMenuDivider key="BringToFrontSectionDivider" />,
+			<DiagramMenuDivider key="StackOrderSectionDivider" />,
 		);
 	}
 
