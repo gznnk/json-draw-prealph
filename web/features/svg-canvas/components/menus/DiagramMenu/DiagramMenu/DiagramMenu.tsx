@@ -53,7 +53,6 @@ import { FontColor } from "../../../icons/FontColor";
 import { FontSize } from "../../../icons/FontSize";
 import { Group } from "../../../icons/Group";
 import { LineStyle } from "../../../icons/LineStyle";
-import { StackOrder as StackOrderIcon } from "../../../icons/StackOrder";
 import { AlignmentMenu } from "../AlignmentMenu/AlignmentMenu";
 import { ColorPicker } from "../ColorPicker";
 import { DiagramMenuItem } from "../DiagramMenuItem";
@@ -377,7 +376,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		}
 	}
 
-	// Set other menu states
+	// Set stack order menu state.
 	if (selectedItems.length === 1) {
 		menuStateMap.StackOrder = isStackOrderMenuOpen ? "Active" : "Show";
 	}
@@ -677,26 +676,15 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 
 	// Create a section for stack order items.
-	const showStackOrderSection = showSection("StackOrder");
-	if (showStackOrderSection) {
+	if (selectedItems.length === 1 && canvasProps.onStackOrderChange) {
 		menuItemComponents.push(
-			<DiagramMenuPositioner key="StackOrder">
-				<DiagramMenuItem
-					menuType="StackOrder"
-					menuStateMap={menuStateMap}
-					onMenuClick={onMenuClick}
-				>
-					<StackOrderIcon title="Stack Order" />
-				</DiagramMenuItem>
-				{menuStateMap.StackOrder === "Active" &&
-					singleSelectedItem &&
-					canvasProps.onStackOrderChange && (
-						<StackOrderMenu
-							selectedItemId={singleSelectedItem.id}
-							onStackOrderChange={canvasProps.onStackOrderChange}
-						/>
-					)}
-			</DiagramMenuPositioner>,
+			<StackOrderMenu
+				key="StackOrder"
+				isOpen={isStackOrderMenuOpen}
+				onToggle={() => setIsStackOrderMenuOpen(!isStackOrderMenuOpen)}
+				selectedItemId={singleSelectedItem.id}
+				onStackOrderChange={canvasProps.onStackOrderChange}
+			/>,
 		);
 		menuItemComponents.push(
 			<DiagramMenuDivider key="StackOrderSectionDivider" />,
