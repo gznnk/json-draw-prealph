@@ -20,12 +20,7 @@ export type DiagramMenuType =
 	| "FontSize"
 	| "Bold"
 	| "FontColor"
-	| "AlignLeft"
-	| "AlignCenter"
-	| "AlignRight"
-	| "AlignTop"
-	| "AlignMiddle"
-	| "AlignBottom"
+	| "Alignment"
 	| "StackOrder"
 	| "KeepAspectRatio"
 	| "Group";

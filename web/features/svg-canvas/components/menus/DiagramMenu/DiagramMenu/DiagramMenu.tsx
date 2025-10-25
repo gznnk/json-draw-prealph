@@ -43,9 +43,7 @@ import { isFrame } from "../../../../utils/validation/isFrame";
 import { isItemableState } from "../../../../utils/validation/isItemableState";
 import { isTextableState } from "../../../../utils/validation/isTextableState";
 import { isTransformativeState } from "../../../../utils/validation/isTransformativeState";
-import { AlignCenter } from "../../../icons/AlignCenter";
 import { AlignLeft } from "../../../icons/AlignLeft";
-import { AlignRight } from "../../../icons/AlignRight";
 import { AspectRatio } from "../../../icons/AspectRatio";
 import { BgColor } from "../../../icons/BgColor";
 import { Bold } from "../../../icons/Bold";
@@ -56,9 +54,7 @@ import { FontSize } from "../../../icons/FontSize";
 import { Group } from "../../../icons/Group";
 import { LineStyle } from "../../../icons/LineStyle";
 import { StackOrder as StackOrderIcon } from "../../../icons/StackOrder";
-import { VerticalAlignBottom } from "../../../icons/VerticalAlignBottom";
-import { VerticalAlignMiddle } from "../../../icons/VerticalAlignMiddle";
-import { VerticalAlignTop } from "../../../icons/VerticalAlignTop";
+import { AlignmentMenu } from "../AlignmentMenu/AlignmentMenu";
 import { ColorPicker } from "../ColorPicker";
 import { DiagramMenuItem } from "../DiagramMenuItem";
 import { LineStyleMenu } from "../LineStyleMenu";
@@ -90,6 +86,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const [isLineStyleMenuOpen, setIsLineStyleMenuOpen] = useState(false);
 	const [isFontSizeSelectorOpen, setIsFontSizeSelectorOpen] = useState(false);
 	const [isFontColorPickerOpen, setIsFontColorPickerOpen] = useState(false);
+	const [isAlignmentMenuOpen, setIsAlignmentMenuOpen] = useState(false);
 	const [isStackOrderMenuOpen, setIsStackOrderMenuOpen] = useState(false);
 
 	// Get selected items and check if the diagram menu should be shown.
@@ -162,6 +159,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				LineStyle: false,
 				FontSize: false,
 				FontColor: false,
+				Alignment: false,
 				StackOrder: false,
 			} as {
 				[key in DiagramMenuType]: boolean;
@@ -177,6 +175,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			setIsLineStyleMenuOpen(newControlsStateMap.LineStyle);
 			setIsFontSizeSelectorOpen(newControlsStateMap.FontSize);
 			setIsFontColorPickerOpen(newControlsStateMap.FontColor);
+			setIsAlignmentMenuOpen(newControlsStateMap.Alignment);
 			setIsStackOrderMenuOpen(newControlsStateMap.StackOrder);
 		},
 		[],
@@ -210,23 +209,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				case "FontColor":
 					openControl("FontColor", currentMenuStateMap);
 					break;
-				case "AlignLeft":
-					changeItemsStyle(selectedItems, { textAlign: "left" });
-					break;
-				case "AlignCenter":
-					changeItemsStyle(selectedItems, { textAlign: "center" });
-					break;
-				case "AlignRight":
-					changeItemsStyle(selectedItems, { textAlign: "right" });
-					break;
-				case "AlignTop":
-					changeItemsStyle(selectedItems, { verticalAlign: "top" });
-					break;
-				case "AlignMiddle":
-					changeItemsStyle(selectedItems, { verticalAlign: "center" });
-					break;
-				case "AlignBottom":
-					changeItemsStyle(selectedItems, { verticalAlign: "bottom" });
+				case "Alignment":
+					openControl("Alignment", currentMenuStateMap);
 					break;
 				case "StackOrder":
 					openControl("StackOrder", currentMenuStateMap);
@@ -318,6 +302,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			setIsLineStyleMenuOpen(false);
 			setIsFontSizeSelectorOpen(false);
 			setIsFontColorPickerOpen(false);
+			setIsAlignmentMenuOpen(false);
 			setIsStackOrderMenuOpen(false);
 		}
 	}, [showDiagramMenu]);
@@ -343,12 +328,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		FontSize: "Hidden",
 		Bold: "Hidden",
 		FontColor: "Hidden",
-		AlignLeft: "Hidden",
-		AlignCenter: "Hidden",
-		AlignRight: "Hidden",
-		AlignTop: "Hidden",
-		AlignMiddle: "Hidden",
-		AlignBottom: "Hidden",
+		Alignment: "Hidden",
 		StackOrder: "Hidden",
 		KeepAspectRatio: "Hidden",
 		Group: "Hidden",
@@ -388,34 +368,11 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuStateMap.FontSize = isFontSizeSelectorOpen ? "Active" : "Show";
 		menuStateMap.Bold = "Show";
 		menuStateMap.FontColor = isFontColorPickerOpen ? "Active" : "Show";
-		menuStateMap.AlignLeft = "Show";
-		menuStateMap.AlignCenter = "Show";
-		menuStateMap.AlignRight = "Show";
-		menuStateMap.AlignTop = "Show";
-		menuStateMap.AlignMiddle = "Show";
-		menuStateMap.AlignBottom = "Show";
+		menuStateMap.Alignment = isAlignmentMenuOpen ? "Active" : "Show";
 
 		if (isTextableState(firstTextableItem)) {
 			if (firstTextableItem.fontWeight === "bold") {
 				menuStateMap.Bold = "Active";
-			}
-			if (firstTextableItem.textAlign === "left") {
-				menuStateMap.AlignLeft = "Active";
-			}
-			if (firstTextableItem.textAlign === "center") {
-				menuStateMap.AlignCenter = "Active";
-			}
-			if (firstTextableItem.textAlign === "right") {
-				menuStateMap.AlignRight = "Active";
-			}
-			if (firstTextableItem.verticalAlign === "top") {
-				menuStateMap.AlignTop = "Active";
-			}
-			if (firstTextableItem.verticalAlign === "center") {
-				menuStateMap.AlignMiddle = "Active";
-			}
-			if (firstTextableItem.verticalAlign === "bottom") {
-				menuStateMap.AlignBottom = "Active";
 			}
 		}
 	}
@@ -684,87 +641,38 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		);
 	}
 
-	// Create a section for text alignment items.
-	const showTextAlignmentSection = showSection(
-		"AlignLeft",
-		"AlignCenter",
-		"AlignRight",
-	);
-	if (showTextAlignmentSection) {
+	// Create a section for alignment items.
+	const showAlignmentSection = showSection("Alignment");
+	if (
+		showAlignmentSection &&
+		firstTextableItem &&
+		isTextableState(firstTextableItem)
+	) {
 		menuItemComponents.push(
-			<DiagramMenuItem
-				key="AlignLeft"
-				menuType="AlignLeft"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<AlignLeft title="Align Left" />
-			</DiagramMenuItem>,
+			<DiagramMenuPositioner key="Alignment">
+				<DiagramMenuItem
+					menuType="Alignment"
+					menuStateMap={menuStateMap}
+					onMenuClick={onMenuClick}
+				>
+					<AlignLeft title="Alignment" />
+				</DiagramMenuItem>
+				{menuStateMap.Alignment === "Active" && (
+					<AlignmentMenu
+						textAlign={firstTextableItem.textAlign}
+						verticalAlign={firstTextableItem.verticalAlign}
+						onTextAlignChange={(align) => {
+							changeItemsStyle(selectedItems, { textAlign: align });
+						}}
+						onVerticalAlignChange={(align) => {
+							changeItemsStyle(selectedItems, { verticalAlign: align });
+						}}
+					/>
+				)}
+			</DiagramMenuPositioner>,
 		);
 		menuItemComponents.push(
-			<DiagramMenuItem
-				key="AlignCenter"
-				menuType="AlignCenter"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<AlignCenter title="Align Center" />
-			</DiagramMenuItem>,
-		);
-		menuItemComponents.push(
-			<DiagramMenuItem
-				key="AlignRight"
-				menuType="AlignRight"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<AlignRight title="Align Right" />
-			</DiagramMenuItem>,
-		);
-		menuItemComponents.push(
-			<DiagramMenuDivider key="TextAlignmentSectionDivider" />,
-		);
-	}
-
-	// Create a section for text vertical alignment items.
-	const showTextVerticalAlignmentSection = showSection(
-		"AlignTop",
-		"AlignMiddle",
-		"AlignBottom",
-	);
-	if (showTextVerticalAlignmentSection) {
-		menuItemComponents.push(
-			<DiagramMenuItem
-				key="AlignTop"
-				menuType="AlignTop"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<VerticalAlignTop title="Align Top" />
-			</DiagramMenuItem>,
-		);
-		menuItemComponents.push(
-			<DiagramMenuItem
-				key="AlignMiddle"
-				menuType="AlignMiddle"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<VerticalAlignMiddle title="Align Middle" />
-			</DiagramMenuItem>,
-		);
-		menuItemComponents.push(
-			<DiagramMenuItem
-				key="AlignBottom"
-				menuType="AlignBottom"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<VerticalAlignBottom title="Align Bottom" />
-			</DiagramMenuItem>,
-		);
-		menuItemComponents.push(
-			<DiagramMenuDivider key="TextVerticalAlignmentSectionDivider" />,
+			<DiagramMenuDivider key="AlignmentSectionDivider" />,
 		);
 	}
 
