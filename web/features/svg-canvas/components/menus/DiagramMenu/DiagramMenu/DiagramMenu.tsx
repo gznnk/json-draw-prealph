@@ -39,7 +39,6 @@ import { newEventId } from "../../../../utils/core/newEventId";
 import { isItemableState } from "../../../../utils/validation/isItemableState";
 import { isTextableState } from "../../../../utils/validation/isTextableState";
 import { isTransformativeState } from "../../../../utils/validation/isTransformativeState";
-import { AlignLeft } from "../../../icons/AlignLeft";
 import { AspectRatio } from "../../../icons/AspectRatio";
 import { BgColor } from "../../../icons/BgColor";
 import { Bold } from "../../../icons/Bold";
@@ -545,33 +544,25 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		isTextableState(firstTextableItem)
 	) {
 		menuItemComponents.push(
-			<DiagramMenuPositioner key="Alignment">
-				<DiagramMenuItem
-					menuType="Alignment"
-					menuStateMap={menuStateMap}
-					onMenuClick={onMenuClick}
-				>
-					<AlignLeft title="Alignment" />
-				</DiagramMenuItem>
-				{menuStateMap.Alignment === "Active" && (
-					<AlignmentMenu
-						textAlign={firstTextableItem.textAlign}
-						verticalAlign={firstTextableItem.verticalAlign}
-						onTextAlignChange={(align) => {
-							applyStyleChange({
-								items: selectedItems,
-								styleData: { textAlign: align },
-							});
-						}}
-						onVerticalAlignChange={(align) => {
-							applyStyleChange({
-								items: selectedItems,
-								styleData: { verticalAlign: align },
-							});
-						}}
-					/>
-				)}
-			</DiagramMenuPositioner>,
+			<AlignmentMenu
+				key="Alignment"
+				isOpen={isAlignmentMenuOpen}
+				onToggle={() => setIsAlignmentMenuOpen(!isAlignmentMenuOpen)}
+				textAlign={firstTextableItem.textAlign}
+				verticalAlign={firstTextableItem.verticalAlign}
+				onTextAlignChange={(align) => {
+					applyStyleChange({
+						items: selectedItems,
+						styleData: { textAlign: align },
+					});
+				}}
+				onVerticalAlignChange={(align) => {
+					applyStyleChange({
+						items: selectedItems,
+						styleData: { verticalAlign: align },
+					});
+				}}
+			/>,
 		);
 		menuItemComponents.push(
 			<DiagramMenuDivider key="AlignmentSectionDivider" />,
