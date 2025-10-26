@@ -1,6 +1,5 @@
 import { NodeHeaderMinimap } from "../../components/elements/NodeHeader";
 import { NodeHeaderDefaultData } from "../../constants/data/elements/NodeHeaderDefaultData";
-import { NodeHeaderMenuConfig } from "../../constants/menu/elements/NodeHeaderMenuConfig";
 import { NodeHeaderDefaultState } from "../../constants/state/elements/NodeHeaderDefaultState";
 import type { NodeHeaderData } from "../../types/data/elements/NodeHeaderData";
 import { NodeHeaderFeatures } from "../../types/data/elements/NodeHeaderData";
@@ -40,7 +39,7 @@ export const NodeHeaderAtlas: NodeHeaderAtlas = {
 
 	type: "NodeHeader",
 	features: NodeHeaderFeatures,
-	menuConfig: NodeHeaderMenuConfig,
+	menuConfig: undefined,
 
 	// ============================================================================
 	// Defaults

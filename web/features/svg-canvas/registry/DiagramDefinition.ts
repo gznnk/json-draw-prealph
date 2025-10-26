@@ -36,15 +36,13 @@ export type DiagramDefinition = {
 	calcConnectPointPosition: (diagram: Diagram) => ConnectPointState[];
 
 	/** Transform Items Functions */
-	transformItems:
-		| ((ownerFrame: Frame, items: Diagram[]) => Diagram[])
-		| undefined;
+	transformItems?: (ownerFrame: Frame, items: Diagram[]) => Diagram[];
 
 	/** Function to create a new instance of the diagram */
 	createState: (props: { x: number; y: number }) => Diagram | undefined;
 
 	/** Function to export the diagram to external format */
-	export: ((diagram: Diagram) => Blob | undefined) | undefined;
+	export?: (diagram: Diagram) => Blob | undefined;
 
 	/** Function to map state to data format for serialization */
 	stateToData: StateToDataMapper;

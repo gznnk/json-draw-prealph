@@ -1,6 +1,5 @@
 import { ConnectPoint } from "../../components/shapes/ConnectPoint";
 import { ConnectPointDefaultData } from "../../constants/data/shapes/ConnectPointDefaultData";
-import { ConnectPointMenuConfig } from "../../constants/menu/shapes/ConnectPointMenuConfig";
 import { ConnectPointDefaultState } from "../../constants/state/shapes/ConnectPointDefaultState";
 import type { ConnectPointData } from "../../types/data/shapes/ConnectPointData";
 import type { ConnectPointProps } from "../../types/props/shapes/ConnectPointProps";
@@ -38,7 +37,7 @@ export const ConnectPointAtlas: ConnectPointAtlas = {
 
 	type: "ConnectPoint",
 	features: {},
-	menuConfig: ConnectPointMenuConfig,
+	menuConfig: undefined,
 
 	// ============================================================================
 	// Defaults

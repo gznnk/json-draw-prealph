@@ -39,7 +39,7 @@ export type DiagramAtlas<
 	features: DiagramFeatures;
 
 	/** Menu Configuration */
-	menuConfig: DiagramMenuConfig;
+	menuConfig?: DiagramMenuConfig;
 
 	// ============================================================================
 	// Defaults
@@ -68,16 +68,14 @@ export type DiagramAtlas<
 	/** Create Functions */
 	createState: (props: { x: number; y: number }) => Diagram;
 
-	/** Export Function */
-	export: ((state: Diagram) => Blob | undefined) | undefined;
+	/** Transform Child Items Functions */
+	transformItems?: (ownerFrame: Frame, items: Diagram[]) => Diagram[];
 
 	/** Calculator Functions */
 	calcConnectPointPosition: (state: Diagram) => ConnectPointState[];
 
-	/** Transform Functions */
-	transformItems:
-		| ((ownerFrame: Frame, items: Diagram[]) => Diagram[])
-		| undefined;
+	/** Export Function */
+	export?: (state: Diagram) => Blob | undefined;
 
 	/** Mapper Functions */
 	dataToState: (data: DiagramData) => Diagram;
