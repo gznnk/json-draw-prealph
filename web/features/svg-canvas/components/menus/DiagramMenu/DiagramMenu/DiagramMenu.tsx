@@ -129,7 +129,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const changeItemsStyle = useCallback(
 		(
 			items: Diagram[],
-			styleData: Partial<Omit<DiagramStyleChangeEvent, "eventId" | "id">>,
+			styleData: Partial<DiagramStyleChangeEvent["data"]>,
 			recursively = true,
 			eventId: string = newEventId(),
 		) => {
@@ -137,7 +137,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				canvasProps.onStyleChange?.({
 					eventId,
 					id: item.id,
-					...styleData,
+					data: styleData,
 				});
 
 				if (recursively && isItemableState(item)) {
