@@ -26,10 +26,8 @@ import {
 	findFirstStrokableRecursive,
 	findFirstTextableRecursive,
 } from "./DiagramMenuUtils";
-import { InteractionState } from "../../../../canvas/types/InteractionState";
-import { DISTANCE_FROM_DIAGRAM } from "../../../../constants/styling/menus/DiagramMenuStyling";
+import { useDiagramMenuState } from "./hooks/useDiagramMenuState";
 import type { PathType } from "../../../../types/core/PathType";
-import type { RectangleVertices } from "../../../../types/core/RectangleVertices";
 import type { StrokeDashType } from "../../../../types/core/StrokeDashType";
 import type { CornerRoundableData } from "../../../../types/data/core/CornerRoundableData";
 import type { FillableData } from "../../../../types/data/core/FillableData";
@@ -38,8 +36,6 @@ import type { TextableData } from "../../../../types/data/core/TextableData";
 import type { Diagram } from "../../../../types/state/core/Diagram";
 import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams";
 import { newEventId } from "../../../../utils/core/newEventId";
-import { calcRectangleVertices } from "../../../../utils/math/geometry/calcRectangleVertices";
-import { isFrame } from "../../../../utils/validation/isFrame";
 import { isItemableState } from "../../../../utils/validation/isItemableState";
 import { isTextableState } from "../../../../utils/validation/isTextableState";
 import { isTransformativeState } from "../../../../utils/validation/isTransformativeState";
@@ -64,17 +60,23 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	containerWidth,
 	containerHeight,
 }) => {
-	// Extract properties from canvasProps.
-	const { items, interactionState, multiSelectGroup, zoom, minX, minY } =
-		canvasProps;
-
 	const menuRef = useRef<HTMLDivElement>(null);
-	const [previousSelectedItemsId, setPreviousSelectedItemsId] =
-		useState<string>("");
-	const [menuDimensions, setMenuDimensions] = useState({
-		width: 0,
-		height: 40,
-	});
+
+	// Get selected items from canvas
+	const selectedItems = getSelectedDiagrams(canvasProps.items);
+	const singleSelectedItem = selectedItems[0];
+
+	// Use diagram menu state hook to manage visibility, position, and selection state
+	const { shouldRender, menuPosition, shouldDisplayMenu } = useDiagramMenuState(
+		{
+			canvasProps,
+			containerWidth,
+			containerHeight,
+			menuRef,
+			selectedItems,
+			singleSelectedItem,
+		},
+	);
 
 	// Diagram menu controls open/close state.
 	const [isBgColorPickerOpen, setIsBgColorPickerOpen] = useState(false);
@@ -86,14 +88,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const [isFontColorPickerOpen, setIsFontColorPickerOpen] = useState(false);
 	const [isAlignmentMenuOpen, setIsAlignmentMenuOpen] = useState(false);
 	const [isStackOrderMenuOpen, setIsStackOrderMenuOpen] = useState(false);
-
-	// Get selected items and check if the diagram menu should be shown.
-	const selectedItems = getSelectedDiagrams(items);
-	const showDiagramMenu =
-		selectedItems.length > 0 && interactionState === InteractionState.Idle;
-	const singleSelectedItem = selectedItems[0];
-	// Create selected items ID string for dependency tracking
-	const selectedItemsId = selectedItems.map((item) => item.id).join(",");
 
 	// Use diagram menu hook for style changes
 	const { applyStyleChange } = useDiagramMenu({
@@ -200,10 +194,10 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					openControl("StackOrder", currentMenuStateMap);
 					break;
 				case "KeepAspectRatio":
-					if (multiSelectGroup) {
+					if (canvasProps.multiSelectGroup) {
 						canvasProps.onConstraintChange?.({
 							eventId: newEventId(),
-							id: multiSelectGroup.id,
+							id: canvasProps.multiSelectGroup.id,
 							keepProportion: currentMenuStateMap.KeepAspectRatio !== "Active",
 						});
 					} else {
@@ -285,7 +279,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 
 	// If the diagram menu is not shown, close controls.
 	useEffect(() => {
-		if (!showDiagramMenu) {
+		if (!shouldRender) {
 			setIsBgColorPickerOpen(false);
 			setIsBorderColorPickerOpen(false);
 			setIsBorderRadiusSelectorOpen(false);
@@ -295,19 +289,9 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			setIsAlignmentMenuOpen(false);
 			setIsStackOrderMenuOpen(false);
 		}
-	}, [showDiagramMenu]);
+	}, [shouldRender]);
 
-	// Update menu dimensions when DOM changes or selected items change
-	useEffect(() => {
-		if (menuRef.current && showDiagramMenu) {
-			const rect = menuRef.current.getBoundingClientRect();
-			setMenuDimensions({ width: rect.width, height: rect.height });
-		}
-		// Update the state for tracking
-		setPreviousSelectedItemsId(selectedItemsId);
-	}, [showDiagramMenu, selectedItemsId]);
-
-	if (!showDiagramMenu) return null;
+	if (!shouldRender) return null;
 
 	// Default menu state map.
 	const menuStateMap = {
@@ -373,8 +357,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 
 	// Set the keep aspect ratio state.
-	if (multiSelectGroup) {
-		menuStateMap.KeepAspectRatio = multiSelectGroup.keepProportion
+	if (canvasProps.multiSelectGroup) {
+		menuStateMap.KeepAspectRatio = canvasProps.multiSelectGroup.keepProportion
 			? "Active"
 			: "Show";
 	} else if (isTransformativeState(singleSelectedItem)) {
@@ -384,84 +368,11 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 
 	// Set the group menu state.
-	if (multiSelectGroup) {
+	if (canvasProps.multiSelectGroup) {
 		menuStateMap.Group = "Show";
 	} else if (singleSelectedItem && singleSelectedItem.type === "Group") {
 		menuStateMap.Group = "Active";
 	}
-
-	// Get diagram position and size
-	let x, y, width, height, rotation, scaleX, scaleY;
-	if (multiSelectGroup) {
-		({ x, y, width, height, rotation, scaleX, scaleY } = multiSelectGroup);
-	} else if (isFrame(singleSelectedItem)) {
-		({ x, y, width, height, rotation, scaleX, scaleY } = singleSelectedItem);
-	} else {
-		// Default values if no transformative item
-		x = y = width = height = 0;
-		rotation = 0;
-		scaleX = scaleY = 1;
-	}
-
-	const vertices = calcRectangleVertices({
-		x: x * zoom,
-		y: y * zoom,
-		width: width * zoom,
-		height: height * zoom,
-		rotation,
-		scaleX,
-		scaleY,
-	});
-
-	// Get diagram bottom Y position
-	const diagramBottomY = Object.keys(vertices).reduce((max, key) => {
-		const vertex = vertices[key as keyof RectangleVertices];
-		return Math.max(max, vertex.y);
-	}, Number.NEGATIVE_INFINITY);
-
-	// Get diagram center X position
-	const diagramCenterX = x * zoom;
-
-	// Calculate menu position with viewport constraints
-	const calculateMenuPosition = (): { x: number; y: number } => {
-		const menuWidth = menuDimensions.width;
-		const menuHeight = menuDimensions.height;
-
-		// Default position: below the diagram, centered
-		let menuX = diagramCenterX - menuWidth / 2;
-		let menuY = diagramBottomY + DISTANCE_FROM_DIAGRAM;
-
-		// Check if menu overflows viewport horizontally
-		const viewportRight = minX + containerWidth;
-		if (menuX + menuWidth > viewportRight) {
-			// Adjust to fit within right boundary
-			menuX = viewportRight - menuWidth;
-		}
-		if (menuX < minX) {
-			// Adjust to fit within left boundary
-			menuX = minX;
-		}
-
-		// Check if menu overflows viewport vertically (bottom)
-		const viewportBottom = minY + containerHeight;
-		if (menuY + menuHeight > viewportBottom) {
-			// Position above the diagram
-			const diagramTopY = Object.keys(vertices).reduce((min, key) => {
-				const vertex = vertices[key as keyof RectangleVertices];
-				return Math.min(min, vertex.y);
-			}, Number.POSITIVE_INFINITY);
-			menuY = diagramTopY - DISTANCE_FROM_DIAGRAM - menuHeight;
-		}
-
-		// Ensure menu doesn't go above viewport
-		if (menuY < minY) {
-			menuY = minY;
-		}
-
-		return { x: menuX, y: menuY };
-	};
-
-	const menuPosition = calculateMenuPosition();
 
 	// Create the menu click handler with the current state
 	const onMenuClick = createMenuClickHandler(menuStateMap);
@@ -668,7 +579,11 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 
 	// Create a section for stack order items.
-	if (selectedItems.length === 1 && canvasProps.onStackOrderChange) {
+	if (
+		selectedItems.length === 1 &&
+		singleSelectedItem &&
+		canvasProps.onStackOrderChange
+	) {
 		menuItemComponents.push(
 			<StackOrderMenu
 				key="StackOrder"
@@ -720,14 +635,11 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	// Remove the last divider.
 	menuItemComponents.pop();
 
-	// Check if selected items have changed to control z-index
-	const isItemsChanged = previousSelectedItemsId !== selectedItemsId;
-
 	return (
 		<DiagramMenuWrapper
 			x={menuPosition.x}
 			y={menuPosition.y}
-			zIndex={isItemsChanged ? -1 : 1060}
+			zIndex={shouldDisplayMenu ? 1060 : -1}
 		>
 			<DiagramMenuDiv ref={menuRef}>
 				{menuItemComponents.map((component) => component)}
