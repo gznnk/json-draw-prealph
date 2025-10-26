@@ -33,11 +33,8 @@ export const useStyleChange = (props: SvgCanvasSubHooksProps) => {
 				// If the id does not match, return the original item.
 				if (item.id !== e.id) return item;
 
-				// Extract style properties from the event.
-				const { eventId: _eventId, id: _id, ...styleChanges } = e;
-
-				// If the id matches, update the item with the new style properties.
-				return { ...item, ...styleChanges };
+				// If the id matches, update the item with the new style properties from event data.
+				return { ...item, ...e.data };
 			});
 
 			// Create new state with updated items.

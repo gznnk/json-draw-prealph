@@ -7,6 +7,7 @@ import {
 	MIN_BORDER_RADIUS,
 	MIN_FONT_SIZE,
 } from "./DiagramMenuConstants";
+import { useDiagramMenu } from "./DiagramMenuHooks";
 import {
 	DiagramMenuDiv,
 	DiagramMenuDivider,
@@ -34,7 +35,6 @@ import type { CornerRoundableData } from "../../../../types/data/core/CornerRoun
 import type { FillableData } from "../../../../types/data/core/FillableData";
 import type { StrokableData } from "../../../../types/data/core/StrokableData";
 import type { TextableData } from "../../../../types/data/core/TextableData";
-import type { DiagramStyleChangeEvent } from "../../../../types/events/DiagramStyleChangeEvent";
 import type { Diagram } from "../../../../types/state/core/Diagram";
 import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams";
 import { newEventId } from "../../../../utils/core/newEventId";
@@ -95,6 +95,11 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	// Create selected items ID string for dependency tracking
 	const selectedItemsId = selectedItems.map((item) => item.id).join(",");
 
+	// Use diagram menu hook for style changes
+	const { applyStyleChange } = useDiagramMenu({
+		onStyleChange: canvasProps.onStyleChange,
+	});
+
 	// Utility functions for changing items
 	const changeItems = useCallback(
 		(
@@ -120,28 +125,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 
 				if (recursively && isItemableState(newItem)) {
 					changeItems(newItem.items, data, recursively, eventId);
-				}
-			}
-		},
-		[canvasProps],
-	);
-
-	const changeItemsStyle = useCallback(
-		(
-			items: Diagram[],
-			styleData: Partial<DiagramStyleChangeEvent["data"]>,
-			recursively = true,
-			eventId: string = newEventId(),
-		) => {
-			for (const item of items) {
-				canvasProps.onStyleChange?.({
-					eventId,
-					id: item.id,
-					data: styleData,
-				});
-
-				if (recursively && isItemableState(item)) {
-					changeItemsStyle(item.items, styleData, recursively, eventId);
 				}
 			}
 		},
@@ -199,9 +182,12 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					openControl("FontSize", currentMenuStateMap);
 					break;
 				case "Bold":
-					changeItemsStyle(selectedItems, {
-						fontWeight:
-							currentMenuStateMap.Bold === "Active" ? "normal" : "bold",
+					applyStyleChange({
+						items: selectedItems,
+						styleData: {
+							fontWeight:
+								currentMenuStateMap.Bold === "Active" ? "normal" : "bold",
+						},
 					});
 					break;
 				case "FontColor":
@@ -244,51 +230,57 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 
 	const onBgColorChange = useCallback(
 		(bgColor: string) => {
-			changeItemsStyle(selectedItems, { fill: bgColor });
+			applyStyleChange({ items: selectedItems, styleData: { fill: bgColor } });
 		},
-		[selectedItems, changeItemsStyle],
+		[selectedItems, applyStyleChange],
 	);
 
 	const onBorderColorChange = useCallback(
 		(borderColor: string) => {
-			changeItemsStyle(selectedItems, { stroke: borderColor });
+			applyStyleChange({
+				items: selectedItems,
+				styleData: { stroke: borderColor },
+			});
 		},
-		[selectedItems, changeItemsStyle],
+		[selectedItems, applyStyleChange],
 	);
 
 	const onBorderRadiusChange = useCallback(
 		(borderRadius: number) => {
-			changeItemsStyle(selectedItems, { cornerRadius: borderRadius });
+			applyStyleChange({
+				items: selectedItems,
+				styleData: { cornerRadius: borderRadius },
+			});
 		},
-		[selectedItems, changeItemsStyle],
+		[selectedItems, applyStyleChange],
 	);
 
 	const onStrokeDashChange = useCallback(
 		(strokeDashType: StrokeDashType) => {
-			changeItemsStyle(selectedItems, { strokeDashType });
+			applyStyleChange({ items: selectedItems, styleData: { strokeDashType } });
 		},
-		[selectedItems, changeItemsStyle],
+		[selectedItems, applyStyleChange],
 	);
 
 	const onPathTypeChange = useCallback(
 		(pathType: PathType) => {
-			changeItemsStyle(selectedItems, { pathType });
+			applyStyleChange({ items: selectedItems, styleData: { pathType } });
 		},
-		[selectedItems, changeItemsStyle],
+		[selectedItems, applyStyleChange],
 	);
 
 	const onFontSizeChange = useCallback(
 		(fontSize: number) => {
-			changeItemsStyle(selectedItems, { fontSize });
+			applyStyleChange({ items: selectedItems, styleData: { fontSize } });
 		},
-		[selectedItems, changeItemsStyle],
+		[selectedItems, applyStyleChange],
 	);
 
 	const onFontColorChange = useCallback(
 		(fontColor: string) => {
-			changeItemsStyle(selectedItems, { fontColor });
+			applyStyleChange({ items: selectedItems, styleData: { fontColor } });
 		},
-		[selectedItems, changeItemsStyle],
+		[selectedItems, applyStyleChange],
 	);
 
 	// If the diagram menu is not shown, close controls.
@@ -560,7 +552,10 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				pathType={firstPathableItem?.pathType || "Linear"}
 				strokeDashType={firstStrokableItem?.strokeDashType || "solid"}
 				onStrokeWidthChange={(value) => {
-					changeItemsStyle(selectedItems, { strokeWidth: value });
+					applyStyleChange({
+						items: selectedItems,
+						styleData: { strokeWidth: value },
+					});
 				}}
 				onPathTypeChange={onPathTypeChange}
 				onStrokeDashTypeChange={onStrokeDashChange}
@@ -652,10 +647,16 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 						textAlign={firstTextableItem.textAlign}
 						verticalAlign={firstTextableItem.verticalAlign}
 						onTextAlignChange={(align) => {
-							changeItemsStyle(selectedItems, { textAlign: align });
+							applyStyleChange({
+								items: selectedItems,
+								styleData: { textAlign: align },
+							});
 						}}
 						onVerticalAlignChange={(align) => {
-							changeItemsStyle(selectedItems, { verticalAlign: align });
+							applyStyleChange({
+								items: selectedItems,
+								styleData: { verticalAlign: align },
+							});
 						}}
 					/>
 				)}
