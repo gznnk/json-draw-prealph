@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 
-import type { DiagramStyleChangeEvent } from "../../../../types/events/DiagramStyleChangeEvent";
-import type { Diagram } from "../../../../types/state/core/Diagram";
-import { newEventId } from "../../../../utils/core/newEventId";
-import { isItemableState } from "../../../../utils/validation/isItemableState";
+import type { DiagramStyleChangeEvent } from "../../../../../types/events/DiagramStyleChangeEvent";
+import type { Diagram } from "../../../../../types/state/core/Diagram";
+import { newEventId } from "../../../../../utils/core/newEventId";
+import { isItemableState } from "../../../../../utils/validation/isItemableState";
 
-export type UseDiagramMenuProps = {
+export type UseStyleChangeProps = {
 	onStyleChange?: (event: DiagramStyleChangeEvent) => void;
 };
 
@@ -16,17 +16,17 @@ export type ApplyStyleChangeParams = {
 	eventId?: string;
 };
 
-export type UseDiagramMenuReturn = {
+export type UseStyleChangeReturn = {
 	applyStyleChange: (params: ApplyStyleChangeParams) => void;
 };
 
 /**
- * Hook for managing diagram menu style changes.
+ * Hook for managing diagram style changes.
  * Provides functionality to apply style changes to diagrams recursively.
  */
-export const useDiagramMenu = (
-	props: UseDiagramMenuProps,
-): UseDiagramMenuReturn => {
+export const useStyleChange = (
+	props: UseStyleChangeProps,
+): UseStyleChangeReturn => {
 	const { onStyleChange } = props;
 
 	const applyStyleChange = useCallback(

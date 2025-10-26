@@ -7,7 +7,6 @@ import {
 	MIN_BORDER_RADIUS,
 	MIN_FONT_SIZE,
 } from "./DiagramMenuConstants";
-import { useDiagramMenu } from "./DiagramMenuHooks";
 import {
 	DiagramMenuDiv,
 	DiagramMenuDivider,
@@ -27,6 +26,7 @@ import {
 	findFirstTextableRecursive,
 } from "./DiagramMenuUtils";
 import { useDiagramMenuState } from "./hooks/useDiagramMenuState";
+import { useStyleChange } from "./hooks/useStyleChange";
 import type { PathType } from "../../../../types/core/PathType";
 import type { StrokeDashType } from "../../../../types/core/StrokeDashType";
 import type { CornerRoundableData } from "../../../../types/data/core/CornerRoundableData";
@@ -89,8 +89,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const [isAlignmentMenuOpen, setIsAlignmentMenuOpen] = useState(false);
 	const [isStackOrderMenuOpen, setIsStackOrderMenuOpen] = useState(false);
 
-	// Use diagram menu hook for style changes
-	const { applyStyleChange } = useDiagramMenu({
+	// Use style change hook for applying style changes
+	const { applyStyleChange } = useStyleChange({
 		onStyleChange: canvasProps.onStyleChange,
 	});
 
