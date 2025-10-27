@@ -7,7 +7,6 @@ import type { AreaSelectionEvent } from "../../types/events/AreaSelectionEvent";
 import type { DiagramChangeEvent } from "../../types/events/DiagramChangeEvent";
 import type { DiagramClickEvent } from "../../types/events/DiagramClickEvent";
 import type { DiagramConnectEvent } from "../../types/events/DiagramConnectEvent";
-import type { DiagramConstraintChangeEvent } from "../../types/events/DiagramConstraintChangeEvent";
 import type { DiagramDragDropEvent } from "../../types/events/DiagramDragDropEvent";
 import type { DiagramDragEvent } from "../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../types/events/DiagramHoverChangeEvent";
@@ -31,7 +30,6 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onCopy?: () => void;
 	onDelete?: () => void;
 	onDiagramChange?: (e: DiagramChangeEvent) => void;
-	onConstraintChange?: (e: DiagramConstraintChangeEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragLeave?: (e: DiagramDragDropEvent) => void;
 	onDragOver?: (e: DiagramDragDropEvent) => void;

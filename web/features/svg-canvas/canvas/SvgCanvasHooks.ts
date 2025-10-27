@@ -1,7 +1,6 @@
 import { useRef, useState, type RefObject } from "react";
 
 import { useAddDiagramByType } from "./hooks/actions/useAddDiagramByType";
-import { useConstraintChange } from "./hooks/actions/useConstraintChange";
 import { useCopy } from "./hooks/actions/useCopy";
 import { useDelete } from "./hooks/actions/useDelete";
 import { useExport } from "./hooks/actions/useExport";
@@ -14,6 +13,7 @@ import { useOnAiMessageChange } from "./hooks/diagram/useOnAiMessageChange";
 import { useOnAppendDiagrams } from "./hooks/diagram/useOnAppendDiagrams";
 import { useOnClick } from "./hooks/diagram/useOnClick";
 import { useOnConnect } from "./hooks/diagram/useOnConnect";
+import { useOnConstraintChange } from "./hooks/diagram/useOnConstraintChange";
 import { useOnDiagramChange } from "./hooks/diagram/useOnDiagramChange";
 import { useOnDrag } from "./hooks/diagram/useOnDrag";
 import { useOnDragLeave } from "./hooks/diagram/useOnDragLeave";
@@ -100,9 +100,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the new diagram event.
 	const onAddDiagramByType = useAddDiagramByType(canvasHooksProps);
 
-	// Handler for the diagram constraint change event.
-	const onConstraintChange = useConstraintChange(canvasHooksProps);
-
 	// Handler for the copy event.
 	const onCopy = useCopy(canvasHooksProps);
 
@@ -139,6 +136,9 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// Hook for the stack order change event.
 	useOnStackOrderChange(canvasHooksProps);
+
+	// Hook for the constraint change event.
+	useOnConstraintChange(canvasHooksProps);
 
 	// Hook for extracting selected diagrams to top level when dragged out of CanvasFrame.
 	useOnExtractDiagramsToTopLevel(canvasHooksProps);
@@ -222,7 +222,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onCopy,
 		onDelete,
 		onDiagramChange,
-		onConstraintChange,
 		onDrag,
 		onDragOver,
 		onDragLeave,
