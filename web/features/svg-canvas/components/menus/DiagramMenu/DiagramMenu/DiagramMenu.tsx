@@ -566,7 +566,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				key="StackOrder"
 				isOpen={isStackOrderMenuOpen}
 				onToggle={() => setIsStackOrderMenuOpen(!isStackOrderMenuOpen)}
-				selectedItemId={singleSelectedItem.id}
+				selectedDiagram={singleSelectedItem}
 			/>,
 		);
 		menuItemComponents.push(

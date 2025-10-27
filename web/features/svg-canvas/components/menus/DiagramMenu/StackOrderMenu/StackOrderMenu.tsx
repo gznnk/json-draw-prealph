@@ -6,6 +6,7 @@ import {
 	StackOrderButton,
 } from "./StackOrderMenuStyled";
 import { useStackOrderChange } from "../../../../hooks/useStackOrderChange";
+import type { Diagram } from "../../../../types/state/core/Diagram";
 import { newEventId } from "../../../../utils/core/newEventId";
 import { BringForward } from "../../../icons/BringForward";
 import { BringToFront } from "../../../icons/BringToFront";
@@ -19,15 +20,20 @@ import { DiagramMenuItemNew } from "../DiagramMenuItem/DiagramMenuItemNew";
 type StackOrderMenuProps = {
 	isOpen: boolean;
 	onToggle: () => void;
-	selectedItemId: string;
+	selectedDiagram?: Diagram;
 };
 
 const StackOrderMenuComponent: React.FC<StackOrderMenuProps> = ({
 	isOpen,
 	onToggle,
-	selectedItemId,
+	selectedDiagram,
 }) => {
 	const onStackOrderChange = useStackOrderChange();
+	const selectedItemId = selectedDiagram?.id;
+
+	if (!selectedItemId) {
+		return null;
+	}
 
 	return (
 		<DiagramMenuPositioner>
