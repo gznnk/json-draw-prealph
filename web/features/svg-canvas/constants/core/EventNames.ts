@@ -16,6 +16,9 @@ export const EXTRACT_DIAGRAMS_TO_TOP_LEVEL_EVENT_NAME =
 // Style events
 export const STYLE_CHANGE_EVENT_NAME = "StyleChange" as const;
 
+// Stack order events
+export const STACK_ORDER_CHANGE_EVENT_NAME = "StackOrderChange" as const;
+
 // Connection events
 export const EVENT_NAME_FLASH_CONNECT_LINE = "FlashConnectLine" as const;
 export const EVENT_NAME_CONNECTION = "Connection" as const;

@@ -5,7 +5,7 @@ import {
 	StackOrderMenuWrapper,
 	StackOrderButton,
 } from "./StackOrderMenuStyled";
-import type { StackOrderChangeEvent } from "../../../../types/events/StackOrderChangeEvent";
+import { useStackOrderChange } from "../../../../hooks/useStackOrderChange";
 import { newEventId } from "../../../../utils/core/newEventId";
 import { BringForward } from "../../../icons/BringForward";
 import { BringToFront } from "../../../icons/BringToFront";
@@ -20,15 +20,15 @@ type StackOrderMenuProps = {
 	isOpen: boolean;
 	onToggle: () => void;
 	selectedItemId: string;
-	onStackOrderChange: (event: StackOrderChangeEvent) => void;
 };
 
 const StackOrderMenuComponent: React.FC<StackOrderMenuProps> = ({
 	isOpen,
 	onToggle,
 	selectedItemId,
-	onStackOrderChange,
 }) => {
+	const onStackOrderChange = useStackOrderChange();
+
 	return (
 		<DiagramMenuPositioner>
 			<DiagramMenuItemNew isActive={isOpen} onClick={onToggle}>

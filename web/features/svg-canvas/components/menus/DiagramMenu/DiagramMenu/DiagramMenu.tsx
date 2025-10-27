@@ -556,18 +556,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 
 	// Create a section for stack order items.
-	if (
-		selectedItems.length === 1 &&
-		singleSelectedItem &&
-		canvasProps.onStackOrderChange
-	) {
+	if (selectedItems.length === 1 && singleSelectedItem) {
 		menuItemComponents.push(
 			<StackOrderMenu
 				key="StackOrder"
 				isOpen={isStackOrderMenuOpen}
 				onToggle={() => setIsStackOrderMenuOpen(!isStackOrderMenuOpen)}
 				selectedItemId={singleSelectedItem.id}
-				onStackOrderChange={canvasProps.onStackOrderChange}
 			/>,
 		);
 		menuItemComponents.push(

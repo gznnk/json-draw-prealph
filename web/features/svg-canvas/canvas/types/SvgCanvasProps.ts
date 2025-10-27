@@ -16,7 +16,6 @@ import type { DiagramTextChangeEvent } from "../../types/events/DiagramTextChang
 import type { DiagramTransformEvent } from "../../types/events/DiagramTransformEvent";
 import type { ExecuteEvent } from "../../types/events/ExecuteEvent";
 import type { PreviewConnectLineEvent } from "../../types/events/PreviewConnectLineEvent";
-import type { StackOrderChangeEvent } from "../../types/events/StackOrderChangeEvent";
 import type { SvgCanvasResizeEvent } from "../../types/events/SvgCanvasResizeEvent";
 
 /**
@@ -43,7 +42,6 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onAddDiagramByType?: (e: AddDiagramByTypeEvent) => void;
 	onPaste?: () => void;
 	onPreviewConnectLine?: (e: PreviewConnectLineEvent) => void;
-	onStackOrderChange?: (e: StackOrderChangeEvent) => void;
 	onTextChange?: (e: DiagramTextChangeEvent) => void;
 	onTransform?: (e: DiagramTransformEvent) => void;
 	onUngroup?: () => void;
