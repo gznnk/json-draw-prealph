@@ -1,6 +1,7 @@
 import type { DiagramType } from "../types/core/DiagramType";
 import type { Frame } from "../types/core/Frame";
 import type { DiagramData } from "../types/data/core/DiagramData";
+import type { DiagramMenuConfig } from "../types/menu/DiagramMenuConfig";
 import type { Diagram } from "../types/state/core/Diagram";
 import type { ConnectPointState } from "../types/state/shapes/ConnectPointState";
 
@@ -24,6 +25,9 @@ export type DiagramDefinition = {
 	/** The diagram type identifier */
 	type: DiagramType;
 
+	/** Menu configuration for the diagram (undefined if no menu is needed) */
+	menuConfig?: DiagramMenuConfig;
+
 	/** React component factory for rendering the diagram */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	component: React.FC<any>;
@@ -36,15 +40,13 @@ export type DiagramDefinition = {
 	calcConnectPointPosition: (diagram: Diagram) => ConnectPointState[];
 
 	/** Transform Items Functions */
-	transformItems:
-		| ((ownerFrame: Frame, items: Diagram[]) => Diagram[])
-		| undefined;
+	transformItems?: (ownerFrame: Frame, items: Diagram[]) => Diagram[];
 
 	/** Function to create a new instance of the diagram */
 	createState: (props: { x: number; y: number }) => Diagram | undefined;
 
 	/** Function to export the diagram to external format */
-	export: ((diagram: Diagram) => Blob | undefined) | undefined;
+	export?: (diagram: Diagram) => Blob | undefined;
 
 	/** Function to map state to data format for serialization */
 	stateToData: StateToDataMapper;

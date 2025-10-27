@@ -346,7 +346,8 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 				);
 
 				if (selectedDiagrams.length > 0) {
-					extractDiagramsToTopLevel(selectedDiagrams);
+					// Pass the drag event's eventId to extractDiagramsToTopLevel
+					extractDiagramsToTopLevel(selectedDiagrams, e.eventId);
 				}
 			}
 
@@ -593,6 +594,10 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 	const dragOffsetX = x - dragStartPosRef.current.x;
 	const dragOffsetY = y - dragStartPosRef.current.y;
 
+	// Determine if we should use cached innerHTML
+	const isCacheActive =
+		isDragging && isRootSelected && !!cachedInnerHTMLRef.current;
+
 	return (
 		<>
 			<CanvasFrameElement
@@ -635,7 +640,7 @@ const CanvasFrameComponent: React.FC<CanvasFrameProps> = ({
 				ref={innerSvgRef}
 			>
 				{children}
-				{isDragging && cachedInnerHTMLRef.current && (
+				{isCacheActive && (
 					<g
 						transform={`translate(${dragOffsetX}, ${dragOffsetY})`}
 						dangerouslySetInnerHTML={{ __html: cachedInnerHTMLRef.current }}

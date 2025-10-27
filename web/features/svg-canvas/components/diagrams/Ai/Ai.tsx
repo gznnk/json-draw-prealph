@@ -504,6 +504,7 @@ const AiComponent: React.FC<AiProps> = (props) => {
 				keepProportion={false}
 				rotateEnabled={false}
 				inversionEnabled={false}
+				strokeDashType="solid"
 				isSelected={false}
 				isAncestorSelected={false}
 				showConnectPoints={false}

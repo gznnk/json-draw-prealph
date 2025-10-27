@@ -6,6 +6,7 @@ import { ButtonDefaultState } from "../../../constants/state/elements/ButtonDefa
 import { useBaseShape } from "../../../hooks/useBaseShape";
 import type { ButtonProps } from "../../../types/props/elements/ButtonProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { convertStrokeDashTypeToArray } from "../../../utils/shapes/common/convertStrokeDashTypeToArray";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 import { BaseShape } from "../../shapes/BaseShape";
 
@@ -28,6 +29,7 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 	fill = ButtonDefaultState.fill,
 	stroke = ButtonDefaultState.stroke,
 	strokeWidth = ButtonDefaultState.strokeWidth,
+	strokeDashType = ButtonDefaultState.strokeDashType,
 	isSelected,
 	isAncestorSelected = false,
 	connectPoints = [],
@@ -139,6 +141,7 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 				fill={fill}
 				stroke={stroke}
 				strokeWidth={strokeWidth}
+				strokeDasharray={convertStrokeDashTypeToArray(strokeDashType)}
 				tabIndex={0}
 				cursor="move"
 				isTransparent={isTransparent}

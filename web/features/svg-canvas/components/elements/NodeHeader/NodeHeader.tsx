@@ -109,6 +109,7 @@ const NodeHeaderComponent: React.FC<NodeHeaderProps> = ({
 				rotateEnabled={true}
 				inversionEnabled={true}
 				strokeWidth="0px"
+				strokeDashType="solid"
 				text={text}
 				textType="text"
 				fontColor={fontColor}

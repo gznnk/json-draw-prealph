@@ -14,6 +14,7 @@ export const InputDefaultData: InputData = CreateDefaultData<InputData>({
 		fill: "#FFFFFF",
 		stroke: "#D9D9D9",
 		strokeWidth: "1px",
+		strokeDashType: "solid",
 		cornerRadius: 6,
 		fontColor: "#000000",
 		fontSize: 14,

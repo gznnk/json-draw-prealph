@@ -1,12 +1,14 @@
+import type { PathType } from "../core/PathType";
+import type { StrokeDashType } from "../core/StrokeDashType";
 import type { TextAlign } from "../core/TextAlign";
 import type { VerticalAlign } from "../core/VerticalAlign";
 
-export type DiagramStyleChangeEvent = {
-	eventId: string;
-	id: string;
+export type DiagramStyle = {
 	cornerRadius?: number;
 	stroke?: string;
 	strokeWidth?: string;
+	strokeDashType?: StrokeDashType;
+	pathType?: PathType;
 	fill?: string;
 	fontColor?: string;
 	fontSize?: number;
@@ -14,4 +16,10 @@ export type DiagramStyleChangeEvent = {
 	fontWeight?: string;
 	textAlign?: TextAlign;
 	verticalAlign?: VerticalAlign;
+};
+
+export type DiagramStyleChangeEvent = {
+	eventId: string;
+	id: string;
+	data: DiagramStyle;
 };

@@ -39,6 +39,7 @@ export const NodeHeaderAtlas: NodeHeaderAtlas = {
 
 	type: "NodeHeader",
 	features: NodeHeaderFeatures,
+	menuConfig: undefined,
 
 	// ============================================================================
 	// Defaults

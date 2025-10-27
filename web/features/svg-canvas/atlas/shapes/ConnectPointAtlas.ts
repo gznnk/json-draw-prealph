@@ -37,6 +37,7 @@ export const ConnectPointAtlas: ConnectPointAtlas = {
 
 	type: "ConnectPoint",
 	features: {},
+	menuConfig: undefined,
 
 	// ============================================================================
 	// Defaults

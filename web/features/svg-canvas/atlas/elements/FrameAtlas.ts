@@ -34,6 +34,7 @@ export const FrameAtlas: FrameAtlas = {
 
 	type: "Frame",
 	features: FrameFeatures,
+	menuConfig: undefined,
 
 	// ============================================================================
 	// Defaults

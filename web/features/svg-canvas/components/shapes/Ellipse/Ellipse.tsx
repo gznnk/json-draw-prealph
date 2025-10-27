@@ -5,6 +5,7 @@ import { EllipseElement } from "./EllipseStyled";
 import { useBaseShape } from "../../../hooks/useBaseShape";
 import type { EllipseProps } from "../../../types/props/shapes/EllipseProps";
 import { degreesToRadians } from "../../../utils/math/common/degreesToRadians";
+import { convertStrokeDashTypeToArray } from "../../../utils/shapes/common/convertStrokeDashTypeToArray";
 import { createSvgTransform } from "../../../utils/shapes/common/createSvgTransform";
 import { BaseShape } from "../BaseShape";
 
@@ -23,6 +24,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 	fill,
 	stroke,
 	strokeWidth,
+	strokeDashType,
 	keepProportion,
 	rotateEnabled,
 	inversionEnabled,
@@ -134,6 +136,7 @@ const EllipseComponent: React.FC<EllipseProps> = ({
 				fill={fill}
 				stroke={stroke}
 				strokeWidth={strokeWidth}
+				strokeDasharray={convertStrokeDashTypeToArray(strokeDashType)}
 				tabIndex={0}
 				cursor="move"
 				isTransparent={isTransparent}

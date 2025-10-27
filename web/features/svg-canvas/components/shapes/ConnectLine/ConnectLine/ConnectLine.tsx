@@ -20,6 +20,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 	scaleY,
 	stroke = "black",
 	strokeWidth = "1px",
+	strokeDashType = "solid",
 	isSelected = false,
 	items = [],
 	pathType,
@@ -64,6 +65,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 			inversionEnabled={false}
 			stroke={stroke}
 			strokeWidth={strokeWidth}
+			strokeDashType={strokeDashType}
 			isSelected={isSelected}
 			showTransformControls={false}
 			showOutline={false}

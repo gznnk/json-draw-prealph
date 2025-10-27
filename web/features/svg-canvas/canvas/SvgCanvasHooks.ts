@@ -8,8 +8,6 @@ import { useExport } from "./hooks/actions/useExport";
 import { useGroup } from "./hooks/actions/useGroup";
 import { usePaste } from "./hooks/actions/usePaste";
 import { usePreviewConnectLine } from "./hooks/actions/usePreviewConnectLine";
-import { useStackOrderChange } from "./hooks/actions/useStackOrderChange";
-import { useStyleChange } from "./hooks/actions/useStyleChange";
 import { useUngroup } from "./hooks/actions/useUngroup";
 import { useOnAddDiagram } from "./hooks/diagram/useOnAddDiagram";
 import { useOnAiMessageChange } from "./hooks/diagram/useOnAiMessageChange";
@@ -24,6 +22,8 @@ import { useOnExecute } from "./hooks/diagram/useOnExecute";
 import { useOnExtractDiagramsToTopLevel } from "./hooks/diagram/useOnExtractDiagramsToTopLevel";
 import { useOnHoverChange } from "./hooks/diagram/useOnHoverChange";
 import { useOnSelect } from "./hooks/diagram/useOnSelect";
+import { useOnStackOrderChange } from "./hooks/diagram/useOnStackOrderChange";
+import { useOnStyleChange } from "./hooks/diagram/useOnStyleChange";
 import { useOnTextChange } from "./hooks/diagram/useOnTextChange";
 import { useOnTransform } from "./hooks/diagram/useOnTransform";
 import { useRedo } from "./hooks/history/useRedo";
@@ -121,12 +121,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the preview connect line event.
 	const onPreviewConnectLine = usePreviewConnectLine(canvasHooksProps);
 
-	// Handler for the stack order change event.
-	const onStackOrderChange = useStackOrderChange(canvasHooksProps);
-
-	// Handler for the diagram style change event.
-	const onStyleChange = useStyleChange(canvasHooksProps);
-
 	// Handler for the ungroup event.
 	const onUngroup = useUngroup(canvasHooksProps);
 
@@ -139,6 +133,12 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// Hook for appending diagrams via D&D.
 	useOnAppendDiagrams(canvasHooksProps);
+
+	// Hook for the diagram style change event.
+	useOnStyleChange(canvasHooksProps);
+
+	// Hook for the stack order change event.
+	useOnStackOrderChange(canvasHooksProps);
 
 	// Hook for extracting selected diagrams to top level when dragged out of CanvasFrame.
 	useOnExtractDiagramsToTopLevel(canvasHooksProps);
@@ -222,7 +222,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onCopy,
 		onDelete,
 		onDiagramChange,
-		onStyleChange,
 		onConstraintChange,
 		onDrag,
 		onDragOver,
@@ -235,7 +234,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onAiMessageChange,
 		onPaste,
 		onPreviewConnectLine,
-		onStackOrderChange,
 		onTextChange,
 		onTransform,
 		onUngroup,

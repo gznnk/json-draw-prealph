@@ -12,12 +12,10 @@ import type { DiagramDragDropEvent } from "../../types/events/DiagramDragDropEve
 import type { DiagramDragEvent } from "../../types/events/DiagramDragEvent";
 import type { DiagramHoverChangeEvent } from "../../types/events/DiagramHoverChangeEvent";
 import type { DiagramSelectEvent } from "../../types/events/DiagramSelectEvent";
-import type { DiagramStyleChangeEvent } from "../../types/events/DiagramStyleChangeEvent";
 import type { DiagramTextChangeEvent } from "../../types/events/DiagramTextChangeEvent";
 import type { DiagramTransformEvent } from "../../types/events/DiagramTransformEvent";
 import type { ExecuteEvent } from "../../types/events/ExecuteEvent";
 import type { PreviewConnectLineEvent } from "../../types/events/PreviewConnectLineEvent";
-import type { StackOrderChangeEvent } from "../../types/events/StackOrderChangeEvent";
 import type { SvgCanvasResizeEvent } from "../../types/events/SvgCanvasResizeEvent";
 
 /**
@@ -34,7 +32,6 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onDelete?: () => void;
 	onDiagramChange?: (e: DiagramChangeEvent) => void;
 	onConstraintChange?: (e: DiagramConstraintChangeEvent) => void;
-	onStyleChange?: (e: DiagramStyleChangeEvent) => void;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragLeave?: (e: DiagramDragDropEvent) => void;
 	onDragOver?: (e: DiagramDragDropEvent) => void;
@@ -45,7 +42,6 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onAddDiagramByType?: (e: AddDiagramByTypeEvent) => void;
 	onPaste?: () => void;
 	onPreviewConnectLine?: (e: PreviewConnectLineEvent) => void;
-	onStackOrderChange?: (e: StackOrderChangeEvent) => void;
 	onTextChange?: (e: DiagramTextChangeEvent) => void;
 	onTransform?: (e: DiagramTransformEvent) => void;
 	onUngroup?: () => void;
