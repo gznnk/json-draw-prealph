@@ -6,8 +6,10 @@ import {
 	LineStyleSection,
 	LineStyleButton,
 } from "./LineStyleMenuStyled";
+import { useStyleChange } from "../../../../hooks/useStyleChange";
 import type { PathType } from "../../../../types/core/PathType";
 import type { StrokeDashType } from "../../../../types/core/StrokeDashType";
+import type { Diagram } from "../../../../types/state/core/Diagram";
 import { LineStyle as LineStyleIcon } from "../../../icons/LineStyle";
 import { DiagramMenuPositioner } from "../DiagramMenu/DiagramMenuStyled";
 import { DiagramMenuControl } from "../DiagramMenuControl";
@@ -19,9 +21,7 @@ type LineStyleMenuProps = {
 	strokeWidth: string;
 	pathType: PathType;
 	strokeDashType: StrokeDashType;
-	onStrokeWidthChange: (value: string) => void;
-	onPathTypeChange: (value: PathType) => void;
-	onStrokeDashTypeChange: (value: StrokeDashType) => void;
+	selectedDiagrams: Diagram[];
 };
 
 const strokeWidths = ["1px", "2px", "3px", "4px"] as const;
@@ -33,10 +33,31 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 	strokeWidth,
 	pathType,
 	strokeDashType,
-	onStrokeWidthChange,
-	onPathTypeChange,
-	onStrokeDashTypeChange,
+	selectedDiagrams,
 }) => {
+	const applyStyleChange = useStyleChange();
+
+	const handleStrokeWidthChange = (width: string) => {
+		applyStyleChange({
+			items: selectedDiagrams,
+			styleData: { strokeWidth: width },
+		});
+	};
+
+	const handlePathTypeChange = (type: PathType) => {
+		applyStyleChange({
+			items: selectedDiagrams,
+			styleData: { pathType: type },
+		});
+	};
+
+	const handleStrokeDashChange = (dashType: StrokeDashType) => {
+		applyStyleChange({
+			items: selectedDiagrams,
+			styleData: { strokeDashType: dashType },
+		});
+	};
+
 	return (
 		<DiagramMenuPositioner>
 			<DiagramMenuItemNew isActive={isOpen} onClick={onToggle}>
@@ -51,7 +72,7 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 								<LineStyleButton
 									key={width}
 									isActive={strokeWidth === width}
-									onClick={() => onStrokeWidthChange(width)}
+									onClick={() => handleStrokeWidthChange(width)}
 									title={`${width} line width`}
 								>
 									<svg width="24" height="24" viewBox="0 0 24 24">
@@ -73,7 +94,7 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 						<LineStyleSection>
 							<LineStyleButton
 								isActive={pathType === "Linear"}
-								onClick={() => onPathTypeChange("Linear")}
+								onClick={() => handlePathTypeChange("Linear")}
 								title="Linear path"
 							>
 								<svg width="24" height="24" viewBox="0 0 24 24">
@@ -89,7 +110,7 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 							</LineStyleButton>
 							<LineStyleButton
 								isActive={pathType === "Bezier"}
-								onClick={() => onPathTypeChange("Bezier")}
+								onClick={() => handlePathTypeChange("Bezier")}
 								title="Bezier path"
 							>
 								<svg width="24" height="24" viewBox="0 0 24 24">
@@ -105,7 +126,7 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 							</LineStyleButton>
 							<LineStyleButton
 								isActive={pathType === "Rounded"}
-								onClick={() => onPathTypeChange("Rounded")}
+								onClick={() => handlePathTypeChange("Rounded")}
 								title="Rounded path"
 							>
 								<svg width="24" height="24" viewBox="0 0 24 24">
@@ -127,7 +148,7 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 								<LineStyleButton
 									key={dashType}
 									isActive={strokeDashType === dashType}
-									onClick={() => onStrokeDashTypeChange(dashType)}
+									onClick={() => handleStrokeDashChange(dashType)}
 									title={`${dashType} line`}
 								>
 									<svg width="24" height="24" viewBox="0 0 24 24">

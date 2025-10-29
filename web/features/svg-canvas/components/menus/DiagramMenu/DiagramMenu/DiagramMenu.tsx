@@ -28,7 +28,6 @@ import {
 import { useDiagramMenuState } from "./hooks/useDiagramMenuState";
 import { useStyleChange } from "../../../../hooks/useStyleChange";
 import type { PathType } from "../../../../types/core/PathType";
-import type { StrokeDashType } from "../../../../types/core/StrokeDashType";
 import type { CornerRoundableData } from "../../../../types/data/core/CornerRoundableData";
 import type { FillableData } from "../../../../types/data/core/FillableData";
 import type { StrokableData } from "../../../../types/data/core/StrokableData";
@@ -224,20 +223,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				items: selectedItems,
 				styleData: { cornerRadius: borderRadius },
 			});
-		},
-		[selectedItems, applyStyleChange],
-	);
-
-	const onStrokeDashChange = useCallback(
-		(strokeDashType: StrokeDashType) => {
-			applyStyleChange({ items: selectedItems, styleData: { strokeDashType } });
-		},
-		[selectedItems, applyStyleChange],
-	);
-
-	const onPathTypeChange = useCallback(
-		(pathType: PathType) => {
-			applyStyleChange({ items: selectedItems, styleData: { pathType } });
 		},
 		[selectedItems, applyStyleChange],
 	);
@@ -441,14 +426,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				strokeWidth={firstStrokableItem?.strokeWidth || "2px"}
 				pathType={firstPathableItem?.pathType || "Linear"}
 				strokeDashType={firstStrokableItem?.strokeDashType || "solid"}
-				onStrokeWidthChange={(value) => {
-					applyStyleChange({
-						items: selectedItems,
-						styleData: { strokeWidth: value },
-					});
-				}}
-				onPathTypeChange={onPathTypeChange}
-				onStrokeDashTypeChange={onStrokeDashChange}
+				selectedDiagrams={selectedItems}
 			/>,
 		);
 		menuItemComponents.push(
