@@ -27,6 +27,7 @@ import {
 	getPreviousZoomLevel,
 	getResetZoomLevel,
 } from "./utils/zoomLevels";
+import { AiChatPanel } from "../components/auxiliary/AiChatPanel";
 import { DragGhost } from "../components/auxiliary/DragGhost";
 import { GridBackground } from "../components/auxiliary/GridBackground";
 import { GridPattern } from "../components/auxiliary/GridPattern";
@@ -610,6 +611,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					<CanvasMenu onAddDiagramByType={onAddDiagramByType} />
 					<UserMenu />
 					<ContextMenu {...contextMenuProps} />
+					<AiChatPanel />
 					<ZoomControls
 						zoom={zoom}
 						onZoomIn={handleZoomIn}
