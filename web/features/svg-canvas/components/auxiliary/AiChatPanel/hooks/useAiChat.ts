@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
 	LLMClientFactory,
@@ -6,10 +6,29 @@ import {
 } from "../../../../../../shared/llm-client";
 import { OpenAiKeyManager } from "../../../../../../utils/KeyManager";
 import type { Message } from "../../../../../llm-chat-ui/types";
+import { useEventBus } from "../../../../context/EventBusContext";
+import {
+	circleShapeToolDefinition,
+	useAddCircleShapeTool,
+} from "../../../../tools/add_circle_shape";
+import {
+	rectangleShapeToolDefinition,
+	useAddRectangleShapeTool,
+} from "../../../../tools/add_rectangle_shape";
+import {
+	textElementToolDefinition,
+	useAddTextElementTool,
+} from "../../../../tools/add_text_element";
+import { connectNodesToolDefinition } from "../../../../tools/connect_nodes/definition";
+import { useConnectNodesTool } from "../../../../tools/connect_nodes/hook";
+import {
+	groupShapesToolDefinition,
+	useGroupShapesTool,
+} from "../../../../tools/group_shapes";
 
 /**
  * Custom hook for managing AI chat functionality using llm-client.
- * Handles LLM client initialization, message management, and streaming responses.
+ * Handles LLM client initialization, message management, streaming responses, and canvas tools.
  *
  * @returns Object containing chat state and handlers
  */
@@ -18,6 +37,41 @@ export const useAiChat = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [apiKey, setApiKey] = useState<string>("");
 	const [llmClient, setLlmClient] = useState<LLMClient | null>(null);
+	const eventBus = useEventBus();
+
+	// Initialize tool hooks
+	const addRectangleShape = useAddRectangleShapeTool(eventBus);
+	const addCircleShape = useAddCircleShapeTool(eventBus);
+	const addTextElement = useAddTextElementTool(eventBus);
+	const connectNodes = useConnectNodesTool(eventBus);
+	const groupShapes = useGroupShapesTool(eventBus);
+
+	// Memoize tool definitions and handlers
+	const toolsConfig = useMemo(
+		() => ({
+			tools: [
+				rectangleShapeToolDefinition,
+				circleShapeToolDefinition,
+				textElementToolDefinition,
+				connectNodesToolDefinition,
+				groupShapesToolDefinition,
+			],
+			handlers: {
+				add_rectangle_shape: addRectangleShape,
+				add_circle_shape: addCircleShape,
+				add_text_element: addTextElement,
+				connect_nodes: connectNodes,
+				group_shapes: groupShapes,
+			},
+		}),
+		[
+			addRectangleShape,
+			addCircleShape,
+			addTextElement,
+			connectNodes,
+			groupShapes,
+		],
+	);
 
 	// Load API key on mount
 	useEffect(() => {
@@ -27,16 +81,18 @@ export const useAiChat = () => {
 		}
 	}, []);
 
-	// Initialize LLM client when API key is available
+	// Initialize LLM client when API key or tools change
 	useEffect(() => {
 		if (apiKey) {
 			const client = LLMClientFactory.createClient(apiKey, {
 				systemPrompt:
-					"You are a helpful AI assistant. Provide clear, concise, and friendly responses.",
+					"You are a helpful AI assistant with access to canvas manipulation tools. You can add shapes (rectangles and circles), add text elements, connect nodes, and group shapes together. When users ask you to create or modify canvas elements, use the appropriate tools to help them.",
+				tools: toolsConfig.tools,
+				functionHandlers: toolsConfig.handlers,
 			});
 			setLlmClient(client);
 		}
-	}, [apiKey]);
+	}, [apiKey, toolsConfig]);
 
 	/**
 	 * Send a message to the AI and handle streaming response
