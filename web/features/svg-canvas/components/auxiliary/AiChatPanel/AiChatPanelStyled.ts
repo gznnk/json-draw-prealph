@@ -3,9 +3,6 @@ import styled from "@emotion/styled";
 import { BOX_SHADOW } from "../../../constants/styling/core/CommonStyling";
 
 export const AiChatContainer = styled.div<{ isOpen: boolean }>`
-	position: absolute;
-	bottom: 24px;
-	right: ${(props) => (props.isOpen ? "232px" : "24px")};
 	display: flex;
 	flex-direction: column;
 	background: #ffffff;
@@ -15,7 +12,6 @@ export const AiChatContainer = styled.div<{ isOpen: boolean }>`
 	z-index: 999;
 	user-select: none;
 	pointer-events: auto;
-	transition: right 0.3s ease;
 	width: ${(props) => (props.isOpen ? "400px" : "auto")};
 	height: ${(props) => (props.isOpen ? "500px" : "auto")};
 `;

@@ -34,6 +34,10 @@ import { GridPattern } from "../components/auxiliary/GridPattern";
 import { MiniMap } from "../components/auxiliary/MiniMap";
 import { PointerCaptureElement } from "../components/auxiliary/PointerCaptureElement";
 import { PreviewConnectLine } from "../components/auxiliary/PreviewConnectLine";
+import {
+	BottomPanelContainer,
+	RightPanelContainer,
+} from "../components/auxiliary/RightPanelContainer";
 import { ZoomControls } from "../components/auxiliary/ZoomControls";
 import { TextEditor } from "../components/core/Textable";
 import { CanvasMenu } from "../components/menus/CanvasMenu";
@@ -611,22 +615,26 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					<CanvasMenu onAddDiagramByType={onAddDiagramByType} />
 					<UserMenu />
 					<ContextMenu {...contextMenuProps} />
-					<AiChatPanel />
-					<ZoomControls
-						zoom={zoom}
-						onZoomIn={handleZoomIn}
-						onZoomOut={handleZoomOut}
-						onZoomReset={handleZoomReset}
-					/>
-					<MiniMap
-						items={items}
-						minX={minX}
-						minY={minY}
-						containerWidth={containerWidth}
-						containerHeight={containerHeight}
-						zoom={zoom}
-						onNavigate={onNavigate}
-					/>
+					<RightPanelContainer>
+						<MiniMap
+							items={items}
+							minX={minX}
+							minY={minY}
+							containerWidth={containerWidth}
+							containerHeight={containerHeight}
+							zoom={zoom}
+							onNavigate={onNavigate}
+						/>
+					</RightPanelContainer>
+					<BottomPanelContainer>
+						<ZoomControls
+							zoom={zoom}
+							onZoomIn={handleZoomIn}
+							onZoomOut={handleZoomOut}
+							onZoomReset={handleZoomReset}
+						/>
+						<AiChatPanel />
+					</BottomPanelContainer>
 					{/* Pointer capture element for area selection */}
 					<PointerCaptureElement
 						elementRef={dummyElementRef}
