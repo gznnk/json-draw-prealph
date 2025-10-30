@@ -627,13 +627,13 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 						/>
 					</RightPanelContainer>
 					<BottomPanelContainer>
+						<AiChatPanel />
 						<ZoomControls
 							zoom={zoom}
 							onZoomIn={handleZoomIn}
 							onZoomOut={handleZoomOut}
 							onZoomReset={handleZoomReset}
 						/>
-						<AiChatPanel />
 					</BottomPanelContainer>
 					{/* Pointer capture element for area selection */}
 					<PointerCaptureElement
