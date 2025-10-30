@@ -5,8 +5,8 @@ import { DiagramMenuPositioner } from "../DiagramMenu/DiagramMenuStyled";
 import { DiagramMenuControl } from "../DiagramMenuControl";
 import { AlignmentMenuWrapper, AlignmentButton } from "./AlignmentMenuStyled";
 import { useStyleChange } from "../../../../hooks/useStyleChange";
-import type { TextableData } from "../../../../types/data/core/TextableData";
 import type { Diagram } from "../../../../types/state/core/Diagram";
+import { isTextableState } from "../../../../utils/validation/isTextableState";
 import { AlignCenter } from "../../../icons/AlignCenter";
 import { AlignLeft as AlignLeftIcon } from "../../../icons/AlignLeft";
 import { AlignRight } from "../../../icons/AlignRight";
@@ -18,17 +18,20 @@ import { DiagramMenuItemNew } from "../DiagramMenuItem/DiagramMenuItemNew";
 type AlignmentMenuProps = {
 	isOpen: boolean;
 	onToggle: () => void;
-	diagram: TextableData;
 	selectedDiagrams: Diagram[];
 };
 
 const AlignmentMenuComponent: React.FC<AlignmentMenuProps> = ({
 	isOpen,
 	onToggle,
-	diagram,
 	selectedDiagrams,
 }) => {
 	const applyStyleChange = useStyleChange();
+
+	// Get the first diagram and check if it's textable
+	const firstDiagram = selectedDiagrams[0];
+	const textableDiagram =
+		firstDiagram && isTextableState(firstDiagram) ? firstDiagram : null;
 
 	const handleTextAlignChange = (align: "left" | "center" | "right") => {
 		applyStyleChange({
@@ -54,21 +57,21 @@ const AlignmentMenuComponent: React.FC<AlignmentMenuProps> = ({
 					<AlignmentMenuWrapper>
 						{/* First row: Horizontal alignment */}
 						<AlignmentButton
-							isActive={diagram.textAlign === "left"}
+							isActive={textableDiagram?.textAlign === "left"}
 							onClick={() => handleTextAlignChange("left")}
 							title="Align Left"
 						>
 							<AlignLeftIcon />
 						</AlignmentButton>
 						<AlignmentButton
-							isActive={diagram.textAlign === "center"}
+							isActive={textableDiagram?.textAlign === "center"}
 							onClick={() => handleTextAlignChange("center")}
 							title="Align Center"
 						>
 							<AlignCenter />
 						</AlignmentButton>
 						<AlignmentButton
-							isActive={diagram.textAlign === "right"}
+							isActive={textableDiagram?.textAlign === "right"}
 							onClick={() => handleTextAlignChange("right")}
 							title="Align Right"
 						>
@@ -77,21 +80,21 @@ const AlignmentMenuComponent: React.FC<AlignmentMenuProps> = ({
 
 						{/* Second row: Vertical alignment */}
 						<AlignmentButton
-							isActive={diagram.verticalAlign === "top"}
+							isActive={textableDiagram?.verticalAlign === "top"}
 							onClick={() => handleVerticalAlignChange("top")}
 							title="Align Top"
 						>
 							<VerticalAlignTop />
 						</AlignmentButton>
 						<AlignmentButton
-							isActive={diagram.verticalAlign === "center"}
+							isActive={textableDiagram?.verticalAlign === "center"}
 							onClick={() => handleVerticalAlignChange("center")}
 							title="Align Middle"
 						>
 							<VerticalAlignMiddle />
 						</AlignmentButton>
 						<AlignmentButton
-							isActive={diagram.verticalAlign === "bottom"}
+							isActive={textableDiagram?.verticalAlign === "bottom"}
 							onClick={() => handleVerticalAlignChange("bottom")}
 							title="Align Bottom"
 						>

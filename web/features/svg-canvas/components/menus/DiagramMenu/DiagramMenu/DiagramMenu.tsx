@@ -24,6 +24,7 @@ import {
 	findFirstPathableRecursive,
 	findFirstStrokableRecursive,
 	findFirstTextableRecursive,
+	getCommonMenuConfig,
 } from "./DiagramMenuUtils";
 import { useDiagramMenuState } from "./hooks/useDiagramMenuState";
 import { useStyleChange } from "../../../../hooks/useStyleChange";
@@ -256,6 +257,9 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}, [shouldRender]);
 
 	if (!shouldRender) return null;
+
+	// Get common menu configuration for selected diagrams
+	const menuConfig = getCommonMenuConfig(selectedItems);
 
 	// Default menu state map.
 	const menuStateMap = {
@@ -495,9 +499,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 
 	// Create a section for alignment items.
-	const showAlignmentSection = showSection("Alignment");
 	if (
-		showAlignmentSection &&
+		menuConfig.textAlignment &&
 		firstTextableItem &&
 		isTextableState(firstTextableItem)
 	) {
@@ -506,7 +509,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				key="Alignment"
 				isOpen={isAlignmentMenuOpen}
 				onToggle={() => setIsAlignmentMenuOpen(!isAlignmentMenuOpen)}
-				diagram={firstTextableItem}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
