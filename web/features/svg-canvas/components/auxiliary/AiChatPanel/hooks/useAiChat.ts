@@ -12,6 +12,10 @@ import {
 	useAddCircleShapeTool,
 } from "../../../../tools/add_circle_shape";
 import {
+	markdownShapeToolDefinition,
+	useAddMarkdownShapeTool,
+} from "../../../../tools/add_markdown_shape";
+import {
 	rectangleShapeToolDefinition,
 	useAddRectangleShapeTool,
 } from "../../../../tools/add_rectangle_shape";
@@ -45,6 +49,7 @@ export const useAiChat = () => {
 	const addTextElement = useAddTextElementTool(eventBus);
 	const connectNodes = useConnectNodesTool(eventBus);
 	const groupShapes = useGroupShapesTool(eventBus);
+	const addMarkdownShape = useAddMarkdownShapeTool(eventBus);
 
 	// Memoize tool definitions and handlers
 	const toolsConfig = useMemo(
@@ -55,6 +60,7 @@ export const useAiChat = () => {
 				textElementToolDefinition,
 				connectNodesToolDefinition,
 				groupShapesToolDefinition,
+				markdownShapeToolDefinition,
 			],
 			handlers: {
 				add_rectangle_shape: addRectangleShape,
@@ -62,6 +68,7 @@ export const useAiChat = () => {
 				add_text_element: addTextElement,
 				connect_nodes: connectNodes,
 				group_shapes: groupShapes,
+				add_markdown_shape: addMarkdownShape,
 			},
 		}),
 		[
@@ -70,6 +77,7 @@ export const useAiChat = () => {
 			addTextElement,
 			connectNodes,
 			groupShapes,
+			addMarkdownShape,
 		],
 	);
 
@@ -86,7 +94,7 @@ export const useAiChat = () => {
 		if (apiKey) {
 			const client = LLMClientFactory.createClient(apiKey, {
 				systemPrompt:
-					"You are a helpful AI assistant with access to canvas manipulation tools. You can add shapes (rectangles and circles), add text elements, connect nodes, and group shapes together. When users ask you to create or modify canvas elements, use the appropriate tools to help them.",
+					"You are a helpful AI assistant with access to canvas manipulation tools. You can add shapes (rectangles and circles), add text elements, add markdown-enabled text boxes, connect nodes, and group shapes together. When users ask you to create or modify canvas elements, use the appropriate tools to help them.",
 				tools: toolsConfig.tools,
 				functionHandlers: toolsConfig.handlers,
 			});
