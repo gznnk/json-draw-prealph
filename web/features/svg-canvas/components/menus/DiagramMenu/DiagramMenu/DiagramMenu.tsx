@@ -45,10 +45,10 @@ import { BorderRadius } from "../../../icons/BorderRadius";
 import { Edit } from "../../../icons/Edit";
 import { FontColor } from "../../../icons/FontColor";
 import { FontSize } from "../../../icons/FontSize";
-import { Group } from "../../../icons/Group";
 import { AlignmentMenu } from "../AlignmentMenu/AlignmentMenu";
 import { ColorPicker } from "../ColorPicker";
 import { DiagramMenuItem } from "../DiagramMenuItem";
+import { GroupMenu } from "../GroupMenu/GroupMenu";
 import { KeepAspectRatioMenu } from "../KeepAspectRatioMenu";
 import { LineStyleMenu } from "../LineStyleMenu";
 import { NumberStepper } from "../NumberStepper";
@@ -190,14 +190,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					break;
 				case "StackOrder":
 					openControl("StackOrder", currentMenuStateMap);
-					break;
-				case "Group":
-					if (currentMenuStateMap.Group === "Show") {
-						canvasProps.onGroup?.();
-					}
-					if (currentMenuStateMap.Group === "Active") {
-						canvasProps.onUngroup?.();
-					}
 					break;
 			}
 		};
@@ -548,14 +540,12 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const showGroupSection = showSection("Group");
 	if (showGroupSection) {
 		menuItemComponents.push(
-			<DiagramMenuItem
+			<GroupMenu
 				key="Group"
-				menuType="Group"
-				menuStateMap={menuStateMap}
-				onMenuClick={onMenuClick}
-			>
-				<Group title={menuStateMap.Group === "Active" ? "Ungroup" : "Group"} />
-			</DiagramMenuItem>,
+				isActive={menuStateMap.Group === "Active"}
+				onGroup={canvasProps.onGroup}
+				onUngroup={canvasProps.onUngroup}
+			/>,
 		);
 		menuItemComponents.push(<DiagramMenuDivider key="GroupSectionDivider" />);
 	}
