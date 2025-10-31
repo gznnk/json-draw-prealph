@@ -26,6 +26,10 @@ import {
 import { connectNodesToolDefinition } from "../../../../tools/connect_nodes/definition";
 import { useConnectNodesTool } from "../../../../tools/connect_nodes/hook";
 import {
+	selectedShapesToolDefinition,
+	useGetSelectedShapesTool,
+} from "../../../../tools/get_selected_shapes";
+import {
 	shapesInfoToolDefinition,
 	useGetShapesInfoTool,
 } from "../../../../tools/get_shapes_info";
@@ -55,6 +59,7 @@ export const useAiChat = () => {
 	const groupShapes = useGroupShapesTool(eventBus);
 	const addMarkdownShape = useAddMarkdownShapeTool(eventBus);
 	const getShapesInfo = useGetShapesInfoTool(eventBus);
+	const getSelectedShapes = useGetSelectedShapesTool(eventBus);
 
 	// Memoize tool definitions and handlers
 	const toolsConfig = useMemo(
@@ -67,6 +72,7 @@ export const useAiChat = () => {
 				groupShapesToolDefinition,
 				markdownShapeToolDefinition,
 				shapesInfoToolDefinition,
+				selectedShapesToolDefinition,
 			],
 			handlers: {
 				add_rectangle_shape: addRectangleShape,
@@ -76,6 +82,7 @@ export const useAiChat = () => {
 				group_shapes: groupShapes,
 				add_markdown_shape: addMarkdownShape,
 				get_shapes_info: getShapesInfo,
+				get_selected_shapes: getSelectedShapes,
 			},
 		}),
 		[
@@ -86,6 +93,7 @@ export const useAiChat = () => {
 			groupShapes,
 			addMarkdownShape,
 			getShapesInfo,
+			getSelectedShapes,
 		],
 	);
 
@@ -102,7 +110,7 @@ export const useAiChat = () => {
 		if (apiKey) {
 			const client = LLMClientFactory.createClient(apiKey, {
 				systemPrompt:
-					"You are a helpful AI assistant with access to canvas manipulation tools. You can add shapes (rectangles and circles), add text elements, add markdown-enabled text boxes, connect nodes, group shapes together, and retrieve information about existing shapes on the canvas. When users ask you to create or modify canvas elements, use the appropriate tools to help them.",
+					"You are a helpful AI assistant with access to canvas manipulation tools. You can add shapes (rectangles and circles), add text elements, add markdown-enabled text boxes, connect nodes, group shapes together, retrieve information about existing shapes on the canvas, and get detailed information about selected shapes. When users ask you to create or modify canvas elements, use the appropriate tools to help them.",
 				tools: toolsConfig.tools,
 				functionHandlers: toolsConfig.handlers,
 			});
