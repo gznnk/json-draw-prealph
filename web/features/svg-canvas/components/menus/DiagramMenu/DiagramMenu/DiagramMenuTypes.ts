@@ -20,8 +20,7 @@ export type DiagramMenuType =
 	| "FontSize"
 	| "Bold"
 	| "FontColor"
-	| "Alignment"
-	| "KeepAspectRatio";
+	| "Alignment";
 
 /**
  * Diagram menu state.

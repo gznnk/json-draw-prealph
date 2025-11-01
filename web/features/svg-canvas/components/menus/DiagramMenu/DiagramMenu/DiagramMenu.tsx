@@ -38,7 +38,6 @@ import { getSelectedDiagrams } from "../../../../utils/core/getSelectedDiagrams"
 import { newEventId } from "../../../../utils/core/newEventId";
 import { isItemableState } from "../../../../utils/validation/isItemableState";
 import { isTextableState } from "../../../../utils/validation/isTextableState";
-import { isTransformativeState } from "../../../../utils/validation/isTransformativeState";
 import { BgColor } from "../../../icons/BgColor";
 import { Bold } from "../../../icons/Bold";
 import { BorderRadius } from "../../../icons/BorderRadius";
@@ -259,7 +258,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		Bold: "Hidden",
 		FontColor: "Hidden",
 		Alignment: "Hidden",
-		KeepAspectRatio: "Hidden",
 	} as DiagramMenuStateMap;
 
 	// Find diagram items for styling
@@ -303,17 +301,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				menuStateMap.Bold = "Active";
 			}
 		}
-	}
-
-	// Set the keep aspect ratio state.
-	if (canvasProps.multiSelectGroup) {
-		menuStateMap.KeepAspectRatio = canvasProps.multiSelectGroup.keepProportion
-			? "Active"
-			: "Show";
-	} else if (isTransformativeState(singleSelectedItem)) {
-		menuStateMap.KeepAspectRatio = singleSelectedItem.keepProportion
-			? "Active"
-			: "Show";
 	}
 
 	// Create the menu click handler with the current state
@@ -503,19 +490,17 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 
 	// Create a section for keep aspect ratio items.
-	const showKeepAspectRatioSection = showSection("KeepAspectRatio");
-	if (showKeepAspectRatioSection) {
-		menuItemComponents.push(
-			<KeepAspectRatioMenu
-				key="KeepAspectRatio"
-				isActive={menuStateMap.KeepAspectRatio === "Active"}
-				selectedItems={selectedItems}
-			/>,
-		);
-		menuItemComponents.push(
-			<DiagramMenuDivider key="KeepAspectRatioSectionDivider" />,
-		);
-	}
+	menuItemComponents.push(
+		<KeepAspectRatioMenu
+			key="KeepAspectRatio"
+			multiSelectGroup={canvasProps.multiSelectGroup}
+			singleSelectedItem={singleSelectedItem}
+			selectedItems={selectedItems}
+		/>,
+	);
+	menuItemComponents.push(
+		<DiagramMenuDivider key="KeepAspectRatioSectionDivider" />,
+	);
 
 	// Create a section for group and ungroup items.
 	menuItemComponents.push(
