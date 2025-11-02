@@ -6,7 +6,7 @@ import styled from "@emotion/styled";
 export const StrokeWidthSliderWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 8px;
 	flex: 1;
 `;
 
@@ -89,7 +89,7 @@ export const StrokeWidthSliderInput = styled.input`
 export const StrokeWidthSliderFooter = styled.div`
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+	align-items: flex-start;
 	gap: 8px;
 `;
 
@@ -98,6 +98,7 @@ export const StrokeWidthSliderFooter = styled.div`
  */
 export const StrokeWidthSliderLabel = styled.label`
 	font-size: 10px;
+	font-weight: 600;
 	color: #6b7280;
 	user-select: none;
 `;
@@ -106,25 +107,26 @@ export const StrokeWidthSliderLabel = styled.label`
  * Number input for direct value entry.
  */
 export const StrokeWidthSliderNumberInput = styled.input`
-	width: 48px;
-	height: 24px;
-	padding: 2px 6px;
-	font-size: 12px;
+	display: block;
+	width: 36px;
+	height: 22px;
+	padding: 2px 4px;
 	text-align: center;
-	color: #374151;
-	background-color: #f9fafb;
+	outline: none;
 	border: 1px solid #e5e7eb;
 	border-radius: 4px;
-	outline: none;
+	background-color: #ffffff;
+	color: #374151;
+	font-size: 12px;
 	transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
-
-	&:hover {
-		border-color: #d1d5db;
-	}
 
 	&:focus {
 		border-color: #6b7280;
-		background-color: #ffffff;
+		box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.2);
+	}
+
+	&:hover {
+		border-color: #9ca3af;
 	}
 
 	/* Hide spinner buttons */
