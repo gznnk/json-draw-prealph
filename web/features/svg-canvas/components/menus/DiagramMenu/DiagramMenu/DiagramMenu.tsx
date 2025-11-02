@@ -472,27 +472,24 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 
 	// Create a section for stack order items.
-	if (selectedItems.length === 1 && singleSelectedItem) {
-		menuItemComponents.push(
-			<StackOrderMenu
-				key="StackOrder"
-				isOpen={isStackOrderMenuOpen}
-				onToggle={() => setIsStackOrderMenuOpen(!isStackOrderMenuOpen)}
-				selectedDiagram={singleSelectedItem}
-			/>,
-		);
-		menuItemComponents.push(
-			<DiagramMenuDivider key="StackOrderSectionDivider" />,
-		);
-	}
+	menuItemComponents.push(
+		<StackOrderMenu
+			key="StackOrder"
+			isOpen={isStackOrderMenuOpen}
+			onToggle={() => setIsStackOrderMenuOpen(!isStackOrderMenuOpen)}
+			selectedDiagrams={selectedItems}
+		/>,
+	);
+	menuItemComponents.push(
+		<DiagramMenuDivider key="StackOrderSectionDivider" />,
+	);
 
 	// Create a section for keep aspect ratio items.
 	menuItemComponents.push(
 		<KeepAspectRatioMenu
 			key="KeepAspectRatio"
 			multiSelectGroup={canvasProps.multiSelectGroup}
-			singleSelectedItem={singleSelectedItem}
-			selectedItems={selectedItems}
+			selectedDiagrams={selectedItems}
 		/>,
 	);
 	menuItemComponents.push(
@@ -504,7 +501,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		<GroupMenu
 			key="Group"
 			multiSelectGroup={canvasProps.multiSelectGroup}
-			singleSelectedItem={singleSelectedItem}
+			selectedDiagrams={selectedItems}
 		/>,
 	);
 	menuItemComponents.push(<DiagramMenuDivider key="GroupSectionDivider" />);
