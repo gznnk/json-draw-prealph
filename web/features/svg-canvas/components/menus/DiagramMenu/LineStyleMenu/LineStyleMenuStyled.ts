@@ -16,6 +16,7 @@ export const LineStyleMenuWrapper = styled.div`
 export const LineStyleSection = styled.div`
 	display: flex;
 	gap: 4px;
+	justify-content: center;
 `;
 
 type LineStyleButtonProps = {
