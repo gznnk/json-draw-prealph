@@ -4,11 +4,12 @@ import type { IconProps } from "../../types/props/icon/IconProps";
 
 /**
  * Aspect ratio icon component
+ * Shows a rectangle with a diagonal arrow from top-left to bottom-right with open arrows at both ends
  *
  * @param props - Props for the icon
  * @param props.width - Icon width
  * @param props.height - Icon height
- * @param props.fill - SVG fill color
+ * @param props.fill - SVG fill color (used for stroke)
  * @param props.title - Accessible title for the icon
  * @returns SVG element for aspect ratio icon
  */
@@ -24,14 +25,30 @@ const AspectRatioComponent: React.FC<IconProps> = ({
 			height={height}
 			viewBox="0 0 16 16"
 			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
 		>
 			<title>{title}</title>
-			<path
-				d="M486.292893,211 L484.490479,211 C484.215057,211 484,211.223858 484,211.5 C484,211.768066 484.219595,212 484.490479,212 L487.509521,212 C487.645649,212 487.767031,211.945315 487.854989,211.85666 C487.943375,211.764692 488,211.643368 488,211.509521 L488,208.490479 C488,208.215057 487.776142,208 487.5,208 C487.231934,208 487,208.219595 487,208.490479 L487,210.292893 L477.707107,201 L479.509521,201 C479.784943,201 480,200.776142 480,200.5 C480,200.231934 479.780405,200 479.509521,200 L476.490479,200 C476.354351,200 476.232969,200.054685 476.145011,200.14334 C476.056625,200.235308 476,200.356632 476,200.490479 L476,203.509521 C476,203.784943 476.223858,204 476.5,204 C476.768066,204 477,203.780405 477,203.509521 L477,201.707107 L486.292893,211 Z M474,199.000872 C474,198.448106 474.444631,198 475.000872,198 L488.999128,198 C489.551894,198 490,198.444631 490,199.000872 L490,212.999128 C490,213.551894 489.555369,214 488.999128,214 L475.000872,214 C474.448106,214 474,213.555369 474,212.999128 L474,199.000872 Z M475,199 L489,199 L489,213 L475,213 L475,199 Z"
-				transform="translate(-474 -198)"
-				fillRule="evenodd"
-				fill={fill}
+			{/* Outer rectangle */}
+			<rect
+				x="1.5"
+				y="1.5"
+				width="13"
+				height="13"
+				stroke={fill}
+				strokeWidth="1.3"
+				fill="none"
 			/>
+			{/* Diagonal arrow line from top-left to bottom-right */}
+			<path
+				d="M5.5 5.5 L10.5 10.5"
+				stroke={fill}
+				strokeWidth="1.3"
+				strokeLinecap="round"
+			/>
+			{/* Top-left arrow head (filled triangle pointing to bottom-right) */}
+			<path d="M3 3 L7.5 3 L3 7.5 Z" fill={fill} />
+			{/* Bottom-right arrow head (filled triangle pointing to bottom-right) */}
+			<path d="M13 13 L8.5 13 L13 8.5 Z" fill={fill} />
 		</svg>
 	);
 };
