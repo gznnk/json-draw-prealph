@@ -7,7 +7,7 @@ import { FilledDiamondMarker } from "./FilledDiamond";
 import { HollowDiamondMarker } from "./HollowDiamond";
 import { HollowTriangleMarker } from "./HollowTriangle";
 import { OpenArrowMarker } from "./OpenArrow";
-import { FilledTriangleMarker } from "./Triangle";
+import { FilledTriangleMarker } from "./FilledTriangle";
 
 /**
  * MarkerDefs component.
