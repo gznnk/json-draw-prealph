@@ -50,7 +50,7 @@ const AlignmentMenuComponent: React.FC<AlignmentMenuProps> = ({
 	return (
 		<DiagramMenuPositioner>
 			<DiagramMenuItemNew isActive={isOpen} onClick={onToggle}>
-				<AlignLeftIcon title="Alignment" />
+				<AlignCenter title="Alignment" />
 			</DiagramMenuItemNew>
 			{isOpen && (
 				<DiagramMenuControl>

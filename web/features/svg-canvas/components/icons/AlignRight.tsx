@@ -4,11 +4,12 @@ import type { IconProps } from "../../types/props/icon/IconProps";
 
 /**
  * Right alignment icon component
+ * Shows 4 horizontal lines representing right-aligned text (2 full-width, 2 half-width)
  *
  * @param props - Props for the icon
  * @param props.width - Icon width
  * @param props.height - Icon height
- * @param props.fill - SVG fill color
+ * @param props.fill - SVG fill color (used for stroke)
  * @param props.title - Accessible title for the icon
  * @returns SVG element for right alignment icon
  */
@@ -22,13 +23,38 @@ const AlignRightComponent: React.FC<IconProps> = ({
 		<svg
 			width={width}
 			height={height}
-			viewBox="0 0 1024 1024"
+			viewBox="0 0 24 24"
 			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
 		>
 			<title>{title}</title>
+			{/* Line 1: Full width */}
 			<path
-				d="M904 158H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h496c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 424H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h496c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 212H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0-424H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8z"
-				fill={fill}
+				d="M3 6 L21 6"
+				stroke={fill}
+				strokeWidth="2"
+				strokeLinecap="round"
+			/>
+			{/* Line 2: Half width (right aligned) */}
+			<path
+				d="M10 10 L21 10"
+				stroke={fill}
+				strokeWidth="2"
+				strokeLinecap="round"
+			/>
+			{/* Line 3: Full width */}
+			<path
+				d="M3 14 L21 14"
+				stroke={fill}
+				strokeWidth="2"
+				strokeLinecap="round"
+			/>
+			{/* Line 4: Half width (right aligned) */}
+			<path
+				d="M10 18 L21 18"
+				stroke={fill}
+				strokeWidth="2"
+				strokeLinecap="round"
 			/>
 		</svg>
 	);
