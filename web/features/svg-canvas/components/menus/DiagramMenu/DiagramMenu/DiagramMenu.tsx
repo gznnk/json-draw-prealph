@@ -28,6 +28,7 @@ import {
 } from "./DiagramMenuUtils";
 import { useDiagramMenuState } from "./hooks/useDiagramMenuState";
 import { useStyleChange } from "../../../../hooks/useStyleChange";
+import { DiagramRegistry } from "../../../../registry";
 import type { PathType } from "../../../../types/core/PathType";
 import type { CornerRoundableData } from "../../../../types/data/core/CornerRoundableData";
 import type { FillableData } from "../../../../types/data/core/FillableData";
@@ -463,17 +464,24 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		<DiagramMenuDivider key="StackOrderSectionDivider" />,
 	);
 
-	// Create a section for keep aspect ratio items.
-	menuItemComponents.push(
-		<KeepAspectRatioMenu
-			key="KeepAspectRatio"
-			multiSelectGroup={canvasProps.multiSelectGroup}
-			selectedDiagrams={selectedItems}
-		/>,
-	);
-	menuItemComponents.push(
-		<DiagramMenuDivider key="KeepAspectRatioSectionDivider" />,
-	);
+	// Create a section for keep aspect ratio items if applicable.
+	const shouldDisplayKeepAspectRatioMenu =
+		(singleSelectedItem &&
+			DiagramRegistry.getMenuConfig(singleSelectedItem.type)?.aspectRatio) ||
+		canvasProps.multiSelectGroup;
+	if (shouldDisplayKeepAspectRatioMenu) {
+		// Create a section for keep aspect ratio items.
+		menuItemComponents.push(
+			<KeepAspectRatioMenu
+				key="KeepAspectRatio"
+				multiSelectGroup={canvasProps.multiSelectGroup}
+				selectedDiagrams={selectedItems}
+			/>,
+		);
+		menuItemComponents.push(
+			<DiagramMenuDivider key="KeepAspectRatioSectionDivider" />,
+		);
+	}
 
 	// Create a section for group and ungroup items.
 	menuItemComponents.push(

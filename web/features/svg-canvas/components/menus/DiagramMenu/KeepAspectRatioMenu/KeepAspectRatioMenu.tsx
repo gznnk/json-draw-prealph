@@ -25,10 +25,6 @@ const KeepAspectRatioMenuComponent: React.FC<KeepAspectRatioMenuProps> = ({
 	const singleSelectedItem =
 		selectedDiagrams.length === 1 ? selectedDiagrams[0] : undefined;
 
-	// Determine if the menu should be shown and if it's active
-	const shouldShow = Boolean(
-		multiSelectGroup || isTransformativeState(singleSelectedItem),
-	);
 	const isActive = Boolean(
 		multiSelectGroup
 			? multiSelectGroup.keepProportion
@@ -56,11 +52,7 @@ const KeepAspectRatioMenuComponent: React.FC<KeepAspectRatioMenuProps> = ({
 	};
 
 	return (
-		<DiagramMenuItemNew
-			isActive={isActive}
-			onClick={handleClick}
-			isHidden={!shouldShow}
-		>
+		<DiagramMenuItemNew isActive={isActive} onClick={handleClick}>
 			<AspectRatio width={22} height={22} title="Keep Aspect Ratio" />
 		</DiagramMenuItemNew>
 	);
