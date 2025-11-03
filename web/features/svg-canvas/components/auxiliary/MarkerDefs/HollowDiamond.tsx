@@ -2,6 +2,10 @@ import type React from "react";
 import { memo } from "react";
 
 const DIAMOND_SIZE = 13;
+const STROKE_WIDTH = 1.5;
+// Add padding for stroke to prevent clipping
+const PADDING = STROKE_WIDTH;
+const MARKER_SIZE = DIAMOND_SIZE + PADDING * 2;
 
 /**
  * HollowDiamond marker definition.
@@ -13,18 +17,18 @@ const HollowDiamondMarkerComponent: React.FC = () => {
 	return (
 		<marker
 			id="marker-hollow-diamond"
-			markerWidth={DIAMOND_SIZE}
-			markerHeight={DIAMOND_SIZE}
-			refX={DIAMOND_SIZE}
-			refY={halfSize}
+			markerWidth={MARKER_SIZE}
+			markerHeight={MARKER_SIZE}
+			refX={DIAMOND_SIZE + PADDING}
+			refY={halfSize + PADDING}
 			orient="auto-start-reverse"
 			markerUnits="userSpaceOnUse"
 		>
 			<polygon
-				points={`0,${halfSize} ${halfSize},0 ${DIAMOND_SIZE},${halfSize} ${halfSize},${DIAMOND_SIZE}`}
+				points={`${PADDING},${halfSize + PADDING} ${halfSize + PADDING},${PADDING} ${DIAMOND_SIZE + PADDING},${halfSize + PADDING} ${halfSize + PADDING},${DIAMOND_SIZE + PADDING}`}
 				fill="white"
 				stroke="context-stroke"
-				strokeWidth="1.5"
+				strokeWidth={STROKE_WIDTH}
 				strokeLinejoin="miter"
 				strokeLinecap="square"
 			/>
