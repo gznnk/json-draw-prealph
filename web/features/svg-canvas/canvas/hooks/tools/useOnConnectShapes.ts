@@ -23,7 +23,7 @@ import { createRectangleConnectPoint } from "../../../utils/shapes/rectangle/cre
 import { isConnectableState } from "../../../utils/validation/isConnectableState";
 import { isFrame } from "../../../utils/validation/isFrame";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
-import { useAddDiagram } from "../actions/useAddDiagram";
+import { applyFunctionRecursively } from "../../utils/applyFunctionRecursively";
 
 /**
  * Hook that monitors ConnectShapes events and performs shape connections.
@@ -32,13 +32,9 @@ import { useAddDiagram } from "../actions/useAddDiagram";
  * arrow heads, and anchor positions.
  */
 export const useOnConnectShapes = (props: SvgCanvasSubHooksProps) => {
-	// Create a function to add a new diagram.
-	const addDiagram = useAddDiagram(props);
-
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
 		props,
-		addDiagram,
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
@@ -49,8 +45,8 @@ export const useOnConnectShapes = (props: SvgCanvasSubHooksProps) => {
 
 		const connectShapesListener = (e: Event) => {
 			// Bypass references to avoid function creation in every render.
-			const { props, addDiagram } = refBus.current;
-			const { canvasState } = props;
+			const { props } = refBus.current;
+			const { canvasState, setCanvasState } = props;
 
 			const event = (e as CustomEvent<ConnectShapesEvent>).detail;
 
@@ -115,27 +111,87 @@ export const useOnConnectShapes = (props: SvgCanvasSubHooksProps) => {
 					.join(", "),
 			});
 
-			const sourceConnectPoint = findConnectPoint(
-				sourceShape as ConnectableState & Diagram,
+			// Determine anchor names
+			const sourceAnchorName =
+				event.sourceAnchor && event.sourceAnchor.trim() !== ""
+					? event.sourceAnchor
+					: "bottomCenterPoint";
+			const targetAnchorName =
+				event.targetAnchor && event.targetAnchor.trim() !== ""
+					? event.targetAnchor
+					: "topCenterPoint";
+
+			// Try to find existing connect points
+			let sourceConnectPoint = findConnectPoint(
+				sourceShape as ConnectableState,
 				event.sourceAnchor,
-				"bottomCenterPoint", // default anchor for source
+				"bottomCenterPoint",
 			);
-
-			const targetConnectPoint = findConnectPoint(
-				targetShape as ConnectableState & Diagram,
+			let targetConnectPoint = findConnectPoint(
+				targetShape as ConnectableState,
 				event.targetAnchor,
-				"topCenterPoint", // default anchor for target
+				"topCenterPoint",
 			);
 
-			if (!sourceConnectPoint || !targetConnectPoint) {
-				console.error(
-					"Source or target connect point not found.",
-					`\nSource shape ID: ${event.sourceShapeId}, requested anchor: "${event.sourceAnchor || "(default)"}"`,
-					`\nTarget shape ID: ${event.targetShapeId}, requested anchor: "${event.targetAnchor || "(default)"}"`,
-					`\nSource point found: ${!!sourceConnectPoint}`,
-					`\nTarget point found: ${!!targetConnectPoint}`,
+			// Track if we need to update shapes with new connect points
+			const updatedShapes: Diagram[] = [];
+
+			// Generate missing source connect point
+			if (!sourceConnectPoint) {
+				console.log(
+					`🔧 [useOnConnectShapes] Generating source connect point: ${sourceAnchorName}`,
 				);
-				return;
+				sourceConnectPoint = generateConnectPoint(
+					sourceShape,
+					sourceAnchorName,
+				);
+				if (!sourceConnectPoint) {
+					console.error(
+						`❌ Failed to generate source connect point: ${sourceAnchorName}`,
+					);
+					return;
+				}
+
+				// Create updated source shape with new connect point (immutable)
+				const sourceConnectable = sourceShape as ConnectableState & Diagram;
+				const updatedSourceShape = {
+					...sourceConnectable,
+					connectEnabled: true,
+					connectPoints: [
+						...(sourceConnectable.connectPoints || []),
+						sourceConnectPoint,
+					],
+				};
+				updatedShapes.push(updatedSourceShape);
+			}
+
+			// Generate missing target connect point
+			if (!targetConnectPoint) {
+				console.log(
+					`🔧 [useOnConnectShapes] Generating target connect point: ${targetAnchorName}`,
+				);
+				targetConnectPoint = generateConnectPoint(
+					targetShape,
+					targetAnchorName,
+				);
+				if (!targetConnectPoint) {
+					console.error(
+						`❌ Failed to generate target connect point: ${targetAnchorName}`,
+					);
+					return;
+				}
+
+				// Create updated target shape with new connect point (immutable)
+				const targetConnectable = targetShape as ConnectableState & Diagram;
+				const updatedTargetShape = {
+					...targetConnectable,
+					connectEnabled: true,
+					connectPoints: [
+						...(targetConnectable.connectPoints || []),
+						targetConnectPoint,
+					],
+				};
+				updatedShapes.push(updatedTargetShape);
 			}
 
 			// Generate connection path points
@@ -192,9 +248,34 @@ export const useOnConnectShapes = (props: SvgCanvasSubHooksProps) => {
 				}),
 			};
 
-			addDiagram({
-				eventId: event.eventId,
-				item: connectLine,
+			// Update canvas state: add connection line and update shapes with new connect points
+			setCanvasState((prevState) => {
+				let newItems = prevState.items;
+
+				// Update shapes with new connect points if needed (recursively)
+				if (updatedShapes.length > 0) {
+					newItems = applyFunctionRecursively(prevState.items, (item) => {
+						const updatedShape = updatedShapes.find((s) => s.id === item.id);
+						if (updatedShape) {
+							console.log(
+								`✅ Updated shape ${item.id} with new connect points`,
+							);
+							return updatedShape;
+						}
+						return item;
+					});
+				}
+
+				// Add the connection line
+				newItems = [...newItems, connectLine];
+				console.log(
+					`✅ Added connection line from ${sourceShape.id} to ${targetShape.id}`,
+				);
+
+				return {
+					...prevState,
+					items: newItems,
+				};
 			});
 		};
 
@@ -210,48 +291,18 @@ export const useOnConnectShapes = (props: SvgCanvasSubHooksProps) => {
 };
 
 /**
- * Finds or creates a connection point on a shape based on the anchor position.
- * If the connection point doesn't exist, it will be generated dynamically.
- * If no anchor is specified, uses the default anchor name.
+ * Generates a connection point for a shape based on its type.
  *
- * @param shape - The connectable shape to find/create the point on
- * @param anchor - The anchor position name (optional)
- * @param defaultAnchor - The default anchor name to use if none specified
- * @returns The connection point or undefined if generation fails
+ * @param shape - The shape to generate connection points for
+ * @param anchorName - The name of the anchor point to generate
+ * @returns The generated connection point or undefined if generation fails
  */
-const findConnectPoint = (
-	shape: ConnectableState & Diagram,
-	anchor: AnchorPosition | undefined,
-	defaultAnchor: string,
+const generateConnectPoint = (
+	shape: Diagram,
+	anchorName: string,
 ): ConnectPointState | undefined => {
-	// Debug: Log input parameters
-	console.log("🔎 [findConnectPoint] Input:", {
-		anchor,
-		anchorType: typeof anchor,
-		anchorLength: anchor?.length,
-		anchorTrimmed: anchor?.trim(),
-		defaultAnchor,
-		availablePoints:
-			shape.connectPoints?.map((p) => p.name).join(", ") || "(none)",
-		shapeType: shape.type,
-	});
-
-	// Empty string should be treated as undefined (use default)
-	const anchorName = anchor && anchor.trim() !== "" ? anchor : defaultAnchor;
-
-	console.log("🎯 [findConnectPoint] Searching for:", anchorName);
-
-	// Try to find existing connect point
-	const existingPoint = shape.connectPoints?.find((p) => p.name === anchorName);
-
-	if (existingPoint) {
-		console.log(`✅ Found existing connect point: ${anchorName}`);
-		return existingPoint;
-	}
-
-	// Connect point not found - generate it dynamically
 	console.log(
-		`🏭 [findConnectPoint] Generating missing connect point: ${anchorName}`,
+		`🏭 [generateConnectPoint] Generating: ${anchorName} for ${shape.type}`,
 	);
 
 	let generatedPoints: ConnectPointState[] = [];
@@ -286,28 +337,49 @@ const findConnectPoint = (
 	}
 
 	// Find the specific connect point we need from the generated points
-	const newConnectPoint = generatedPoints.find(
+	const connectPoint = generatedPoints.find(
 		(p: ConnectPointState) => p.name === anchorName,
 	);
 
-	if (!newConnectPoint) {
+	if (!connectPoint) {
 		console.error(
 			`❌ Failed to generate connect point "${anchorName}" for shape type: ${shape.type}`,
 		);
 		return undefined;
 	}
 
-	// Initialize connectPoints array if it doesn't exist
-	if (!shape.connectPoints) {
-		shape.connectPoints = [];
+	console.log(`✨ [generateConnectPoint] Generated: ${anchorName}`);
+	return connectPoint;
+};
+
+/**
+ * Finds a connection point on a shape based on the anchor position.
+ * If no anchor is specified, uses the default anchor name.
+ * Does NOT generate missing points - returns undefined if not found.
+ *
+ * @param shape - The connectable shape to find the point on
+ * @param anchor - The anchor position name (optional)
+ * @param defaultAnchor - The default anchor name to use if none specified
+ * @returns The connection point or undefined if not found
+ */
+const findConnectPoint = (
+	shape: ConnectableState,
+	anchor: AnchorPosition | undefined,
+	defaultAnchor: string,
+): ConnectPointState | undefined => {
+	// Empty string should be treated as undefined (use default)
+	const anchorName = anchor && anchor.trim() !== "" ? anchor : defaultAnchor;
+
+	console.log("🔎 [findConnectPoint] Searching for:", anchorName);
+
+	// Find existing connect point
+	const existingPoint = shape.connectPoints?.find((p) => p.name === anchorName);
+
+	if (existingPoint) {
+		console.log(`✅ Found existing connect point: ${anchorName}`);
+	} else {
+		console.log(`⚠️ Connect point not found: ${anchorName}`);
 	}
 
-	// Add the newly generated point to the shape's connect points
-	shape.connectPoints.push(newConnectPoint);
-
-	console.log(
-		`✨ [findConnectPoint] Generated and added connect point: ${anchorName}`,
-	);
-
-	return newConnectPoint;
+	return existingPoint;
 };
