@@ -307,6 +307,7 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<ArrowHeadMenu key="Arrow" selectedDiagrams={selectedItems} />,
 		);
+		menuItemComponents.push(<DiagramMenuDivider key="ArrowDivider" />);
 	}
 
 	// Create a section for fillable and strokable items.

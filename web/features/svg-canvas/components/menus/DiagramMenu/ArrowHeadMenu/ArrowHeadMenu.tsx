@@ -86,7 +86,7 @@ const ArrowHeadMenuComponent: React.FC<ArrowHeadMenuProps> = ({
 
 			{/* Swap Arrows Button */}
 			<DiagramMenuItemNew onClick={handleSwapArrows}>
-				<ArrowSwap title="Swap arrows" />
+				<ArrowSwap fill="#333333" width={24} height={24} title="Swap arrows" />
 			</DiagramMenuItemNew>
 
 			{/* End Arrow Button */}
