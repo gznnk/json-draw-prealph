@@ -11,5 +11,7 @@ export const PathDefaultData = CreateDefaultData<PathData>({
 	options: PathFeatures,
 	properties: {
 		pathType: "Linear",
+		startArrowHead: "None",
+		endArrowHead: "None",
 	},
 });

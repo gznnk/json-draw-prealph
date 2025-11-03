@@ -16,6 +16,7 @@ export const ConnectLineDefaultData = CreateDefaultData<ConnectLineData>({
 		startOwnerId: "",
 		endOwnerId: "",
 		autoRouting: true,
+		startArrowHead: "None",
 		endArrowHead: "Circle",
 	},
 });
