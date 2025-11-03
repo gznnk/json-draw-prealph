@@ -10,8 +10,12 @@ import type { ArrowHeadType } from "../../../../types/core/ArrowHeadType";
 
 const arrowHeadTypes: ArrowHeadType[] = [
 	"None",
-	"Triangle",
+	"FilledTriangle",
 	"ConcaveTriangle",
+	"OpenArrow",
+	"HollowTriangle",
+	"FilledDiamond",
+	"HollowDiamond",
 	"Circle",
 ];
 

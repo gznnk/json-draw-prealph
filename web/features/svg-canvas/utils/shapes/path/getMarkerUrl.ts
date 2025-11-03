@@ -12,11 +12,23 @@ export const getMarkerUrl = (
 		return undefined;
 	}
 
-	if (type === "Triangle") {
-		return "url(#marker-triangle)";
+	if (type === "FilledTriangle") {
+		return "url(#marker-filled-triangle)";
 	}
 	if (type === "ConcaveTriangle") {
 		return "url(#marker-concave-triangle)";
+	}
+	if (type === "OpenArrow") {
+		return "url(#marker-open-arrow)";
+	}
+	if (type === "HollowTriangle") {
+		return "url(#marker-hollow-triangle)";
+	}
+	if (type === "FilledDiamond") {
+		return "url(#marker-filled-diamond)";
+	}
+	if (type === "HollowDiamond") {
+		return "url(#marker-hollow-diamond)";
 	}
 	if (type === "Circle") {
 		return "url(#marker-circle)";

@@ -4,14 +4,14 @@ import { memo } from "react";
 const TRIANGLE_SIZE = 13;
 
 /**
- * FilledTriangle arrow marker definition.
- * Creates a standard filled triangular arrow head marker for use with SVG paths.
- * Uses context-stroke to inherit color from the path.
+ * OpenArrow marker definition.
+ * Creates an open arrow marker for UML dependency relationships.
+ * Uses context-stroke for the outline only (not filled).
  */
-const FilledTriangleMarkerComponent: React.FC = () => {
+const OpenArrowMarkerComponent: React.FC = () => {
 	return (
 		<marker
-			id="marker-filled-triangle"
+			id="marker-open-arrow"
 			markerWidth={TRIANGLE_SIZE}
 			markerHeight={TRIANGLE_SIZE}
 			refX={TRIANGLE_SIZE}
@@ -19,12 +19,14 @@ const FilledTriangleMarkerComponent: React.FC = () => {
 			orient="auto-start-reverse"
 			markerUnits="userSpaceOnUse"
 		>
-			<polygon
+			<polyline
 				points={`0,0 ${TRIANGLE_SIZE},${TRIANGLE_SIZE / 2} 0,${TRIANGLE_SIZE}`}
-				fill="context-stroke"
+				fill="none"
+				stroke="context-stroke"
+				strokeWidth="1.5"
 			/>
 		</marker>
 	);
 };
 
-export const FilledTriangleMarker = memo(FilledTriangleMarkerComponent);
+export const OpenArrowMarker = memo(OpenArrowMarkerComponent);

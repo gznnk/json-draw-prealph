@@ -1,4 +1,8 @@
 export { MarkerDefs } from "./MarkerDefs";
 export { CircleMarker } from "./Circle";
 export { ConcaveTriangleMarker } from "./ConcaveTriangle";
-export { TriangleMarker } from "./Triangle";
+export { FilledDiamondMarker } from "./FilledDiamond";
+export { FilledTriangleMarker } from "./Triangle";
+export { HollowDiamondMarker } from "./HollowDiamond";
+export { HollowTriangleMarker } from "./HollowTriangle";
+export { OpenArrowMarker } from "./OpenArrow";

@@ -3,19 +3,28 @@ import { memo } from "react";
 
 import { CircleMarker } from "./Circle";
 import { ConcaveTriangleMarker } from "./ConcaveTriangle";
-import { TriangleMarker } from "./Triangle";
+import { FilledDiamondMarker } from "./FilledDiamond";
+import { HollowDiamondMarker } from "./HollowDiamond";
+import { HollowTriangleMarker } from "./HollowTriangle";
+import { OpenArrowMarker } from "./OpenArrow";
+import { FilledTriangleMarker } from "./Triangle";
 
 /**
  * MarkerDefs component.
  * Defines all SVG markers for arrow heads in a <defs> element.
  * These markers can be referenced by SVG paths using marker-start and marker-end attributes.
  * Markers use context-stroke to inherit the color from the path.
+ * Includes standard arrows and UML relationship markers.
  */
 const MarkerDefsComponent: React.FC = () => {
 	return (
 		<defs>
-			<TriangleMarker />
+			<FilledTriangleMarker />
 			<ConcaveTriangleMarker />
+			<OpenArrowMarker />
+			<HollowTriangleMarker />
+			<FilledDiamondMarker />
+			<HollowDiamondMarker />
 			<CircleMarker />
 		</defs>
 	);
