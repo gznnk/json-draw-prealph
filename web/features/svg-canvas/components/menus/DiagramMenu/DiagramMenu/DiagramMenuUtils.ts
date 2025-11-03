@@ -232,11 +232,10 @@ export const getCommonMenuConfig = (diagrams: Diagram[]): DiagramMenuConfig => {
 		result.textAlignment = textAlignment;
 	}
 
-	// Merge aspectRatio
-	const aspectRatio = mergeBooleanProperty(menuConfigs, "aspectRatio");
-	if (aspectRatio !== undefined) {
-		result.aspectRatio = aspectRatio;
-	}
+	// aspectRatio is not merged here - it's always undefined
+	// Display control is handled in DiagramMenu based on single/multi selection
+	// Active/inactive state is determined in KeepAspectRatioMenu itself
+	result.aspectRatio = undefined;
 
 	return result;
 };
