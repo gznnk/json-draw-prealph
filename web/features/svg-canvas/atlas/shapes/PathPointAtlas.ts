@@ -1,7 +1,6 @@
 import { PathPoint } from "../../components/shapes/Path";
 import { PathPointMinimap } from "../../components/shapes/Path/PathPoint";
 import { PathPointDefaultData } from "../../constants/data/shapes/PathPointDefaultData";
-import { PathPointMenuConfig } from "../../constants/menu/shapes/PathPointMenuConfig";
 import { PathPointDefaultState } from "../../constants/state/shapes/PathPointDefaultState";
 import type { PathPointData } from "../../types/data/shapes/PathPointData";
 import type { PathPointProps } from "../../types/props/shapes/PathPointProps";
@@ -45,7 +44,7 @@ export const PathPointAtlas: PathPointAtlas = {
 
 	type: "PathPoint",
 	features: {},
-	menuConfig: PathPointMenuConfig,
+	menuConfig: undefined,
 
 	// ============================================================================
 	// Defaults

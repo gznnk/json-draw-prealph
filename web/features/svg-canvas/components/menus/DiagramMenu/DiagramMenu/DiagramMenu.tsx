@@ -303,6 +303,12 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	// This will be used to render the menu items conditionally based on the state map.
 	const menuItemComponents = [];
 
+	if (menuConfig.arrowHead) {
+		menuItemComponents.push(
+			<ArrowHeadMenu key="Arrow" selectedDiagrams={selectedItems} />,
+		);
+	}
+
 	// Create a section for fillable and strokable items.
 	const showFillableAndStrokableSection = showSection(
 		"BgColor",
@@ -373,9 +379,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 				onToggle={() => setIsLineStyleMenuOpen(!isLineStyleMenuOpen)}
 				selectedDiagrams={selectedItems}
 			/>,
-		);
-		menuItemComponents.push(
-			<ArrowHeadMenu key="Arrow" selectedDiagrams={selectedItems} />,
 		);
 		menuItemComponents.push(
 			<DiagramMenuDivider key="FillableAndStrokableSectionDivider" />,

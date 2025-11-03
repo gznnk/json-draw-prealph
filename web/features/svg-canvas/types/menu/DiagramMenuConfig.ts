@@ -18,6 +18,9 @@ export type DiagramMenuConfig = {
 	/** Show border radius control */
 	borderRadius?: boolean;
 
+	/** Show arrow head controls */
+	arrowHead?: boolean;
+
 	/** Show line style controls (width, dash type, etc.) */
 	lineStyle?: boolean;
 

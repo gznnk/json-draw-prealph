@@ -4,6 +4,9 @@ import { createMenuConfig } from "../core/createMenuConfig";
 
 /**
  * Menu configuration for Path shapes.
- * Border color, line style, group, and transformation options are enabled based on PathFeatures.
+ * Border color, line style, arrow head, group, and transformation options are enabled.
  */
-export const PathMenuConfig: DiagramMenuConfig = createMenuConfig(PathFeatures);
+export const PathMenuConfig: DiagramMenuConfig = {
+	...createMenuConfig(PathFeatures),
+	arrowHead: true,
+};

@@ -4,7 +4,9 @@ import { createMenuConfig } from "../core/createMenuConfig";
 
 /**
  * Menu configuration for ConnectLine shapes.
- * Only border color and line style options are enabled based on ConnectLineFeatures.
+ * Border color, line style, and arrow head options are enabled.
  */
-export const ConnectLineMenuConfig: DiagramMenuConfig =
-	createMenuConfig(ConnectLineFeatures);
+export const ConnectLineMenuConfig: DiagramMenuConfig = {
+	...createMenuConfig(ConnectLineFeatures),
+	arrowHead: true,
+};
