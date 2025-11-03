@@ -1,7 +1,7 @@
 import type React from "react";
 import { memo } from "react";
 
-const TRIANGLE_SIZE = 13;
+const TRIANGLE_SIZE = 14;
 
 /**
  * Concave Triangle arrow marker definition.

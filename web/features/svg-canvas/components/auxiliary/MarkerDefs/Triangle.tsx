@@ -1,7 +1,7 @@
 import type React from "react";
 import { memo } from "react";
 
-const TRIANGLE_SIZE = 12;
+const TRIANGLE_SIZE = 14;
 
 /**
  * FilledTriangle arrow marker definition.

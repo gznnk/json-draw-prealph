@@ -1,7 +1,7 @@
 import type React from "react";
 import { memo } from "react";
 
-const DIAMOND_SIZE = 13;
+const DIAMOND_SIZE = 14;
 
 /**
  * FilledDiamond marker definition.

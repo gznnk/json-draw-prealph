@@ -1,8 +1,8 @@
 import type React from "react";
 import { memo } from "react";
 
-const TRIANGLE_SIZE = 11;
-const STROKE_WIDTH = 1;
+const TRIANGLE_SIZE = 12;
+const STROKE_WIDTH = 1.5;
 // Add padding for stroke to prevent clipping
 const PADDING = STROKE_WIDTH;
 const MARKER_SIZE = TRIANGLE_SIZE + PADDING * 2;
