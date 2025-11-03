@@ -29,7 +29,8 @@ const ArrowHeadIconPreviewComponent: React.FC<ArrowHeadIconPreviewProps> = ({
 	//    - Start arrow: shorten left side (M 7 12 L 22 12)
 	//    - End arrow: shorten right side (M 2 12 L 17 12)
 	//    - No arrow: full width (M 2 12 L 22 12)
-	const visiblePathD = !markerUrl
+	const shouldShowFullPath = !markerUrl || arrowType === "OpenArrow";
+	const visiblePathD = shouldShowFullPath
 		? "M 2 12 L 22 12"
 		: isStart
 			? "M 7 12 L 22 12"
@@ -38,11 +39,11 @@ const ArrowHeadIconPreviewComponent: React.FC<ArrowHeadIconPreviewProps> = ({
 	return (
 		<svg width="24" height="24" viewBox="0 6 24 12">
 			{/* Visible path shortened on marker side to avoid overlap */}
-			<path d={visiblePathD} stroke="#6b7280" strokeWidth="2" fill="none" />
+			<path d={visiblePathD} stroke="#333333" strokeWidth="2" fill="none" />
 			{/* Invisible path for marker positioning */}
 			<path
 				d="M 2 12 L 22 12"
-				stroke="#6b7280"
+				stroke="#333333"
 				strokeWidth="0"
 				fill="none"
 				markerStart={isStart ? markerUrl : undefined}

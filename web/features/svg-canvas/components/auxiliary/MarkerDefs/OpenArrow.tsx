@@ -1,7 +1,11 @@
 import type React from "react";
 import { memo } from "react";
 
-const TRIANGLE_SIZE = 13;
+const TRIANGLE_SIZE = 12;
+const STROKE_WIDTH = 1.5;
+// Add padding for stroke to prevent clipping
+const PADDING = STROKE_WIDTH;
+const MARKER_SIZE = TRIANGLE_SIZE + PADDING * 2;
 
 /**
  * OpenArrow marker definition.
@@ -12,18 +16,20 @@ const OpenArrowMarkerComponent: React.FC = () => {
 	return (
 		<marker
 			id="marker-open-arrow"
-			markerWidth={TRIANGLE_SIZE}
-			markerHeight={TRIANGLE_SIZE}
-			refX={TRIANGLE_SIZE}
-			refY={TRIANGLE_SIZE / 2}
+			markerWidth={MARKER_SIZE}
+			markerHeight={MARKER_SIZE}
+			refX={MARKER_SIZE - 0.7}
+			refY={MARKER_SIZE / 2}
 			orient="auto-start-reverse"
 			markerUnits="userSpaceOnUse"
 		>
 			<polyline
-				points={`0,0 ${TRIANGLE_SIZE},${TRIANGLE_SIZE / 2} 0,${TRIANGLE_SIZE}`}
+				points={`${PADDING},${PADDING} ${TRIANGLE_SIZE + PADDING},${MARKER_SIZE / 2} ${PADDING},${TRIANGLE_SIZE + PADDING}`}
 				fill="none"
 				stroke="context-stroke"
-				strokeWidth="1.5"
+				strokeWidth={STROKE_WIDTH}
+				strokeLinejoin="miter"
+				strokeLinecap="round"
 			/>
 		</marker>
 	);
