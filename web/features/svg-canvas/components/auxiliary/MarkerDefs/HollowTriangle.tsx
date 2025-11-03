@@ -24,6 +24,8 @@ const HollowTriangleMarkerComponent: React.FC = () => {
 				fill="white"
 				stroke="context-stroke"
 				strokeWidth="1.5"
+				strokeLinejoin="miter"
+				strokeLinecap="square"
 			/>
 		</marker>
 	);
