@@ -465,10 +465,11 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	);
 
 	// Create a section for keep aspect ratio items if applicable.
-	const shouldDisplayKeepAspectRatioMenu =
+	const shouldDisplayKeepAspectRatioMenu = Boolean(
 		(singleSelectedItem &&
 			DiagramRegistry.getMenuConfig(singleSelectedItem.type)?.aspectRatio) ||
-		canvasProps.multiSelectGroup;
+			canvasProps.multiSelectGroup,
+	);
 	if (shouldDisplayKeepAspectRatioMenu) {
 		// Create a section for keep aspect ratio items.
 		menuItemComponents.push(
@@ -484,14 +485,17 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 
 	// Create a section for group and ungroup items.
-	menuItemComponents.push(
-		<GroupMenu
-			key="Group"
-			multiSelectGroup={canvasProps.multiSelectGroup}
-			selectedDiagrams={selectedItems}
-		/>,
+	const shouldShowGroupMenu = Boolean(
+		canvasProps.multiSelectGroup ||
+			(singleSelectedItem && singleSelectedItem.type === "Group"),
 	);
-	menuItemComponents.push(<DiagramMenuDivider key="GroupSectionDivider" />);
+	if (shouldShowGroupMenu) {
+		// Create a section for group and ungroup items.
+		menuItemComponents.push(
+			<GroupMenu key="Group" selectedDiagrams={selectedItems} />,
+		);
+		menuItemComponents.push(<DiagramMenuDivider key="GroupSectionDivider" />);
+	}
 
 	// Remove the last divider.
 	menuItemComponents.pop();

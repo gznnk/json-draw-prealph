@@ -4,19 +4,14 @@ import { memo } from "react";
 import { useGroup } from "../../../../hooks/useGroup";
 import { useUngroup } from "../../../../hooks/useUngroup";
 import type { Diagram } from "../../../../types/state/core/Diagram";
-import type { GroupState } from "../../../../types/state/shapes/GroupState";
 import { Group } from "../../../icons/Group";
 import { DiagramMenuItemNew } from "../DiagramMenuItem/DiagramMenuItemNew";
 
 type GroupMenuProps = {
-	multiSelectGroup: GroupState | undefined;
 	selectedDiagrams: Diagram[];
 };
 
-const GroupMenuComponent: React.FC<GroupMenuProps> = ({
-	multiSelectGroup,
-	selectedDiagrams,
-}) => {
+const GroupMenuComponent: React.FC<GroupMenuProps> = ({ selectedDiagrams }) => {
 	const onGroup = useGroup();
 	const onUngroup = useUngroup();
 
@@ -24,10 +19,6 @@ const GroupMenuComponent: React.FC<GroupMenuProps> = ({
 	const singleSelectedItem =
 		selectedDiagrams.length === 1 ? selectedDiagrams[0] : undefined;
 
-	// Determine if the menu should be shown and if it's active
-	const shouldShow = Boolean(
-		multiSelectGroup || (singleSelectedItem && singleSelectedItem.type === "Group"),
-	);
 	const isActive = Boolean(
 		singleSelectedItem && singleSelectedItem.type === "Group",
 	);
@@ -41,12 +32,8 @@ const GroupMenuComponent: React.FC<GroupMenuProps> = ({
 	};
 
 	return (
-		<DiagramMenuItemNew
-			isActive={isActive}
-			onClick={handleClick}
-			isHidden={!shouldShow}
-		>
-			<Group width={22} height={22} title={isActive ? "Ungroup" : "Group"} />
+		<DiagramMenuItemNew isActive={isActive} onClick={handleClick}>
+			<Group width={24} height={24} title={isActive ? "Ungroup" : "Group"} />
 		</DiagramMenuItemNew>
 	);
 };
