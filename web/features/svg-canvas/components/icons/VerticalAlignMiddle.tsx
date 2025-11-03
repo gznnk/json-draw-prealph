@@ -37,22 +37,22 @@ const VerticalAlignMiddleComponent: React.FC<IconProps> = ({
 			/>
 			{/* Top vertical line (upper arrow shaft) */}
 			<path
-				d="M12 3 L12 9"
+				d="M12 0 L12 8"
 				stroke={fill}
 				strokeWidth="2"
 				strokeLinecap="round"
 			/>
 			{/* Bottom vertical line (lower arrow shaft) */}
 			<path
-				d="M12 15 L12 21"
+				d="M12 16 L12 24"
 				stroke={fill}
 				strokeWidth="2"
 				strokeLinecap="round"
 			/>
 			{/* Downward arrow head at top (filled triangle) */}
-			<path d="M12 10 L8 5 L16 5 Z" fill={fill} />
+			<path d="M12 10 L6 4 L18 4 Z" fill={fill} />
 			{/* Upward arrow head at bottom (filled triangle) */}
-			<path d="M12 14 L8 19 L16 19 Z" fill={fill} />
+			<path d="M12 14 L6 20 L18 20 Z" fill={fill} />
 		</svg>
 	);
 };

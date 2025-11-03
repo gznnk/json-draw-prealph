@@ -43,7 +43,7 @@ const VerticalAlignTopComponent: React.FC<IconProps> = ({
 				strokeLinecap="round"
 			/>
 			{/* Upward arrow head (filled triangle) */}
-			<path d="M12 7 L16 12 L8 12 Z" fill={fill} />
+			<path d="M12 7 L18 13 L6 13 Z" fill={fill} />
 		</svg>
 	);
 };
