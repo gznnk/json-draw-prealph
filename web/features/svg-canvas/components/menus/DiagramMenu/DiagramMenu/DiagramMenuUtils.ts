@@ -164,6 +164,7 @@ const mergeBorderStyle = (
  */
 export const getCommonMenuConfig = (diagrams: Diagram[]): DiagramMenuConfig => {
 	const types = collectDiagramTypes(diagrams);
+	types.delete("Group"); // Exclude Group type
 
 	if (types.size === 0) {
 		return {};
