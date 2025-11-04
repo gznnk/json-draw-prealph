@@ -13,6 +13,6 @@ export const isStrokableState = (obj: unknown): obj is StrokableState => {
 		"stroke" in obj &&
 		"strokeWidth" in obj &&
 		typeof (obj as StrokableState).stroke === "string" &&
-		typeof (obj as StrokableState).strokeWidth === "string"
+		typeof (obj as StrokableState).strokeWidth === "number"
 	);
 };
