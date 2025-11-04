@@ -34,7 +34,7 @@ export const createMenuConfig = (
 	if (features.strokable) {
 		config.borderColor = overrides.borderColor ?? true;
 		config.borderStyle = overrides.borderStyle ?? {};
-		config.lineStyle = overrides.lineStyle ?? true;
+		// config.lineStyle = overrides.lineStyle ?? true;
 	}
 
 	// Add corner roundable features
