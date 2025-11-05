@@ -8,4 +8,6 @@ export type TransformativeState = TransformativeData & {
 	isTransforming: boolean;
 	minWidth?: number;
 	minHeight?: number;
+	/** When true, hides the transform controls for this diagram */
+	hideTransformControl?: boolean;
 };

@@ -24,7 +24,6 @@ export const canvasDataToState = (
 		zoom: data.zoom,
 		items: stateItems,
 		selectedDiagramPathIndex: new Map(),
-		hideTransformativeForDiagramIds: new Set(),
 		history: [
 			{
 				id: data.id,

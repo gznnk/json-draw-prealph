@@ -1,10 +1,12 @@
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
+import { useDiagramUpdate } from "./useDiagramUpdate";
 import { EVENT_NAME_TRANSFORM_CONTROL_CLICK } from "../constants/core/EventNames";
 import { useEventBus } from "../context/EventBusContext";
-import { useSvgCanvasState } from "../context/SvgCanvasStateContext";
 import type { TransformControlClickEvent } from "../types/events/TransformControlClickEvent";
+import type { TransformativeState } from "../types/state/core/TransformativeState";
+import { newEventId } from "../utils/core/newEventId";
 
 /**
  * Props for the useTransformControl hook
@@ -19,47 +21,43 @@ export type UseTransformControlProps = {
  * Return value from useTransformControl hook
  */
 export type UseTransformControlReturn = {
-	showTransformControl: boolean;
 	setShowTransformControl: (show: boolean) => void;
 };
 
 /**
  * Custom hook to manage transform control visibility and handle click events via EventBus.
  * This hook allows shape components to:
- * - Control whether their Transformative component should be displayed
+ * - Control whether their Transformative component should be displayed via hideTransformControl property
  * - Respond to clicks on transform controls without tight coupling
+ *
+ * Uses useDiagramUpdate to update the diagram's hideTransformControl property,
+ * which triggers re-render and proper visibility control.
  *
  * @param props Hook props
  * @param props.id - ID of the diagram
  * @param props.ref - Reference to the SVG element for pointer-over detection
  * @param props.onTransformControlClick - Callback when transform control is clicked
- * @returns Object with showTransformControl flag and setter
+ * @returns Object with setShowTransformControl function
  */
 export const useTransformControl = (
 	props: UseTransformControlProps,
 ): UseTransformControlReturn => {
 	const { id, onTransformControlClick } = props;
 	const eventBus = useEventBus();
-	const canvasStateRef = useSvgCanvasState();
-	const [showTransformControl, setShowTransformControlInternal] =
-		useState(true);
+	const updateDiagram = useDiagramUpdate();
 
-	// Wrapper to update both local state and canvas state
+	// Update diagram's hideTransformControl property using useDiagramUpdate
 	const setShowTransformControl = useCallback(
 		(show: boolean) => {
-			setShowTransformControlInternal(show);
-
-			// Update canvas state's hideTransformativeForDiagramIds set
-			if (canvasStateRef?.current) {
-				const hideSet = canvasStateRef.current.hideTransformativeForDiagramIds;
-				if (show) {
-					hideSet.delete(id);
-				} else {
-					hideSet.add(id);
-				}
-			}
+			updateDiagram({
+				eventId: newEventId(),
+				id,
+				data: {
+					hideTransformControl: !show,
+				} as Partial<TransformativeState>,
+			});
 		},
-		[id, canvasStateRef],
+		[id, updateDiagram],
 	);
 
 	useEffect(() => {
@@ -91,7 +89,6 @@ export const useTransformControl = (
 	}, [id, onTransformControlClick, eventBus]);
 
 	return {
-		showTransformControl,
 		setShowTransformControl,
 	};
 };
