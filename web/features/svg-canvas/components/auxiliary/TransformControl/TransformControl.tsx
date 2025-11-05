@@ -36,6 +36,7 @@ import { RotatePoint } from "../../core/RotatePoint";
 type Props = TransformativeState & {
 	id: string;
 	type: DiagramType;
+	zoom?: number;
 	onTransform?: (e: DiagramTransformEvent) => void;
 };
 
@@ -57,6 +58,7 @@ const TransformControlComponent: React.FC<Props> = ({
 	keepProportion,
 	rotateEnabled,
 	inversionEnabled,
+	zoom = 1,
 	onTransform,
 }) => {
 	const eventBus = useEventBus();
@@ -1022,6 +1024,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						endX={vertices.topRightPoint.x}
 						endY={vertices.topRightPoint.y}
 						cursor={cursors.topCenter}
+						zoom={zoom}
 						onDrag={handleDragTopCenter}
 						onClick={handleClick}
 						dragPositioningFunction={linearDragFunctionTopCenter}
@@ -1036,6 +1039,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						endX={vertices.bottomLeftPoint.x}
 						endY={vertices.bottomLeftPoint.y}
 						cursor={cursors.leftCenter}
+						zoom={zoom}
 						onDrag={handleDragLeftCenter}
 						onClick={handleClick}
 						dragPositioningFunction={linearDragFunctionLeftCenter}
@@ -1050,6 +1054,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						endX={vertices.bottomRightPoint.x}
 						endY={vertices.bottomRightPoint.y}
 						cursor={cursors.rightCenter}
+						zoom={zoom}
 						onDrag={handleDragRightCenter}
 						onClick={handleClick}
 						dragPositioningFunction={linearDragFunctionRightCenter}
@@ -1064,6 +1069,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						endX={vertices.bottomRightPoint.x}
 						endY={vertices.bottomRightPoint.y}
 						cursor={cursors.bottomCenter}
+						zoom={zoom}
 						onDrag={handleDragBottomCenter}
 						onClick={handleClick}
 						dragPositioningFunction={linearDragFunctionBottomCenter}
@@ -1074,6 +1080,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						x={vertices.topLeftPoint.x}
 						y={vertices.topLeftPoint.y}
 						cursor={cursors.leftTop}
+						zoom={zoom}
 						onDrag={handleDragLeftTop}
 						dragPositioningFunction={
 							doKeepProportion ? linearDragFunctionLeftTop : undefined
@@ -1085,6 +1092,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						x={vertices.bottomLeftPoint.x}
 						y={vertices.bottomLeftPoint.y}
 						cursor={cursors.leftBottom}
+						zoom={zoom}
 						onDrag={handleDragLeftBottom}
 						dragPositioningFunction={
 							doKeepProportion ? linearDragFunctionLeftBottom : undefined
@@ -1096,6 +1104,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						x={vertices.topRightPoint.x}
 						y={vertices.topRightPoint.y}
 						cursor={cursors.rightTop}
+						zoom={zoom}
 						onDrag={handleDragRightTop}
 						dragPositioningFunction={
 							doKeepProportion ? linearDragFunctionRightTop : undefined
@@ -1107,6 +1116,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						x={vertices.bottomRightPoint.x}
 						y={vertices.bottomRightPoint.y}
 						cursor={cursors.rightBottom}
+						zoom={zoom}
 						onDrag={handleDragRightBottom}
 						dragPositioningFunction={
 							doKeepProportion ? linearDragFunctionRightBottom : undefined
@@ -1118,6 +1128,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						x={vertices.topCenterPoint.x}
 						y={vertices.topCenterPoint.y}
 						cursor={cursors.topCenter}
+						zoom={zoom}
 						onDrag={handleDragTopCenter}
 						dragPositioningFunction={linearDragFunctionTopCenter}
 					/>
@@ -1127,6 +1138,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						x={vertices.leftCenterPoint.x}
 						y={vertices.leftCenterPoint.y}
 						cursor={cursors.leftCenter}
+						zoom={zoom}
 						onDrag={handleDragLeftCenter}
 						dragPositioningFunction={linearDragFunctionLeftCenter}
 					/>
@@ -1136,6 +1148,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						x={vertices.rightCenterPoint.x}
 						y={vertices.rightCenterPoint.y}
 						cursor={cursors.rightCenter}
+						zoom={zoom}
 						onDrag={handleDragRightCenter}
 						dragPositioningFunction={linearDragFunctionRightCenter}
 					/>
@@ -1145,6 +1158,7 @@ const TransformControlComponent: React.FC<Props> = ({
 						x={vertices.bottomCenterPoint.x}
 						y={vertices.bottomCenterPoint.y}
 						cursor={cursors.bottomCenter}
+						zoom={zoom}
 						onDrag={handleDragBottomCenter}
 						dragPositioningFunction={linearDragFunctionBottomCenter}
 					/>
@@ -1157,6 +1171,7 @@ const TransformControlComponent: React.FC<Props> = ({
 					x={rotationPoint.x}
 					y={rotationPoint.y}
 					rotation={rotation}
+					zoom={zoom}
 					onDrag={handleDragRotationPoint}
 					dragPositioningFunction={dragFunctionRotationPoint}
 				/>

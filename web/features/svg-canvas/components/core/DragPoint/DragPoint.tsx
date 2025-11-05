@@ -30,6 +30,7 @@ export type DragPointProps = {
 	outline?: string;
 	isTransparent?: boolean;
 	hidden?: boolean;
+	zoom?: number;
 	onDrag?: (e: DiagramDragEvent) => void;
 	onDragOver?: (e: DiagramDragDropEvent) => void;
 	onDragLeave?: (e: DiagramDragDropEvent) => void;
@@ -53,6 +54,7 @@ const DragPointComponent: React.FC<DragPointProps> = ({
 	outline = DRAG_POINT_OUTLINE,
 	isTransparent = false,
 	hidden = false,
+	zoom = 1,
 	onDrag,
 	onDragOver,
 	onDragLeave,
@@ -61,6 +63,9 @@ const DragPointComponent: React.FC<DragPointProps> = ({
 	dragPositioningFunction,
 }) => {
 	const svgRef = useRef<SVGCircleElement>({} as SVGCircleElement);
+
+	// Adjust radius based on zoom level to maintain consistent visual size
+	const adjustedRadius = radius / zoom;
 
 	const dragProps = useDrag({
 		id,
@@ -88,7 +93,7 @@ const DragPointComponent: React.FC<DragPointProps> = ({
 			id={id}
 			cx={x}
 			cy={y}
-			r={radius}
+			r={adjustedRadius}
 			stroke={stroke}
 			fill={fill}
 			cursor={cursor}

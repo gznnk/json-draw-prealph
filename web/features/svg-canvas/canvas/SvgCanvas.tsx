@@ -529,6 +529,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					{...multiSelectGroup}
 					id={MULTI_SELECT_GROUP}
 					type="Group"
+					zoom={zoom}
 					onTransform={onTransform}
 				/>
 			);
@@ -546,6 +547,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 						<TransformControl
 							key={`transform-control-${selectedItem.id}`}
 							{...selectedItem}
+							zoom={zoom}
 							onTransform={onTransform}
 						/>
 					);

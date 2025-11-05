@@ -16,6 +16,7 @@ type DragLineProps = Omit<DragProps, "ref"> & {
 	endX: number;
 	endY: number;
 	cursor: string;
+	zoom?: number;
 	onClick?: (e: DiagramClickEvent) => void;
 };
 
@@ -31,12 +32,16 @@ const DragLineComponent: React.FC<DragLineProps> = ({
 	endX,
 	endY,
 	cursor,
+	zoom = 1,
 	onPointerDown,
 	onClick,
 	onDrag,
 	dragPositioningFunction,
 }) => {
 	const svgRef = useRef<SVGLineElement>({} as SVGLineElement);
+
+	// Adjust stroke width based on zoom level to maintain consistent visual size
+	const adjustedStrokeWidth = 5 / zoom;
 
 	const dragProps = useDrag({
 		id,
@@ -66,7 +71,7 @@ const DragLineComponent: React.FC<DragLineProps> = ({
 			x2={endX}
 			y2={endY}
 			stroke="transparent"
-			strokeWidth={5}
+			strokeWidth={adjustedStrokeWidth}
 			cursor={cursor}
 			ref={svgRef}
 			{...composedProps}

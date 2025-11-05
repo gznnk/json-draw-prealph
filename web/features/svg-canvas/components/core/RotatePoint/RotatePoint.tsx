@@ -13,6 +13,7 @@ type RotatePointProps = Omit<DragProps, "ref"> & {
 	rotation?: number;
 	color?: string;
 	hidden?: boolean;
+	zoom?: number;
 };
 
 /**
@@ -28,9 +29,16 @@ const RotatePointComponent: React.FC<RotatePointProps> = ({
 	rotation = 0,
 	color = "rgba(107, 114, 128, 0.8)",
 	hidden = false,
+	zoom = 1,
 }) => {
 	const [isDragging, setIsDragging] = useState(false);
 	const svgRef = useRef<SVGCircleElement>({} as SVGCircleElement);
+
+	// Adjust size based on zoom level to maintain consistent visual size
+	const scale = 1 / zoom;
+	const adjustedRadius = 7 / zoom;
+	const adjustedTextOffset = 16 / zoom;
+	const adjustedFontSize = 12 / zoom;
 
 	// Create references bypass to avoid function creation in every render.
 	const refBusVal = {
@@ -67,7 +75,7 @@ const RotatePointComponent: React.FC<RotatePointProps> = ({
 
 	return (
 		<>
-			<g transform={`translate(${x} ${y}) rotate(${rotation})`}>
+			<g transform={`translate(${x} ${y}) rotate(${rotation}) scale(${scale})`}>
 				<g transform="translate(-12 -12)">
 					<RotateRight fill={color} />
 				</g>
@@ -76,7 +84,7 @@ const RotatePointComponent: React.FC<RotatePointProps> = ({
 				id={id}
 				cx={x}
 				cy={y}
-				r={7}
+				r={adjustedRadius}
 				fill="transparent"
 				cursor="move"
 				tabIndex={0}
@@ -85,10 +93,10 @@ const RotatePointComponent: React.FC<RotatePointProps> = ({
 			/>
 			{isDragging && (
 				<text
-					x={x + 16}
-					y={y + 4}
+					x={x + adjustedTextOffset}
+					y={y + 4 / zoom}
 					fill="rgba(107, 114, 128, 1)"
-					fontSize="12px"
+					fontSize={`${adjustedFontSize}px`}
 				>{`${rotation}˚`}</text>
 			)}
 		</>
