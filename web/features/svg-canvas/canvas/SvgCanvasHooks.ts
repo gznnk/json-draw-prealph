@@ -19,6 +19,7 @@ import { useOnDragOver } from "./hooks/diagram/useOnDragOver";
 import { useOnExecute } from "./hooks/diagram/useOnExecute";
 import { useOnExtractDiagramsToTopLevel } from "./hooks/diagram/useOnExtractDiagramsToTopLevel";
 import { useOnGroup } from "./hooks/diagram/useOnGroup";
+import { useOnHideTransformControl } from "./hooks/diagram/useOnHideTransformControl";
 import { useOnHoverChange } from "./hooks/diagram/useOnHoverChange";
 import { useOnKeepProportionChange } from "./hooks/diagram/useOnKeepProportionChange";
 import { useOnSelect } from "./hooks/diagram/useOnSelect";
@@ -137,6 +138,9 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// Hook for the keep proportion change event.
 	useOnKeepProportionChange(canvasHooksProps);
+
+	// Hook for the hide transform control event.
+	useOnHideTransformControl(canvasHooksProps);
 
 	// Hook for the group event.
 	useOnGroup(canvasHooksProps);

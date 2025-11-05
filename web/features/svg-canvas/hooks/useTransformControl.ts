@@ -1,12 +1,12 @@
 import type React from "react";
 import { useCallback, useEffect } from "react";
 
-import { useDiagramUpdate } from "./useDiagramUpdate";
-import { EVENT_NAME_TRANSFORM_CONTROL_CLICK } from "../constants/core/EventNames";
+import {
+	EVENT_NAME_HIDE_TRANSFORM_CONTROL,
+	EVENT_NAME_TRANSFORM_CONTROL_CLICK,
+} from "../constants/core/EventNames";
 import { useEventBus } from "../context/EventBusContext";
 import type { TransformControlClickEvent } from "../types/events/TransformControlClickEvent";
-import type { TransformativeState } from "../types/state/core/TransformativeState";
-import { newEventId } from "../utils/core/newEventId";
 
 /**
  * Props for the useTransformControl hook
@@ -30,8 +30,8 @@ export type UseTransformControlReturn = {
  * - Control whether their Transformative component should be displayed via hideTransformControl property
  * - Respond to clicks on transform controls without tight coupling
  *
- * Uses useDiagramUpdate to update the diagram's hideTransformControl property,
- * which triggers re-render and proper visibility control.
+ * Uses HideTransformControlEvent to update the diagram's hideTransformControl property.
+ * This is a UI-only state change that does NOT save to history.
  *
  * @param props Hook props
  * @param props.id - ID of the diagram
@@ -44,20 +44,21 @@ export const useTransformControl = (
 ): UseTransformControlReturn => {
 	const { id, onTransformControlClick } = props;
 	const eventBus = useEventBus();
-	const updateDiagram = useDiagramUpdate();
 
-	// Update diagram's hideTransformControl property using useDiagramUpdate
+	// Dispatch HideTransformControlEvent to update diagram's hideTransformControl property
+	// This is a UI-only state change that does NOT save to history
 	const setShowTransformControl = useCallback(
 		(show: boolean) => {
-			updateDiagram({
-				eventId: newEventId(),
-				id,
-				data: {
-					hideTransformControl: !show,
-				} as Partial<TransformativeState>,
-			});
+			eventBus.dispatchEvent(
+				new CustomEvent(EVENT_NAME_HIDE_TRANSFORM_CONTROL, {
+					detail: {
+						id,
+						hide: !show,
+					},
+				}),
+			);
 		},
-		[id, updateDiagram],
+		[id, eventBus],
 	);
 
 	useEffect(() => {
