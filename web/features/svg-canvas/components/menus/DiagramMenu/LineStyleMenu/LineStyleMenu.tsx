@@ -10,10 +10,14 @@ import { useStyleChange } from "../../../../hooks/useStyleChange";
 import type { PathType } from "../../../../types/core/PathType";
 import type { StrokeDashType } from "../../../../types/core/StrokeDashType";
 import type { Diagram } from "../../../../types/state/core/Diagram";
+import { CurvePathIcon } from "../../../icons/CurvePathIcon";
 import { DashedLine } from "../../../icons/DashedLine";
 import { DottedLine } from "../../../icons/DottedLine";
 import { LineStyle as LineStyleIcon } from "../../../icons/LineStyle";
+import { PolylinePathIcon } from "../../../icons/PolylinePathIcon";
+import { RoundedPathIcon } from "../../../icons/RoundedPathIcon";
 import { SolidLine } from "../../../icons/SolidLine";
+import { StraightPathIcon } from "../../../icons/StraightPathIcon";
 import { DiagramMenuPositioner } from "../DiagramMenu/DiagramMenuStyled";
 import { DiagramMenuControl } from "../DiagramMenuControl";
 import { DiagramMenuItemNew } from "../DiagramMenuItem/DiagramMenuItemNew";
@@ -87,65 +91,28 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 								onClick={() => handlePathTypeChange("Straight")}
 								title="Straight path"
 							>
-								<svg width="24" height="24" viewBox="0 0 24 24">
-									<path
-										d="M 6,18 L 18,6"
-										stroke="currentColor"
-										strokeWidth="2"
-										fill="none"
-									/>
-									<circle cx="6" cy="18" r="2" fill="currentColor" />
-									<circle cx="18" cy="6" r="2" fill="currentColor" />
-								</svg>
+								<StraightPathIcon />
 							</LineStyleButton>
 							<LineStyleButton
 								isActive={pathType === "Polyline"}
 								onClick={() => handlePathTypeChange("Polyline")}
 								title="Polyline path"
 							>
-								<svg width="24" height="24" viewBox="0 0 24 24">
-									<path
-										d="M 6,16 L 12,8 L 18,16"
-										stroke="currentColor"
-										strokeWidth="2"
-										fill="none"
-									/>
-									<circle cx="6" cy="16" r="2" fill="currentColor" />
-									<circle cx="12" cy="8" r="2" fill="currentColor" />
-									<circle cx="18" cy="16" r="2" fill="currentColor" />
-								</svg>
+								<PolylinePathIcon />
 							</LineStyleButton>
 							<LineStyleButton
 								isActive={pathType === "Curve"}
 								onClick={() => handlePathTypeChange("Curve")}
 								title="Curve path"
 							>
-								<svg width="24" height="24" viewBox="0 0 24 24">
-									<path
-										d="M 6,16 Q 12,6 18,16"
-										stroke="currentColor"
-										strokeWidth="2"
-										fill="none"
-									/>
-									<circle cx="6" cy="16" r="2" fill="currentColor" />
-									<circle cx="18" cy="16" r="2" fill="currentColor" />
-								</svg>
+								<CurvePathIcon />
 							</LineStyleButton>
 							<LineStyleButton
 								isActive={pathType === "Rounded"}
 								onClick={() => handlePathTypeChange("Rounded")}
 								title="Rounded path"
 							>
-								<svg width="24" height="24" viewBox="0 0 24 24">
-									<path
-										d="M 6,16 L 10,16 Q 12,16 12,14 L 12,10 Q 12,8 14,8 L 18,8"
-										stroke="currentColor"
-										strokeWidth="2"
-										fill="none"
-									/>
-									<circle cx="6" cy="16" r="2" fill="currentColor" />
-									<circle cx="18" cy="8" r="2" fill="currentColor" />
-								</svg>
+								<RoundedPathIcon />
 							</LineStyleButton>
 						</LineStyleSection>
 
