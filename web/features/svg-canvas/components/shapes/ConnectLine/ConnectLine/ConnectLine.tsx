@@ -65,6 +65,7 @@ const ConnectLineComponent: React.FC<ConnectLineProps> = ({
 			strokeDashType={strokeDashType}
 			isSelected={isSelected}
 			showOutline={false}
+			outlineDisabled={true}
 			pathType={pathType}
 			dragType="segment-right-angle"
 			fixBothEnds={true}

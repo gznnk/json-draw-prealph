@@ -7,4 +7,5 @@ export type SelectableState = {
 	isRootSelected?: boolean;
 	isAncestorSelected?: boolean;
 	showOutline: boolean;
+	outlineDisabled?: boolean;
 };

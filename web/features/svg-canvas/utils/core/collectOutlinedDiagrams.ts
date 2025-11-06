@@ -24,9 +24,9 @@ export const collectOutlinedDiagrams = (diagrams: Diagram[]): OutlineData[] => {
 	for (const diagram of diagrams) {
 		// Check if this diagram has showOutline=true and Frame properties
 		if (
-			diagram.type !== "ConnectLine" &&
 			isSelectableState(diagram) &&
 			diagram.showOutline &&
+			!diagram.outlineDisabled &&
 			isFrame(diagram)
 		) {
 			outlines.push({

@@ -580,9 +580,9 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				const diagram = getDiagramByPath(items, paths[0]);
 				if (
 					diagram &&
-					diagram.type !== "ConnectLine" &&
 					isSelectableState(diagram) &&
 					diagram.showOutline &&
+					!diagram.outlineDisabled &&
 					isFrame(diagram)
 				) {
 					outlinesToRender.push({

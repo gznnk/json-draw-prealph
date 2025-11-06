@@ -36,6 +36,7 @@ const ConnectLineMinimapComponent: React.FC<ConnectLineProps> = ({
 			endArrowHead={endArrowHead}
 			isSelected={false}
 			showOutline={false}
+			outlineDisabled={true}
 		/>
 	);
 };
