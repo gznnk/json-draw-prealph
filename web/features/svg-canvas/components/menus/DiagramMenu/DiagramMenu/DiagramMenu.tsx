@@ -311,6 +311,17 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(<DiagramMenuDivider key="ArrowDivider" />);
 	}
 
+	if (menuConfig.lineStyle) {
+		menuItemComponents.push(
+			<LineStyleMenu
+				key="LineStyle"
+				isOpen={isLineStyleMenuOpen}
+				onToggle={() => setIsLineStyleMenuOpen(!isLineStyleMenuOpen)}
+				selectedDiagrams={selectedItems}
+			/>,
+		);
+	}
+
 	// Create a section for fillable and strokable items.
 	const showFillableAndStrokableSection = showSection(
 		"BgColor",
@@ -373,14 +384,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 					/>
 				)}
 			</DiagramMenuPositioner>,
-		);
-		menuItemComponents.push(
-			<LineStyleMenu
-				key="LineStyle"
-				isOpen={isLineStyleMenuOpen}
-				onToggle={() => setIsLineStyleMenuOpen(!isLineStyleMenuOpen)}
-				selectedDiagrams={selectedItems}
-			/>,
 		);
 		menuItemComponents.push(
 			<DiagramMenuDivider key="FillableAndStrokableSectionDivider" />,

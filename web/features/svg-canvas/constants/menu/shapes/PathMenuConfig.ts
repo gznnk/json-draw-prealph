@@ -9,4 +9,5 @@ import { createMenuConfig } from "../core/createMenuConfig";
 export const PathMenuConfig: DiagramMenuConfig = {
 	...createMenuConfig(PathFeatures),
 	arrowHead: true,
+	lineStyle: true,
 };

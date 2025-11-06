@@ -6,7 +6,7 @@ export const StackOrderMenuWrapper = styled.div`
 	display: flex;
 	flex-direction: row;
 	gap: 4px;
-	padding: 8px;
+	padding: 4px;
 	background-color: #fff;
 	border-radius: 4px;
 	box-shadow: ${BOX_SHADOW};
@@ -17,13 +17,12 @@ type StackOrderButtonProps = {
 	isActive: boolean;
 };
 
-export const StackOrderButton = styled.button<StackOrderButtonProps>`
+export const StackOrderButton = styled.div<StackOrderButtonProps>`
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	width: 32px;
 	height: 32px;
-	padding: 4px;
 	border: 1px solid ${(props) => (props.isActive ? "#6b7280" : "transparent")};
 	border-radius: 6px;
 	background-color: ${(props) => (props.isActive ? "#f9fafb" : "transparent")};
