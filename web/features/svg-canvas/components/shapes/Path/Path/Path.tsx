@@ -17,10 +17,8 @@ import { PathElement } from "./PathStyled";
 import { useClick } from "../../../../hooks/useClick";
 import { useDrag } from "../../../../hooks/useDrag";
 import { useSelect } from "../../../../hooks/useSelect";
-import { useTransformControl } from "../../../../hooks/useTransformControl";
 import { calcOrientedFrameFromPoints } from "../../../../utils/math/geometry/calcOrientedFrameFromPoints";
 import { convertStrokeDashTypeToArray } from "../../../../utils/shapes/common/convertStrokeDashTypeToArray";
-import { isPointerOver } from "../../../../utils/shapes/common/isPointerOver";
 import { createDValue } from "../../../../utils/shapes/path/createDValue";
 import { createPathDValue } from "../../../../utils/shapes/path/createPathDValue";
 import { isItemableData } from "../../../../utils/validation/isItemableData";
@@ -46,7 +44,6 @@ const PathComponent: React.FC<PathProps> = ({
 	items = [],
 	pathType,
 	dragEnabled = true,
-	transformEnabled = true,
 	verticesModeEnabled = true,
 	rightAngleSegmentDrag = false,
 	fixBothEnds = false,
@@ -80,7 +77,6 @@ const PathComponent: React.FC<PathProps> = ({
 		scaleY,
 		isSelected,
 		dragEnabled,
-		transformEnabled,
 		verticesModeEnabled,
 		items,
 		onDrag,
@@ -114,40 +110,12 @@ const PathComponent: React.FC<PathProps> = ({
 		onClick?.(e);
 	}, []);
 
-	// Transform control click event handler
-	const handleTransformControlClick = useCallback(
-		(e: { clientX: number; clientY: number }) => {
-			const { verticesModeEnabled } = refBus.current;
-
-			// Switch to Vertices mode when transform control is clicked on the path itself
-			if (
-				verticesModeEnabled &&
-				isPointerOver(dragSvgRef, e.clientX, e.clientY)
-			) {
-				setMode("Vertices");
-			}
-		},
-		[],
-	);
-
-	// Listen for transform control click events and manage visibility
-	const { setShowTransformControl } = useTransformControl({
-		id,
-		ref: dragSvgRef,
-		onTransformControlClick: handleTransformControlClick,
-	});
-
 	// Path drag event handler
 	const handlePathDrag = useCallback((e: DiagramDragEvent) => {
-		const { dragEnabled, onDrag, mode } = refBus.current;
+		const { dragEnabled, onDrag } = refBus.current;
 
 		// Disable dragging by suppressing event when drag is disabled
 		if (!dragEnabled) {
-			return;
-		}
-
-		// Disable dragging by suppressing event when not in transform mode
-		if (mode !== "Transform") {
 			return;
 		}
 
@@ -157,23 +125,12 @@ const PathComponent: React.FC<PathProps> = ({
 	// Path selection state control
 	useEffect(() => {
 		if (isSelected) {
-			if (transformEnabled) {
-				setMode("Transform");
-			} else {
-				// If transform is disabled, skip transform mode;
-				setMode("Vertices");
-			}
+			setMode("Vertices");
 		} else {
 			setIsSequentialSelection(false);
 			setMode("Inactive");
 		}
-	}, [isSelected, transformEnabled]);
-
-	// Control transform control visibility based on mode
-	useEffect(() => {
-		// Show transform controls only when NOT in Vertices mode
-		setShowTransformControl(mode !== "Vertices");
-	}, [mode, setShowTransformControl]);
+	}, [isSelected]);
 
 	// Generate drag properties for path element.
 	const dragProps = useDrag({
@@ -246,13 +203,6 @@ const PathComponent: React.FC<PathProps> = ({
 			setDraggingPathPointId(null);
 		}
 	}, []);
-
-	// Segment click event handler
-	const handleSegmentClick = useCallback(() => {
-		if (transformEnabled) {
-			setMode("Transform");
-		}
-	}, [transformEnabled]);
 
 	/**
 	 * Change event handler for line segments and new vertices
@@ -365,7 +315,6 @@ const PathComponent: React.FC<PathProps> = ({
 					rightAngleSegmentDrag={rightAngleSegmentDrag}
 					fixBothEnds={fixBothEnds}
 					items={items}
-					onClick={handleSegmentClick}
 					onDiagramChange={handleDiagramChangeForVertexAndSegmentDrag}
 				/>
 			)}

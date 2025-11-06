@@ -36,10 +36,6 @@ const ConnectLineMinimapComponent: React.FC<ConnectLineProps> = ({
 			endArrowHead={endArrowHead}
 			isSelected={false}
 			showOutline={false}
-			keepProportion={false}
-			rotateEnabled={false}
-			inversionEnabled={false}
-			isTransforming={false}
 		/>
 	);
 };
