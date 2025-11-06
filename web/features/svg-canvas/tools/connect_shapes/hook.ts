@@ -200,5 +200,5 @@ const isValidLineStyle = (value: string): value is StrokeDashType => {
  * Validates if a value is a valid PathType
  */
 const isValidPathType = (value: string): value is PathType => {
-	return ["Linear", "Bezier", "Rounded"].includes(value);
+	return ["Straight", "Polyline", "Curve", "Rounded"].includes(value);
 };

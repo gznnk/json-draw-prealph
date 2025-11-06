@@ -17,7 +17,7 @@ Available options (all optional parameters, provide empty string to use defaults
 - startArrowHead: Arrow style at connection start (FilledTriangle, ConcaveTriangle, OpenArrow, HollowTriangle, FilledDiamond, HollowDiamond, Circle, None)
 - endArrowHead: Arrow style at connection end (FilledTriangle, ConcaveTriangle, OpenArrow, HollowTriangle, FilledDiamond, HollowDiamond, Circle, None)
 - lineStyle: Line pattern (solid, dashed, dotted)
-- pathType: Path rendering (Linear, Bezier, Rounded)
+- pathType: Path rendering (Straight, Polyline, Curve, Rounded)
 - sourceAnchor: Connection point name on source shape (topLeftPoint, topCenterPoint, topRightPoint, leftCenterPoint, rightCenterPoint, bottomLeftPoint, bottomCenterPoint, bottomRightPoint)
 - targetAnchor: Connection point name on target shape (topLeftPoint, topCenterPoint, topRightPoint, leftCenterPoint, rightCenterPoint, bottomLeftPoint, bottomCenterPoint, bottomRightPoint)
 `;
@@ -87,8 +87,8 @@ export const connectShapesToolDefinition: ToolDefinition = {
 			name: "pathType",
 			type: "string",
 			description:
-				"Path rendering type. Provide empty string to use default (Linear). Options: Linear (straight lines), Bezier (curved), Rounded (straight lines with rounded corners), or empty string for default.",
-			enum: ["", "Linear", "Bezier", "Rounded"],
+				"Path rendering type. Provide empty string to use default (Polyline). Options: Straight (single straight line), Polyline (zigzag lines), Curve (curved), Rounded (straight lines with rounded corners), or empty string for default.",
+			enum: ["", "Straight", "Polyline", "Curve", "Rounded"],
 		},
 		{
 			name: "sourceAnchor",

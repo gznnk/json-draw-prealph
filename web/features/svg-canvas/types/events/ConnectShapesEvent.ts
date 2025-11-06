@@ -28,7 +28,7 @@ export type ConnectShapesEvent = {
 	endArrowHead?: ArrowHeadType;
 	/** Line style for the connection (optional, defaults to "solid") */
 	lineStyle?: StrokeDashType;
-	/** Path rendering type (optional, defaults to "Linear") */
+	/** Path rendering type (optional, defaults to "Polyline") */
 	pathType?: PathType;
 	/** Anchor position on the source shape (optional, auto-determined if not specified) */
 	sourceAnchor?: AnchorPosition;

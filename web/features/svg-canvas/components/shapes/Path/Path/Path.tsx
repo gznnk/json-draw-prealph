@@ -207,6 +207,7 @@ const PathComponent: React.FC<PathProps> = ({
 		hidden:
 			!isSelected ||
 			(fixBothEnds && isBothEnds(idx)) ||
+			(pathType === "Straight" && !isBothEnds(idx)) ||
 			Boolean(draggingPathPointId && item.id !== draggingPathPointId),
 	}));
 
@@ -214,17 +215,19 @@ const PathComponent: React.FC<PathProps> = ({
 	const showSegmentList =
 		isSelected &&
 		!draggingPathPointId &&
+		pathType !== "Straight" &&
 		(dragType === "segment" || dragType === "segment-right-angle");
 
 	// Display flag for new vertices
-	const showNewVertex = isSelected && !draggingPathPointId;
+	const showNewVertex =
+		isSelected && !draggingPathPointId && pathType !== "Straight";
 
 	// Display flag for path points
 	const showPathPoints = isSelected;
 
-	// Display flag for dashed guide lines (Bézier mode + selected)
+	// Display flag for dashed guide lines (Curve mode + selected)
 	const showDashedGuideLines =
-		pathType === "Bezier" && isSelected && !draggingPathPointId;
+		pathType === "Curve" && isSelected && !draggingPathPointId;
 
 	// Flag to show the position label.
 	const showPositionLabel = isSelected && isDragging;

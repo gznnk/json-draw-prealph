@@ -10,7 +10,7 @@ export const PathDefaultData = CreateDefaultData<PathData>({
 	type: "Path",
 	options: PathFeatures,
 	properties: {
-		pathType: "Linear",
+		pathType: "Polyline",
 		startArrowHead: "None",
 		endArrowHead: "None",
 	},

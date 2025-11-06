@@ -214,8 +214,8 @@ export const AI_AGENT_TOOLS = [
 				pathType: {
 					type: "string",
 					description:
-						"Path rendering type (Linear, Bezier, Rounded, or empty string for default Linear).",
-					enum: ["", "Linear", "Bezier", "Rounded"],
+						"Path rendering type (Straight, Polyline, Curve, Rounded, or empty string for default Polyline).",
+					enum: ["", "Straight", "Polyline", "Curve", "Rounded"],
 				},
 				sourceAnchor: {
 					type: "string",
