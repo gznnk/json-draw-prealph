@@ -26,7 +26,7 @@ const BringForwardComponent: React.FC<IconProps> = ({
 			xmlns="http://www.w3.org/2000/svg"
 		>
 			<title>{title}</title>
-			<polygon points="4,18.5 12,6 20,18.5" fill={fill} />
+			<polygon points="4,17.5 12,6 20,17.5" fill={fill} />
 		</svg>
 	);
 };
