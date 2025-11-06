@@ -10,4 +10,6 @@ export type TransformativeState = TransformativeData & {
 	minHeight?: number;
 	/** When true, hides the transform controls for this diagram */
 	hideTransformControl?: boolean;
+	/** When false, disables transform controls for this diagram */
+	transformEnabled?: boolean;
 };

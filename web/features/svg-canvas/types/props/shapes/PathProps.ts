@@ -10,7 +10,6 @@ export type PathProps = CreateDiagramProps<
 	typeof PathFeatures,
 	{
 		dragEnabled?: boolean;
-		transformEnabled?: boolean;
 		verticesModeEnabled?: boolean;
 		rightAngleSegmentDrag?: boolean;
 		fixBothEnds?: boolean;

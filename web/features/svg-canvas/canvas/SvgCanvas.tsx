@@ -528,7 +528,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		// - Otherwise, render for the single selected item that is transformable
 		let renderedTransformative: JSX.Element | null = null;
 		if (interactionState !== InteractionState.Dragging) {
-			// Multi-select case: render Transformative for the group
+			// Multi-select case: render Transformative for the group (always enabled)
 			if (multiSelectGroup && isTransformativeState(multiSelectGroup)) {
 				renderedTransformative = (
 					<TransformControl
@@ -548,7 +548,8 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 					if (
 						selectedItem &&
 						isTransformativeState(selectedItem) &&
-						!selectedItem.hideTransformControl
+						!selectedItem.hideTransformControl &&
+						selectedItem.transformEnabled !== false
 					) {
 						renderedTransformative = (
 							<TransformControl
@@ -579,6 +580,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 				const diagram = getDiagramByPath(items, paths[0]);
 				if (
 					diagram &&
+					diagram.type !== "ConnectLine" &&
 					isSelectableState(diagram) &&
 					diagram.showOutline &&
 					isFrame(diagram)
