@@ -6,7 +6,7 @@ import {
 	LineStyleSection,
 	LineStyleButton,
 } from "./LineStyleMenuStyled";
-import { useStyleChange } from "../../../../hooks/useStyleChange";
+import { useDiagramUpdateRecursively } from "../../../../hooks/useDiagramUpdateRecursively";
 import type { PathType } from "../../../../types/core/PathType";
 import type { StrokeDashType } from "../../../../types/core/StrokeDashType";
 import type { Diagram } from "../../../../types/state/core/Diagram";
@@ -34,7 +34,7 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 	onToggle,
 	selectedDiagrams,
 }) => {
-	const applyStyleChange = useStyleChange();
+	const applyDiagramUpdate = useDiagramUpdateRecursively();
 
 	// Get the first diagram
 	const firstDiagram = selectedDiagrams[0];
@@ -50,23 +50,23 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 	)?.strokeDashType;
 
 	const handleStrokeWidthChange = (width: number) => {
-		applyStyleChange({
+		applyDiagramUpdate({
 			items: selectedDiagrams,
-			styleData: { strokeWidth: width },
+			data: { strokeWidth: width },
 		});
 	};
 
 	const handlePathTypeChange = (type: PathType) => {
-		applyStyleChange({
+		applyDiagramUpdate({
 			items: selectedDiagrams,
-			styleData: { pathType: type },
+			data: { pathType: type },
 		});
 	};
 
 	const handleStrokeDashChange = (dashType: StrokeDashType) => {
-		applyStyleChange({
+		applyDiagramUpdate({
 			items: selectedDiagrams,
-			styleData: { strokeDashType: dashType },
+			data: { strokeDashType: dashType },
 		});
 	};
 

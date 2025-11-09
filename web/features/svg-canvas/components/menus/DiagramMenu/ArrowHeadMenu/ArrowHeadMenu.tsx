@@ -3,7 +3,7 @@ import { memo, useState } from "react";
 
 import { ArrowHeadIconPreview } from "./ArrowHeadIconPreview";
 import { ArrowHeadSelector } from "./ArrowHeadSelector";
-import { useStyleChange } from "../../../../hooks/useStyleChange";
+import { useDiagramUpdateRecursively } from "../../../../hooks/useDiagramUpdateRecursively";
 import type { ArrowHeadType } from "../../../../types/core/ArrowHeadType";
 import type { Diagram } from "../../../../types/state/core/Diagram";
 import { ArrowSwap } from "../../../icons/ArrowSwap";
@@ -18,7 +18,7 @@ type ArrowHeadMenuProps = {
 const ArrowHeadMenuComponent: React.FC<ArrowHeadMenuProps> = ({
 	selectedDiagrams,
 }) => {
-	const applyStyleChange = useStyleChange();
+	const applyDiagramUpdate = useDiagramUpdateRecursively();
 
 	const [startArrowHeadSelectorOpen, setStartArrowHeadSelectorOpen] =
 		useState(false);
@@ -35,25 +35,25 @@ const ArrowHeadMenuComponent: React.FC<ArrowHeadMenuProps> = ({
 	)?.endArrowHead;
 
 	const handleStartArrowChange = (arrowType: ArrowHeadType) => {
-		applyStyleChange({
+		applyDiagramUpdate({
 			items: selectedDiagrams,
-			styleData: { startArrowHead: arrowType },
+			data: { startArrowHead: arrowType },
 		});
 		setStartArrowHeadSelectorOpen(false);
 	};
 
 	const handleEndArrowChange = (arrowType: ArrowHeadType) => {
-		applyStyleChange({
+		applyDiagramUpdate({
 			items: selectedDiagrams,
-			styleData: { endArrowHead: arrowType },
+			data: { endArrowHead: arrowType },
 		});
 		setEndArrowHeadSelectorOpen(false);
 	};
 
 	const handleSwapArrows = () => {
-		applyStyleChange({
+		applyDiagramUpdate({
 			items: selectedDiagrams,
-			styleData: {
+			data: {
 				startArrowHead: endArrowHead || "None",
 				endArrowHead: startArrowHead || "None",
 			},

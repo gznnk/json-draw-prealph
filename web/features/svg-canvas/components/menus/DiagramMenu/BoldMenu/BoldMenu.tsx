@@ -1,7 +1,7 @@
 import type React from "react";
 import { memo } from "react";
 
-import { useStyleChange } from "../../../../hooks/useStyleChange";
+import { useDiagramUpdateRecursively } from "../../../../hooks/useDiagramUpdateRecursively";
 import type { Diagram } from "../../../../types/state/core/Diagram";
 import { isTextableState } from "../../../../utils/validation/isTextableState";
 import { Bold as BoldIcon } from "../../../icons/Bold";
@@ -12,7 +12,7 @@ type BoldMenuProps = {
 };
 
 const BoldMenuComponent: React.FC<BoldMenuProps> = ({ selectedDiagrams }) => {
-	const applyStyleChange = useStyleChange();
+	const applyDiagramUpdate = useDiagramUpdateRecursively();
 
 	// Get the first diagram and check if it's textable
 	const firstDiagram = selectedDiagrams[0];
@@ -24,9 +24,9 @@ const BoldMenuComponent: React.FC<BoldMenuProps> = ({ selectedDiagrams }) => {
 	const isActive = Boolean(textableDiagram?.fontWeight === "bold");
 
 	const handleClick = () => {
-		applyStyleChange({
+		applyDiagramUpdate({
 			items: selectedDiagrams,
-			styleData: {
+			data: {
 				fontWeight: isActive ? "normal" : "bold",
 			},
 		});

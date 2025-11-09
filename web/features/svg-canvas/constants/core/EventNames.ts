@@ -15,9 +15,6 @@ export const APPEND_DIAGRAMS_EVENT_NAME = "AppendDiagrams" as const;
 export const EXTRACT_DIAGRAMS_TO_TOP_LEVEL_EVENT_NAME =
 	"ExtractDiagramsToTopLevel" as const;
 
-// Style events
-export const STYLE_CHANGE_EVENT_NAME = "StyleChange" as const;
-
 // Diagram update events
 export const DIAGRAM_UPDATE_EVENT_NAME = "DiagramUpdate" as const;
 export const DIAGRAM_CHANGE_EVENT_NAME = "DiagramChange" as const;

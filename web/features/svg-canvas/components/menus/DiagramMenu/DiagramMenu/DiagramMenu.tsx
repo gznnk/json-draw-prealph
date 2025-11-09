@@ -27,7 +27,7 @@ import {
 	getCommonMenuConfig,
 } from "./DiagramMenuUtils";
 import { useDiagramMenuState } from "./hooks/useDiagramMenuState";
-import { useStyleChange } from "../../../../hooks/useStyleChange";
+import { useDiagramUpdateRecursively } from "../../../../hooks/useDiagramUpdateRecursively";
 import { DiagramRegistry } from "../../../../registry";
 import type { PathType } from "../../../../types/core/PathType";
 import type { CornerRoundableData } from "../../../../types/data/core/CornerRoundableData";
@@ -89,8 +89,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const [isAlignmentMenuOpen, setIsAlignmentMenuOpen] = useState(false);
 	const [isStackOrderMenuOpen, setIsStackOrderMenuOpen] = useState(false);
 
-	// Use style change hook for applying style changes
-	const applyStyleChange = useStyleChange();
+	// Use diagram update recursively hook for applying style changes
+	const applyDiagramUpdate = useDiagramUpdateRecursively();
 
 	// Utility functions for changing items
 	const changeItems = useCallback(
@@ -182,43 +182,43 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 
 	const onBgColorChange = useCallback(
 		(bgColor: string) => {
-			applyStyleChange({ items: selectedItems, styleData: { fill: bgColor } });
+			applyDiagramUpdate({ items: selectedItems, data: { fill: bgColor } });
 		},
-		[selectedItems, applyStyleChange],
+		[selectedItems, applyDiagramUpdate],
 	);
 
 	const onBorderColorChange = useCallback(
 		(borderColor: string) => {
-			applyStyleChange({
+			applyDiagramUpdate({
 				items: selectedItems,
-				styleData: { stroke: borderColor },
+				data: { stroke: borderColor },
 			});
 		},
-		[selectedItems, applyStyleChange],
+		[selectedItems, applyDiagramUpdate],
 	);
 
 	const onBorderRadiusChange = useCallback(
 		(borderRadius: number) => {
-			applyStyleChange({
+			applyDiagramUpdate({
 				items: selectedItems,
-				styleData: { cornerRadius: borderRadius },
+				data: { cornerRadius: borderRadius },
 			});
 		},
-		[selectedItems, applyStyleChange],
+		[selectedItems, applyDiagramUpdate],
 	);
 
 	const onFontSizeChange = useCallback(
 		(fontSize: number) => {
-			applyStyleChange({ items: selectedItems, styleData: { fontSize } });
+			applyDiagramUpdate({ items: selectedItems, data: { fontSize } });
 		},
-		[selectedItems, applyStyleChange],
+		[selectedItems, applyDiagramUpdate],
 	);
 
 	const onFontColorChange = useCallback(
 		(fontColor: string) => {
-			applyStyleChange({ items: selectedItems, styleData: { fontColor } });
+			applyDiagramUpdate({ items: selectedItems, data: { fontColor } });
 		},
-		[selectedItems, applyStyleChange],
+		[selectedItems, applyDiagramUpdate],
 	);
 
 	// If the diagram menu is not shown, close controls.

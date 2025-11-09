@@ -4,7 +4,7 @@ import { memo } from "react";
 import { DiagramMenuPositioner } from "../DiagramMenu/DiagramMenuStyled";
 import { DiagramMenuControl } from "../DiagramMenuControl";
 import { AlignmentMenuWrapper, AlignmentButton } from "./AlignmentMenuStyled";
-import { useStyleChange } from "../../../../hooks/useStyleChange";
+import { useDiagramUpdateRecursively } from "../../../../hooks/useDiagramUpdateRecursively";
 import type { Diagram } from "../../../../types/state/core/Diagram";
 import { isTextableState } from "../../../../utils/validation/isTextableState";
 import { AlignCenter } from "../../../icons/AlignCenter";
@@ -26,7 +26,7 @@ const AlignmentMenuComponent: React.FC<AlignmentMenuProps> = ({
 	onToggle,
 	selectedDiagrams,
 }) => {
-	const applyStyleChange = useStyleChange();
+	const applyDiagramUpdate = useDiagramUpdateRecursively();
 
 	// Get the first diagram and check if it's textable
 	const firstDiagram = selectedDiagrams[0];
@@ -34,16 +34,16 @@ const AlignmentMenuComponent: React.FC<AlignmentMenuProps> = ({
 		firstDiagram && isTextableState(firstDiagram) ? firstDiagram : null;
 
 	const handleTextAlignChange = (align: "left" | "center" | "right") => {
-		applyStyleChange({
+		applyDiagramUpdate({
 			items: selectedDiagrams,
-			styleData: { textAlign: align },
+			data: { textAlign: align },
 		});
 	};
 
 	const handleVerticalAlignChange = (align: "top" | "center" | "bottom") => {
-		applyStyleChange({
+		applyDiagramUpdate({
 			items: selectedDiagrams,
-			styleData: { verticalAlign: align },
+			data: { verticalAlign: align },
 		});
 	};
 

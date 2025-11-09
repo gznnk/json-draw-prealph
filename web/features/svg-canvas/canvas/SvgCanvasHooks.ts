@@ -23,7 +23,6 @@ import { useOnHoverChange } from "./hooks/diagram/useOnHoverChange";
 import { useOnKeepProportionChange } from "./hooks/diagram/useOnKeepProportionChange";
 import { useOnSelect } from "./hooks/diagram/useOnSelect";
 import { useOnStackOrderChange } from "./hooks/diagram/useOnStackOrderChange";
-import { useOnStyleChange } from "./hooks/diagram/useOnStyleChange";
 import { useOnTextChange } from "./hooks/diagram/useOnTextChange";
 import { useOnTransform } from "./hooks/diagram/useOnTransform";
 import { useOnUngroup } from "./hooks/diagram/useOnUngroup";
@@ -125,9 +124,6 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 
 	// Hook for appending diagrams via D&D.
 	useOnAppendDiagrams(canvasHooksProps);
-
-	// Hook for the diagram style change event.
-	useOnStyleChange(canvasHooksProps);
 
 	// Hook for the diagram update event.
 	useOnDiagramUpdate(canvasHooksProps);
