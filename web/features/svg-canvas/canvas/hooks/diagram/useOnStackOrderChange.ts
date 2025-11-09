@@ -6,6 +6,7 @@ import type { Diagram } from "../../../types/state/core/Diagram";
 import { isItemableState } from "../../../utils/validation/isItemableState";
 import type { SvgCanvasState } from "../../types/SvgCanvasState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+import { createSelectedDiagramPathIndex } from "../../utils/createSelectedDiagramPathIndex";
 import { useAddHistory } from "../history/useAddHistory";
 
 /**
@@ -99,10 +100,14 @@ export const useOnStackOrderChange = (props: SvgCanvasSubHooksProps) => {
 					items = updateOrderRecursive(items);
 				}
 
+				// Create path index for selected diagrams
+				const selectedDiagramPathIndex = createSelectedDiagramPathIndex(items);
+
 				// Create new state
 				let newState: SvgCanvasState = {
 					...prevState,
 					items,
+					selectedDiagramPathIndex,
 				};
 
 				// Add history
