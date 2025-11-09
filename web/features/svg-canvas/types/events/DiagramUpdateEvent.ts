@@ -15,4 +15,5 @@ export type DiagramUpdateEvent<T = unknown> = {
 	eventId: string;
 	id: string;
 	data: DiagramUpdateData<T>;
+	skipHistory?: boolean;
 };

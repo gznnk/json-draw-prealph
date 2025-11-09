@@ -82,8 +82,10 @@ export const useOnDiagramUpdate = (props: SvgCanvasSubHooksProps) => {
 				// Update the connect lines
 				newState = updateConnectLinesByIds(connectLineIds, newState, prevState);
 
-				// Add history for programmatic updates
-				newState = addHistory(e.eventId, newState);
+				// Add history for programmatic updates unless skipHistory is true
+				if (!e.skipHistory) {
+					newState = addHistory(e.eventId, newState);
+				}
 
 				return newState;
 			});
