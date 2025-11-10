@@ -219,12 +219,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 
 	// Default menu state map.
 	const menuStateMap = {
-		BgColor: "Hidden",
-		BorderColor: "Hidden",
-		LineStyle: "Hidden",
 		FontSize: "Hidden",
 		FontColor: "Hidden",
-		Alignment: "Hidden",
 	} as DiagramMenuStateMap;
 
 	// Find diagram items for styling
@@ -292,6 +288,30 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		);
 	}
 
+	if (menuConfig.backgroundColor) {
+		menuItemComponents.push(
+			<BackgroundColorMenu
+				key="BgColor"
+				isOpen={isBgColorPickerOpen}
+				onToggle={() => setIsBgColorPickerOpen(!isBgColorPickerOpen)}
+				selectedDiagrams={selectedItems}
+				onColorChange={onBgColorChange}
+			/>,
+		);
+	}
+
+	if (menuConfig.borderColor) {
+		menuItemComponents.push(
+			<BorderColorMenu
+				key="BorderColor"
+				isOpen={isBorderColorPickerOpen}
+				onToggle={() => setIsBorderColorPickerOpen(!isBorderColorPickerOpen)}
+				selectedDiagrams={selectedItems}
+				onColorChange={onBorderColorChange}
+			/>,
+		);
+	}
+
 	if (menuConfig.borderStyle) {
 		menuItemComponents.push(
 			<BorderStyleMenu
@@ -304,37 +324,13 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		);
 	}
 
-	// Create a section for fillable and strokable items.
-	const showFillableAndStrokableSection = showSection(
-		"BgColor",
-		"BorderColor",
-		"LineStyle",
-	);
-	if (showFillableAndStrokableSection) {
-		if (menuStateMap.BgColor !== "Hidden") {
-			menuItemComponents.push(
-				<BackgroundColorMenu
-					key="BgColor"
-					isOpen={isBgColorPickerOpen}
-					onToggle={() => setIsBgColorPickerOpen(!isBgColorPickerOpen)}
-					selectedDiagrams={selectedItems}
-					onColorChange={onBgColorChange}
-				/>,
-			);
-		}
-		if (menuStateMap.BorderColor !== "Hidden") {
-			menuItemComponents.push(
-				<BorderColorMenu
-					key="BorderColor"
-					isOpen={isBorderColorPickerOpen}
-					onToggle={() => setIsBorderColorPickerOpen(!isBorderColorPickerOpen)}
-					selectedDiagrams={selectedItems}
-					onColorChange={onBorderColorChange}
-				/>,
-			);
-		}
+	if (
+		menuConfig.backgroundColor ||
+		menuConfig.borderColor ||
+		menuConfig.borderStyle
+	) {
 		menuItemComponents.push(
-			<DiagramMenuDivider key="FillableAndStrokableSectionDivider" />,
+			<DiagramMenuDivider key="ShapeStyleSectionDivider" />,
 		);
 	}
 
