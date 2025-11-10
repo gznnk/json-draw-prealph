@@ -214,7 +214,10 @@ const InputComponent: React.FC<InputProps> = ({
 				fill={fill}
 				stroke={stroke}
 				strokeWidth={strokeWidth}
-				strokeDasharray={convertStrokeDashTypeToArray(strokeDashType)}
+				strokeDasharray={convertStrokeDashTypeToArray(
+					strokeDashType,
+					strokeWidth,
+				)}
 				tabIndex={0}
 				cursor="move"
 				transform={transform}

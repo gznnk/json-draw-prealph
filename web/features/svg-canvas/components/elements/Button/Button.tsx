@@ -137,7 +137,10 @@ const ButtonComponent: React.FC<ButtonProps> = ({
 				fill={fill}
 				stroke={stroke}
 				strokeWidth={strokeWidth}
-				strokeDasharray={convertStrokeDashTypeToArray(strokeDashType)}
+				strokeDasharray={convertStrokeDashTypeToArray(
+					strokeDashType,
+					strokeWidth,
+				)}
 				tabIndex={0}
 				cursor="move"
 				isTransparent={isTransparent}

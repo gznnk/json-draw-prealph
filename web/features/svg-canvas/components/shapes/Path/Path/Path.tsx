@@ -233,7 +233,10 @@ const PathComponent: React.FC<PathProps> = ({
 	const showPositionLabel = isSelected && isDragging;
 
 	// Convert strokeDashType to strokeDasharray value
-	const strokeDasharray = convertStrokeDashTypeToArray(strokeDashType);
+	const strokeDasharray = convertStrokeDashTypeToArray(
+		strokeDashType,
+		strokeWidth,
+	);
 
 	return (
 		<>
