@@ -27,11 +27,15 @@ const StraightPathIconComponent: React.FC<IconProps> = ({
 		>
 			<title>{title}</title>
 			{/* Diagonal line from bottom-left to top-right */}
-			<line x1="4" y1="18" x2="20" y2="6" stroke={fill} strokeWidth="2" />
-			{/* Start point */}
-			<circle cx="4" cy="18" r="3" fill={fill} />
-			{/* End point */}
-			<circle cx="20" cy="6" r="3" fill={fill} />
+			<line
+				x1="4"
+				y1="18"
+				x2="20"
+				y2="6"
+				stroke={fill}
+				strokeWidth="2"
+				strokeLinecap="round"
+			/>
 		</svg>
 	);
 };

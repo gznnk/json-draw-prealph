@@ -3,7 +3,7 @@ import { memo } from "react";
 import type { IconProps } from "../../types/props/icon/IconProps";
 
 /**
- * Curve path icon component - shows a smooth Bezier curve
+ * Curve path icon component - shows a smooth curved line with a single flowing bend
  *
  * @param props - Props for the icon
  * @param props.width - Icon width
@@ -26,12 +26,14 @@ const CurvePathIconComponent: React.FC<IconProps> = ({
 			xmlns="http://www.w3.org/2000/svg"
 		>
 			<title>{title}</title>
-			{/* Smooth Bezier curve */}
-			<path d="M 4,16 Q 12,4 20,16" stroke={fill} strokeWidth="2" fill="none" />
-			{/* Start point */}
-			<circle cx="4" cy="16" r="3" fill={fill} />
-			{/* End point */}
-			<circle cx="20" cy="16" r="3" fill={fill} />
+			{/* Smooth curved path from bottom-left to top-right */}
+			<path
+				d="M4 18 C8 8 12 16 20 6"
+				stroke={fill}
+				strokeWidth="2"
+				fill="none"
+				strokeLinecap="round"
+			/>
 		</svg>
 	);
 };

@@ -26,20 +26,15 @@ const PolylinePathIconComponent: React.FC<IconProps> = ({
 			xmlns="http://www.w3.org/2000/svg"
 		>
 			<title>{title}</title>
-			{/* Zigzag polyline */}
+			{/* Zigzag polyline: bottom-left → bottom-center → top-center → top-right with sharp corners */}
 			<polyline
-				points="4,16 12,6 20,16"
+				points="4,18 12,18 12,6 20,6"
 				stroke={fill}
 				strokeWidth="2"
 				fill="none"
 				strokeLinejoin="miter"
+				strokeLinecap="round"
 			/>
-			{/* Start point */}
-			<circle cx="4" cy="16" r="3" fill={fill} />
-			{/* Middle point */}
-			<circle cx="12" cy="6" r="3" fill={fill} />
-			{/* End point */}
-			<circle cx="20" cy="16" r="3" fill={fill} />
 		</svg>
 	);
 };
