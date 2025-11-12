@@ -40,7 +40,7 @@ const BackgroundColorMenuComponent: React.FC<BackgroundColorMenuProps> = ({
 	return (
 		<DiagramMenuPositioner>
 			<DiagramMenuItemNew isActive={isOpen} onClick={onToggle}>
-				<ColorPreview color={currentColor} />
+				<ColorPreview color={currentColor} title="Background Color" />
 			</DiagramMenuItemNew>
 			{isOpen && (
 				<ColorPicker color={currentColor} onColorChange={handleColorChange} />

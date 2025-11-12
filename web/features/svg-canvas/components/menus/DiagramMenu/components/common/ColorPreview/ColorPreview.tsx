@@ -6,6 +6,7 @@ import { isTransparentColor } from "../../../../../../utils/core/isTransparentCo
 type ColorPreviewProps = {
 	color: string;
 	size?: number;
+	title?: string;
 };
 
 /**
@@ -16,6 +17,7 @@ type ColorPreviewProps = {
 const ColorPreviewComponent: React.FC<ColorPreviewProps> = ({
 	color,
 	size = 24,
+	title,
 }) => {
 	const isTransparent = isTransparentColor(color);
 
@@ -26,7 +28,7 @@ const ColorPreviewComponent: React.FC<ColorPreviewProps> = ({
 			viewBox="0 0 24 24"
 			xmlns="http://www.w3.org/2000/svg"
 		>
-			<title>Color Preview</title>
+			{title && <title>{title}</title>}
 			{isTransparent && (
 				<defs>
 					<pattern

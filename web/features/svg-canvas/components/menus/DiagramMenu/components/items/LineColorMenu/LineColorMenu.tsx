@@ -40,7 +40,7 @@ const LineColorMenuComponent: React.FC<LineColorMenuProps> = ({
 	return (
 		<DiagramMenuPositioner>
 			<DiagramMenuItemNew isActive={isOpen} onClick={onToggle}>
-				<ColorPreview color={currentColor} />
+				<ColorPreview color={currentColor} title="Line Color" />
 			</DiagramMenuItemNew>
 			{isOpen && (
 				<ColorPicker color={currentColor} onColorChange={handleColorChange} />
