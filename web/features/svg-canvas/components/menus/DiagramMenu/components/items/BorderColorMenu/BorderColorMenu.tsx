@@ -3,6 +3,7 @@ import { memo } from "react";
 
 import { useDiagramUpdateRecursively } from "../../../../../../hooks/useDiagramUpdateRecursively";
 import type { Diagram } from "../../../../../../types/state/core/Diagram";
+import { isTransparentColor } from "../../../../../../utils/core/isTransparentColor";
 import { isStrokableState } from "../../../../../../utils/validation/isStrokableState";
 import { DiagramMenuPositioner } from "../../../DiagramMenuStyled";
 import { ColorPicker } from "../../common/ColorPicker";
@@ -36,6 +37,9 @@ const BorderColorMenuComponent: React.FC<BorderColorMenuProps> = ({
 		applyDiagramUpdate({ items: selectedDiagrams, data: { stroke: color } });
 	};
 
+	// Check if the color is transparent
+	const isTransparent = isTransparentColor(currentColor);
+
 	// Create a hollow circle SVG icon with the current color
 	const icon = (
 		<svg
@@ -45,14 +49,39 @@ const BorderColorMenuComponent: React.FC<BorderColorMenuProps> = ({
 			xmlns="http://www.w3.org/2000/svg"
 		>
 			<title>Border Color</title>
-			<circle
-				cx="12"
-				cy="12"
-				r="8"
-				fill="none"
-				stroke={currentColor}
-				strokeWidth="2"
-			/>
+			{isTransparent ? (
+				<>
+					{/* Background checkered pattern using stroke-dasharray */}
+					<circle
+						cx="12"
+						cy="12"
+						r="8"
+						fill="none"
+						stroke="#ccc"
+						strokeWidth="4"
+						strokeDasharray="3 2"
+					/>
+					<circle
+						cx="12"
+						cy="12"
+						r="8"
+						fill="none"
+						stroke="#fff"
+						strokeWidth="4"
+						strokeDasharray="3 2"
+						strokeDashoffset="3"
+					/>
+				</>
+			) : (
+				<circle
+					cx="12"
+					cy="12"
+					r="8"
+					fill="none"
+					stroke={currentColor}
+					strokeWidth="4"
+				/>
+			)}
 		</svg>
 	);
 

@@ -29,11 +29,11 @@ const DashedCircleComponent: React.FC<IconProps> = ({
 			<circle
 				cx="12"
 				cy="12"
-				r="8"
+				r="9"
 				fill="none"
 				stroke={fill}
 				strokeWidth="2"
-				strokeDasharray="4,2"
+				strokeDasharray="4,3"
 			/>
 		</svg>
 	);
