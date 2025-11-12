@@ -1,8 +1,6 @@
 import type React from "react";
-import { memo, useRef, useEffect, useState, useCallback } from "react";
+import { memo, useRef, useEffect, useState } from "react";
 
-import { DiagramMenuItem } from "./components/common/DiagramMenuItem";
-import { NumberStepper } from "./components/common/NumberStepper";
 import { AlignmentMenu } from "./components/items/AlignmentMenu";
 import { ArrowHeadMenu } from "./components/items/ArrowHeadMenu";
 import { BackgroundColorMenu } from "./components/items/BackgroundColorMenu";
@@ -10,42 +8,22 @@ import { BoldMenu } from "./components/items/BoldMenu";
 import { BorderColorMenu } from "./components/items/BorderColorMenu";
 import { BorderStyleMenu } from "./components/items/BorderStyleMenu";
 import { FontColorMenu } from "./components/items/FontColorMenu";
+import { FontSizeMenu } from "./components/items/FontSizeMenu";
 import { GroupMenu } from "./components/items/GroupMenu";
 import { KeepAspectRatioMenu } from "./components/items/KeepAspectRatioMenu";
 import { LineColorMenu } from "./components/items/LineColorMenu";
 import { LineStyleMenu } from "./components/items/LineStyleMenu";
 import { StackOrderMenu } from "./components/items/StackOrderMenu";
-import { MAX_FONT_SIZE, MIN_FONT_SIZE } from "./DiagramMenuConstants";
 import {
 	DiagramMenuDiv,
 	DiagramMenuDivider,
-	DiagramMenuPositioner,
 	DiagramMenuWrapper,
 } from "./DiagramMenuStyled";
-import type {
-	DiagramMenuProps,
-	DiagramMenuType,
-	DiagramMenuStateMap,
-} from "./DiagramMenuTypes";
-import {
-	findFirstFillableRecursive,
-	findFirstPathableRecursive,
-	findFirstStrokableRecursive,
-	findFirstTextableRecursive,
-	getCommonMenuConfig,
-} from "./DiagramMenuUtils";
+import type { DiagramMenuProps } from "./DiagramMenuTypes";
+import { getCommonMenuConfig } from "./DiagramMenuUtils";
 import { useDiagramMenuState } from "./hooks/useDiagramMenuState";
-import { useDiagramUpdateRecursively } from "../../../hooks/useDiagramUpdateRecursively";
 import { DiagramRegistry } from "../../../registry";
-import type { PathType } from "../../../types/core/PathType";
-import type { FillableData } from "../../../types/data/core/FillableData";
-import type { StrokableData } from "../../../types/data/core/StrokableData";
-import type { TextableData } from "../../../types/data/core/TextableData";
-import type { Diagram } from "../../../types/state/core/Diagram";
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
-import { newEventId } from "../../../utils/core/newEventId";
-import { isItemableState } from "../../../utils/validation/isItemableState";
-import { FontSize } from "../../icons/FontSize";
 
 const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	canvasProps,
@@ -82,99 +60,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const [isAlignmentMenuOpen, setIsAlignmentMenuOpen] = useState(false);
 	const [isStackOrderMenuOpen, setIsStackOrderMenuOpen] = useState(false);
 
-	// Use diagram update recursively hook for applying style changes
-	const applyDiagramUpdate = useDiagramUpdateRecursively();
-
-	// Utility functions for changing items
-	const changeItems = useCallback(
-		(
-			items: Diagram[],
-			data: Partial<Diagram>,
-			recursively = true,
-			eventId: string = newEventId(),
-		) => {
-			for (const item of items) {
-				const newItem = { ...item };
-				for (const key of Object.keys(data) as (keyof Diagram)[]) {
-					if (key in newItem) {
-						(newItem[key] as (typeof data)[keyof Diagram]) = data[key];
-					}
-				}
-				canvasProps.onDiagramChange?.({
-					eventId,
-					eventPhase: "Ended",
-					id: item.id,
-					startDiagram: item,
-					endDiagram: newItem,
-				});
-
-				if (recursively && isItemableState(newItem)) {
-					changeItems(newItem.items, data, recursively, eventId);
-				}
-			}
-		},
-		[canvasProps],
-	);
-
-	const openControl = useCallback(
-		(menuType: DiagramMenuType, currentMenuStateMap: DiagramMenuStateMap) => {
-			const newControlsStateMap = {
-				BgColor: false,
-				BorderColor: false,
-				LineStyle: false,
-				FontSize: false,
-				FontColor: false,
-				Alignment: false,
-			} as {
-				[key in DiagramMenuType]: boolean;
-			};
-
-			// Check current state to determine if we should open the control
-			const shouldOpen = currentMenuStateMap[menuType] === "Show";
-			newControlsStateMap[menuType] = shouldOpen;
-
-			setIsBgColorPickerOpen(newControlsStateMap.BgColor);
-			setIsBorderColorPickerOpen(newControlsStateMap.BorderColor);
-			setIsLineStyleMenuOpen(newControlsStateMap.LineStyle);
-			setIsFontSizeSelectorOpen(newControlsStateMap.FontSize);
-			setIsFontColorPickerOpen(newControlsStateMap.FontColor);
-			setIsAlignmentMenuOpen(newControlsStateMap.Alignment);
-		},
-		[],
-	);
-
-	// Create a callback that uses the current menuStateMap
-	const createMenuClickHandler =
-		(currentMenuStateMap: DiagramMenuStateMap) => (menuType: string) => {
-			switch (menuType) {
-				case "BgColor":
-					openControl("BgColor", currentMenuStateMap);
-					break;
-				case "BorderColor":
-					openControl("BorderColor", currentMenuStateMap);
-					break;
-				case "LineStyle":
-					openControl("LineStyle", currentMenuStateMap);
-					break;
-				case "FontSize":
-					openControl("FontSize", currentMenuStateMap);
-					break;
-				case "FontColor":
-					openControl("FontColor", currentMenuStateMap);
-					break;
-				case "Alignment":
-					openControl("Alignment", currentMenuStateMap);
-					break;
-			}
-		};
-
-	const onFontSizeChange = useCallback(
-		(fontSize: number) => {
-			applyDiagramUpdate({ items: selectedItems, data: { fontSize } });
-		},
-		[selectedItems, applyDiagramUpdate],
-	);
-
 	// If the diagram menu is not shown, close controls.
 	useEffect(() => {
 		if (!shouldRender) {
@@ -194,45 +79,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 
 	// Get common menu configuration for selected diagrams
 	const menuConfig = getCommonMenuConfig(selectedItems);
-
-	// Default menu state map.
-	const menuStateMap = {
-		FontSize: "Hidden",
-		FontColor: "Hidden",
-	} as DiagramMenuStateMap;
-
-	// Find diagram items for styling
-	const firstFillableItem = findFirstFillableRecursive(selectedItems) as
-		| FillableData
-		| undefined;
-	const firstStrokableItem = findFirstStrokableRecursive(selectedItems) as
-		| StrokableData
-		| undefined;
-	const firstTextableItem = findFirstTextableRecursive(selectedItems) as
-		| TextableData
-		| undefined;
-	const firstPathableItem = findFirstPathableRecursive(selectedItems) as
-		| { pathType: PathType }
-		| undefined;
-
-	// Set menu state based on selected items
-	if (firstFillableItem) {
-		menuStateMap.BgColor = isBgColorPickerOpen ? "Active" : "Show";
-	}
-	if (firstStrokableItem) {
-		menuStateMap.BorderColor = isBorderColorPickerOpen ? "Active" : "Show";
-	}
-	if (firstPathableItem) {
-		menuStateMap.LineStyle = isLineStyleMenuOpen ? "Active" : "Show";
-	}
-	if (firstTextableItem) {
-		menuStateMap.FontSize = isFontSizeSelectorOpen ? "Active" : "Show";
-		menuStateMap.FontColor = isFontColorPickerOpen ? "Active" : "Show";
-		menuStateMap.Alignment = isAlignmentMenuOpen ? "Active" : "Show";
-	}
-
-	// Create the menu click handler with the current state
-	const onMenuClick = createMenuClickHandler(menuStateMap);
 
 	// Array to hold the menu item components.
 	// This will be used to render the menu items conditionally based on the state map.
@@ -321,25 +167,12 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	// Create a section for text appearance items.
 	if (menuConfig.fontStyle) {
 		menuItemComponents.push(
-			<DiagramMenuPositioner key="FontSize">
-				<DiagramMenuItem
-					menuType="FontSize"
-					menuStateMap={menuStateMap}
-					onMenuClick={onMenuClick}
-				>
-					<FontSize title="Font Size" />
-				</DiagramMenuItem>
-				{menuStateMap.FontSize === "Active" && (
-					<NumberStepper
-						value={firstTextableItem?.fontSize || 0}
-						min={MIN_FONT_SIZE}
-						max={MAX_FONT_SIZE}
-						minusTooltip="Decrease font size"
-						plusTooltip="Increase font size"
-						onChange={onFontSizeChange}
-					/>
-				)}
-			</DiagramMenuPositioner>,
+			<FontSizeMenu
+				key="FontSize"
+				isOpen={isFontSizeSelectorOpen}
+				onToggle={() => setIsFontSizeSelectorOpen(!isFontSizeSelectorOpen)}
+				selectedDiagrams={selectedItems}
+			/>,
 		);
 		menuItemComponents.push(
 			<FontColorMenu
