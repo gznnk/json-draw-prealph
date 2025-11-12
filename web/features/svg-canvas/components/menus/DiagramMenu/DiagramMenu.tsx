@@ -1,7 +1,6 @@
 import type React from "react";
 import { memo, useRef, useEffect, useState, useCallback } from "react";
 
-import { ColorPicker } from "./components/common/ColorPicker";
 import { DiagramMenuItem } from "./components/common/DiagramMenuItem";
 import { NumberStepper } from "./components/common/NumberStepper";
 import { AlignmentMenu } from "./components/items/AlignmentMenu";
@@ -10,6 +9,7 @@ import { BackgroundColorMenu } from "./components/items/BackgroundColorMenu";
 import { BoldMenu } from "./components/items/BoldMenu";
 import { BorderColorMenu } from "./components/items/BorderColorMenu";
 import { BorderStyleMenu } from "./components/items/BorderStyleMenu";
+import { FontColorMenu } from "./components/items/FontColorMenu";
 import { GroupMenu } from "./components/items/GroupMenu";
 import { KeepAspectRatioMenu } from "./components/items/KeepAspectRatioMenu";
 import { LineColorMenu } from "./components/items/LineColorMenu";
@@ -45,7 +45,6 @@ import type { Diagram } from "../../../types/state/core/Diagram";
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 import { newEventId } from "../../../utils/core/newEventId";
 import { isItemableState } from "../../../utils/validation/isItemableState";
-import { FontColor } from "../../icons/FontColor";
 import { FontSize } from "../../icons/FontSize";
 
 const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
@@ -172,13 +171,6 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	const onFontSizeChange = useCallback(
 		(fontSize: number) => {
 			applyDiagramUpdate({ items: selectedItems, data: { fontSize } });
-		},
-		[selectedItems, applyDiagramUpdate],
-	);
-
-	const onFontColorChange = useCallback(
-		(fontColor: string) => {
-			applyDiagramUpdate({ items: selectedItems, data: { fontColor } });
 		},
 		[selectedItems, applyDiagramUpdate],
 	);
@@ -361,21 +353,12 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			</DiagramMenuPositioner>,
 		);
 		menuItemComponents.push(
-			<DiagramMenuPositioner key="FontColor">
-				<DiagramMenuItem
-					menuType="FontColor"
-					menuStateMap={menuStateMap}
-					onMenuClick={onMenuClick}
-				>
-					<FontColor title="Font Color" />
-				</DiagramMenuItem>
-				{menuStateMap.FontColor === "Active" && (
-					<ColorPicker
-						color={firstTextableItem?.fontColor || "transparent"}
-						onColorChange={onFontColorChange}
-					/>
-				)}
-			</DiagramMenuPositioner>,
+			<FontColorMenu
+				key="FontColor"
+				isOpen={isFontColorPickerOpen}
+				onToggle={() => setIsFontColorPickerOpen(!isFontColorPickerOpen)}
+				selectedDiagrams={selectedItems}
+			/>,
 		);
 		menuItemComponents.push(
 			<BoldMenu key="Bold" selectedDiagrams={selectedItems} />,

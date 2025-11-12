@@ -1,0 +1,52 @@
+import type React from "react";
+import { memo } from "react";
+
+import { useDiagramUpdateRecursively } from "../../../../../../hooks/useDiagramUpdateRecursively";
+import type { Diagram } from "../../../../../../types/state/core/Diagram";
+import { isTextableState } from "../../../../../../utils/validation/isTextableState";
+import { FontColor } from "../../../../../icons/FontColor";
+import { DiagramMenuPositioner } from "../../../DiagramMenuStyled";
+import { ColorPicker } from "../../common/ColorPicker";
+import { DiagramMenuItemNew } from "../../common/DiagramMenuItem/DiagramMenuItemNew";
+
+type FontColorMenuProps = {
+	isOpen: boolean;
+	onToggle: () => void;
+	selectedDiagrams: Diagram[];
+};
+
+/**
+ * FontColorMenu component.
+ * Displays a font color icon and opens a color picker.
+ */
+const FontColorMenuComponent: React.FC<FontColorMenuProps> = ({
+	isOpen,
+	onToggle,
+	selectedDiagrams,
+}) => {
+	const applyDiagramUpdate = useDiagramUpdateRecursively();
+
+	// Get the first diagram and check if it's textable
+	const firstDiagram = selectedDiagrams[0];
+	const textableDiagram =
+		firstDiagram && isTextableState(firstDiagram) ? firstDiagram : null;
+
+	const currentColor = textableDiagram?.fontColor || "transparent";
+
+	const handleColorChange = (color: string) => {
+		applyDiagramUpdate({ items: selectedDiagrams, data: { fontColor: color } });
+	};
+
+	return (
+		<DiagramMenuPositioner>
+			<DiagramMenuItemNew isActive={isOpen} onClick={onToggle}>
+				<FontColor title="Font Color" />
+			</DiagramMenuItemNew>
+			{isOpen && (
+				<ColorPicker color={currentColor} onColorChange={handleColorChange} />
+			)}
+		</DiagramMenuPositioner>
+	);
+};
+
+export const FontColorMenu = memo(FontColorMenuComponent);
