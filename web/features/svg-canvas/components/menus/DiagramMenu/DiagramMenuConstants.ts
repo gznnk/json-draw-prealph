@@ -1,3 +1,18 @@
+// Menu item IDs for type-safe menu state management
+export enum MenuItemId {
+	ARROW_HEAD_START = "arrowHeadStart",
+	ARROW_HEAD_END = "arrowHeadEnd",
+	BG_COLOR = "bgColor",
+	BORDER_COLOR = "borderColor",
+	BORDER_STYLE = "borderStyle",
+	LINE_COLOR = "lineColor",
+	LINE_STYLE = "lineStyle",
+	FONT_SIZE = "fontSize",
+	FONT_COLOR = "fontColor",
+	ALIGNMENT = "alignment",
+	STACK_ORDER = "stackOrder",
+}
+
 // Font size constraints
 export const MIN_FONT_SIZE = 1;
 export const MAX_FONT_SIZE = 999;

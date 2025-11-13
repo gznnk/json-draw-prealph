@@ -14,6 +14,7 @@ import { KeepAspectRatioMenu } from "./components/items/KeepAspectRatioMenu";
 import { LineColorMenu } from "./components/items/LineColorMenu";
 import { LineStyleMenu } from "./components/items/LineStyleMenu";
 import { StackOrderMenu } from "./components/items/StackOrderMenu";
+import { MenuItemId } from "./DiagramMenuConstants";
 import {
 	DiagramMenuDiv,
 	DiagramMenuDivider,
@@ -73,10 +74,10 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<ArrowHeadMenu
 				key="Arrow"
-				isStartOpen={menuState.isOpen("arrowHeadStart")}
-				isEndOpen={menuState.isOpen("arrowHeadEnd")}
-				onToggleStart={() => menuState.toggle("arrowHeadStart")}
-				onToggleEnd={() => menuState.toggle("arrowHeadEnd")}
+				isStartOpen={menuState.isOpen(MenuItemId.ARROW_HEAD_START)}
+				isEndOpen={menuState.isOpen(MenuItemId.ARROW_HEAD_END)}
+				onToggleStart={() => menuState.toggle(MenuItemId.ARROW_HEAD_START)}
+				onToggleEnd={() => menuState.toggle(MenuItemId.ARROW_HEAD_END)}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -88,8 +89,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<LineColorMenu
 				key="LineColor"
-				isOpen={menuState.isOpen("lineColor")}
-				onToggle={() => menuState.toggle("lineColor")}
+				isOpen={menuState.isOpen(MenuItemId.LINE_COLOR)}
+				onToggle={() => menuState.toggle(MenuItemId.LINE_COLOR)}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -99,8 +100,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<LineStyleMenu
 				key="LineStyle"
-				isOpen={menuState.isOpen("lineStyle")}
-				onToggle={() => menuState.toggle("lineStyle")}
+				isOpen={menuState.isOpen(MenuItemId.LINE_STYLE)}
+				onToggle={() => menuState.toggle(MenuItemId.LINE_STYLE)}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -115,8 +116,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<BackgroundColorMenu
 				key="BgColor"
-				isOpen={menuState.isOpen("bgColor")}
-				onToggle={() => menuState.toggle("bgColor")}
+				isOpen={menuState.isOpen(MenuItemId.BG_COLOR)}
+				onToggle={() => menuState.toggle(MenuItemId.BG_COLOR)}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -126,8 +127,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<BorderColorMenu
 				key="BorderColor"
-				isOpen={menuState.isOpen("borderColor")}
-				onToggle={() => menuState.toggle("borderColor")}
+				isOpen={menuState.isOpen(MenuItemId.BORDER_COLOR)}
+				onToggle={() => menuState.toggle(MenuItemId.BORDER_COLOR)}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -137,8 +138,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<BorderStyleMenu
 				key="BorderStyle"
-				isOpen={menuState.isOpen("borderStyle")}
-				onToggle={() => menuState.toggle("borderStyle")}
+				isOpen={menuState.isOpen(MenuItemId.BORDER_STYLE)}
+				onToggle={() => menuState.toggle(MenuItemId.BORDER_STYLE)}
 				selectedDiagrams={selectedItems}
 				showRadius={menuConfig.borderStyle.radius}
 			/>,
@@ -160,16 +161,16 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<FontSizeMenu
 				key="FontSize"
-				isOpen={menuState.isOpen("fontSize")}
-				onToggle={() => menuState.toggle("fontSize")}
+				isOpen={menuState.isOpen(MenuItemId.FONT_SIZE)}
+				onToggle={() => menuState.toggle(MenuItemId.FONT_SIZE)}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
 		menuItemComponents.push(
 			<FontColorMenu
 				key="FontColor"
-				isOpen={menuState.isOpen("fontColor")}
-				onToggle={() => menuState.toggle("fontColor")}
+				isOpen={menuState.isOpen(MenuItemId.FONT_COLOR)}
+				onToggle={() => menuState.toggle(MenuItemId.FONT_COLOR)}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -182,8 +183,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<AlignmentMenu
 				key="Alignment"
-				isOpen={menuState.isOpen("alignment")}
-				onToggle={() => menuState.toggle("alignment")}
+				isOpen={menuState.isOpen(MenuItemId.ALIGNMENT)}
+				onToggle={() => menuState.toggle(MenuItemId.ALIGNMENT)}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -201,8 +202,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<StackOrderMenu
 				key="StackOrder"
-				isOpen={menuState.isOpen("stackOrder")}
-				onToggle={() => menuState.toggle("stackOrder")}
+				isOpen={menuState.isOpen(MenuItemId.STACK_ORDER)}
+				onToggle={() => menuState.toggle(MenuItemId.STACK_ORDER)}
 				selectedDiagrams={selectedItems}
 			/>,
 		);

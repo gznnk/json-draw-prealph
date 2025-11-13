@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-export type MenuId = string;
+import { type MenuItemId } from "../DiagramMenuConstants";
 
 export type UseDiagramMenuItemsStateProps = {
 	/**
@@ -14,12 +14,12 @@ export type UseDiagramMenuItemsStateReturn = {
 	/**
 	 * Check if a specific menu is open
 	 */
-	isOpen: (menuId: MenuId) => boolean;
+	isOpen: (menuId: MenuItemId) => boolean;
 	/**
 	 * Toggle a menu open/closed
 	 * If opening a menu, all other menus will be closed (exclusive behavior)
 	 */
-	toggle: (menuId: MenuId) => void;
+	toggle: (menuId: MenuItemId) => void;
 };
 
 /**
@@ -36,8 +36,8 @@ export type UseDiagramMenuItemsStateReturn = {
  * const menuState = useDiagramMenuItemsState({ shouldCloseAll: !shouldRender });
  *
  * <ColorPicker
- *   isOpen={menuState.isOpen("bgColor")}
- *   onToggle={() => menuState.toggle("bgColor")}
+ *   isOpen={menuState.isOpen(MenuItemId.BG_COLOR)}
+ *   onToggle={() => menuState.toggle(MenuItemId.BG_COLOR)}
  * />
  * ```
  */
@@ -47,7 +47,7 @@ export const useDiagramMenuItemsState = (
 	const { shouldCloseAll = false } = props;
 
 	// Store the currently open menu ID (null means all closed)
-	const [openMenuId, setOpenMenuId] = useState<MenuId | null>(null);
+	const [openMenuId, setOpenMenuId] = useState<MenuItemId | null>(null);
 
 	// Close all menus when shouldCloseAll is true
 	useEffect(() => {
@@ -58,7 +58,7 @@ export const useDiagramMenuItemsState = (
 
 	// Check if a specific menu is open
 	const isOpen = useCallback(
-		(menuId: MenuId): boolean => {
+		(menuId: MenuItemId): boolean => {
 			return openMenuId === menuId;
 		},
 		[openMenuId],
@@ -66,7 +66,7 @@ export const useDiagramMenuItemsState = (
 
 	// Toggle a menu open/closed
 	// If opening, close all other menus (exclusive behavior)
-	const toggle = useCallback((menuId: MenuId): void => {
+	const toggle = useCallback((menuId: MenuItemId): void => {
 		setOpenMenuId((current) => (current === menuId ? null : menuId));
 	}, []);
 
