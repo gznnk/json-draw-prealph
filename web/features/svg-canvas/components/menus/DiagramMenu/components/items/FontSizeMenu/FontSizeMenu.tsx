@@ -6,7 +6,11 @@ import { useDiagramUpdateRecursively } from "../../../../../../hooks/useDiagramU
 import type { Diagram } from "../../../../../../types/state/core/Diagram";
 import { isTextableState } from "../../../../../../utils/validation/isTextableState";
 import { FontSize } from "../../../../../icons/FontSize";
-import { MAX_FONT_SIZE, MIN_FONT_SIZE } from "../../../DiagramMenuConstants";
+import {
+	DEFAULT_FONT_SIZE,
+	MAX_FONT_SIZE,
+	MIN_FONT_SIZE,
+} from "../../../DiagramMenuConstants";
 import { DiagramMenuPositioner } from "../../../DiagramMenuStyled";
 import { DiagramMenuButton } from "../../common/DiagramMenuButton/DiagramMenuButton";
 import { DiagramMenuControl } from "../../common/DiagramMenuControl";
@@ -33,7 +37,7 @@ const FontSizeMenuComponent: React.FC<FontSizeMenuProps> = ({
 	const firstDiagram = selectedDiagrams[0];
 	const fontSize = isTextableState(firstDiagram)
 		? firstDiagram.fontSize
-		: MIN_FONT_SIZE;
+		: DEFAULT_FONT_SIZE;
 
 	const handleFontSizeChange = (size: number) => {
 		// Real-time update (no history saving)

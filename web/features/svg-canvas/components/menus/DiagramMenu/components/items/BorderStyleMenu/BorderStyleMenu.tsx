@@ -14,6 +14,14 @@ import { DashedCircle } from "../../../../../icons/DashedCircle";
 import { DashedLine } from "../../../../../icons/DashedLine";
 import { DottedLine } from "../../../../../icons/DottedLine";
 import { SolidLine } from "../../../../../icons/SolidLine";
+import {
+	DEFAULT_BORDER_RADIUS,
+	DEFAULT_BORDER_WIDTH,
+	MAX_BORDER_RADIUS,
+	MAX_BORDER_WIDTH,
+	MIN_BORDER_RADIUS,
+	MIN_BORDER_WIDTH,
+} from "../../../DiagramMenuConstants";
 import { DiagramMenuPositioner } from "../../../DiagramMenuStyled";
 import { DiagramMenuButton } from "../../common/DiagramMenuButton/DiagramMenuButton";
 import { DiagramMenuControl } from "../../common/DiagramMenuControl";
@@ -41,13 +49,13 @@ const BorderStyleMenuComponent: React.FC<BorderStyleMenuProps> = ({
 	// Type-safe extraction of properties using type guards
 	const strokeWidth = isStrokableState(firstDiagram)
 		? firstDiagram.strokeWidth
-		: 2;
+		: DEFAULT_BORDER_WIDTH;
 	const strokeDashType = isStrokableState(firstDiagram)
 		? firstDiagram.strokeDashType
 		: undefined;
 	const cornerRadius = isCornerRoundableState(firstDiagram)
 		? firstDiagram.cornerRadius
-		: 0;
+		: DEFAULT_BORDER_RADIUS;
 
 	const handleStrokeWidthChange = (width: number) => {
 		// Real-time update (no history saving)
@@ -124,8 +132,8 @@ const BorderStyleMenuComponent: React.FC<BorderStyleMenuProps> = ({
 						<MenuSlider
 							label="Border Width"
 							value={strokeWidth}
-							min={0}
-							max={100}
+							min={MIN_BORDER_WIDTH}
+							max={MAX_BORDER_WIDTH}
 							onChange={handleStrokeWidthChange}
 							onChangeCommit={handleStrokeWidthCommit}
 						/>
@@ -135,8 +143,8 @@ const BorderStyleMenuComponent: React.FC<BorderStyleMenuProps> = ({
 							<MenuSlider
 								label="Corner Radius"
 								value={cornerRadius}
-								min={0}
-								max={100}
+								min={MIN_BORDER_RADIUS}
+								max={MAX_BORDER_RADIUS}
 								onChange={handleCornerRadiusChange}
 								onChangeCommit={handleCornerRadiusCommit}
 							/>

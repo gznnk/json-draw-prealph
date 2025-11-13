@@ -14,6 +14,11 @@ import { PolylinePathIcon } from "../../../../../icons/PolylinePathIcon";
 import { RoundedPathIcon } from "../../../../../icons/RoundedPathIcon";
 import { SolidLine } from "../../../../../icons/SolidLine";
 import { StraightPathIcon } from "../../../../../icons/StraightPathIcon";
+import {
+	DEFAULT_STROKE_WIDTH,
+	MAX_STROKE_WIDTH,
+	MIN_STROKE_WIDTH,
+} from "../../../DiagramMenuConstants";
 import { DiagramMenuPositioner } from "../../../DiagramMenuStyled";
 import { DiagramMenuButton } from "../../common/DiagramMenuButton/DiagramMenuButton";
 import { DiagramMenuControl } from "../../common/DiagramMenuControl";
@@ -38,7 +43,8 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 	// Get stroke width, path type, and stroke dash type from the first diagram
 	// If the property doesn't exist, it will be undefined
 	const strokeWidth =
-		(firstDiagram as { strokeWidth?: number } | undefined)?.strokeWidth ?? 2;
+		(firstDiagram as { strokeWidth?: number } | undefined)?.strokeWidth ??
+		DEFAULT_STROKE_WIDTH;
 	const pathType = (firstDiagram as { pathType?: PathType } | undefined)
 		?.pathType;
 	const strokeDashType = (
@@ -87,8 +93,8 @@ const LineStyleMenuComponent: React.FC<LineStyleMenuProps> = ({
 						<MenuSlider
 							label="Line Width"
 							value={strokeWidth}
-							min={1}
-							max={100}
+							min={MIN_STROKE_WIDTH}
+							max={MAX_STROKE_WIDTH}
 							onChange={handleStrokeWidthChange}
 							onChangeCommit={handleStrokeWidthCommit}
 						/>
