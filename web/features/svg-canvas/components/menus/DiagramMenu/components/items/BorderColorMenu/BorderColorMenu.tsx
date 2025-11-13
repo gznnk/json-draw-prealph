@@ -35,7 +35,18 @@ const BorderColorMenuComponent: React.FC<BorderColorMenuProps> = ({
 	const currentColor = strokeableDiagram?.stroke || "transparent";
 
 	const handleColorChange = (color: string) => {
-		applyDiagramUpdate({ items: selectedDiagrams, data: { stroke: color } });
+		applyDiagramUpdate({
+			items: selectedDiagrams,
+			data: { stroke: color },
+			skipHistory: true,
+		});
+	};
+
+	const handleColorChangeCommit = (color: string) => {
+		applyDiagramUpdate({
+			items: selectedDiagrams,
+			data: { stroke: color },
+		});
 	};
 
 	// Check if the color is transparent
@@ -92,7 +103,11 @@ const BorderColorMenuComponent: React.FC<BorderColorMenuProps> = ({
 				{icon}
 			</DiagramMenuButton>
 			{isOpen && (
-				<ColorPicker color={currentColor} onColorChange={handleColorChange} />
+				<ColorPicker
+					color={currentColor}
+					onColorChange={handleColorChange}
+					onColorChangeCommit={handleColorChangeCommit}
+				/>
 			)}
 		</DiagramMenuPositioner>
 	);

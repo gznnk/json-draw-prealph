@@ -35,7 +35,18 @@ const FontColorMenuComponent: React.FC<FontColorMenuProps> = ({
 	const currentColor = textableDiagram?.fontColor || "transparent";
 
 	const handleColorChange = (color: string) => {
-		applyDiagramUpdate({ items: selectedDiagrams, data: { fontColor: color } });
+		applyDiagramUpdate({
+			items: selectedDiagrams,
+			data: { fontColor: color },
+			skipHistory: true,
+		});
+	};
+
+	const handleColorChangeCommit = (color: string) => {
+		applyDiagramUpdate({
+			items: selectedDiagrams,
+			data: { fontColor: color },
+		});
 	};
 
 	return (
@@ -44,7 +55,11 @@ const FontColorMenuComponent: React.FC<FontColorMenuProps> = ({
 				<FontColor title="Font Color" />
 			</DiagramMenuButton>
 			{isOpen && (
-				<ColorPicker color={currentColor} onColorChange={handleColorChange} />
+				<ColorPicker
+					color={currentColor}
+					onColorChange={handleColorChange}
+					onColorChangeCommit={handleColorChangeCommit}
+				/>
 			)}
 		</DiagramMenuPositioner>
 	);

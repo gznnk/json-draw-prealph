@@ -35,7 +35,18 @@ const BackgroundColorMenuComponent: React.FC<BackgroundColorMenuProps> = ({
 	const currentColor = fillableDiagram?.fill || "transparent";
 
 	const handleColorChange = (color: string) => {
-		applyDiagramUpdate({ items: selectedDiagrams, data: { fill: color } });
+		applyDiagramUpdate({
+			items: selectedDiagrams,
+			data: { fill: color },
+			skipHistory: true,
+		});
+	};
+
+	const handleColorChangeCommit = (color: string) => {
+		applyDiagramUpdate({
+			items: selectedDiagrams,
+			data: { fill: color },
+		});
 	};
 
 	return (
@@ -44,7 +55,11 @@ const BackgroundColorMenuComponent: React.FC<BackgroundColorMenuProps> = ({
 				<ColorPreview color={currentColor} title="Background Color" />
 			</DiagramMenuButton>
 			{isOpen && (
-				<ColorPicker color={currentColor} onColorChange={handleColorChange} />
+				<ColorPicker
+					color={currentColor}
+					onColorChange={handleColorChange}
+					onColorChangeCommit={handleColorChangeCommit}
+				/>
 			)}
 		</DiagramMenuPositioner>
 	);

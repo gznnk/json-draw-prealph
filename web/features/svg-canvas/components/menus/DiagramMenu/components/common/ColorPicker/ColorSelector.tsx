@@ -17,7 +17,7 @@ type ColorSelectorProps = {
 	/** Called on every color change (real-time updates) */
 	onChange: (newColor: string) => void;
 	/** Called when color change is committed (triggers history saving) */
-	onChangeCommit?: (newColor: string) => void;
+	onChangeCommit: (newColor: string) => void;
 };
 
 /**
@@ -34,8 +34,7 @@ const ColorSelectorComponent: React.FC<ColorSelectorProps> = ({
 	const [isValid, setIsValid] = useState(true);
 
 	const handleColorClick = (selectedColor: string) => {
-		onChange(selectedColor);
-		onChangeCommit?.(selectedColor);
+		onChangeCommit(selectedColor);
 	};
 
 	const handleHexInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +51,7 @@ const ColorSelectorComponent: React.FC<ColorSelectorProps> = ({
 
 	const handleInputBlur = () => {
 		if (isValid && inputValue !== color) {
-			onChangeCommit?.(inputValue);
+			onChangeCommit(inputValue);
 		}
 	};
 

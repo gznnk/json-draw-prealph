@@ -35,7 +35,18 @@ const LineColorMenuComponent: React.FC<LineColorMenuProps> = ({
 	const currentColor = strokeableDiagram?.stroke || "transparent";
 
 	const handleColorChange = (color: string) => {
-		applyDiagramUpdate({ items: selectedDiagrams, data: { stroke: color } });
+		applyDiagramUpdate({
+			items: selectedDiagrams,
+			data: { stroke: color },
+			skipHistory: true,
+		});
+	};
+
+	const handleColorChangeCommit = (color: string) => {
+		applyDiagramUpdate({
+			items: selectedDiagrams,
+			data: { stroke: color },
+		});
 	};
 
 	return (
@@ -44,7 +55,11 @@ const LineColorMenuComponent: React.FC<LineColorMenuProps> = ({
 				<ColorPreview color={currentColor} title="Line Color" />
 			</DiagramMenuButton>
 			{isOpen && (
-				<ColorPicker color={currentColor} onColorChange={handleColorChange} />
+				<ColorPicker
+					color={currentColor}
+					onColorChange={handleColorChange}
+					onColorChangeCommit={handleColorChangeCommit}
+				/>
 			)}
 		</DiagramMenuPositioner>
 	);

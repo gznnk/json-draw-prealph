@@ -9,7 +9,10 @@ import { ColorSelector } from "./ColorSelector";
  */
 type ColorPickerProps = {
 	color: string;
+	/** Called on every color change (real-time updates) */
 	onColorChange: (newColor: string) => void;
+	/** Called when color change is committed (triggers history saving) */
+	onColorChangeCommit: (newColor: string) => void;
 };
 
 /**
@@ -19,10 +22,15 @@ type ColorPickerProps = {
 const ColorPickerComponent: React.FC<ColorPickerProps> = ({
 	color,
 	onColorChange,
+	onColorChangeCommit,
 }) => {
 	return (
 		<DiagramMenuControl>
-			<ColorSelector color={color} onChange={onColorChange} />
+			<ColorSelector
+				color={color}
+				onChange={onColorChange}
+				onChangeCommit={onColorChangeCommit}
+			/>
 		</DiagramMenuControl>
 	);
 };
