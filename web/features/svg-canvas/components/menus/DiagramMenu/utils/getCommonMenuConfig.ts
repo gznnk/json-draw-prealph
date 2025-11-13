@@ -71,32 +71,55 @@ export const getCommonMenuConfig = (diagrams: Diagram[]): DiagramMenuConfig => {
 		return {};
 	}
 
-	// Merge boolean properties using a loop for DRY principle
+	// Merge each property individually in the same loop
 	const result: DiagramMenuConfig = {};
 
-	// List of boolean properties to merge
-	const booleanKeys: Array<keyof DiagramMenuConfig> = [
-		"backgroundColor",
-		"borderColor",
-		"lineColor",
-		"arrowHead",
-		"lineStyle",
-		"fontStyle",
-		"textAlignment",
-	];
+	// Merge backgroundColor
+	const backgroundColor = mergeBooleanProperty(menuConfigs, "backgroundColor");
+	if (backgroundColor !== undefined) {
+		result.backgroundColor = backgroundColor;
+	}
 
-	// Merge each boolean property
-	for (const key of booleanKeys) {
-		const value = mergeBooleanProperty(menuConfigs, key);
-		if (value !== undefined) {
-			result[key] = value;
-		}
+	// Merge borderColor
+	const borderColor = mergeBooleanProperty(menuConfigs, "borderColor");
+	if (borderColor !== undefined) {
+		result.borderColor = borderColor;
+	}
+
+	// Merge lineColor
+	const lineColor = mergeBooleanProperty(menuConfigs, "lineColor");
+	if (lineColor !== undefined) {
+		result.lineColor = lineColor;
 	}
 
 	// Merge borderStyle (nested object with special handling)
 	const borderStyle = mergeBorderStyle(menuConfigs);
 	if (borderStyle !== undefined) {
 		result.borderStyle = borderStyle;
+	}
+
+	// Merge arrowHead
+	const arrowHead = mergeBooleanProperty(menuConfigs, "arrowHead");
+	if (arrowHead !== undefined) {
+		result.arrowHead = arrowHead;
+	}
+
+	// Merge lineStyle
+	const lineStyle = mergeBooleanProperty(menuConfigs, "lineStyle");
+	if (lineStyle !== undefined) {
+		result.lineStyle = lineStyle;
+	}
+
+	// Merge fontStyle
+	const fontStyle = mergeBooleanProperty(menuConfigs, "fontStyle");
+	if (fontStyle !== undefined) {
+		result.fontStyle = fontStyle;
+	}
+
+	// Merge textAlignment
+	const textAlignment = mergeBooleanProperty(menuConfigs, "textAlignment");
+	if (textAlignment !== undefined) {
+		result.textAlignment = textAlignment;
 	}
 
 	// aspectRatio is not merged here - it's always undefined
