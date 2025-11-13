@@ -10,6 +10,9 @@ import { EVENT_NAME_CANVAS_ZOOM } from "../../../constants/core/EventNames";
 import { InteractionState } from "../../types/InteractionState";
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
 
+// Use setInterval with 16ms interval (approximately 60fps)
+const INTERVAL_MS = 16;
+
 /**
  * Return type for the useGrabScroll hook
  */
@@ -52,16 +55,16 @@ export const useGrabScroll = (
 		velocityY: number;
 	} | null>(null);
 
-	// Animation frame reference for inertia
-	const inertiaAnimationFrame = useRef<number | null>(null);
+	// Interval reference for inertia
+	const inertiaInterval = useRef<number | null>(null);
 
 	/**
 	 * Cancel inertia scrolling animation
 	 */
 	const cancelInertiaAnimation = useCallback((): void => {
-		if (inertiaAnimationFrame.current !== null) {
-			cancelAnimationFrame(inertiaAnimationFrame.current);
-			inertiaAnimationFrame.current = null;
+		if (inertiaInterval.current !== null) {
+			clearInterval(inertiaInterval.current);
+			inertiaInterval.current = null;
 			setCanvasState((prevState) => ({
 				...prevState,
 				interactionState: InteractionState.Idle,
@@ -113,7 +116,10 @@ export const useGrabScroll = (
 					Math.abs(velocityX) < INERTIA_MIN_VELOCITY &&
 					Math.abs(velocityY) < INERTIA_MIN_VELOCITY
 				) {
-					inertiaAnimationFrame.current = null;
+					if (inertiaInterval.current !== null) {
+						clearInterval(inertiaInterval.current);
+						inertiaInterval.current = null;
+					}
 					// Reset interaction state to Idle when inertia animation completes
 					setCanvasState((prevState) => ({
 						...prevState,
@@ -145,13 +151,10 @@ export const useGrabScroll = (
 
 					return newState;
 				});
-
-				// Continue animation
-				inertiaAnimationFrame.current = requestAnimationFrame(animate);
 			};
 
-			// Start the animation
-			inertiaAnimationFrame.current = requestAnimationFrame(animate);
+			// Start the animation with setInterval
+			inertiaInterval.current = window.setInterval(animate, INTERVAL_MS);
 		},
 		[],
 	);
