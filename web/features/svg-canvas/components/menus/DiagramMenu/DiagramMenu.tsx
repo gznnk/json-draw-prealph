@@ -20,9 +20,9 @@ import {
 	DiagramMenuWrapper,
 } from "./DiagramMenuStyled";
 import type { DiagramMenuProps } from "./DiagramMenuTypes";
-import { getCommonMenuConfig } from "./DiagramMenuUtils";
 import { useDiagramMenuDisplay } from "./hooks/useDiagramMenuDisplay";
 import { useDiagramMenuItemsState } from "./hooks/useDiagramMenuItemsState";
+import { getCommonMenuConfig } from "./utils/getCommonMenuConfig";
 import { DiagramRegistry } from "../../../registry";
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 
