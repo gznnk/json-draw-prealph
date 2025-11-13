@@ -1,5 +1,5 @@
 import type React from "react";
-import { memo, useRef, useEffect, useState } from "react";
+import { memo, useRef } from "react";
 
 import { AlignmentMenu } from "./components/items/AlignmentMenu";
 import { ArrowHeadMenu } from "./components/items/ArrowHeadMenu";
@@ -22,6 +22,7 @@ import {
 import type { DiagramMenuProps } from "./DiagramMenuTypes";
 import { getCommonMenuConfig } from "./DiagramMenuUtils";
 import { useDiagramMenuDisplay } from "./hooks/useDiagramMenuDisplay";
+import { useDiagramMenuItemsState } from "./hooks/useDiagramMenuItemsState";
 import { DiagramRegistry } from "../../../registry";
 import { getSelectedDiagrams } from "../../../utils/core/getSelectedDiagrams";
 
@@ -48,31 +49,9 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 			singleSelectedItem,
 		});
 
-	// Diagram menu controls open/close state.
-	const [isBgColorPickerOpen, setIsBgColorPickerOpen] = useState(false);
-	const [isBorderColorPickerOpen, setIsBorderColorPickerOpen] = useState(false);
-	const [isLineColorPickerOpen, setIsLineColorPickerOpen] = useState(false);
-	const [isBorderStyleMenuOpen, setIsBorderStyleMenuOpen] = useState(false);
-	const [isLineStyleMenuOpen, setIsLineStyleMenuOpen] = useState(false);
-	const [isFontSizeSelectorOpen, setIsFontSizeSelectorOpen] = useState(false);
-	const [isFontColorPickerOpen, setIsFontColorPickerOpen] = useState(false);
-	const [isAlignmentMenuOpen, setIsAlignmentMenuOpen] = useState(false);
-	const [isStackOrderMenuOpen, setIsStackOrderMenuOpen] = useState(false);
-
-	// If the diagram menu is not shown, close controls.
-	useEffect(() => {
-		if (!shouldRender) {
-			setIsBgColorPickerOpen(false);
-			setIsBorderColorPickerOpen(false);
-			setIsLineColorPickerOpen(false);
-			setIsBorderStyleMenuOpen(false);
-			setIsLineStyleMenuOpen(false);
-			setIsFontSizeSelectorOpen(false);
-			setIsFontColorPickerOpen(false);
-			setIsAlignmentMenuOpen(false);
-			setIsStackOrderMenuOpen(false);
-		}
-	}, [shouldRender]);
+	// Use menu items state to handle open/close state for all sub-menus
+	// Only one menu can be open at a time (exclusive behavior)
+	const menuState = useDiagramMenuItemsState({ shouldCloseAll: !shouldRender });
 
 	if (!shouldRender) return null;
 
@@ -96,8 +75,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<LineColorMenu
 				key="LineColor"
-				isOpen={isLineColorPickerOpen}
-				onToggle={() => setIsLineColorPickerOpen(!isLineColorPickerOpen)}
+				isOpen={menuState.isOpen("lineColor")}
+				onToggle={() => menuState.toggle("lineColor")}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -107,8 +86,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<LineStyleMenu
 				key="LineStyle"
-				isOpen={isLineStyleMenuOpen}
-				onToggle={() => setIsLineStyleMenuOpen(!isLineStyleMenuOpen)}
+				isOpen={menuState.isOpen("lineStyle")}
+				onToggle={() => menuState.toggle("lineStyle")}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -123,8 +102,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<BackgroundColorMenu
 				key="BgColor"
-				isOpen={isBgColorPickerOpen}
-				onToggle={() => setIsBgColorPickerOpen(!isBgColorPickerOpen)}
+				isOpen={menuState.isOpen("bgColor")}
+				onToggle={() => menuState.toggle("bgColor")}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -134,8 +113,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<BorderColorMenu
 				key="BorderColor"
-				isOpen={isBorderColorPickerOpen}
-				onToggle={() => setIsBorderColorPickerOpen(!isBorderColorPickerOpen)}
+				isOpen={menuState.isOpen("borderColor")}
+				onToggle={() => menuState.toggle("borderColor")}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -145,8 +124,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<BorderStyleMenu
 				key="BorderStyle"
-				isOpen={isBorderStyleMenuOpen}
-				onToggle={() => setIsBorderStyleMenuOpen(!isBorderStyleMenuOpen)}
+				isOpen={menuState.isOpen("borderStyle")}
+				onToggle={() => menuState.toggle("borderStyle")}
 				selectedDiagrams={selectedItems}
 				showRadius={menuConfig.borderStyle.radius}
 			/>,
@@ -168,16 +147,16 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<FontSizeMenu
 				key="FontSize"
-				isOpen={isFontSizeSelectorOpen}
-				onToggle={() => setIsFontSizeSelectorOpen(!isFontSizeSelectorOpen)}
+				isOpen={menuState.isOpen("fontSize")}
+				onToggle={() => menuState.toggle("fontSize")}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
 		menuItemComponents.push(
 			<FontColorMenu
 				key="FontColor"
-				isOpen={isFontColorPickerOpen}
-				onToggle={() => setIsFontColorPickerOpen(!isFontColorPickerOpen)}
+				isOpen={menuState.isOpen("fontColor")}
+				onToggle={() => menuState.toggle("fontColor")}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -190,8 +169,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<AlignmentMenu
 				key="Alignment"
-				isOpen={isAlignmentMenuOpen}
-				onToggle={() => setIsAlignmentMenuOpen(!isAlignmentMenuOpen)}
+				isOpen={menuState.isOpen("alignment")}
+				onToggle={() => menuState.toggle("alignment")}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
@@ -209,8 +188,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 		menuItemComponents.push(
 			<StackOrderMenu
 				key="StackOrder"
-				isOpen={isStackOrderMenuOpen}
-				onToggle={() => setIsStackOrderMenuOpen(!isStackOrderMenuOpen)}
+				isOpen={menuState.isOpen("stackOrder")}
+				onToggle={() => menuState.toggle("stackOrder")}
 				selectedDiagrams={selectedItems}
 			/>,
 		);
