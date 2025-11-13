@@ -196,8 +196,8 @@ const DiagramMenuComponent: React.FC<DiagramMenuProps> = ({
 	}
 
 	// Create a section for stack order items.
-	const slouldDisplayStackOrderMenu = selectedItems.length > 0;
-	if (slouldDisplayStackOrderMenu) {
+	const shouldDisplayStackOrderMenu = selectedItems.length > 0;
+	if (shouldDisplayStackOrderMenu) {
 		menuItemComponents.push(
 			<StackOrderMenu
 				key="StackOrder"
