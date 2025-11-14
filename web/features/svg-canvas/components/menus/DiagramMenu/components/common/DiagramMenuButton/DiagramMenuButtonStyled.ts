@@ -22,15 +22,6 @@ export const DiagramMenuButtonDiv = styled.div`
 		border-color: #6b7280;
 	}
 
-	&.disabled {
-		cursor: not-allowed;
-		opacity: 0.25;
-
-		&:hover {
-			background-color: transparent;
-		}
-	}
-
 	svg {
 		color: #6b7280;
 		transition: color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -42,9 +33,5 @@ export const DiagramMenuButtonDiv = styled.div`
 
 	&.active svg {
 		color: #374151;
-	}
-
-	&.disabled svg {
-		color: #d1d5db;
 	}
 `;
