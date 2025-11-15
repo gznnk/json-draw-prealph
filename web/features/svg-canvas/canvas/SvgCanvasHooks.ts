@@ -6,6 +6,7 @@ import { useDelete } from "./hooks/actions/useDelete";
 import { useExport } from "./hooks/actions/useExport";
 import { usePaste } from "./hooks/actions/usePaste";
 import { usePreviewConnectLine } from "./hooks/actions/usePreviewConnectLine";
+import { useSuppressContextMenu } from "./hooks/control/useSuppressContextMenu";
 import { useOnAddDiagram } from "./hooks/diagram/useOnAddDiagram";
 import { useOnAiMessageChange } from "./hooks/diagram/useOnAiMessageChange";
 import { useOnAppendDiagrams } from "./hooks/diagram/useOnAppendDiagrams";
@@ -205,6 +206,10 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 	// Handler for the select all event.
 	const onSelectAll = useSelectAll(canvasHooksProps);
 
+	// context menu
+	// Handler for changing suppressContextMenu state
+	const onSuppressContextMenuChange = useSuppressContextMenu(canvasHooksProps);
+
 	// tools
 	// Hook for the connect shapes tool.
 	useOnConnectShapes(canvasHooksProps);
@@ -249,6 +254,8 @@ export const useSvgCanvas = (props: SvgCanvasHooksProps) => {
 		onClearAllSelection,
 		onSelect,
 		onSelectAll,
+		// control
+		onSuppressContextMenuChange,
 	};
 
 	return {

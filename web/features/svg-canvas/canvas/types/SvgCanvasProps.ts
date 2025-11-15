@@ -59,6 +59,8 @@ export type SvgCanvasProps = SvgCanvasState & {
 	onClearAllSelection?: () => void;
 	onSelect?: (e: DiagramSelectEvent) => void;
 	onSelectAll?: () => void;
+	// control
+	onSuppressContextMenuChange?: (suppress: boolean) => void;
 	// other
 	onDataChange?: (data: SvgCanvasData) => void;
 	onCanvasResize?: (e: SvgCanvasResizeEvent) => void;

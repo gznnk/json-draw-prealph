@@ -126,6 +126,8 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onClearAllSelection,
 			onSelect,
 			onSelectAll,
+			// context menu
+			onSuppressContextMenuChange,
 		} = props;
 
 		// Reference to the SVG element container
@@ -252,6 +254,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 			onGrabStart,
 			onGrabMove,
 			onGrabEnd,
+			onSuppressContextMenuChange,
 			contextMenuFunctions,
 		};
 		const refBus = useRef(refBusVal);
@@ -277,8 +280,15 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 		const handlePointerDown = useCallback(
 			(e: React.PointerEvent<SVGSVGElement>) => {
 				// Bypass references to avoid function creation in every render.
-				const { onClearAllSelection, onGrabStart, contextMenuFunctions } =
-					refBus.current;
+				const {
+					onClearAllSelection,
+					onGrabStart,
+					onSuppressContextMenuChange,
+					contextMenuFunctions,
+				} = refBus.current;
+
+				// Reset suppressContextMenu flag to allow context menu on next right-click
+				onSuppressContextMenuChange?.(false);
 
 				if (e.target === e.currentTarget) {
 					// Start area selection if left mouse button is pressed
