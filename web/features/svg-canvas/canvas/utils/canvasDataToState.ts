@@ -26,10 +26,6 @@ export const canvasDataToState = (
 		selectedDiagramPathIndex: new Map(),
 		history: [
 			{
-				id: data.id,
-				minX: data.minX,
-				minY: data.minY,
-				zoom: data.zoom,
 				items: deepCopy(stateItems),
 			},
 		],

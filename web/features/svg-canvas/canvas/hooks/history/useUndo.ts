@@ -1,6 +1,7 @@
 import { useCallback, useRef } from "react";
 
 import type { SvgCanvasSubHooksProps } from "../../types/SvgCanvasSubHooksProps";
+import { canvasStateToData } from "../../utils/canvasStateToData";
 import { diagramDataListToDiagramList } from "../../utils/diagramDataListToDiagramList";
 
 /**
@@ -37,7 +38,7 @@ export const useUndo = (props: SvgCanvasSubHooksProps) => {
 			ret.items = diagramDataListToDiagramList(prevHistory.items);
 
 			// Notify the data change directly (no new history entry needed for undo).
-			onDataChange?.(prevHistory);
+			onDataChange?.(canvasStateToData(ret));
 
 			return ret;
 		});

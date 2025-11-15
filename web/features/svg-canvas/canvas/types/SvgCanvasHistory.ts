@@ -1,6 +1,8 @@
-import type { SvgCanvasData } from "./SvgCanvasData";
+import type { DiagramData } from "../../types/data/core/DiagramData";
 
 /**
  * Type for the history of the SvgCanvas state.
  */
-export type SvgCanvasHistory = SvgCanvasData;
+export type SvgCanvasHistory = {
+	items: DiagramData[];
+};

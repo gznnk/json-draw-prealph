@@ -22,7 +22,7 @@ const CanvasViewComponent = ({
 }: CanvasViewProps): ReactElement => {
 	// Extract canvas data from the content
 	const canvasId = id || content.id;
-	const { items, minX, minY, zoom } = content;
+	const { items, minX = 0, minY = 0, zoom = 1 } = content;
 	const panZoom = {
 		minX,
 		minY,

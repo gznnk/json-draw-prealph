@@ -1,4 +1,4 @@
-import { canvasStateToData } from "./canvasStateToData";
+import { convertItemsStateToData } from "../../utils/core/convertItemsStateToData";
 import { deepCopy } from "../../utils/core/deepCopy";
 import type { SvgCanvasHistory } from "../types/SvgCanvasHistory";
 import type { SvgCanvasState } from "../types/SvgCanvasState";
@@ -12,9 +12,11 @@ import type { SvgCanvasState } from "../types/SvgCanvasState";
 export const canvasStateToHistory = (
 	canvasState: SvgCanvasState,
 ): SvgCanvasHistory => {
-	// Convert the canvas state to data format with proper item types
-	const canvasData = canvasStateToData(canvasState);
+	// Convert the canvas state to history format
+	const canvasHistory = {
+		items: convertItemsStateToData(canvasState.items),
+	};
 
-	// Deep copy the canvas data to avoid mutating the original state
-	return deepCopy(canvasData);
+	// Deep copy the canvas history to avoid mutating the original state
+	return deepCopy(canvasHistory);
 };
