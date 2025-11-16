@@ -671,7 +671,7 @@ const SvgCanvasComponent = forwardRef<SvgCanvasRef, SvgCanvasProps>(
 									{/* Arrow marker definitions */}
 									<MarkerDefs />
 									{/* Grid pattern definition */}
-									<GridPattern gridSize={20} color="#f3f4f6" />
+									<GridPattern zoom={zoom} baseGridSize={20} color="#f3f4f6" />
 									{/* Grid background */}
 									<GridBackground
 										x={minX / zoom}
