@@ -29,15 +29,19 @@ const GridPatternComponent = ({
 		const boldGrid = (baseGridSize * 4) / scaleFactor; // 80px at zoom=1
 
 		// Calculate screen sizes for opacity transition
-		const boldGridScreenSize = boldGrid * zoom;
+		const mediumGridScreenSize = mediumGrid * zoom;
 
-		// Medium grid appears when bold grid reaches half its size (40px)
-		// Fade in as bold grid shrinks from 80px to 40px on screen
-		const fadeStart = 40;
-		const fadeEnd = 60;
+		// Medium grid: smooth fade-in as grid gets larger (zooming in)
+		// Fade in from 0 to 1 as screen size goes from 10px to 30px
+		const mediumFadeStart = 10;
+		const mediumFadeEnd = 30;
 		const mediumOpacity = Math.max(
 			0,
-			Math.min(1, (boldGridScreenSize - fadeStart) / (fadeEnd - fadeStart)),
+			Math.min(
+				1,
+				(mediumGridScreenSize - mediumFadeStart) /
+					(mediumFadeEnd - mediumFadeStart),
+			),
 		);
 
 		// Bold grid is always visible
