@@ -9,8 +9,8 @@ type GridPatternProps = {
 /**
  * SVG grid pattern component with adaptive multi-level grid system.
  * Similar to Miro, it shows:
- * - Medium grid lines at 20px intervals
- * - Bold grid lines at 100px intervals (5 x 20px)
+ * - Medium grid lines at 25px intervals
+ * - Bold grid lines at 100px intervals (4 x 25px)
  *
  * The grid adapts to zoom level, with medium lines becoming bold lines as you zoom out.
  */
@@ -22,22 +22,36 @@ const GridPatternComponent = ({
 	const gridConfig = useMemo(() => {
 		// Fixed grid sizes in world coordinates
 		// These don't change - only zoom changes how they appear on screen
-		const baseLevel = Math.floor(Math.log(zoom) / Math.log(5));
-		const scaleFactor = 5 ** baseLevel;
+		const baseLevel = Math.floor(Math.log(zoom) / Math.log(4));
+		const scaleFactor = 4 ** baseLevel;
 
 		const mediumGrid = baseGridSize / scaleFactor; // 20px at zoom=1
-		const boldGrid = (baseGridSize * 5) / scaleFactor; // 100px at zoom=1
+		const boldGrid = (baseGridSize * 4) / scaleFactor; // 80px at zoom=1
 
-		// Stroke widths in world coordinates (will be scaled by zoom)
-		// These values are divided by zoom to maintain consistent screen size
-		const mediumStrokeWidth = 1 / zoom;
-		const boldStrokeWidth = 2 / zoom;
+		// Calculate screen sizes for opacity transition
+		const boldGridScreenSize = boldGrid * zoom;
+
+		// Medium grid appears when bold grid reaches half its size (40px)
+		// Fade in as bold grid shrinks from 80px to 40px on screen
+		const fadeStart = 40;
+		const fadeEnd = 60;
+		const mediumOpacity = Math.max(
+			0,
+			Math.min(1, (boldGridScreenSize - fadeStart) / (fadeEnd - fadeStart)),
+		);
+
+		// Bold grid is always visible
+		const boldOpacity = 1;
+
+		// Both use same stroke width for consistency
+		const strokeWidth = 1 / zoom;
 
 		return {
 			mediumGrid,
 			boldGrid,
-			mediumStrokeWidth,
-			boldStrokeWidth,
+			mediumOpacity,
+			boldOpacity,
+			strokeWidth,
 		};
 	}, [zoom, baseGridSize]);
 
@@ -54,7 +68,8 @@ const GridPatternComponent = ({
 					d={`M ${gridConfig.mediumGrid} 0 L 0 0 0 ${gridConfig.mediumGrid}`}
 					fill="none"
 					stroke={color}
-					strokeWidth={gridConfig.mediumStrokeWidth}
+					strokeWidth={gridConfig.strokeWidth}
+					opacity={gridConfig.mediumOpacity}
 				/>
 			</pattern>
 
@@ -69,7 +84,8 @@ const GridPatternComponent = ({
 					d={`M ${gridConfig.boldGrid} 0 L 0 0 0 ${gridConfig.boldGrid}`}
 					fill="none"
 					stroke={color}
-					strokeWidth={gridConfig.boldStrokeWidth}
+					strokeWidth={gridConfig.strokeWidth}
+					opacity={gridConfig.boldOpacity}
 				/>
 			</pattern>
 
