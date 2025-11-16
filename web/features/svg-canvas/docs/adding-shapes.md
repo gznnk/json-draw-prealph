@@ -143,7 +143,37 @@ src/features/svg-canvas/constants/state/diagrams/MyDiagramDefaultState.ts  # Def
 
 ```
 
-### 4. Utility Functions
+### 4. Menu Configuration
+
+**For Shapes:**
+```
+
+src/features/svg-canvas/constants/menu/shapes/MyShapeMenuConfig.ts # Menu configuration
+
+```
+
+**For Elements:**
+```
+
+src/features/svg-canvas/constants/menu/elements/MyElementMenuConfig.ts # Menu configuration
+
+```
+
+**For Workflow Nodes:**
+```
+
+src/features/svg-canvas/constants/menu/nodes/MyNodeMenuConfig.ts # Menu configuration
+
+```
+
+**For Diagrams:**
+```
+
+src/features/svg-canvas/constants/menu/diagrams/MyDiagramMenuConfig.ts # Menu configuration
+
+```
+
+### 5. Utility Functions
 
 **For Shapes:**
 ```
@@ -305,7 +335,97 @@ export const MyShapeDefaultData: MyShapeData = CreateDefaultData<MyShapeData>({
 });
 ```
 
-### Step 5: Create Default State Values
+### Step 5: Create Menu Configuration
+
+Menu configuration controls which menu items are displayed when your shape is selected. The `createMenuConfig()` utility automatically generates menu configuration based on your shape's features.
+
+Create `src/features/svg-canvas/constants/menu/shapes/MyShapeMenuConfig.ts`:
+
+```typescript
+import { createMenuConfig } from "../core/createMenuConfig";
+import { MyShapeFeatures } from "../../../types/data/shapes/MyShapeData";
+import type { DiagramMenuConfig } from "../../../types/menu/DiagramMenuConfig";
+
+/**
+ * Menu configuration for MyShape.
+ *
+ * The createMenuConfig() utility automatically generates menu items based on features:
+ * - fillable: true → backgroundColor menu
+ * - strokable: true → borderColor and borderStyle menus
+ * - cornerRoundable: true → borderStyle.radius control
+ * - textable: true → fontStyle and textAlignment menus
+ * - transformative: true → aspectRatio menu
+ *
+ * You can override specific properties or add additional menu items:
+ */
+export const MyShapeMenuConfig: DiagramMenuConfig =
+	createMenuConfig(MyShapeFeatures);
+
+// Example with overrides:
+// export const MyShapeMenuConfig: DiagramMenuConfig = {
+//   ...createMenuConfig(MyShapeFeatures),
+//   aspectRatio: false,  // Disable aspect ratio lock
+//   borderStyle: {
+//     radius: false,     // Disable corner radius control
+//   },
+// };
+
+// Example for connectable shapes (like Path or ConnectLine):
+// export const MyShapeMenuConfig: DiagramMenuConfig = {
+//   ...createMenuConfig(MyShapeFeatures),
+//   arrowHead: true,      // Enable arrow head controls
+//   lineStyle: true,      // Enable line style (width, dash pattern)
+//   lineColor: true,      // Enable line color picker
+//   borderColor: false,   // Disable border color (use lineColor instead)
+//   borderStyle: undefined, // Remove border style menu
+// };
+```
+
+**Available Menu Configuration Properties:**
+
+| Property             | Type                   | Description                                                                               |
+| -------------------- | ---------------------- | ----------------------------------------------------------------------------------------- |
+| `backgroundColor`    | `boolean`              | Show/hide background color picker (auto-enabled if `fillable: true`)                      |
+| `borderColor`        | `boolean`              | Show/hide border/stroke color picker (auto-enabled if `strokable: true`)                  |
+| `lineColor`          | `boolean`              | Show/hide line color picker (for connectors and paths)                                    |
+| `borderStyle`        | `{ radius?: boolean }` | Show/hide border styling with optional radius control (auto-enabled if `strokable: true`) |
+| `borderStyle.radius` | `boolean`              | Show/hide corner radius control (auto-enabled if `cornerRoundable: true`)                 |
+| `arrowHead`          | `boolean`              | Show/hide arrow head controls (for connectors and paths)                                  |
+| `lineStyle`          | `boolean`              | Show/hide line style options - width, dash pattern (for connectors and paths)             |
+| `fontStyle`          | `boolean`              | Show/hide font controls - size, color, bold (auto-enabled if `textable: true`)            |
+| `textAlignment`      | `boolean`              | Show/hide text alignment controls (auto-enabled if `textable: true`)                      |
+| `aspectRatio`        | `boolean`              | Show/hide aspect ratio lock control (auto-enabled if `transformative: true`)              |
+
+**Menu Configuration Examples:**
+
+```typescript
+// Simple shape with automatic configuration
+export const RectangleMenuConfig: DiagramMenuConfig =
+	createMenuConfig(RectangleFeatures);
+
+// Connector with line-specific controls
+export const ConnectLineMenuConfig: DiagramMenuConfig = {
+	...createMenuConfig(ConnectLineFeatures),
+	aspectRatio: false, // Disable aspect ratio
+	arrowHead: true, // Enable arrow controls
+	lineStyle: true, // Enable line width/dash
+	lineColor: true, // Enable line color
+	borderColor: false, // Disable border color
+	borderStyle: undefined, // Remove border style menu
+};
+
+// Path with custom overrides
+export const PathMenuConfig: DiagramMenuConfig = {
+	...createMenuConfig(PathFeatures),
+	arrowHead: true, // Enable arrow controls
+	lineStyle: true, // Enable line width/dash
+	lineColor: true, // Enable line color
+	borderColor: false, // Disable border color
+	borderStyle: undefined, // Remove border style menu
+};
+```
+
+### Step 6: Create Default State Values
 
 Create `src/features/svg-canvas/constants/state/shapes/MyShapeDefaultState.ts`:
 
@@ -326,7 +446,7 @@ export const MyShapeDefaultState: MyShapeState =
 	});
 ```
 
-### Step 6: Implement Utility Functions
+### Step 7: Implement Utility Functions
 
 Create the state creation function in `src/features/svg-canvas/utils/shapes/myShape/createMyShapeState.ts`:
 
@@ -391,7 +511,7 @@ export const myShapeStateToData = (state: Diagram): DiagramData =>
 	mapMyShapeStateToData(state as MyShapeState);
 ```
 
-### Step 7: Implement Connect Point Functions (if connectable)
+### Step 8: Implement Connect Point Functions (if connectable)
 
 If your shape supports connections, create connect point calculator in `src/features/svg-canvas/utils/shapes/myShape/calcMyShapeConnectPointPosition.ts`:
 
@@ -461,7 +581,7 @@ export const createMyShapeConnectPoint = (
 };
 ```
 
-### Step 8: Implement React Components
+### Step 9: Implement React Components
 
 Create the main component in `src/features/svg-canvas/components/shapes/MyShape/MyShape.tsx`:
 
@@ -671,7 +791,7 @@ export { MyShape } from "./MyShape";
 export { MyShapeMinimap } from "./MyShapeMinimap";
 ```
 
-### Step 9: Create Atlas Object
+### Step 10: Create Atlas Object
 
 Create an Atlas object for your shape/node.
 
@@ -690,6 +810,7 @@ import type { MyShapeProps } from "../../types/props/shapes/MyShapeProps";
 import { MyShapeFeatures } from "../../types/data/shapes/MyShapeData";
 import { MyShapeDefaultData } from "../../constants/data/shapes/MyShapeDefaultData";
 import { MyShapeDefaultState } from "../../constants/state/shapes/MyShapeDefaultState";
+import { MyShapeMenuConfig } from "../../constants/menu/shapes/MyShapeMenuConfig";
 import { MyShape, MyShapeMinimap } from "../../components/shapes/MyShape";
 import { createMyShapeState } from "../../utils/shapes/myShape/createMyShapeState";
 import { calcMyShapeConnectPointPosition } from "../../utils/shapes/myShape/calcMyShapeConnectPointPosition";
@@ -728,6 +849,12 @@ export const MyShapeAtlas: MyShapeAtlas = {
 	defaultState: MyShapeDefaultState,
 
 	// ============================================================================
+	// Menu Configuration
+	// ============================================================================
+
+	menuConfig: MyShapeMenuConfig,
+
+	// ============================================================================
 	// Components
 	// ============================================================================
 
@@ -749,7 +876,9 @@ export const MyShapeAtlas: MyShapeAtlas = {
 
 **Note for Workflow Nodes**: Replace `shapes/` paths with `nodes/` and use appropriate node-specific imports (e.g., `calcRectangleConnectPointPosition` for most nodes).
 
-### Step 10: Register the Atlas
+**Important**: The `menuConfig` property in the Atlas defines which menu items are shown when the shape is selected. Use `createMenuConfig(MyShapeFeatures)` for automatic configuration based on features, or customize it with overrides for specific menu items.
+
+### Step 11: Register the Atlas
 
 Add your Atlas to the registry in `src/features/svg-canvas/canvas/SvgCanvasRegistry.ts`:
 
@@ -806,7 +935,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 };
 ```
 
-### Step 11: Update Type Definitions
+### Step 12: Update Type Definitions
 
 Add your shape type to the DiagramType union in `src/features/svg-canvas/types/core/DiagramType.ts`:
 
@@ -815,7 +944,7 @@ export type DiagramType = "Rectangle" | "Ellipse" | "MyShape"; // Add your shape
 // ... other types
 ```
 
-### Step 12: Update Default Data Constants
+### Step 13: Update Default Data Constants
 
 Add your element's default data to the appropriate CreateDefaultData file:
 
@@ -916,19 +1045,23 @@ export const CreateDefaultState = {
 
 ## Common Pitfalls
 
-1. **Missing Atlas creation**: Don't forget to create the Atlas object for your shape/node
-2. **Missing Atlas registration**: Ensure your Atlas is registered in SvgCanvasRegistry
-3. **Atlas organization**: Put shape Atlas in `atlas/shapes/`, node Atlas in `atlas/nodes/`
-4. **Alphabetical ordering**: Maintain alphabetical order in registry and import statements
-5. **Missing exports**: Ensure all new files are properly exported through index files
-6. **Type mismatches**: Verify that your data, state, and props types align correctly
-7. **Catalog union types**: Must add your types to both `DiagramData.ts` and `Diagram.ts` unions
-8. **DiagramType union**: Must add your type string to the `DiagramType` union
-9. **Default value consistency**: Ensure default data and state values are consistent
-10. **Transform center**: Remember that shapes are positioned from their center, not top-left
-11. **Feature consistency**: Make sure your component implementation matches declared features
-12. **Folder structure**: Use `shapes/` for basic elements, `nodes/` for workflow nodes
-13. **Atlas imports**: Use proper import paths in your Atlas files (../../types/, ../../components/, etc.)
+1. **Missing Menu Configuration**: Don't forget to create the menuConfig file for your shape
+2. **Missing menuConfig in Atlas**: Ensure your Atlas includes the `menuConfig` property
+3. **Menu configuration mismatches**: Verify menuConfig properties match your shape's features
+4. **Missing Atlas creation**: Don't forget to create the Atlas object for your shape/node
+5. **Missing Atlas registration**: Ensure your Atlas is registered in SvgCanvasRegistry
+6. **Atlas organization**: Put shape Atlas in `atlas/shapes/`, node Atlas in `atlas/nodes/`
+7. **Alphabetical ordering**: Maintain alphabetical order in registry and import statements
+8. **Missing exports**: Ensure all new files are properly exported through index files
+9. **Type mismatches**: Verify that your data, state, and props types align correctly
+10. **Catalog union types**: Must add your types to both `DiagramData.ts` and `Diagram.ts` unions
+11. **DiagramType union**: Must add your type string to the `DiagramType` union
+12. **Default value consistency**: Ensure default data and state values are consistent
+13. **Transform center**: Remember that shapes are positioned from their center, not top-left
+14. **Feature consistency**: Make sure your component implementation matches declared features
+15. **Folder structure**: Use `shapes/` for basic elements, `nodes/` for workflow nodes
+16. **Atlas imports**: Use proper import paths in your Atlas files (../../types/, ../../components/, etc.)
+17. **createMenuConfig usage**: Use `createMenuConfig()` for automatic menu generation based on features
 
 By following this guide, you'll create a shape that integrates seamlessly with the existing SVG canvas architecture while maintaining consistency and performance.
 
@@ -947,8 +1080,66 @@ Each Atlas object consolidates:
 
 - Type definitions (Data, State, Props, Features)
 - Default values (DefaultData, DefaultState)
+- Menu configuration (menuConfig)
 - React components (Component, MinimapComponent)
 - Utility functions (createState, mappers, calculators)
 - Export functions (if applicable)
 
 This makes the system more maintainable and easier to understand for developers working with the SVG canvas.
+
+## Menu Configuration System
+
+The menu configuration system controls which menu items are displayed when a diagram element is selected. It uses a declarative approach where menu items are automatically generated based on the shape's features.
+
+### How Menu Configuration Works
+
+1. **Feature-based generation**: The `createMenuConfig()` utility automatically generates appropriate menu items based on your shape's `DiagramFeatures`:
+   - `fillable: true` → Adds `backgroundColor` menu
+   - `strokable: true` → Adds `borderColor` and `borderStyle` menus
+   - `cornerRoundable: true` → Adds `borderStyle.radius` control
+   - `textable: true` → Adds `fontStyle` and `textAlignment` menus
+   - `transformative: true` → Adds `aspectRatio` menu
+
+2. **Custom overrides**: You can override auto-generated settings or add additional menu items like `arrowHead` and `lineStyle` for connectors.
+
+3. **Multi-selection support**: When multiple elements are selected, only menu items that are enabled for ALL selected types are shown (intersection of configs).
+
+4. **Nested configuration**: Some menu items like `borderStyle` support nested options (e.g., `borderStyle.radius`).
+
+### Example Usage Patterns
+
+**Basic shape (auto-generated):**
+
+```typescript
+export const RectangleMenuConfig: DiagramMenuConfig =
+	createMenuConfig(RectangleFeatures);
+// Automatically includes: backgroundColor, borderColor, borderStyle.radius,
+// fontStyle, textAlignment, aspectRatio based on features
+```
+
+**Connector with overrides:**
+
+```typescript
+export const ConnectLineMenuConfig: DiagramMenuConfig = {
+	...createMenuConfig(ConnectLineFeatures),
+	aspectRatio: false, // Disable auto-generated aspectRatio
+	arrowHead: true, // Add connector-specific control
+	lineStyle: true, // Add line styling
+	lineColor: true, // Use lineColor instead of borderColor
+	borderColor: false, // Disable borderColor
+	borderStyle: undefined, // Remove border style menu
+};
+```
+
+**Custom node with selective features:**
+
+```typescript
+export const MyNodeMenuConfig: DiagramMenuConfig = {
+	...createMenuConfig(MyNodeFeatures),
+	borderStyle: {
+		radius: false, // Disable only the radius control, keep other border style options
+	},
+};
+```
+
+This approach ensures consistency across all diagram types while allowing flexibility for specialized elements.
