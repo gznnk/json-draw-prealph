@@ -67,6 +67,11 @@ export const useAddDiagramByType = (props: SvgCanvasSubHooksProps) => {
 			return;
 		}
 
+		// Apply variant overrides if provided
+		if (e.variant) {
+			Object.assign(data, e.variant);
+		}
+
 		if (e.isSelected && isSelectableState(data)) {
 			data.isSelected = true;
 			data.showOutline = true;

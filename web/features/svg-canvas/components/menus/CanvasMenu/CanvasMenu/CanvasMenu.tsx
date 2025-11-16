@@ -1,13 +1,22 @@
 import type React from "react";
-import { memo } from "react";
+import { memo, useState } from "react";
 
 // Import types related to SvgCanvas.
-import { CanvasMenuDiv } from "./CanvasMenuStyled";
+import {
+	CANVAS_MENU_CATEGORIES,
+	type CanvasMenuItem as MenuItemConfig,
+} from "../../../../constants/menu/canvas/CanvasMenuItems";
 import type { AddDiagramByTypeEvent } from "../../../../types/events/AddDiagramByTypeEvent";
 // Import functions related to SvgCanvas.
 import { newEventId } from "../../../../utils/core/newEventId";
 // Imports related to this component.
 import { CanvasMenuItem } from "../CanvasMenuItem";
+import {
+	CanvasMenuDiv,
+	CanvasMenuCategoryDiv,
+	CanvasMenuCategoryLabel,
+	CanvasMenuItemsDiv,
+} from "./CanvasMenuStyled";
 
 type CanvasMenuProps = {
 	onAddDiagramByType?: (e: AddDiagramByTypeEvent) => void;
@@ -16,405 +25,59 @@ type CanvasMenuProps = {
 const CanvasMenuComponent: React.FC<CanvasMenuProps> = ({
 	onAddDiagramByType,
 }) => {
+	const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(
+		new Set(),
+	);
+
+	const handleToggleCategory = (categoryId: string) => {
+		setCollapsedCategories((prev) => {
+			const next = new Set(prev);
+			if (next.has(categoryId)) {
+				next.delete(categoryId);
+			} else {
+				next.add(categoryId);
+			}
+			return next;
+		});
+	};
+
+	const handleItemClick = (config: MenuItemConfig) => {
+		onAddDiagramByType?.({
+			eventId: newEventId(),
+			diagramType: config.diagramType,
+			isSelected: true,
+			...(config.variant && { variant: config.variant }),
+		});
+	};
+
 	return (
 		<CanvasMenuDiv draggable={false}>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "Rectangle",
-						isSelected: true,
-					})
-				}
-			>
-				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>Add Rectangle</title>
-					<rect
-						x="2"
-						y="2"
-						width="20"
-						height="20"
-						fill="none"
-						stroke="#D0D4E0"
-					/>
-				</svg>
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "Ellipse",
-						isSelected: true,
-					})
-				}
-			>
-				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>Add Circle</title>
-					<ellipse
-						cx="12"
-						cy="12"
-						rx="10"
-						ry="10"
-						fill="none"
-						stroke="#D0D4E0"
-					/>
-				</svg>
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "Button",
-						isSelected: true,
-					})
-				}
-			>
-				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>Add Button</title>
-					<rect
-						x="2"
-						y="8"
-						width="20"
-						height="8"
-						rx="4"
-						ry="4"
-						fill="none"
-						stroke="#D0D4E0"
-					/>
-					<text x="12" y="13" fontSize="6" textAnchor="middle" fill="#D0D4E0">
-						BTN
-					</text>
-				</svg>
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "Input",
-						isSelected: true,
-					})
-				}
-			>
-				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>Add Input</title>
-					<rect
-						x="2"
-						y="9"
-						width="20"
-						height="6"
-						rx="1"
-						ry="1"
-						fill="none"
-						stroke="#D0D4E0"
-					/>
-					<line
-						x1="4"
-						y1="12"
-						x2="4"
-						y2="12"
-						stroke="#D0D4E0"
-						strokeWidth="1"
-					/>
-				</svg>
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "Path",
-						isSelected: true,
-					})
-				}
-			>
-				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>Add Line</title>
-					<path
-						d="M22 22 L2 2 Z"
-						fill="none"
-						stroke="#D0D4E0"
-						strokeWidth={1}
-					/>
-				</svg>
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "Ai",
-						isSelected: true,
-					})
-				}
-			>
-				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>Add AI Chat</title>
-					{/* Avatar circle */}
-					<circle
-						cx="12"
-						cy="7"
-						r="3.5"
-						fill="#4A90E2"
-						stroke="#333"
-						strokeWidth="0.5"
-					/>
-					{/* Robot emoji representation */}
-					<text
-						x="12"
-						y="8"
-						fontSize="4"
-						textAnchor="middle"
-						dominantBaseline="central"
-					>
-						🤖
-					</text>
-					{/* Speech bubble */}
-					<rect
-						x="5"
-						y="12"
-						width="14"
-						height="8"
-						rx="2"
-						ry="2"
-						fill="#F0F0F0"
-						stroke="#999"
-						strokeWidth="0.5"
-					/>
-					{/* Bubble tail */}
-					<polygon
-						points="12,12 10,10 14,10"
-						fill="#F0F0F0"
-						stroke="#999"
-						strokeWidth="0.5"
-					/>
-				</svg>
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "Sticky",
-						isSelected: true,
-					})
-				}
-			>
-				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>Add Sticky Note</title>
-					<rect
-						x="3"
-						y="3"
-						width="16"
-						height="16"
-						rx="2"
-						ry="2"
-						fill="#fef08a"
-						stroke="#fef08a"
-						strokeWidth="1"
-					/>
-					<line
-						x1="6"
-						y1="8"
-						x2="18"
-						y2="8"
-						stroke="#000000"
-						strokeWidth="0.5"
-					/>
-					<line
-						x1="6"
-						y1="11"
-						x2="15"
-						y2="11"
-						stroke="#000000"
-						strokeWidth="0.5"
-					/>
-					<line
-						x1="6"
-						y1="14"
-						x2="13"
-						y2="14"
-						stroke="#000000"
-						strokeWidth="0.5"
-					/>
-				</svg>
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "TextAreaNode",
-						isSelected: true,
-					})
-				}
-			>
-				T
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "LLMNode",
-						isSelected: true,
-					})
-				}
-			>
-				AI
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "HtmlGenNode",
-						isSelected: true,
-					})
-				}
-			>
-				HTML
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "SvgToDiagramNode",
-						isSelected: true,
-					})
-				}
-			>
-				SVG
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "HubNode",
-						isSelected: true,
-					})
-				}
-			>
-				※
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "ImageGenNode",
-						isSelected: true,
-					})
-				}
-			>
-				IMG
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "AgentNode",
-						isSelected: true,
-					})
-				}
-			>
-				AG
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "PageDesignNode",
-						isSelected: true,
-					})
-				}
-			>
-				PD
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "WebSearchNode",
-						isSelected: true,
-					})
-				}
-			>
-				WB
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "VectorStoreNode",
-						isSelected: true,
-					})
-				}
-			>
-				VS
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "CanvasFrame",
-						isSelected: true,
-					})
-				}
-			>
-				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>Add Canvas Frame</title>
-					<rect
-						x="2"
-						y="2"
-						width="20"
-						height="20"
-						rx="2"
-						ry="2"
-						fill="none"
-						stroke="#D0D4E0"
-						strokeWidth="2"
-					/>
-					<rect
-						x="5"
-						y="5"
-						width="14"
-						height="14"
-						rx="1"
-						ry="1"
-						fill="none"
-						stroke="#D0D4E0"
-						strokeWidth="1"
-						strokeDasharray="2,2"
-					/>
-				</svg>
-			</CanvasMenuItem>
-			<CanvasMenuItem
-				onClick={() =>
-					onAddDiagramByType?.({
-						eventId: newEventId(),
-						diagramType: "HtmlPreview",
-						isSelected: true,
-					})
-				}
-			>
-				<svg width="20" height="20" viewBox="0 0 24 24">
-					<title>Add HTML Preview</title>
-					<rect
-						x="2"
-						y="2"
-						width="20"
-						height="20"
-						rx="2"
-						ry="2"
-						fill="#f0f0f0"
-						stroke="#4A90E2"
-						strokeWidth="1.5"
-					/>
-					<text
-						x="12"
-						y="14"
-						fontSize="8"
-						fontWeight="bold"
-						textAnchor="middle"
-						fill="#4A90E2"
-					>
-						HTML
-					</text>
-				</svg>
-			</CanvasMenuItem>
+			{CANVAS_MENU_CATEGORIES.map((category) => {
+				const isCollapsed = collapsedCategories.has(category.id);
+
+				return (
+					<CanvasMenuCategoryDiv key={category.id}>
+						<CanvasMenuCategoryLabel
+							onClick={() => handleToggleCategory(category.id)}
+							data-collapsed={isCollapsed}
+						>
+							{category.label}
+						</CanvasMenuCategoryLabel>
+
+						{!isCollapsed && (
+							<CanvasMenuItemsDiv>
+								{category.items.map((item) => (
+									<CanvasMenuItem
+										key={item.id}
+										config={item}
+										onClick={handleItemClick}
+									/>
+								))}
+							</CanvasMenuItemsDiv>
+						)}
+					</CanvasMenuCategoryDiv>
+				);
+			})}
 		</CanvasMenuDiv>
 	);
 };

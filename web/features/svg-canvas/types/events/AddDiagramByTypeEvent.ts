@@ -9,4 +9,6 @@ export type AddDiagramByTypeEvent = {
 	x?: number;
 	y?: number;
 	isSelected?: boolean;
+	/** Optional property overrides for diagram variants */
+	variant?: Record<string, unknown>;
 };
