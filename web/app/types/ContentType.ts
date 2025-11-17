@@ -8,6 +8,8 @@ export enum ContentType {
 	CANVAS = "canvas",
 	/** Sandbox */
 	SANDBOX = "sandbox",
+	/** Folder Explorer */
+	FOLDER_EXPLORER = "folder-explorer",
 	/** Other type for future extension */
 	OTHER = "other",
 }

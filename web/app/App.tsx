@@ -10,8 +10,10 @@ import {
 	type ChatSpaceMessage,
 	type ChatSpaceThread,
 } from "../features/chat-space";
+import { FolderTree } from "../features/folder-explorer";
 
 const ENABLE_CHAT_SPACE_EXPERIMENT = true;
+const ENABLE_FOLDER_EXPLORER = true;
 
 const INITIAL_THREADS: ChatSpaceThread[] = [
 	{
@@ -116,35 +118,32 @@ const AppContent = (): ReactElement => {
 		);
 	}, []);
 
-	const handleSendMessage = useCallback(
-		(threadId: string, content: string) => {
-			const now = new Date();
-			const nextMessage: ChatSpaceMessage = {
-				id: `message-${now.getTime()}`,
-				threadId,
-				role: "user",
-				authorName: "You",
-				content,
-				timestamp: now,
-			};
+	const handleSendMessage = useCallback((threadId: string, content: string) => {
+		const now = new Date();
+		const nextMessage: ChatSpaceMessage = {
+			id: `message-${now.getTime()}`,
+			threadId,
+			role: "user",
+			authorName: "You",
+			content,
+			timestamp: now,
+		};
 
-			setMessages((prev) => [...prev, nextMessage]);
-			setThreads((prev) =>
-				prev.map((thread) =>
-					thread.id === threadId
-						? {
-								...thread,
-								unreadCount: 0,
-								lastActivityAt: now,
-								lastMessagePreview: content,
-							}
-						: thread,
-				),
-			);
-			setActiveThreadId(threadId);
-		},
-		[],
-	);
+		setMessages((prev) => [...prev, nextMessage]);
+		setThreads((prev) =>
+			prev.map((thread) =>
+				thread.id === threadId
+					? {
+							...thread,
+							unreadCount: 0,
+							lastActivityAt: now,
+							lastMessagePreview: content,
+						}
+					: thread,
+			),
+		);
+		setActiveThreadId(threadId);
+	}, []);
 
 	const canvasPane = canvas?.content ? (
 		<CanvasView content={canvas.content} onDataChange={updateCanvas} />
@@ -166,6 +165,30 @@ const AppContent = (): ReactElement => {
 
 	if (!ENABLE_CHAT_SPACE_EXPERIMENT) {
 		return <Page>{canvasPane}</Page>;
+	}
+
+	// FolderExplorer is enabled: show 3-column layout
+	if (ENABLE_FOLDER_EXPLORER) {
+		return (
+			<Page>
+				<SplitView
+					initialRatio={[0.2, 0.5, 0.3]}
+					left={<FolderTree />}
+					center={canvasPane}
+					right={
+						<ChatSpace
+							threads={threads}
+							messages={messages}
+							initialThreadId={activeThreadId}
+							width="100%"
+							height="100%"
+							onThreadSelect={handleThreadSelect}
+							onSendMessage={handleSendMessage}
+						/>
+					}
+				/>
+			</Page>
+		);
 	}
 
 	return (

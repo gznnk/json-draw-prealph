@@ -7,6 +7,7 @@ import {
 } from "./ContentViewConstants";
 import { Container, EmptyContent } from "./ContentViewStyled";
 import type { ContentViewProps } from "./ContentViewTypes";
+import { FolderTree } from "../../../features/folder-explorer";
 import { MarkdownEditor } from "../../../features/markdown-editor";
 import type { SvgCanvasData } from "../../../features/svg-canvas/canvas/types/SvgCanvasData";
 import { ContentType } from "../../types/ContentType";
@@ -39,6 +40,8 @@ const ContentViewComponent = ({
 						case ContentType.CANVAS:
 							// Pass content directly as SvgCanvasData
 							return <CanvasView content={content as SvgCanvasData} id={id} />;
+						case ContentType.FOLDER_EXPLORER:
+							return <FolderTree />;
 						default:
 							return <EmptyContent>{EMPTY_CONTENT_MESSAGE}</EmptyContent>;
 					}
