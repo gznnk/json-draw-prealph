@@ -58,6 +58,4 @@ export const DiagramMenuDivider = styled.div`
  */
 export const DiagramMenuPositioner = styled.div`
 	position: relative;
-	display: flex;
-	flex-direction: row;
 `;

@@ -10,7 +10,6 @@ export const DiagramMenuControlPositioner = styled.div`
 
 export const DiagramMenuControlContainer = styled.div`
 	height: 100%;
-	margin: 0 -100px;
 	display: flex;
 	align-items: center;
 	flex-direction: column;
