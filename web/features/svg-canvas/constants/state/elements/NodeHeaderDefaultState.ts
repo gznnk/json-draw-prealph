@@ -11,4 +11,7 @@ export const NodeHeaderDefaultState: NodeHeaderState =
 		type: "NodeHeader",
 		options: NodeHeaderFeatures,
 		baseData: NodeHeaderDefaultData,
+		properties: {
+			outlineDisabled: true,
+		},
 	});

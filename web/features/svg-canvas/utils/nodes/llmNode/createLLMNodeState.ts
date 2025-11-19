@@ -111,6 +111,7 @@ export const createLLMNodeState = ({
 					text,
 					verticalAlign: "top",
 				}),
+				outlineDisabled: true,
 			},
 		],
 		connectPoints,

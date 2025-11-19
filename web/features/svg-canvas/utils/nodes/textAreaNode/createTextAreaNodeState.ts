@@ -75,6 +75,7 @@ export const createTextAreaNodeState = ({
 					verticalAlign: "top",
 				}),
 				connectPoints: [],
+				outlineDisabled: true,
 			},
 		],
 		connectPoints,
