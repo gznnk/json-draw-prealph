@@ -10,10 +10,10 @@ import { VectorStoreNodeFeatures } from "../../types/data/nodes/VectorStoreNodeD
 import type { VectorStoreNodeProps } from "../../types/props/nodes/VectorStoreNodeProps";
 import type { VectorStoreNodeState } from "../../types/state/nodes/VectorStoreNodeState";
 import { createVectorStoreNodeState } from "../../utils/nodes/vectorStoreNode/createVectorStoreNodeState";
+import { isVectorStoreNodeData } from "../../utils/nodes/vectorStoreNode/isVectorStoreNodeData";
 import { mapVectorStoreNodeDataToState } from "../../utils/nodes/vectorStoreNode/mapVectorStoreNodeDataToState";
 import { vectorStoreNodeStateToData } from "../../utils/nodes/vectorStoreNode/mapVectorStoreNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isVectorStoreNodeData } from "../../utils/nodes/vectorStoreNode/isVectorStoreNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

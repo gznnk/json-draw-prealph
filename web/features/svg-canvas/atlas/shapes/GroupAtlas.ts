@@ -6,9 +6,9 @@ import type { GroupData } from "../../types/data/shapes/GroupData";
 import { GroupFeatures } from "../../types/data/shapes/GroupData";
 import type { GroupProps } from "../../types/props/shapes/GroupProps";
 import type { GroupState } from "../../types/state/shapes/GroupState";
+import { isGroupData } from "../../utils/shapes/group/isGroupData";
 import { mapGroupDataToState } from "../../utils/shapes/group/mapGroupDataToState";
 import { groupStateToData } from "../../utils/shapes/group/mapGroupStateToData";
-import { isGroupData } from "../../utils/shapes/group/isGroupData";
 import {
 	type DiagramAtlas,
 	type DataToStateMapper,

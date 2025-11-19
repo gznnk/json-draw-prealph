@@ -9,9 +9,9 @@ import type { ConnectLineData } from "../../types/data/shapes/ConnectLineData";
 import { ConnectLineFeatures } from "../../types/data/shapes/ConnectLineData";
 import type { ConnectLineProps } from "../../types/props/shapes/ConnectLineProps";
 import type { ConnectLineState } from "../../types/state/shapes/ConnectLineState";
+import { isConnectLineData } from "../../utils/shapes/connectLine/isConnectLineData";
 import { mapConnectLineDataToState } from "../../utils/shapes/connectLine/mapConnectLineDataToState";
 import { connectLineStateToData } from "../../utils/shapes/connectLine/mapConnectLineStateToData";
-import { isConnectLineData } from "../../utils/shapes/connectLine/isConnectLineData";
 import {
 	dummyImplementation,
 	type DataToStateMapper,

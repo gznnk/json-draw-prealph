@@ -10,9 +10,9 @@ import { HtmlPreviewFeatures } from "../../types/data/shapes/HtmlPreviewData";
 import type { HtmlPreviewProps } from "../../types/props/shapes/HtmlPreviewProps";
 import type { HtmlPreviewState } from "../../types/state/shapes/HtmlPreviewState";
 import { createHtmlPreviewState } from "../../utils/shapes/htmlPreview/createHtmlPreviewState";
+import { isHtmlPreviewData } from "../../utils/shapes/htmlPreview/isHtmlPreviewData";
 import { mapHtmlPreviewDataToState } from "../../utils/shapes/htmlPreview/mapHtmlPreviewDataToState";
 import { mapHtmlPreviewStateToData } from "../../utils/shapes/htmlPreview/mapHtmlPreviewStateToData";
-import { isHtmlPreviewData } from "../../utils/shapes/htmlPreview/isHtmlPreviewData";
 import type {
 	DiagramAtlas,
 	DataToStateMapper,

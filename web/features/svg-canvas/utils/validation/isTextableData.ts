@@ -1,3 +1,6 @@
+import { isTextableType } from "./isTextableType";
+import { isTextAlign } from "./isTextAlign";
+import { isVerticalAlign } from "./isVerticalAlign";
 import {
 	isCssColor,
 	isNonNegativeNumber,
@@ -15,9 +18,12 @@ export const isTextableData = (data: unknown): data is TextableData => {
 	return (
 		"text" in data &&
 		isString(data.text) &&
-		"textType" in data && // TODO: Further validation of textType can be added here
-		"textAlign" in data && // TODO: Further validation of textAlign can be added here
-		"verticalAlign" in data && // TODO: Further validation of verticalAlign can be added here
+		"textType" in data &&
+		isTextableType(data.textType) &&
+		"textAlign" in data &&
+		isTextAlign(data.textAlign) &&
+		"verticalAlign" in data &&
+		isVerticalAlign(data.verticalAlign) &&
 		"fontColor" in data &&
 		isCssColor(data.fontColor) &&
 		"fontSize" in data &&

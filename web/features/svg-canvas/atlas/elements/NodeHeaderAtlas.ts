@@ -6,9 +6,9 @@ import { NodeHeaderFeatures } from "../../types/data/elements/NodeHeaderData";
 import type { NodeHeaderProps } from "../../types/props/elements/NodeHeaderProps";
 import type { NodeHeaderState } from "../../types/state/elements/NodeHeaderState";
 import { createNodeHeaderState } from "../../utils/elements/nodeHeader/createNodeHeaderState";
+import { isNodeHeaderData } from "../../utils/elements/nodeHeader/isNodeHeaderData";
 import { mapNodeHeaderDataToState } from "../../utils/elements/nodeHeader/mapNodeHeaderDataToState";
 import { mapNodeHeaderStateToData } from "../../utils/elements/nodeHeader/mapNodeHeaderStateToData";
-import { isNodeHeaderData } from "../../utils/elements/nodeHeader/isNodeHeaderData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

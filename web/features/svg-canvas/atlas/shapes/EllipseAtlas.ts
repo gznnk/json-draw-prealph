@@ -8,9 +8,9 @@ import type { EllipseProps } from "../../types/props/shapes/EllipseProps";
 import type { EllipseState } from "../../types/state/shapes/EllipseState";
 import { calcEllipseConnectPointPosition } from "../../utils/shapes/ellipse/calcEllipseConnectPointPosition";
 import { createEllipseState } from "../../utils/shapes/ellipse/createEllipseState";
+import { isEllipseData } from "../../utils/shapes/ellipse/isEllipseData";
 import { mapEllipseDataToState } from "../../utils/shapes/ellipse/mapEllipseDataToState";
 import { ellipseStateToData } from "../../utils/shapes/ellipse/mapEllipseStateToData";
-import { isEllipseData } from "../../utils/shapes/ellipse/isEllipseData";
 import type {
 	DiagramAtlas,
 	DataToStateMapper,

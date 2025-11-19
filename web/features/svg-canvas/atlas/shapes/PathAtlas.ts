@@ -7,9 +7,9 @@ import { PathFeatures } from "../../types/data/shapes/PathData";
 import type { PathProps } from "../../types/props/shapes/PathProps";
 import type { PathState } from "../../types/state/shapes/PathState";
 import { createPathState } from "../../utils/shapes/path/createPathState";
+import { isPathData } from "../../utils/shapes/path/isPathData";
 import { mapPathDataToState } from "../../utils/shapes/path/mapPathDataToState";
 import { pathStateToData } from "../../utils/shapes/path/mapPathStateToData";
-import { isPathData } from "../../utils/shapes/path/isPathData";
 import {
 	dummyImplementation,
 	type DataToStateMapper,

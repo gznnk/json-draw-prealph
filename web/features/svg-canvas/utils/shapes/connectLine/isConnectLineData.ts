@@ -1,19 +1,9 @@
+import { isBoolean, isString } from "../../../../../shared/validation";
 import type { ConnectLineData } from "../../../types/data/shapes/ConnectLineData";
 import { ConnectLineFeatures } from "../../../types/data/shapes/ConnectLineData";
 import { createValidatorFromTypeAndFeatures } from "../../validation/createValidatorFromTypeAndFeatures";
-import { isBoolean, isString } from "../../../../../shared/validation";
-
-const VALID_PATH_TYPES = ["Straight", "Polyline", "Curve", "Rounded"];
-const VALID_ARROW_HEADS = [
-	"FilledTriangle",
-	"ConcaveTriangle",
-	"OpenArrow",
-	"HollowTriangle",
-	"FilledDiamond",
-	"HollowDiamond",
-	"Circle",
-	"None",
-];
+import { isArrowHeadType } from "../../validation/isArrowHeadType";
+import { isPathType } from "../../validation/isPathType";
 
 const baseValidator = createValidatorFromTypeAndFeatures(
 	"ConnectLine",
@@ -31,22 +21,16 @@ export const isConnectLineData = (data: unknown): data is ConnectLineData => {
 
 	const lineData = data as ConnectLineData;
 
-	if (!VALID_PATH_TYPES.includes(lineData.pathType)) return false;
+	if (!isPathType(lineData.pathType)) return false;
 	if (!isString(lineData.startOwnerId)) return false;
 	if (!isString(lineData.endOwnerId)) return false;
 	if (!isBoolean(lineData.autoRouting)) return false;
 
-	if (
-		lineData.startArrowHead &&
-		!VALID_ARROW_HEADS.includes(lineData.startArrowHead)
-	) {
+	if (lineData.startArrowHead && !isArrowHeadType(lineData.startArrowHead)) {
 		return false;
 	}
 
-	if (
-		lineData.endArrowHead &&
-		!VALID_ARROW_HEADS.includes(lineData.endArrowHead)
-	) {
+	if (lineData.endArrowHead && !isArrowHeadType(lineData.endArrowHead)) {
 		return false;
 	}
 

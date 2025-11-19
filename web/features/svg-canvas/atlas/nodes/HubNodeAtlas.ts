@@ -7,10 +7,10 @@ import { HubNodeFeatures } from "../../types/data/nodes/HubNodeData";
 import type { HubNodeProps } from "../../types/props/nodes/HubNodeProps";
 import type { HubNodeState } from "../../types/state/nodes/HubNodeState";
 import { createHubNodeState } from "../../utils/nodes/hubNode/createHubNodeState";
+import { isHubNodeData } from "../../utils/nodes/hubNode/isHubNodeData";
 import { mapHubNodeDataToState } from "../../utils/nodes/hubNode/mapHubNodeDataToState";
 import { hubNodeStateToData } from "../../utils/nodes/hubNode/mapHubNodeStateToData";
 import { calcEllipseConnectPointPosition } from "../../utils/shapes/ellipse/calcEllipseConnectPointPosition";
-import { isHubNodeData } from "../../utils/nodes/hubNode/isHubNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

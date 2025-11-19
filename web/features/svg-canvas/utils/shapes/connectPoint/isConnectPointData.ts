@@ -1,6 +1,6 @@
+import { isString } from "../../../../../shared/validation";
 import type { ConnectPointData } from "../../../types/data/shapes/ConnectPointData";
 import { isDiagramBaseData } from "../../validation/isDiagramBaseData";
-import { isString } from "../../../../../shared/validation";
 
 /**
  * Type guard to check if data is ConnectPointData.
@@ -11,7 +11,7 @@ import { isString } from "../../../../../shared/validation";
 export const isConnectPointData = (data: unknown): data is ConnectPointData => {
 	if (!isDiagramBaseData(data)) return false;
 	if (data.type !== "ConnectPoint") return false;
-	
+
 	const connectPointData = data as ConnectPointData;
 	return isString(connectPointData.name);
 };

@@ -7,10 +7,10 @@ import { InputFeatures } from "../../types/data/elements/InputData";
 import type { InputProps } from "../../types/props/elements/InputProps";
 import type { InputState } from "../../types/state/elements/InputState";
 import { createInputState } from "../../utils/elements/input/createInputState";
+import { isInputData } from "../../utils/elements/input/isInputData";
 import { mapInputDataToState } from "../../utils/elements/input/mapInputDataToState";
 import { inputStateToData } from "../../utils/elements/input/mapInputStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isInputData } from "../../utils/elements/input/isInputData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

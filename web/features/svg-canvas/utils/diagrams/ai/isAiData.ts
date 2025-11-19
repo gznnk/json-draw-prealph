@@ -1,8 +1,6 @@
-import {
-	isCssColor,
-	isString,
-} from "../../../../../shared/validation";
-import { AiData, AiFeatures } from "../../../types/data/diagrams/AiData";
+import { isCssColor, isString } from "../../../../../shared/validation";
+import type { AiData } from "../../../types/data/diagrams/AiData";
+import { AiFeatures } from "../../../types/data/diagrams/AiData";
 import { createValidatorFromTypeAndFeatures } from "../../validation/createValidatorFromTypeAndFeatures";
 
 const baseValidator = createValidatorFromTypeAndFeatures("Ai", AiFeatures);

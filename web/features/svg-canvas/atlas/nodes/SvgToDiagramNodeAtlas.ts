@@ -10,10 +10,10 @@ import { SvgToDiagramNodeFeatures } from "../../types/data/nodes/SvgToDiagramNod
 import type { SvgToDiagramNodeProps } from "../../types/props/nodes/SvgToDiagramNodeProps";
 import type { SvgToDiagramNodeState } from "../../types/state/nodes/SvgToDiagramNodeState";
 import { createSvgToDiagramNodeState } from "../../utils/nodes/svgToDiagramNode/createSvgToDiagramNodeState";
+import { isSvgToDiagramNodeData } from "../../utils/nodes/svgToDiagramNode/isSvgToDiagramNodeData";
 import { mapSvgToDiagramNodeDataToState } from "../../utils/nodes/svgToDiagramNode/mapSvgToDiagramNodeDataToState";
 import { svgToDiagramNodeStateToData } from "../../utils/nodes/svgToDiagramNode/mapSvgToDiagramNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isSvgToDiagramNodeData } from "../../utils/nodes/svgToDiagramNode/isSvgToDiagramNodeData";
 import type {
 	DiagramAtlas,
 	DataToStateMapper,

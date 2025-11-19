@@ -7,10 +7,10 @@ import { ButtonFeatures } from "../../types/data/elements/ButtonData";
 import type { ButtonProps } from "../../types/props/elements/ButtonProps";
 import type { ButtonState } from "../../types/state/elements/ButtonState";
 import { createButtonState } from "../../utils/elements/button/createButtonState";
+import { isButtonData } from "../../utils/elements/button/isButtonData";
 import { mapButtonDataToState } from "../../utils/elements/button/mapButtonDataToState";
 import { mapButtonStateToData } from "../../utils/elements/button/mapButtonStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isButtonData } from "../../utils/elements/button/isButtonData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

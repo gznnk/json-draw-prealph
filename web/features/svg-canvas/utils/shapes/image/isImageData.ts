@@ -1,9 +1,12 @@
+import { isString } from "../../../../../shared/validation";
 import type { ImageData } from "../../../types/data/shapes/ImageData";
 import { ImageFeatures } from "../../../types/data/shapes/ImageData";
 import { createValidatorFromTypeAndFeatures } from "../../validation/createValidatorFromTypeAndFeatures";
-import { isString } from "../../../../../shared/validation";
 
-const baseValidator = createValidatorFromTypeAndFeatures("Image", ImageFeatures);
+const baseValidator = createValidatorFromTypeAndFeatures(
+	"Image",
+	ImageFeatures,
+);
 
 /**
  * Type guard to check if data is ImageData.

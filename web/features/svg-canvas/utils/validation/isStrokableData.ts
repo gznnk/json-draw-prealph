@@ -1,3 +1,4 @@
+import { isStrokeDashType } from "./isStrokeDashType";
 import {
 	isCssColor,
 	isNonNegativeNumber,
@@ -16,6 +17,7 @@ export const isStrokableData = (data: unknown): data is StrokableData => {
 		isCssColor(data.stroke) &&
 		"strokeWidth" in data &&
 		isNonNegativeNumber(data.strokeWidth) &&
-		"strokeDasharray" in data // TODO: Further validation of strokeDasharray can be added here
+		"strokeDasharray" in data &&
+		isStrokeDashType(data.strokeDasharray)
 	);
 };

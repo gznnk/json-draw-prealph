@@ -5,9 +5,9 @@ import { PathPointDefaultState } from "../../constants/state/shapes/PathPointDef
 import type { PathPointData } from "../../types/data/shapes/PathPointData";
 import type { PathPointProps } from "../../types/props/shapes/PathPointProps";
 import type { PathPointState } from "../../types/state/shapes/PathPointState";
+import { isPathPointData } from "../../utils/shapes/path/isPathPointData";
 import { mapPathPointDataToState } from "../../utils/shapes/path/mapPathPointDataToState";
 import { pathPointStateToData } from "../../utils/shapes/path/mapPathPointStateToData";
-import { isPathPointData } from "../../utils/shapes/path/isPathPointData";
 import {
 	dummyImplementation,
 	type DataToStateMapper,

@@ -5,9 +5,9 @@ import type { FrameData } from "../../types/data/elements/FrameData";
 import { FrameFeatures } from "../../types/data/elements/FrameData";
 import type { FrameProps } from "../../types/props/elements/FrameProps";
 import type { FrameState } from "../../types/state/elements/FrameState";
+import { isFrameData } from "../../utils/elements/frame/isFrameData";
 import type { DiagramAtlas, DiagramDataValidator } from "../DiagramAtlas";
 import { DummyComponent, dummyImplementation } from "../DiagramAtlas";
-import { isFrameData } from "../../utils/elements/frame/isFrameData";
 
 /**
  * Frame Element Atlas

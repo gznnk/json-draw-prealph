@@ -10,10 +10,10 @@ import { ImageGenNodeFeatures } from "../../types/data/nodes/ImageGenNodeData";
 import type { ImageGenNodeProps } from "../../types/props/nodes/ImageGenNodeProps";
 import type { ImageGenNodeState } from "../../types/state/nodes/ImageGenNodeState";
 import { createImageGenNodeState } from "../../utils/nodes/imageGenNode/createImageGenNodeState";
+import { isImageGenNodeData } from "../../utils/nodes/imageGenNode/isImageGenNodeData";
 import { mapImageGenNodeDataToState } from "../../utils/nodes/imageGenNode/mapImageGenNodeDataToState";
 import { imageGenNodeStateToData } from "../../utils/nodes/imageGenNode/mapImageGenNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isImageGenNodeData } from "../../utils/nodes/imageGenNode/isImageGenNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

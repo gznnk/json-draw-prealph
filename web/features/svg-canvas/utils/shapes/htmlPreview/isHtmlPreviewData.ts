@@ -1,7 +1,7 @@
+import { isString } from "../../../../../shared/validation";
 import type { HtmlPreviewData } from "../../../types/data/shapes/HtmlPreviewData";
 import { HtmlPreviewFeatures } from "../../../types/data/shapes/HtmlPreviewData";
 import { createValidatorFromTypeAndFeatures } from "../../validation/createValidatorFromTypeAndFeatures";
-import { isString } from "../../../../../shared/validation";
 
 const baseValidator = createValidatorFromTypeAndFeatures(
 	"HtmlPreview",

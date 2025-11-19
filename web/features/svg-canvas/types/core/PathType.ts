@@ -6,4 +6,13 @@
  * - Curve: Quadratic Bézier curves using path points as control points
  * - Rounded: Straight line segments with rounded corners between path points
  */
-export type PathType = "Straight" | "Polyline" | "Curve" | "Rounded";
+/**
+ * Available path type values.
+ */
+export const PathTypes = ["Straight", "Polyline", "Curve", "Rounded"] as const;
+
+/**
+ * Defines the available types for path rendering.
+ * Determines how the path between points is drawn.
+ */
+export type PathType = (typeof PathTypes)[number];

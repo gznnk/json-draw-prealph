@@ -7,10 +7,10 @@ import { SvgFeatures } from "../../types/data/shapes/SvgData";
 import type { SvgProps } from "../../types/props/shapes/SvgProps";
 import type { SvgState } from "../../types/state/shapes/SvgState";
 import { createSvgState } from "../../utils/shapes/svg/createSvgState";
+import { isSvgData } from "../../utils/shapes/svg/isSvgData";
 import { mapSvgDataToState } from "../../utils/shapes/svg/mapSvgDataToState";
 import { svgStateToData } from "../../utils/shapes/svg/mapSvgStateToData";
 import { svgToBlob } from "../../utils/shapes/svg/svgToBlob";
-import { isSvgData } from "../../utils/shapes/svg/isSvgData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

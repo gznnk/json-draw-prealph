@@ -7,11 +7,11 @@ import type { LLMNodeData } from "../../types/data/nodes/LLMNodeData";
 import type { LLMNodeProps } from "../../types/props/nodes/LLMNodeProps";
 import type { LLMNodeState } from "../../types/state/nodes/LLMNodeState";
 import { createLLMNodeState } from "../../utils/nodes/llmNode/createLLMNodeState";
+import { isLLMNodeData } from "../../utils/nodes/llmNode/isLLMNodeData";
 import { mapLLMNodeDataToState } from "../../utils/nodes/llmNode/mapLLMNodeDataToState";
 import { llmNodeStateToData } from "../../utils/nodes/llmNode/mapLLMNodeStateToData";
 import { transformLLMNodeItems } from "../../utils/nodes/llmNode/transformLLMNodeItems";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isLLMNodeData } from "../../utils/nodes/llmNode/isLLMNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

@@ -10,10 +10,10 @@ import { TextAreaNodeFeatures } from "../../types/data/nodes/TextAreaNodeData";
 import type { TextAreaNodeProps } from "../../types/props/nodes/TextAreaNodeProps";
 import type { TextAreaNodeState } from "../../types/state/nodes/TextAreaNodeState";
 import { createTextAreaNodeState } from "../../utils/nodes/textAreaNode/createTextAreaNodeState";
+import { isTextAreaNodeData } from "../../utils/nodes/textAreaNode/isTextAreaNodeData";
 import { mapTextAreaNodeDataToState } from "../../utils/nodes/textAreaNode/mapTextAreaNodeDataToState";
 import { textAreaNodeStateToData } from "../../utils/nodes/textAreaNode/mapTextAreaNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isTextAreaNodeData } from "../../utils/nodes/textAreaNode/isTextAreaNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

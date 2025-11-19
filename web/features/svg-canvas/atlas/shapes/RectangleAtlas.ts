@@ -8,9 +8,9 @@ import type { RectangleProps } from "../../types/props/shapes/RectangleProps";
 import type { RectangleState } from "../../types/state/shapes/RectangleState";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
 import { createRectangleState } from "../../utils/shapes/rectangle/createRectangleState";
+import { isRectangleData } from "../../utils/shapes/rectangle/isRectangleData";
 import { rectangleDataToState } from "../../utils/shapes/rectangle/mapRectangleDataToState";
 import { rectangleStateToData } from "../../utils/shapes/rectangle/mapRectangleStateToData";
-import { isRectangleData } from "../../utils/shapes/rectangle/isRectangleData";
 import {
 	type DataToStateMapper,
 	type DiagramAtlas,

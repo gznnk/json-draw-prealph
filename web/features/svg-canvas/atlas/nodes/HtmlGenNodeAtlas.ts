@@ -10,10 +10,10 @@ import type { HtmlGenNodeData } from "../../types/data/nodes/HtmlGenNodeData";
 import type { HtmlGenNodeProps } from "../../types/props/nodes/HtmlGenNodeProps";
 import type { HtmlGenNodeState } from "../../types/state/nodes/HtmlGenNodeState";
 import { createHtmlGenNodeState } from "../../utils/nodes/htmlGenNode/createHtmlGenNodeState";
+import { isHtmlGenNodeData } from "../../utils/nodes/htmlGenNode/isHtmlGenNodeData";
 import { mapHtmlGenNodeDataToState } from "../../utils/nodes/htmlGenNode/mapHtmlGenNodeDataToState";
 import { htmlGenNodeStateToData } from "../../utils/nodes/htmlGenNode/mapHtmlGenNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isHtmlGenNodeData } from "../../utils/nodes/htmlGenNode/isHtmlGenNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

@@ -10,10 +10,10 @@ import { WebSearchNodeFeatures } from "../../types/data/nodes/WebSearchNodeData"
 import type { WebSearchNodeProps } from "../../types/props/nodes/WebSearchNodeProps";
 import type { WebSearchNodeState } from "../../types/state/nodes/WebSearchNodeState";
 import { createWebSearchNodeState } from "../../utils/nodes/webSearchNode/createWebSearchNodeState";
+import { isWebSearchNodeData } from "../../utils/nodes/webSearchNode/isWebSearchNodeData";
 import { mapWebSearchNodeDataToState } from "../../utils/nodes/webSearchNode/mapWebSearchNodeDataToState";
 import { webSearchNodeStateToData } from "../../utils/nodes/webSearchNode/mapWebSearchNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isWebSearchNodeData } from "../../utils/nodes/webSearchNode/isWebSearchNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

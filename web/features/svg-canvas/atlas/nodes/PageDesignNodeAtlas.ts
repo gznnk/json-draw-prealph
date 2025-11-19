@@ -10,10 +10,10 @@ import { PageDesignNodeFeatures } from "../../types/data/nodes/PageDesignNodeDat
 import type { PageDesignNodeProps } from "../../types/props/nodes/PageDesignNodeProps";
 import type { PageDesignNodeState } from "../../types/state/nodes/PageDesignNodeState";
 import { createPageDesignNodeState } from "../../utils/nodes/pageDesignNode/createPageDesignNodeState";
+import { isPageDesignNodeData } from "../../utils/nodes/pageDesignNode/isPageDesignNodeData";
 import { mapPageDesignNodeDataToState } from "../../utils/nodes/pageDesignNode/mapPageDesignNodeDataToState";
 import { pageDesignNodeStateToData } from "../../utils/nodes/pageDesignNode/mapPageDesignNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isPageDesignNodeData } from "../../utils/nodes/pageDesignNode/isPageDesignNodeData";
 import type {
 	DiagramAtlas,
 	DataToStateMapper,

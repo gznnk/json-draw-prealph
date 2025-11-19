@@ -7,10 +7,10 @@ import { AgentNodeFeatures } from "../../types/data/nodes/AgentNodeData";
 import type { AgentNodeProps } from "../../types/props/nodes/AgentNodeProps";
 import type { AgentNodeState } from "../../types/state/nodes/AgentNodeState";
 import { createAgentNodeState } from "../../utils/nodes/agentNode/createAgentNodeState";
+import { isAgentNodeData } from "../../utils/nodes/agentNode/isAgentNodeData";
 import { mapAgentNodeDataToState } from "../../utils/nodes/agentNode/mapAgentNodeDataToState";
 import { agentNodeStateToData } from "../../utils/nodes/agentNode/mapAgentNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
-import { isAgentNodeData } from "../../utils/nodes/agentNode/isAgentNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,

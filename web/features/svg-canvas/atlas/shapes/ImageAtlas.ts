@@ -8,9 +8,9 @@ import type { ImageProps } from "../../types/props/shapes/ImageProps";
 import type { ImageState } from "../../types/state/shapes/ImageState";
 import { createImageState } from "../../utils/shapes/image/createImageState";
 import { imageToBlob } from "../../utils/shapes/image/imageToBlob";
+import { isImageData } from "../../utils/shapes/image/isImageData";
 import { mapImageDataToState } from "../../utils/shapes/image/mapImageDataToState";
 import { imageStateToData } from "../../utils/shapes/image/mapImageStateToData";
-import { isImageData } from "../../utils/shapes/image/isImageData";
 import {
 	type DiagramAtlas,
 	type DataToStateMapper,
