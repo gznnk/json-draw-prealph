@@ -6,7 +6,13 @@ import { NodeHeaderFeatures } from "../../types/data/elements/NodeHeaderData";
 import type { NodeHeaderProps } from "../../types/props/elements/NodeHeaderProps";
 import type { NodeHeaderState } from "../../types/state/elements/NodeHeaderState";
 import { createNodeHeaderState } from "../../utils/elements/nodeHeader/createNodeHeaderState";
-import type { DiagramAtlas } from "../DiagramAtlas";
+import { mapNodeHeaderDataToState } from "../../utils/elements/nodeHeader/mapNodeHeaderDataToState";
+import { mapNodeHeaderStateToData } from "../../utils/elements/nodeHeader/mapNodeHeaderStateToData";
+import type {
+	DataToStateMapper,
+	DiagramAtlas,
+	StateToDataMapper,
+} from "../DiagramAtlas";
 import { DummyComponent, dummyImplementation } from "../DiagramAtlas";
 
 /**
@@ -63,6 +69,6 @@ export const NodeHeaderAtlas: NodeHeaderAtlas = {
 	export: undefined,
 	calcConnectPointPosition: dummyImplementation,
 	transformItems: undefined,
-	dataToState: dummyImplementation,
-	stateToData: dummyImplementation,
+	dataToState: mapNodeHeaderDataToState as DataToStateMapper,
+	stateToData: mapNodeHeaderStateToData as StateToDataMapper,
 };

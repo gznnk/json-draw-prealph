@@ -1,268 +1,197 @@
 {
-  "id": "canvas-1763518796768",
+  "id": "canvas-1763521830427",
   "name": "新しい図",
   "content": {
-    "id": "canvas-1763518796768",
+    "id": "canvas-1763521830427",
     "minX": 256.3951496283846,
     "minY": 117.78514618062358,
     "zoom": 1.3509905071119193,
     "items": [
       {
-        "id": "5e025d7c-4ac0-40ca-a659-e33d498b1147",
-        "type": "Rectangle",
-        "x": 510.2734375,
-        "y": 374.5,
-        "width": 100,
-        "height": 100,
-        "rotation": 0,
-        "scaleX": 1,
-        "scaleY": 1,
-        "keepProportion": false,
-        "rotateEnabled": true,
-        "inversionEnabled": true,
-        "connectEnabled": true,
-        "connectPoints": [
-          {
-            "id": "90ea5cf6-a1e7-4a34-b1a3-6eb0868e953b",
-            "type": "ConnectPoint",
-            "x": 640.2734375,
-            "y": 407.5,
-            "name": "topLeftPoint"
-          },
-          {
-            "id": "5268a5e4-0b89-460a-aa1f-9718e21f273d",
-            "type": "ConnectPoint",
-            "x": 640.2734375,
-            "y": 507.5,
-            "name": "bottomLeftPoint"
-          },
-          {
-            "id": "7aa7f3e0-cfac-42bd-8601-359ae20305ff",
-            "type": "ConnectPoint",
-            "x": 740.2734375,
-            "y": 407.5,
-            "name": "topRightPoint"
-          },
-          {
-            "id": "1fc562ae-d344-41eb-9416-701885cb92e3",
-            "type": "ConnectPoint",
-            "x": 740.2734375,
-            "y": 507.5,
-            "name": "bottomRightPoint"
-          },
-          {
-            "id": "7b70c18f-0008-45f6-93b8-2c0a155a350e",
-            "type": "ConnectPoint",
-            "x": 690.2734375,
-            "y": 407.5,
-            "name": "topCenterPoint"
-          },
-          {
-            "id": "f751c01b-3ed6-468d-9f4c-d8cacfd1a953",
-            "type": "ConnectPoint",
-            "x": 640.2734375,
-            "y": 457.5,
-            "name": "leftCenterPoint"
-          },
-          {
-            "id": "e9f29efc-e6c8-4045-be99-f03133ffab93",
-            "type": "ConnectPoint",
-            "x": 740.2734375,
-            "y": 457.5,
-            "name": "rightCenterPoint"
-          },
-          {
-            "id": "802d5dd1-5dc1-4560-9e1c-1eeb7e39f3ce",
-            "type": "ConnectPoint",
-            "x": 690.2734375,
-            "y": 507.5,
-            "name": "bottomCenterPoint"
-          }
-        ],
-        "stroke": "#2E5C8A",
-        "strokeWidth": 1,
-        "strokeDashType": "solid",
-        "fill": "#4A90E2",
-        "text": "",
-        "textType": "textarea",
-        "fontColor": "black",
-        "fontSize": 16,
-        "fontFamily": "Noto Sans JP",
-        "fontWeight": "normal",
-        "textAlign": "center",
-        "verticalAlign": "center",
-        "cornerRadius": 0
-      },
-      {
-        "id": "5fc637f2-4fc4-496b-9725-4d293ed79cc9",
-        "type": "Rectangle",
-        "x": 923.2734375,
-        "y": 444.5,
+        "id": "98de06a8-e613-43fd-bc94-8547d096f52e",
+        "type": "LLMNode",
+        "x": 567.2086822378466,
+        "y": 457.6531745993362,
+        "name": "",
+        "description": "",
         "width": 200,
-        "height": 150,
+        "height": 200,
         "rotation": 0,
         "scaleX": 1,
         "scaleY": 1,
         "keepProportion": false,
         "rotateEnabled": true,
         "inversionEnabled": true,
+        "items": [
+          {
+            "id": "911d0edf-c2c1-4f55-8492-c0bda452d084",
+            "type": "NodeHeader",
+            "x": 567.2086822378466,
+            "y": 384.6531745993362,
+            "name": "",
+            "description": "",
+            "width": 100,
+            "height": 30,
+            "rotation": 0,
+            "scaleX": 1,
+            "scaleY": 1,
+            "text": "LLM",
+            "textType": "textarea",
+            "fontColor": "#000000",
+            "fontSize": 18,
+            "fontFamily": "Noto Sans JP",
+            "fontWeight": "400",
+            "textAlign": "left",
+            "verticalAlign": "center"
+          },
+          {
+            "id": "cbbfa430-8193-40ba-a04d-d58784afcf89",
+            "type": "Input",
+            "x": 567.2086822378466,
+            "y": 475.6531745993362,
+            "name": "",
+            "description": "",
+            "width": 168,
+            "height": 132,
+            "rotation": 0,
+            "scaleX": 1,
+            "scaleY": 1,
+            "keepProportion": false,
+            "rotateEnabled": true,
+            "inversionEnabled": true,
+            "connectEnabled": true,
+            "connectPoints": [
+              {
+                "id": "cb0f8517-78c1-4a6d-b29d-e4d045ae08ef",
+                "type": "ConnectPoint",
+                "x": 530.5813629019091,
+                "y": 377.8247139059768,
+                "name": "topLeftPoint"
+              },
+              {
+                "id": "d9356bd3-cc86-46d6-aac9-383dc7fb6de8",
+                "type": "ConnectPoint",
+                "x": 530.5813629019091,
+                "y": 509.8247139059768,
+                "name": "bottomLeftPoint"
+              },
+              {
+                "id": "079413c1-871d-4045-9216-f7f0b1a2a9cf",
+                "type": "ConnectPoint",
+                "x": 698.5813629019091,
+                "y": 377.8247139059768,
+                "name": "topRightPoint"
+              },
+              {
+                "id": "0f0f0401-8a22-4b05-9ce5-762aea9a0f73",
+                "type": "ConnectPoint",
+                "x": 698.5813629019091,
+                "y": 509.8247139059768,
+                "name": "bottomRightPoint"
+              },
+              {
+                "id": "4bd6a0b0-806f-4a0f-ab9f-257712e25f39",
+                "type": "ConnectPoint",
+                "x": 614.5813629019091,
+                "y": 377.8247139059768,
+                "name": "topCenterPoint"
+              },
+              {
+                "id": "a5d17acb-de6b-48ef-b46a-22b27d306299",
+                "type": "ConnectPoint",
+                "x": 530.5813629019091,
+                "y": 443.8247139059768,
+                "name": "leftCenterPoint"
+              },
+              {
+                "id": "13fceefa-bb54-4e32-a0e1-030ae880785d",
+                "type": "ConnectPoint",
+                "x": 698.5813629019091,
+                "y": 443.8247139059768,
+                "name": "rightCenterPoint"
+              },
+              {
+                "id": "87a68153-0ebc-4518-a36d-e6066c221557",
+                "type": "ConnectPoint",
+                "x": 614.5813629019091,
+                "y": 509.8247139059768,
+                "name": "bottomCenterPoint"
+              }
+            ],
+            "stroke": "#D9D9D9",
+            "strokeWidth": 1,
+            "strokeDashType": "solid",
+            "fill": "#FFFFFF",
+            "text": "",
+            "textType": "textarea",
+            "fontColor": "#000000",
+            "fontSize": 14,
+            "fontFamily": "Noto Sans JP",
+            "fontWeight": "normal",
+            "textAlign": "left",
+            "verticalAlign": "top",
+            "cornerRadius": 6
+          }
+        ],
         "connectEnabled": true,
         "connectPoints": [
           {
-            "id": "85c8fe09-b1f7-483e-a114-bd39b1237aa4",
+            "id": "6c78e973-3eef-49b6-a04a-7713776e6e70",
             "type": "ConnectPoint",
-            "x": 640.2734375,
-            "y": 407.5,
+            "x": 514.5813629019091,
+            "y": 325.8247139059768,
             "name": "topLeftPoint"
           },
           {
-            "id": "9c822d56-2329-42d9-b1e5-b99b4b86b02d",
+            "id": "dd661dcd-77af-4d7b-9faf-309083c67040",
             "type": "ConnectPoint",
-            "x": 640.2734375,
-            "y": 507.5,
+            "x": 514.5813629019091,
+            "y": 525.8247139059768,
             "name": "bottomLeftPoint"
           },
           {
-            "id": "24131b0f-ec53-4f71-85c7-09e2e3a8d30b",
+            "id": "6a8de334-ab49-442b-b1a0-c86c3e5b01b2",
             "type": "ConnectPoint",
-            "x": 740.2734375,
-            "y": 407.5,
+            "x": 714.5813629019091,
+            "y": 325.8247139059768,
             "name": "topRightPoint"
           },
           {
-            "id": "a5b2ac32-7815-4dd6-a38d-58aaa11f442c",
+            "id": "f9032b3d-09b8-49b3-97c6-4de701b0a3e7",
             "type": "ConnectPoint",
-            "x": 740.2734375,
-            "y": 507.5,
+            "x": 714.5813629019091,
+            "y": 525.8247139059768,
             "name": "bottomRightPoint"
           },
           {
-            "id": "ff1f3013-2d72-4d9d-b397-198efe6c69d7",
+            "id": "1df47368-3d92-4386-8b6b-0c8ccc85c756",
             "type": "ConnectPoint",
-            "x": 690.2734375,
-            "y": 407.5,
+            "x": 614.5813629019091,
+            "y": 325.8247139059768,
             "name": "topCenterPoint"
           },
           {
-            "id": "9dc7b336-ea98-44df-b98c-fece84c6084c",
+            "id": "3595673f-7a27-4882-aa4e-8e821b95d11c",
             "type": "ConnectPoint",
-            "x": 640.2734375,
-            "y": 457.5,
+            "x": 514.5813629019091,
+            "y": 425.8247139059768,
             "name": "leftCenterPoint"
           },
           {
-            "id": "67958652-e47b-44d4-b588-e8bc7bfa9e8d",
+            "id": "cde72544-c75e-449a-8f7d-f751cb65671e",
             "type": "ConnectPoint",
-            "x": 740.2734375,
-            "y": 457.5,
+            "x": 714.5813629019091,
+            "y": 425.8247139059768,
             "name": "rightCenterPoint"
           },
           {
-            "id": "ad0c4f9d-3411-4920-ad9f-6a167c7d6387",
+            "id": "33c7ed60-2388-4c88-9d4b-c595f70fd712",
             "type": "ConnectPoint",
-            "x": 690.2734375,
-            "y": 507.5,
+            "x": 614.5813629019091,
+            "y": 525.8247139059768,
             "name": "bottomCenterPoint"
           }
-        ],
-        "stroke": "black",
-        "strokeWidth": 1,
-        "strokeDashType": "solid",
-        "fill": "transparent",
-        "text": "",
-        "textType": "textarea",
-        "fontColor": "black",
-        "fontSize": 16,
-        "fontFamily": "Noto Sans JP",
-        "fontWeight": "normal",
-        "textAlign": "center",
-        "verticalAlign": "center",
-        "cornerRadius": 0
-      },
-      {
-        "id": "5cfffba4-545f-42e1-b8fb-b4923239a57f",
-        "type": "Ellipse",
-        "x": 686.2734375,
-        "y": 246.5,
-        "width": 100,
-        "height": 100,
-        "rotation": 0,
-        "scaleX": 1,
-        "scaleY": 1,
-        "keepProportion": false,
-        "rotateEnabled": true,
-        "inversionEnabled": true,
-        "connectEnabled": true,
-        "connectPoints": [
-          {
-            "id": "21ff7400-686b-42c2-880e-a54d2efc512f",
-            "type": "ConnectPoint",
-            "x": 654.9180984406727,
-            "y": 422.1446609406726,
-            "name": "topLeftPoint"
-          },
-          {
-            "id": "19ce326e-d830-4845-b8ed-3d6210c8af3e",
-            "type": "ConnectPoint",
-            "x": 654.9180984406727,
-            "y": 492.8553390593274,
-            "name": "bottomLeftPoint"
-          },
-          {
-            "id": "735d9ef5-a7f0-4ca6-9ea1-d6777138db61",
-            "type": "ConnectPoint",
-            "x": 725.6287765593273,
-            "y": 422.1446609406726,
-            "name": "topRightPoint"
-          },
-          {
-            "id": "5af8946c-b714-4bcd-8863-bd93ea2780ad",
-            "type": "ConnectPoint",
-            "x": 725.6287765593273,
-            "y": 492.8553390593274,
-            "name": "bottomRightPoint"
-          },
-          {
-            "id": "064a08b7-8f12-43f5-bb93-808418c7b23c",
-            "type": "ConnectPoint",
-            "x": 690.2734375,
-            "y": 407.5,
-            "name": "topCenterPoint"
-          },
-          {
-            "id": "59b97c1f-ca3d-4c06-a43d-007fcd58176e",
-            "type": "ConnectPoint",
-            "x": 640.2734375,
-            "y": 457.5,
-            "name": "leftCenterPoint"
-          },
-          {
-            "id": "3114f811-7db6-4458-bf96-8becaab44e2e",
-            "type": "ConnectPoint",
-            "x": 740.2734375,
-            "y": 457.5,
-            "name": "rightCenterPoint"
-          },
-          {
-            "id": "4d0dda46-ba0a-4612-9742-8af32d79291c",
-            "type": "ConnectPoint",
-            "x": 690.2734375,
-            "y": 507.5,
-            "name": "bottomCenterPoint"
-          }
-        ],
-        "stroke": "black",
-        "strokeWidth": 1,
-        "strokeDashType": "solid",
-        "fill": "transparent",
-        "text": "",
-        "textType": "textarea",
-        "fontColor": "black",
-        "fontSize": 16,
-        "fontFamily": "Noto Sans JP",
-        "fontWeight": "normal",
-        "textAlign": "center",
-        "verticalAlign": "center"
+        ]
       }
     ]
   }

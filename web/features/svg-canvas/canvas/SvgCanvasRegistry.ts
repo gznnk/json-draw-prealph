@@ -3,6 +3,7 @@ import { CanvasFrameAtlas } from "../atlas/diagrams/CanvasFrameAtlas";
 import { StickyAtlas } from "../atlas/diagrams/StickyAtlas";
 import { ButtonAtlas } from "../atlas/elements/ButtonAtlas";
 import { InputAtlas } from "../atlas/elements/InputAtlas";
+import { NodeHeaderAtlas } from "../atlas/elements/NodeHeaderAtlas";
 import { AgentNodeAtlas } from "../atlas/nodes/AgentNodeAtlas";
 import { HtmlGenNodeAtlas } from "../atlas/nodes/HtmlGenNodeAtlas";
 import { HubNodeAtlas } from "../atlas/nodes/HubNodeAtlas";
@@ -50,6 +51,7 @@ export const initializeSvgCanvasDiagrams = (): void => {
 	// ============================================================================
 	DiagramRegistry.register(ButtonAtlas);
 	DiagramRegistry.register(InputAtlas);
+	DiagramRegistry.register(NodeHeaderAtlas);
 
 	// ============================================================================
 	// Diagram Atlas Registration
