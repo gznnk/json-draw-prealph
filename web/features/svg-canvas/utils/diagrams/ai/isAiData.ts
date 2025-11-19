@@ -1,42 +1,38 @@
-/**
- * Validation function for Ai diagram data.
- */
-
 import {
 	isCssColor,
-	isObject,
 	isString,
 } from "../../../../../shared/validation";
-import { AiFeatures } from "../../../types/data/diagrams/AiData";
-import { createValidatorFromFeatures } from "../../validation/createValidatorFromFeatures";
+import { AiData, AiFeatures } from "../../../types/data/diagrams/AiData";
+import { createValidatorFromTypeAndFeatures } from "../../validation/createValidatorFromTypeAndFeatures";
+
+const baseValidator = createValidatorFromTypeAndFeatures("Ai", AiFeatures);
 
 /**
  * Check if data is valid Ai diagram data.
  * Uses the base validator from features and adds Ai-specific validations.
  */
-export const isAiData = (data: unknown): boolean => {
+export const isAiData = (data: unknown): data is AiData => {
 	// Base validation from features
-	const baseValidator = createValidatorFromFeatures(AiFeatures);
 	if (!baseValidator(data)) return false;
 
-	if (!isObject(data)) return false;
-
 	// Ai-specific validations
+	const aiData = data as AiData;
+
 	// avatarUrl is optional (if present, must be string)
-	if ("avatarUrl" in data && data.avatarUrl !== undefined) {
-		if (!isString(data.avatarUrl)) return false;
+	if ("avatarUrl" in aiData && aiData.avatarUrl !== undefined) {
+		if (!isString(aiData.avatarUrl)) return false;
 	}
 
 	// avatarBgColor is required and must be valid color
-	if (!("avatarBgColor" in data) || !isCssColor(data.avatarBgColor))
+	if (!("avatarBgColor" in aiData) || !isCssColor(aiData.avatarBgColor))
 		return false;
 
 	// bubbleBgColor is required and must be valid color
-	if (!("bubbleBgColor" in data) || !isCssColor(data.bubbleBgColor))
+	if (!("bubbleBgColor" in aiData) || !isCssColor(aiData.bubbleBgColor))
 		return false;
 
 	// aiMessage is required and must be string
-	if (!("aiMessage" in data) || !isString(data.aiMessage)) return false;
+	if (!("aiMessage" in aiData) || !isString(aiData.aiMessage)) return false;
 
 	return true;
 };

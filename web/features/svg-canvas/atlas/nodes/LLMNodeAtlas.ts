@@ -11,9 +11,11 @@ import { mapLLMNodeDataToState } from "../../utils/nodes/llmNode/mapLLMNodeDataT
 import { llmNodeStateToData } from "../../utils/nodes/llmNode/mapLLMNodeStateToData";
 import { transformLLMNodeItems } from "../../utils/nodes/llmNode/transformLLMNodeItems";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isLLMNodeData } from "../../utils/nodes/llmNode/isLLMNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -69,4 +71,5 @@ export const LLMNodeAtlas: LLMNodeAtlas = {
 	transformItems: transformLLMNodeItems,
 	dataToState: mapLLMNodeDataToState as DataToStateMapper,
 	stateToData: llmNodeStateToData as StateToDataMapper,
+	validateData: isLLMNodeData as DiagramDataValidator,
 };

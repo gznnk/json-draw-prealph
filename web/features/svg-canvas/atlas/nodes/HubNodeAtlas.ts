@@ -10,9 +10,11 @@ import { createHubNodeState } from "../../utils/nodes/hubNode/createHubNodeState
 import { mapHubNodeDataToState } from "../../utils/nodes/hubNode/mapHubNodeDataToState";
 import { hubNodeStateToData } from "../../utils/nodes/hubNode/mapHubNodeStateToData";
 import { calcEllipseConnectPointPosition } from "../../utils/shapes/ellipse/calcEllipseConnectPointPosition";
+import { isHubNodeData } from "../../utils/nodes/hubNode/isHubNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -68,4 +70,5 @@ export const HubNodeAtlas: HubNodeAtlas = {
 	transformItems: undefined,
 	dataToState: mapHubNodeDataToState as DataToStateMapper,
 	stateToData: hubNodeStateToData as StateToDataMapper,
+	validateData: isHubNodeData as DiagramDataValidator,
 };

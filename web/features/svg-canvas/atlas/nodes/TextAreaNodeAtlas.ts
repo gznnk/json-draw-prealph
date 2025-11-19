@@ -13,9 +13,11 @@ import { createTextAreaNodeState } from "../../utils/nodes/textAreaNode/createTe
 import { mapTextAreaNodeDataToState } from "../../utils/nodes/textAreaNode/mapTextAreaNodeDataToState";
 import { textAreaNodeStateToData } from "../../utils/nodes/textAreaNode/mapTextAreaNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isTextAreaNodeData } from "../../utils/nodes/textAreaNode/isTextAreaNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -75,4 +77,5 @@ export const TextAreaNodeAtlas: TextAreaNodeAtlas = {
 	transformItems: undefined,
 	dataToState: mapTextAreaNodeDataToState as DataToStateMapper,
 	stateToData: textAreaNodeStateToData as StateToDataMapper,
+	validateData: isTextAreaNodeData as DiagramDataValidator,
 };

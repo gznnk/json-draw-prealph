@@ -10,9 +10,11 @@ import { createAgentNodeState } from "../../utils/nodes/agentNode/createAgentNod
 import { mapAgentNodeDataToState } from "../../utils/nodes/agentNode/mapAgentNodeDataToState";
 import { agentNodeStateToData } from "../../utils/nodes/agentNode/mapAgentNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isAgentNodeData } from "../../utils/nodes/agentNode/isAgentNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -72,4 +74,5 @@ export const AgentNodeAtlas: AgentNodeAtlas = {
 	transformItems: undefined,
 	dataToState: mapAgentNodeDataToState as DataToStateMapper,
 	stateToData: agentNodeStateToData as StateToDataMapper,
+	validateData: isAgentNodeData as DiagramDataValidator,
 };

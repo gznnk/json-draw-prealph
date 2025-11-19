@@ -13,9 +13,11 @@ import { createImageGenNodeState } from "../../utils/nodes/imageGenNode/createIm
 import { mapImageGenNodeDataToState } from "../../utils/nodes/imageGenNode/mapImageGenNodeDataToState";
 import { imageGenNodeStateToData } from "../../utils/nodes/imageGenNode/mapImageGenNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isImageGenNodeData } from "../../utils/nodes/imageGenNode/isImageGenNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -75,4 +77,5 @@ export const ImageGenNodeAtlas: ImageGenNodeAtlas = {
 	transformItems: undefined,
 	dataToState: mapImageGenNodeDataToState as DataToStateMapper,
 	stateToData: imageGenNodeStateToData as StateToDataMapper,
+	validateData: isImageGenNodeData as DiagramDataValidator,
 };

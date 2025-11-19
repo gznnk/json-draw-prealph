@@ -10,13 +10,14 @@ import { isTransformativeData } from "./isTransformativeData";
 import type { DiagramFeatures } from "../../types/core/DiagramFeatures";
 
 /**
- * Create a validator function from DiagramFeatures.
+ * Create a validator function from Type and DiagramFeatures.
  * Returns a boolean-returning validation function.
  */
-export const createValidatorFromFeatures =
-	(features: DiagramFeatures) =>
+export const createValidatorFromTypeAndFeatures =
+	(type: string, features: DiagramFeatures) =>
 	(data: unknown): boolean => {
 		if (!isDiagramBaseData(data)) return false;
+		if (data.type !== type) return false;
 
 		// Check all required features
 		if (features.frameable && !isFrameableData(data)) return false;

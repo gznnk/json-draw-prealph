@@ -13,9 +13,11 @@ import { createPageDesignNodeState } from "../../utils/nodes/pageDesignNode/crea
 import { mapPageDesignNodeDataToState } from "../../utils/nodes/pageDesignNode/mapPageDesignNodeDataToState";
 import { pageDesignNodeStateToData } from "../../utils/nodes/pageDesignNode/mapPageDesignNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isPageDesignNodeData } from "../../utils/nodes/pageDesignNode/isPageDesignNodeData";
 import type {
 	DiagramAtlas,
 	DataToStateMapper,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -75,4 +77,5 @@ export const PageDesignNodeAtlas: PageDesignNodeAtlas = {
 	transformItems: undefined,
 	dataToState: mapPageDesignNodeDataToState as DataToStateMapper,
 	stateToData: pageDesignNodeStateToData as StateToDataMapper,
+	validateData: isPageDesignNodeData as DiagramDataValidator,
 };

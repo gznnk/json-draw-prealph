@@ -10,9 +10,11 @@ import { createInputState } from "../../utils/elements/input/createInputState";
 import { mapInputDataToState } from "../../utils/elements/input/mapInputDataToState";
 import { inputStateToData } from "../../utils/elements/input/mapInputStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isInputData } from "../../utils/elements/input/isInputData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -68,4 +70,5 @@ export const InputAtlas: InputAtlas = {
 	transformItems: undefined,
 	dataToState: mapInputDataToState as DataToStateMapper,
 	stateToData: inputStateToData as StateToDataMapper,
+	validateData: isInputData as DiagramDataValidator,
 };

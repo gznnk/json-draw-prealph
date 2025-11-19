@@ -10,9 +10,11 @@ import { createButtonState } from "../../utils/elements/button/createButtonState
 import { mapButtonDataToState } from "../../utils/elements/button/mapButtonDataToState";
 import { mapButtonStateToData } from "../../utils/elements/button/mapButtonStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isButtonData } from "../../utils/elements/button/isButtonData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -68,4 +70,5 @@ export const ButtonAtlas: ButtonAtlas = {
 	transformItems: undefined,
 	dataToState: mapButtonDataToState as DataToStateMapper,
 	stateToData: mapButtonStateToData as StateToDataMapper,
+	validateData: isButtonData as DiagramDataValidator,
 };

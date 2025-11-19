@@ -10,10 +10,12 @@ import { createImageState } from "../../utils/shapes/image/createImageState";
 import { imageToBlob } from "../../utils/shapes/image/imageToBlob";
 import { mapImageDataToState } from "../../utils/shapes/image/mapImageDataToState";
 import { imageStateToData } from "../../utils/shapes/image/mapImageStateToData";
+import { isImageData } from "../../utils/shapes/image/isImageData";
 import {
 	type DiagramAtlas,
 	type DataToStateMapper,
 	type StateToDataMapper,
+	type DiagramDataValidator,
 	dummyImplementation,
 } from "../DiagramAtlas";
 
@@ -69,4 +71,5 @@ export const ImageAtlas: ImageAtlas = {
 	transformItems: undefined,
 	dataToState: mapImageDataToState as DataToStateMapper,
 	stateToData: imageStateToData as StateToDataMapper,
+	validateData: isImageData as DiagramDataValidator,
 };

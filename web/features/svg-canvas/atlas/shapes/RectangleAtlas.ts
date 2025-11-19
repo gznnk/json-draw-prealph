@@ -10,9 +10,11 @@ import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/
 import { createRectangleState } from "../../utils/shapes/rectangle/createRectangleState";
 import { rectangleDataToState } from "../../utils/shapes/rectangle/mapRectangleDataToState";
 import { rectangleStateToData } from "../../utils/shapes/rectangle/mapRectangleStateToData";
+import { isRectangleData } from "../../utils/shapes/rectangle/isRectangleData";
 import {
 	type DataToStateMapper,
 	type DiagramAtlas,
+	type DiagramDataValidator,
 	type StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -72,4 +74,5 @@ export const RectangleAtlas: RectangleAtlas = {
 	transformItems: undefined,
 	dataToState: rectangleDataToState as DataToStateMapper,
 	stateToData: rectangleStateToData as StateToDataMapper,
+	validateData: isRectangleData as DiagramDataValidator,
 };

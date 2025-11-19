@@ -7,10 +7,12 @@ import type { PathPointProps } from "../../types/props/shapes/PathPointProps";
 import type { PathPointState } from "../../types/state/shapes/PathPointState";
 import { mapPathPointDataToState } from "../../utils/shapes/path/mapPathPointDataToState";
 import { pathPointStateToData } from "../../utils/shapes/path/mapPathPointStateToData";
+import { isPathPointData } from "../../utils/shapes/path/isPathPointData";
 import {
 	dummyImplementation,
 	type DataToStateMapper,
 	type DiagramAtlas,
+	type DiagramDataValidator,
 	type StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -74,4 +76,5 @@ export const PathPointAtlas: PathPointAtlas = {
 	transformItems: undefined,
 	dataToState: mapPathPointDataToState as DataToStateMapper,
 	stateToData: pathPointStateToData as StateToDataMapper,
+	validateData: isPathPointData as DiagramDataValidator,
 };

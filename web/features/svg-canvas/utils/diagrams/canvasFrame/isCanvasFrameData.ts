@@ -1,13 +1,12 @@
-/**
- * Validation function for CanvasFrame diagram data.
- */
-
+import type { CanvasFrameData } from "../../../types/data/diagrams/CanvasFrameData";
 import { CanvasFrameFeatures } from "../../../types/data/diagrams/CanvasFrameData";
-import { createValidatorFromFeatures } from "../../validation/createValidatorFromFeatures";
+import { createValidatorFromTypeAndFeatures } from "../../validation/createValidatorFromTypeAndFeatures";
 
 /**
  * Check if data is valid CanvasFrame diagram data.
  * Uses the base validator from features.
  */
-export const isCanvasFrameData =
-	createValidatorFromFeatures(CanvasFrameFeatures);
+export const isCanvasFrameData = createValidatorFromTypeAndFeatures(
+	"CanvasFrame",
+	CanvasFrameFeatures,
+) as (data: unknown) => data is CanvasFrameData;

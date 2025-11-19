@@ -9,10 +9,12 @@ import type { PathState } from "../../types/state/shapes/PathState";
 import { createPathState } from "../../utils/shapes/path/createPathState";
 import { mapPathDataToState } from "../../utils/shapes/path/mapPathDataToState";
 import { pathStateToData } from "../../utils/shapes/path/mapPathStateToData";
+import { isPathData } from "../../utils/shapes/path/isPathData";
 import {
 	dummyImplementation,
 	type DataToStateMapper,
 	type DiagramAtlas,
+	type DiagramDataValidator,
 	type StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -68,4 +70,5 @@ export const PathAtlas: PathAtlas = {
 	transformItems: undefined,
 	dataToState: mapPathDataToState as DataToStateMapper,
 	stateToData: pathStateToData as StateToDataMapper,
+	validateData: isPathData as DiagramDataValidator,
 };

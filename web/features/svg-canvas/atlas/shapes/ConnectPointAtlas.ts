@@ -4,8 +4,9 @@ import { ConnectPointDefaultState } from "../../constants/state/shapes/ConnectPo
 import type { ConnectPointData } from "../../types/data/shapes/ConnectPointData";
 import type { ConnectPointProps } from "../../types/props/shapes/ConnectPointProps";
 import type { ConnectPointState } from "../../types/state/shapes/ConnectPointState";
-import type { DiagramAtlas } from "../DiagramAtlas";
+import type { DiagramAtlas, DiagramDataValidator } from "../DiagramAtlas";
 import { DummyComponent, dummyImplementation } from "../DiagramAtlas";
+import { isConnectPointData } from "../../utils/shapes/connectPoint/isConnectPointData";
 
 /**
  * ConnectPoint Shape Atlas
@@ -63,4 +64,5 @@ export const ConnectPointAtlas: ConnectPointAtlas = {
 	transformItems: undefined,
 	dataToState: dummyImplementation,
 	stateToData: dummyImplementation,
+	validateData: isConnectPointData as DiagramDataValidator,
 };

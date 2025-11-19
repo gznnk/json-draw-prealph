@@ -13,9 +13,11 @@ import { createHtmlGenNodeState } from "../../utils/nodes/htmlGenNode/createHtml
 import { mapHtmlGenNodeDataToState } from "../../utils/nodes/htmlGenNode/mapHtmlGenNodeDataToState";
 import { htmlGenNodeStateToData } from "../../utils/nodes/htmlGenNode/mapHtmlGenNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isHtmlGenNodeData } from "../../utils/nodes/htmlGenNode/isHtmlGenNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -75,4 +77,5 @@ export const HtmlGenNodeAtlas: HtmlGenNodeAtlas = {
 	transformItems: undefined,
 	dataToState: mapHtmlGenNodeDataToState as DataToStateMapper,
 	stateToData: htmlGenNodeStateToData as StateToDataMapper,
+	validateData: isHtmlGenNodeData as DiagramDataValidator,
 };

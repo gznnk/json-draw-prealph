@@ -5,8 +5,9 @@ import type { FrameData } from "../../types/data/elements/FrameData";
 import { FrameFeatures } from "../../types/data/elements/FrameData";
 import type { FrameProps } from "../../types/props/elements/FrameProps";
 import type { FrameState } from "../../types/state/elements/FrameState";
-import type { DiagramAtlas } from "../DiagramAtlas";
+import type { DiagramAtlas, DiagramDataValidator } from "../DiagramAtlas";
 import { DummyComponent, dummyImplementation } from "../DiagramAtlas";
+import { isFrameData } from "../../utils/elements/frame/isFrameData";
 
 /**
  * Frame Element Atlas
@@ -60,4 +61,5 @@ export const FrameAtlas: FrameAtlas = {
 	transformItems: undefined,
 	dataToState: dummyImplementation,
 	stateToData: dummyImplementation,
+	validateData: isFrameData as DiagramDataValidator,
 };

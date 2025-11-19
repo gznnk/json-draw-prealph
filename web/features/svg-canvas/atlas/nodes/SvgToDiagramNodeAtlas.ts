@@ -13,9 +13,11 @@ import { createSvgToDiagramNodeState } from "../../utils/nodes/svgToDiagramNode/
 import { mapSvgToDiagramNodeDataToState } from "../../utils/nodes/svgToDiagramNode/mapSvgToDiagramNodeDataToState";
 import { svgToDiagramNodeStateToData } from "../../utils/nodes/svgToDiagramNode/mapSvgToDiagramNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isSvgToDiagramNodeData } from "../../utils/nodes/svgToDiagramNode/isSvgToDiagramNodeData";
 import type {
 	DiagramAtlas,
 	DataToStateMapper,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -75,4 +77,5 @@ export const SvgToDiagramNodeAtlas: SvgToDiagramNodeAtlas = {
 	transformItems: undefined,
 	dataToState: mapSvgToDiagramNodeDataToState as DataToStateMapper,
 	stateToData: svgToDiagramNodeStateToData as StateToDataMapper,
+	validateData: isSvgToDiagramNodeData as DiagramDataValidator,
 };

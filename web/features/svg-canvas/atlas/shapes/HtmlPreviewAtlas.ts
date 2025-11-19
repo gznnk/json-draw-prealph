@@ -12,10 +12,12 @@ import type { HtmlPreviewState } from "../../types/state/shapes/HtmlPreviewState
 import { createHtmlPreviewState } from "../../utils/shapes/htmlPreview/createHtmlPreviewState";
 import { mapHtmlPreviewDataToState } from "../../utils/shapes/htmlPreview/mapHtmlPreviewDataToState";
 import { mapHtmlPreviewStateToData } from "../../utils/shapes/htmlPreview/mapHtmlPreviewStateToData";
+import { isHtmlPreviewData } from "../../utils/shapes/htmlPreview/isHtmlPreviewData";
 import type {
 	DiagramAtlas,
 	DataToStateMapper,
 	StateToDataMapper,
+	DiagramDataValidator,
 } from "../DiagramAtlas";
 
 /**
@@ -76,4 +78,5 @@ export const HtmlPreviewAtlas: HtmlPreviewAtlas = {
 	transformItems: undefined,
 	dataToState: mapHtmlPreviewDataToState as DataToStateMapper,
 	stateToData: mapHtmlPreviewStateToData as StateToDataMapper,
+	validateData: isHtmlPreviewData as DiagramDataValidator,
 };

@@ -10,10 +10,12 @@ import { calcEllipseConnectPointPosition } from "../../utils/shapes/ellipse/calc
 import { createEllipseState } from "../../utils/shapes/ellipse/createEllipseState";
 import { mapEllipseDataToState } from "../../utils/shapes/ellipse/mapEllipseDataToState";
 import { ellipseStateToData } from "../../utils/shapes/ellipse/mapEllipseStateToData";
+import { isEllipseData } from "../../utils/shapes/ellipse/isEllipseData";
 import type {
 	DiagramAtlas,
 	DataToStateMapper,
 	StateToDataMapper,
+	DiagramDataValidator,
 } from "../DiagramAtlas";
 
 /**
@@ -68,4 +70,5 @@ export const EllipseAtlas: EllipseAtlas = {
 	transformItems: undefined,
 	dataToState: mapEllipseDataToState as DataToStateMapper,
 	stateToData: ellipseStateToData as StateToDataMapper,
+	validateData: isEllipseData as DiagramDataValidator,
 };

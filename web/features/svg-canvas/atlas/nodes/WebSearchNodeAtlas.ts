@@ -13,9 +13,11 @@ import { createWebSearchNodeState } from "../../utils/nodes/webSearchNode/create
 import { mapWebSearchNodeDataToState } from "../../utils/nodes/webSearchNode/mapWebSearchNodeDataToState";
 import { webSearchNodeStateToData } from "../../utils/nodes/webSearchNode/mapWebSearchNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isWebSearchNodeData } from "../../utils/nodes/webSearchNode/isWebSearchNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -75,4 +77,5 @@ export const WebSearchNodeAtlas: WebSearchNodeAtlas = {
 	transformItems: undefined,
 	dataToState: mapWebSearchNodeDataToState as DataToStateMapper,
 	stateToData: webSearchNodeStateToData as StateToDataMapper,
+	validateData: isWebSearchNodeData as DiagramDataValidator,
 };

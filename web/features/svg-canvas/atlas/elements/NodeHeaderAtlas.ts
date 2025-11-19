@@ -8,9 +8,11 @@ import type { NodeHeaderState } from "../../types/state/elements/NodeHeaderState
 import { createNodeHeaderState } from "../../utils/elements/nodeHeader/createNodeHeaderState";
 import { mapNodeHeaderDataToState } from "../../utils/elements/nodeHeader/mapNodeHeaderDataToState";
 import { mapNodeHeaderStateToData } from "../../utils/elements/nodeHeader/mapNodeHeaderStateToData";
+import { isNodeHeaderData } from "../../utils/elements/nodeHeader/isNodeHeaderData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 import { DummyComponent, dummyImplementation } from "../DiagramAtlas";
@@ -71,4 +73,5 @@ export const NodeHeaderAtlas: NodeHeaderAtlas = {
 	transformItems: undefined,
 	dataToState: mapNodeHeaderDataToState as DataToStateMapper,
 	stateToData: mapNodeHeaderStateToData as StateToDataMapper,
+	validateData: isNodeHeaderData as DiagramDataValidator,
 };

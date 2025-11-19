@@ -10,9 +10,11 @@ import { createSvgState } from "../../utils/shapes/svg/createSvgState";
 import { mapSvgDataToState } from "../../utils/shapes/svg/mapSvgDataToState";
 import { svgStateToData } from "../../utils/shapes/svg/mapSvgStateToData";
 import { svgToBlob } from "../../utils/shapes/svg/svgToBlob";
+import { isSvgData } from "../../utils/shapes/svg/isSvgData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -69,4 +71,5 @@ export const SvgAtlas: SvgAtlas = {
 	transformItems: undefined,
 	dataToState: mapSvgDataToState as DataToStateMapper,
 	stateToData: svgStateToData as StateToDataMapper,
+	validateData: isSvgData as DiagramDataValidator,
 };

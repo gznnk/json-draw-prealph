@@ -8,10 +8,12 @@ import type { GroupProps } from "../../types/props/shapes/GroupProps";
 import type { GroupState } from "../../types/state/shapes/GroupState";
 import { mapGroupDataToState } from "../../utils/shapes/group/mapGroupDataToState";
 import { groupStateToData } from "../../utils/shapes/group/mapGroupStateToData";
+import { isGroupData } from "../../utils/shapes/group/isGroupData";
 import {
 	type DiagramAtlas,
 	type DataToStateMapper,
 	type StateToDataMapper,
+	type DiagramDataValidator,
 	dummyImplementation,
 } from "../DiagramAtlas";
 
@@ -71,4 +73,5 @@ export const GroupAtlas: GroupAtlas = {
 	transformItems: undefined,
 	dataToState: mapGroupDataToState as DataToStateMapper,
 	stateToData: groupStateToData as StateToDataMapper,
+	validateData: isGroupData as DiagramDataValidator,
 };

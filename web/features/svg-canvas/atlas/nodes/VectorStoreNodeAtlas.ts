@@ -13,9 +13,11 @@ import { createVectorStoreNodeState } from "../../utils/nodes/vectorStoreNode/cr
 import { mapVectorStoreNodeDataToState } from "../../utils/nodes/vectorStoreNode/mapVectorStoreNodeDataToState";
 import { vectorStoreNodeStateToData } from "../../utils/nodes/vectorStoreNode/mapVectorStoreNodeStateToData";
 import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/calcRectangleConnectPointPosition";
+import { isVectorStoreNodeData } from "../../utils/nodes/vectorStoreNode/isVectorStoreNodeData";
 import type {
 	DataToStateMapper,
 	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -75,4 +77,5 @@ export const VectorStoreNodeAtlas: VectorStoreNodeAtlas = {
 	transformItems: undefined,
 	dataToState: mapVectorStoreNodeDataToState as DataToStateMapper,
 	stateToData: vectorStoreNodeStateToData as StateToDataMapper,
+	validateData: isVectorStoreNodeData as DiagramDataValidator,
 };
