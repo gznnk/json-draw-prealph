@@ -1,5 +1,6 @@
 import type {
 	DataToStateMapper,
+	DiagramDataValidator,
 	DiagramDefinition,
 	StateToDataMapper,
 } from "./DiagramDefinition";
@@ -135,6 +136,16 @@ class DiagramRegistryClass {
 	 */
 	getDataToStateMapper(type: DiagramType): DataToStateMapper | undefined {
 		return this.definitions.get(type)?.dataToState;
+	}
+
+	/**
+	 * Get the data validator function for a diagram type.
+	 *
+	 * @param type - The diagram type
+	 * @returns The data validator function or undefined if not found
+	 */
+	getDataValidator(type: DiagramType): DiagramDataValidator | undefined {
+		return this.definitions.get(type)?.validateData;
 	}
 
 	/**

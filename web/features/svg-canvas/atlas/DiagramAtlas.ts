@@ -12,6 +12,7 @@ import type { ConnectPointState } from "../types/state/shapes/ConnectPointState"
 
 export type {
 	DataToStateMapper,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../registry/DiagramDefinition";
 
@@ -80,6 +81,9 @@ export type DiagramAtlas<
 	/** Mapper Functions */
 	dataToState: (data: DiagramData) => Diagram;
 	stateToData: (state: Diagram) => DiagramData;
+
+	/** Validation Function (returns true if valid, false otherwise) */
+	validateData?: (data: unknown) => boolean;
 };
 
 /**

@@ -1,3 +1,4 @@
+import { isCornerRoundableData } from "./isCornerRoundableData";
 import type { CornerRoundableState } from "../../types/state/core/CornerRoundableState";
 
 /**
@@ -9,10 +10,5 @@ import type { CornerRoundableState } from "../../types/state/core/CornerRoundabl
 export const isCornerRoundableState = (
 	obj: unknown,
 ): obj is CornerRoundableState => {
-	return (
-		obj !== null &&
-		typeof obj === "object" &&
-		"cornerRadius" in obj &&
-		typeof (obj as CornerRoundableState).cornerRadius === "number"
-	);
+	return isCornerRoundableData(obj);
 };

@@ -1,3 +1,4 @@
+import { isFillableData } from "./isFillableData";
 import type { FillableState } from "../../types/state/core/FillableState";
 
 /**
@@ -7,10 +8,5 @@ import type { FillableState } from "../../types/state/core/FillableState";
  * @returns True if the object is FillableState, false otherwise
  */
 export const isFillableState = (obj: unknown): obj is FillableState => {
-	return (
-		obj !== null &&
-		typeof obj === "object" &&
-		"fill" in obj &&
-		typeof (obj as FillableState).fill === "string"
-	);
+	return isFillableData(obj);
 };

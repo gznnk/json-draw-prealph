@@ -1,3 +1,5 @@
+import { isString } from "../../../../shared/validation";
+
 /**
  * SVG validation utility
  * Validates SVG strings by attempting to parse them as XML
@@ -9,7 +11,7 @@
  * @returns true if the SVG is valid, false otherwise
  */
 export const isValidSvgString = (svgString: string): boolean => {
-	if (!svgString || typeof svgString !== "string") {
+	if (!isString(svgString) || svgString.length === 0) {
 		return false;
 	}
 

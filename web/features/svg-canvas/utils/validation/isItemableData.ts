@@ -1,3 +1,4 @@
+import { isArray, isObject } from "../../../../shared/validation";
 import type { ItemableData } from "../../types/data/core/ItemableData";
 
 /**
@@ -7,10 +8,7 @@ import type { ItemableData } from "../../types/data/core/ItemableData";
  * @returns True if the object is ItemableData, false otherwise
  */
 export const isItemableData = (obj: unknown): obj is ItemableData => {
-	return (
-		obj !== null &&
-		typeof obj === "object" &&
-		"items" in obj &&
-		Array.isArray((obj as ItemableData).items)
-	);
+	if (!isObject(obj)) return false;
+
+	return "items" in obj && isArray(obj.items);
 };

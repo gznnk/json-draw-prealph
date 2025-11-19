@@ -1,3 +1,5 @@
+import { isConnectableData } from "./isConnectableData";
+import { isBoolean } from "../../../../shared/validation";
 import type { ConnectableState } from "../../types/state/shapes/ConnectableState";
 
 /**
@@ -8,13 +10,8 @@ import type { ConnectableState } from "../../types/state/shapes/ConnectableState
  */
 export const isConnectableState = (obj: unknown): obj is ConnectableState => {
 	return (
-		obj !== null &&
-		typeof obj === "object" &&
+		isConnectableData(obj) &&
 		"showConnectPoints" in obj &&
-		typeof (obj as ConnectableState).showConnectPoints === "boolean" &&
-		"connectEnabled" in obj &&
-		typeof (obj as ConnectableState).connectEnabled === "boolean" &&
-		"connectPoints" in obj &&
-		Array.isArray((obj as ConnectableState).connectPoints)
+		isBoolean(obj.showConnectPoints)
 	);
 };

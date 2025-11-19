@@ -18,6 +18,12 @@ export type StateToDataMapper = (state: Diagram) => DiagramData;
 export type DataToStateMapper = (data: DiagramData) => Diagram;
 
 /**
+ * Type for data validator function.
+ * Returns true if data is valid, false otherwise.
+ */
+export type DiagramDataValidator = (data: unknown) => boolean;
+
+/**
  * Definition of a diagram that includes all necessary functions and components.
  * This interface unifies component, calculator, creator, and exporter definitions.
  */
@@ -53,4 +59,7 @@ export type DiagramDefinition = {
 
 	/** Function to map data to state format for deserialization */
 	dataToState: DataToStateMapper;
+
+	/** Function to validate diagram data */
+	validateData?: DiagramDataValidator;
 };

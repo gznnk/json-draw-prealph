@@ -10,10 +10,10 @@ import { calcRectangleConnectPointPosition } from "../../utils/shapes/rectangle/
 import { createRectangleState } from "../../utils/shapes/rectangle/createRectangleState";
 import { rectangleDataToState } from "../../utils/shapes/rectangle/mapRectangleDataToState";
 import { rectangleStateToData } from "../../utils/shapes/rectangle/mapRectangleStateToData";
-import type {
-	DataToStateMapper,
-	DiagramAtlas,
-	StateToDataMapper,
+import {
+	type DataToStateMapper,
+	type DiagramAtlas,
+	type StateToDataMapper,
 } from "../DiagramAtlas";
 
 /**

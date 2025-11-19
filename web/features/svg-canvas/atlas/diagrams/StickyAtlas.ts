@@ -7,11 +7,13 @@ import { StickyFeatures } from "../../types/data/diagrams/StickyData";
 import type { StickyProps } from "../../types/props/diagrams/StickyProps";
 import type { StickyState } from "../../types/state/diagrams/StickyState";
 import { createStickyState } from "../../utils/diagrams/sticky/createStickyState";
+import { isStickyData } from "../../utils/diagrams/sticky/isStickyData";
 import { stickyDataToState } from "../../utils/diagrams/sticky/mapStickyDataToState";
 import { stickyStateToData } from "../../utils/diagrams/sticky/mapStickyStateToData";
 import type {
-	DiagramAtlas,
 	DataToStateMapper,
+	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -64,4 +66,5 @@ export const StickyAtlas: StickyAtlas = {
 	transformItems: undefined, // Optional: implement if diagram can transform child items
 	dataToState: stickyDataToState as DataToStateMapper,
 	stateToData: stickyStateToData as StateToDataMapper,
+	validateData: isStickyData as DiagramDataValidator,
 };

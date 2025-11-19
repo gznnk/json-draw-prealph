@@ -1,3 +1,4 @@
+import { isStrokableData } from "./isStrokableData";
 import type { StrokableState } from "../../types/state/core/StrokableState";
 
 /**
@@ -7,12 +8,5 @@ import type { StrokableState } from "../../types/state/core/StrokableState";
  * @returns True if the object is StrokableState, false otherwise
  */
 export const isStrokableState = (obj: unknown): obj is StrokableState => {
-	return (
-		obj !== null &&
-		typeof obj === "object" &&
-		"stroke" in obj &&
-		"strokeWidth" in obj &&
-		typeof (obj as StrokableState).stroke === "string" &&
-		typeof (obj as StrokableState).strokeWidth === "number"
-	);
+	return isStrokableData(obj);
 };

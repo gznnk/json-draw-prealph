@@ -1,0 +1,21 @@
+import {
+	isCssColor,
+	isNonNegativeNumber,
+	isObject,
+} from "../../../../shared/validation";
+import type { StrokableData } from "../../types/data/core/StrokableData";
+
+/**
+ * Check if data has valid stroke properties (strokable feature).
+ */
+export const isStrokableData = (data: unknown): data is StrokableData => {
+	if (!isObject(data)) return false;
+
+	return (
+		"stroke" in data &&
+		isCssColor(data.stroke) &&
+		"strokeWidth" in data &&
+		isNonNegativeNumber(data.strokeWidth) &&
+		"strokeDasharray" in data // TODO: Further validation of strokeDasharray can be added here
+	);
+};

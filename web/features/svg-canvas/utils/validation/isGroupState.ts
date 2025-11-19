@@ -1,3 +1,4 @@
+import { isArray, isObject } from "../../../../shared/validation";
 import type { GroupState } from "../../types/state/shapes/GroupState";
 
 /**
@@ -7,12 +8,12 @@ import type { GroupState } from "../../types/state/shapes/GroupState";
  * @returns True if the object is GroupState, false otherwise
  */
 export const isGroupState = (obj: unknown): obj is GroupState => {
+	if (!isObject(obj)) return false;
+
 	return (
-		obj !== null &&
-		typeof obj === "object" &&
 		"type" in obj &&
-		(obj as GroupState).type === "Group" &&
+		obj.type === "Group" &&
 		"items" in obj &&
-		Array.isArray((obj as GroupState).items)
+		isArray(obj.items)
 	);
 };

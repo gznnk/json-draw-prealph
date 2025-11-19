@@ -1,3 +1,4 @@
+import { isObject } from "../../../../shared/validation";
 import { DiagramRegistry } from "../../registry";
 import type { DiagramType } from "../../types/core/DiagramType";
 
@@ -8,9 +9,9 @@ import type { DiagramType } from "../../types/core/DiagramType";
  * @returns True if the object is exportable, false otherwise
  */
 export const isExportable = (obj: unknown): boolean => {
+	if (!isObject(obj)) return false;
+
 	return (
-		obj !== null &&
-		typeof obj === "object" &&
 		"type" in obj &&
 		DiagramRegistry.getExportFunction(obj.type as DiagramType) !== undefined
 	);

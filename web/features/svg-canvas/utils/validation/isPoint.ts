@@ -1,3 +1,4 @@
+import { isNumber, isObject } from "../../../../shared/validation";
 import type { Point } from "../../types/core/Point";
 
 /**
@@ -5,12 +6,7 @@ import type { Point } from "../../types/core/Point";
  * Validates that the value has x and y properties that are both numbers.
  */
 export const isPoint = (value: unknown): value is Point => {
-	return (
-		typeof value === "object" &&
-		value !== null &&
-		"x" in value &&
-		"y" in value &&
-		typeof (value as Point).x === "number" &&
-		typeof (value as Point).y === "number"
-	);
+	if (!isObject(value)) return false;
+
+	return "x" in value && isNumber(value.x) && "y" in value && isNumber(value.y);
 };

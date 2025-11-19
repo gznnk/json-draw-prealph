@@ -4,8 +4,8 @@
  */
 export type SelectableState = {
 	isSelected: boolean;
-	isRootSelected?: boolean;
-	isAncestorSelected?: boolean;
+	isRootSelected?: boolean; // TODO: 必須にする
+	isAncestorSelected?: boolean; // TODO: 必須にする
 	showOutline: boolean;
-	outlineDisabled?: boolean;
+	outlineDisabled?: boolean; // TODO: 必須にする
 };

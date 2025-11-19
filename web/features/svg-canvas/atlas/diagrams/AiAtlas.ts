@@ -7,11 +7,13 @@ import { AiFeatures } from "../../types/data/diagrams/AiData";
 import type { AiProps } from "../../types/props/diagrams/AiProps";
 import type { AiState } from "../../types/state/diagrams/AiState";
 import { createAiState } from "../../utils/diagrams/ai/createAiState";
+import { isAiData } from "../../utils/diagrams/ai/isAiData";
 import { aiDataToState } from "../../utils/diagrams/ai/mapAiDataToState";
 import { aiStateToData } from "../../utils/diagrams/ai/mapAiStateToData";
 import type {
-	DiagramAtlas,
 	DataToStateMapper,
+	DiagramAtlas,
+	DiagramDataValidator,
 	StateToDataMapper,
 } from "../DiagramAtlas";
 
@@ -64,4 +66,5 @@ export const AiAtlas: AiAtlas = {
 	transformItems: undefined, // Optional: implement if diagram can transform child items
 	dataToState: aiDataToState as DataToStateMapper,
 	stateToData: aiStateToData as StateToDataMapper,
+	validateData: isAiData as DiagramDataValidator,
 };
