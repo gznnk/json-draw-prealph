@@ -14,8 +14,8 @@ import {
 import { FolderTree } from "../features/folder-explorer";
 import type { SvgCanvasData } from "../features/svg-canvas/canvas/types/SvgCanvasData";
 
-const ENABLE_CHAT_SPACE_EXPERIMENT = true;
-const ENABLE_FOLDER_EXPLORER = true;
+const ENABLE_CHAT_SPACE_EXPERIMENT = false;
+const ENABLE_FOLDER_EXPLORER = false;
 
 const INITIAL_THREADS: ChatSpaceThread[] = [
 	{

@@ -305,50 +305,6 @@ export const CANVAS_MENU_CATEGORIES: CanvasMenuCategory[] = [
 		),
 		items: [
 			{
-				id: "ai",
-				diagramType: "Ai",
-				label: "AI チャット",
-				icon: (
-					<svg width="20" height="20" viewBox="0 0 24 24">
-						<title>Add AI Chat</title>
-						<circle
-							cx="12"
-							cy="7"
-							r="3.5"
-							fill="#4A90E2"
-							stroke="#333"
-							strokeWidth="0.5"
-						/>
-						<text
-							x="12"
-							y="8"
-							fontSize="4"
-							textAnchor="middle"
-							dominantBaseline="central"
-						>
-							🤖
-						</text>
-						<rect
-							x="5"
-							y="12"
-							width="14"
-							height="8"
-							rx="2"
-							ry="2"
-							fill="#F0F0F0"
-							stroke="#999"
-							strokeWidth="0.5"
-						/>
-						<polygon
-							points="12,12 10,10 14,10"
-							fill="#F0F0F0"
-							stroke="#999"
-							strokeWidth="0.5"
-						/>
-					</svg>
-				),
-			},
-			{
 				id: "sticky",
 				diagramType: "Sticky",
 				label: "付箋",
@@ -426,37 +382,6 @@ export const CANVAS_MENU_CATEGORIES: CanvasMenuCategory[] = [
 					</svg>
 				),
 			},
-			{
-				id: "html-preview",
-				diagramType: "HtmlPreview",
-				label: "HTML プレビュー",
-				icon: (
-					<svg width="20" height="20" viewBox="0 0 24 24">
-						<title>Add HTML Preview</title>
-						<rect
-							x="2"
-							y="2"
-							width="20"
-							height="20"
-							rx="2"
-							ry="2"
-							fill="#f0f0f0"
-							stroke="#4A90E2"
-							strokeWidth="1.5"
-						/>
-						<text
-							x="12"
-							y="14"
-							fontSize="8"
-							fontWeight="bold"
-							textAnchor="middle"
-							fill="#4A90E2"
-						>
-							HTML
-						</text>
-					</svg>
-				),
-			},
 		],
 	},
 	{
@@ -520,18 +445,6 @@ export const CANVAS_MENU_CATEGORIES: CanvasMenuCategory[] = [
 				icon: "AI",
 			},
 			{
-				id: "agent-node",
-				diagramType: "AgentNode",
-				label: "エージェント",
-				icon: "AG",
-			},
-			{
-				id: "html-gen-node",
-				diagramType: "HtmlGenNode",
-				label: "HTML生成",
-				icon: "HTML",
-			},
-			{
 				id: "svg-to-diagram-node",
 				diagramType: "SvgToDiagramNode",
 				label: "SVG変換",
@@ -560,12 +473,6 @@ export const CANVAS_MENU_CATEGORIES: CanvasMenuCategory[] = [
 				diagramType: "WebSearchNode",
 				label: "Web検索",
 				icon: "WB",
-			},
-			{
-				id: "vector-store-node",
-				diagramType: "VectorStoreNode",
-				label: "ベクトルストア",
-				icon: "VS",
 			},
 		],
 	},

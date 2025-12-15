@@ -3,7 +3,6 @@ import { memo } from "react";
 
 import { PageContainer } from "./PageStyled";
 import { Body } from "../Body";
-import { Header } from "../Header";
 
 /**
  * Constants related to the Page layout.
@@ -40,15 +39,10 @@ type PageProps = {
  * @param props - Component props
  * @returns ReactElement representing the entire page
  */
-const PageComponent: React.FC<PageProps> = ({
-	headerHeight = PAGE_CONSTANTS.HEADER_HEIGHT,
-	children,
-	onSave,
-}) => {
+const PageComponent: React.FC<PageProps> = ({ children }) => {
 	return (
 		<PageContainer>
-			<Header height={headerHeight} onSave={onSave} />
-			<Body top={headerHeight}>{children}</Body>
+			<Body top={0}>{children}</Body>
 		</PageContainer>
 	);
 };
