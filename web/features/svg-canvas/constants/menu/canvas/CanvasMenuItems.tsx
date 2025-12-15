@@ -1,5 +1,12 @@
 import type React from "react";
 
+import { Gachapon } from "../../../components/icons/Gachapon";
+import { Hub } from "../../../components/icons/Hub";
+import { LLM } from "../../../components/icons/LLM";
+import { PageDesign } from "../../../components/icons/PageDesign";
+import { Picture } from "../../../components/icons/Picture";
+import { TextArea } from "../../../components/icons/TextArea";
+import { WebSearch } from "../../../components/icons/WebSearch";
 import type { DiagramType } from "../../../types/core/DiagramType";
 
 /**
@@ -436,43 +443,43 @@ export const CANVAS_MENU_CATEGORIES: CanvasMenuCategory[] = [
 				id: "textarea-node",
 				diagramType: "TextAreaNode",
 				label: "テキスト",
-				icon: "T",
+				icon: <TextArea width={20} height={20} fill="#D0D4E0" />,
 			},
 			{
 				id: "llm-node",
 				diagramType: "LLMNode",
 				label: "LLM",
-				icon: "AI",
+				icon: <LLM width={20} height={20} fill="#D0D4E0" />,
 			},
 			{
 				id: "svg-to-diagram-node",
 				diagramType: "SvgToDiagramNode",
 				label: "SVG変換",
-				icon: "SVG",
+				icon: <Gachapon width={20} height={20} />,
 			},
 			{
 				id: "hub-node",
 				diagramType: "HubNode",
 				label: "ハブ",
-				icon: "※",
+				icon: <Hub width={20} height={20} />,
 			},
 			{
 				id: "image-gen-node",
 				diagramType: "ImageGenNode",
 				label: "画像生成",
-				icon: "IMG",
+				icon: <Picture width={20} height={20} />,
 			},
 			{
 				id: "page-design-node",
 				diagramType: "PageDesignNode",
 				label: "ページデザイン",
-				icon: "PD",
+				icon: <PageDesign width={20} height={20} />,
 			},
 			{
 				id: "web-search-node",
 				diagramType: "WebSearchNode",
 				label: "Web検索",
-				icon: "WB",
+				icon: <WebSearch width={20} height={20} />,
 			},
 		],
 	},
