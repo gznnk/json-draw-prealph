@@ -33,3 +33,6 @@ dist-desktop
 
 # Dependency analysis output
 .dependency-graph/
+
+# Internal development notes
+worklog/

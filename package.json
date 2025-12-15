@@ -1,5 +1,5 @@
 {
-	"name": "react-vite-project",
+	"name": "json-draw-prealpha",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
@@ -100,8 +100,8 @@
 		"wait-on": "^9.0.0"
 	},
 	"build": {
-		"appId": "com.react-vite-project.app",
-		"productName": "React Vite Project",
+		"appId": "com.json-draw-prealpha.app",
+		"productName": "JSON Draw Pre-Alpha",
 		"directories": {
 			"output": "electron-dist"
 		},
@@ -123,7 +123,7 @@
 		"publish": {
 			"provider": "github",
 			"owner": "your-username",
-			"repo": "react-vite-project"
+			"repo": "json-draw-prealpha"
 		}
 	}
 }

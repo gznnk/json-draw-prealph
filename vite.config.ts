@@ -6,7 +6,7 @@ import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-	// base: "/react-vite-project/",
+	// base: "/json-draw-prealpha/",
 	plugins: [react()],
 	build: {
 		outDir: "dist-web",

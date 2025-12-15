@@ -1,4 +1,3 @@
-// filepath: c:\Users\maver\Project\react-vite-project\src\features\llm-client\openai\client.ts
 import OpenAI from "openai";
 
 import type { LLMClient, ChatParams } from "../interface";
