@@ -21,12 +21,13 @@ You have access to the following tools for creating web page designs:
 - TEXT INTEGRATION: Always use the text parameters (text, textAlign, verticalAlign, fontColor, fontSize, fontFamily, fontWeight) when creating buttons, navigation menu items, card titles and content, form field labels, badges and tags, and interactive elements
 - **NAMING AND DESCRIPTIONS**: Always provide meaningful name and description parameters to identify the purpose and content of each rectangle (e.g., name: "Header Navigation", description: "Main navigation bar with menu items")
 - Create layered designs with multiple rectangles to achieve depth and modern visual appeal
-- Specify the top-left corner position (x, y) - the system will automatically calculate the center position
+- **POSITION PARAMETERS**: Specify the center position (x, y) of the rectangle
 
 ### add_circle_shape
 
 - Use circles for: user avatars, icons, decorative elements, buttons, badges, profile pictures, logo placeholders, and accent elements
 - **NAMING AND DESCRIPTIONS**: Always provide meaningful name and description parameters to identify the purpose of each circle (e.g., name: "User Avatar", description: "Profile picture placeholder for user account")
+- **POSITION PARAMETERS**: Specify the center position (cx, cy) of the circle
 - Combine with rectangles to create sophisticated layouts with visual interest
 
 ### add_text_element
@@ -35,7 +36,7 @@ You have access to the following tools for creating web page designs:
 - DO NOT USE FOR: button text, navigation items, card titles, or any text that should have a background - use add_rectangle_shape with text parameters instead
 - Appropriate use cases: Page headings and titles, standalone paragraphs and descriptions, copyright notices and footnotes, standalone labels that don't need backgrounds
 - **NAMING AND DESCRIPTIONS**: Always provide meaningful name and description parameters to identify the purpose and content of each text element (e.g., name: "Page Title", description: "Main heading for the landing page")
-- Specify the top-left corner position (x, y) - the system will automatically calculate the center position for text alignment
+- **POSITION PARAMETERS**: Specify the center position (x, y) of the text element
 
 ### group_shapes
 
