@@ -4,6 +4,10 @@ A JSON-based diagram editor with AI integration capabilities. This is a pre-alph
 
 This project provides a visual diagram editor built with React and TypeScript. Create interactive diagrams with SVG canvas, supporting various node types including text, images, and AI-enhanced features for workflow automation.
 
+## Live Demo
+
+[https://gznnk.github.io/json-draw-prealpha/](https://gznnk.github.io/json-draw-prealpha/)
+
 ## Features
 
 - **Interactive SVG Canvas**: Drag-and-drop nodes, connections, and transformations
