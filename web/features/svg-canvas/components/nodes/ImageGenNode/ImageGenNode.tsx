@@ -1,8 +1,8 @@
 import { OpenAI } from "openai";
 import type React from "react";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 
-import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
+import { useApiKey } from "../../../../../app/contexts/ApiKeyContext";
 import { RectangleDefaultState } from "../../../constants/state/shapes/RectangleDefaultState";
 import { useAddDiagram } from "../../../hooks/useAddDiagram";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
@@ -19,19 +19,12 @@ import { Rectangle } from "../../shapes/Rectangle";
  */
 const ImageGenNodeComponent: React.FC<ImageGenNodeProps> = (props) => {
 	const addDiagram = useAddDiagram();
-	const [apiKey, setApiKey] = useState<string>("");
+	const { apiKey } = useApiKey();
 	const [processIdList, setProcessIdList] = useState<string[]>([]);
 
 	const refBusVal = { props };
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-
-	useEffect(() => {
-		const storedApiKey = OpenAiKeyManager.loadKey();
-		if (storedApiKey) {
-			setApiKey(storedApiKey);
-		}
-	}, []);
 
 	useExecutionChain({
 		id: props.id,
@@ -40,6 +33,11 @@ const ImageGenNodeComponent: React.FC<ImageGenNodeProps> = (props) => {
 			const textData = e.payload.data;
 			if (textData === "") return;
 			if (e.eventPhase !== "Ended") return;
+
+			if (!apiKey) {
+				alert("API key is not set. Please enter your OpenAI API key.");
+				return;
+			}
 
 			const processId = newEventId();
 			setProcessIdList((prev) => [...prev, processId]);

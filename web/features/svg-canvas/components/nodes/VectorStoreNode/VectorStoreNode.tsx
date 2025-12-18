@@ -1,10 +1,10 @@
 import { OpenAI, toFile } from "openai";
 import type React from "react";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 // Import other libraries.
 
 // Import components related to SvgCanvas.
-import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
+import { useApiKey } from "../../../../../app/contexts/ApiKeyContext";
 import { RectangleDefaultState } from "../../../constants/state/shapes/RectangleDefaultState";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
 import type { FileDropEvent } from "../../../types/events/FileDropEvent";
@@ -29,7 +29,7 @@ import { Rectangle } from "../../shapes/Rectangle";
  * VectorStoreNode component.
  */
 const VectorStoreNodeComponent: React.FC<VectorStoreNodeProps> = (props) => {
-	const [apiKey, setApiKey] = useState<string>("");
+	const { apiKey } = useApiKey();
 	const [processIdList, setProcessIdList] = useState<string[]>([]);
 
 	// Create references bypass to avoid function creation in every render.
@@ -39,18 +39,15 @@ const VectorStoreNodeComponent: React.FC<VectorStoreNodeProps> = (props) => {
 	};
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
-
-	// Load the API key from local storage when the component mounts.
-	useEffect(() => {
-		const storedApiKey = OpenAiKeyManager.loadKey();
-		if (storedApiKey) {
-			setApiKey(storedApiKey);
-		}
-	}, []);
 	/**
 	 * Process to upload file to vector store
 	 */
 	const uploadFileToVectorStore = useCallback(async (file: File) => {
+		if (!refBus.current.apiKey) {
+			alert("API key is not set. Please enter your OpenAI API key.");
+			return;
+		}
+
 		const processId = newEventId();
 		setProcessIdList((prev) => [...prev, processId]);
 
@@ -104,6 +101,11 @@ const VectorStoreNodeComponent: React.FC<VectorStoreNodeProps> = (props) => {
 			const textData = e.payload.data;
 			if (textData === "") return;
 			if (e.eventPhase !== "Ended") return;
+
+			if (!apiKey) {
+				alert("API key is not set. Please enter your OpenAI API key.");
+				return;
+			}
 
 			const processId = newEventId();
 			setProcessIdList((prev) => [...prev, processId]);

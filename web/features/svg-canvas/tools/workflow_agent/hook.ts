@@ -6,7 +6,6 @@ import type {
 	FunctionCallHandler,
 	FunctionCallInfo,
 } from "../../../../shared/llm-client/types";
-import { OpenAiKeyManager } from "../../../../utils/KeyManager";
 import {
 	imageGenToolDefinition,
 	useAddImageGenNodeTool,
@@ -31,6 +30,7 @@ import AI_AGENT_INSTRUCTIONS from "./prompts/agent-instructions.md?raw";
  */
 export const useWorkflowAgentHandler = (
 	eventBus: EventBus,
+	apiKey: string | null,
 ): FunctionCallHandler => {
 	// 各ツールのhandlerをhookで生成
 	const addImageGenNodeHandler = useAddImageGenNodeTool(eventBus);
@@ -63,12 +63,10 @@ export const useWorkflowAgentHandler = (
 		) => {
 			const args = functionCall.arguments as { user_goal: string };
 			if (typeof args.user_goal === "string") {
-				const storedApiKey = OpenAiKeyManager.loadKey();
-				if (!storedApiKey)
-					return { success: false, content: "API key not found." };
+				if (!apiKey) return { success: false, content: "API key not found." };
 				let outputContent = "";
 				try {
-					const llmClient = LLMClientFactory.createClient(storedApiKey, {
+					const llmClient = LLMClientFactory.createClient(apiKey, {
 						tools: AI_TOOLS,
 						systemPrompt: AI_AGENT_INSTRUCTIONS,
 						functionHandlers: functionHandlerMap,
@@ -99,6 +97,7 @@ export const useWorkflowAgentHandler = (
 		};
 		return handler;
 	}, [
+		apiKey,
 		addImageGenNodeHandler,
 		addLLMNodeHandler,
 		addTextNodeHandler,

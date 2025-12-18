@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { useApiKey } from "../../../../../../app/contexts/ApiKeyContext";
 import {
 	LLMClientFactory,
 	type LLMClient,
 } from "../../../../../../shared/llm-client";
-import { OpenAiKeyManager } from "../../../../../../utils/KeyManager";
 import type { Message } from "../../../../../llm-chat-ui/types";
 import { useEventBus } from "../../../../context/EventBusContext";
 import {
@@ -65,7 +65,7 @@ import {
 export const useAiChat = () => {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
-	const [apiKey, setApiKey] = useState<string>("");
+	const { apiKey } = useApiKey();
 	const [llmClient, setLlmClient] = useState<LLMClient | null>(null);
 	const eventBus = useEventBus();
 
@@ -131,14 +131,6 @@ export const useAiChat = () => {
 		],
 	);
 
-	// Load API key on mount
-	useEffect(() => {
-		const storedApiKey = OpenAiKeyManager.loadKey();
-		if (storedApiKey) {
-			setApiKey(storedApiKey);
-		}
-	}, []);
-
 	// Initialize LLM client when API key or tools change
 	useEffect(() => {
 		if (apiKey) {
@@ -157,7 +149,12 @@ export const useAiChat = () => {
 	 */
 	const sendMessage = useCallback(
 		async (messageContent: string) => {
-			if (!messageContent.trim() || !llmClient || isLoading) {
+			if (!messageContent.trim() || isLoading) {
+				return;
+			}
+
+			if (!llmClient) {
+				alert("API key is not set. Please enter your OpenAI API key.");
 				return;
 			}
 

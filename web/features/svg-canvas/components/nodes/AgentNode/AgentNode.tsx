@@ -1,6 +1,7 @@
 import type React from "react";
 import { memo, useState } from "react";
 
+import { useApiKey } from "../../../../../app/contexts/ApiKeyContext";
 import { RectangleDefaultState } from "../../../constants/state/shapes/RectangleDefaultState";
 import { useEventBus } from "../../../context/EventBusContext";
 import { useExecutionChain } from "../../../hooks/useExecutionChain";
@@ -17,9 +18,10 @@ import { Rectangle } from "../../shapes/Rectangle";
 
 const AgentNodeComponent: React.FC<AgentNodeProps> = (props) => {
 	const [isProcessing, setIsProcessing] = useState(false);
+	const { apiKey } = useApiKey();
 	// eventBusはuseEventBusフックで取得
 	const eventBus = useEventBus();
-	const workflowAgentHandler = useWorkflowAgentHandler(eventBus);
+	const workflowAgentHandler = useWorkflowAgentHandler(eventBus, apiKey);
 
 	useExecutionChain({
 		id: props.id,

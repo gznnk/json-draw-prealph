@@ -1,11 +1,11 @@
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
+import { useApiKey } from "../../../../../app/contexts/ApiKeyContext";
 import {
 	LLMClientFactory,
 	type LLMClient,
 } from "../../../../../shared/llm-client";
-import { OpenAiKeyManager } from "../../../../../utils/KeyManager";
 import {
 	BACKGROUND_COLOR,
 	BORDER_COLOR,
@@ -69,7 +69,7 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 	const nodeHeaderState = items[0] as NodeHeaderState;
 	const inputState = items[1] as InputState;
 
-	const [apiKey, setApiKey] = useState<string>("");
+	const { apiKey } = useApiKey();
 	const [instructions, setInstructions] = useState<string>(inputState.text);
 	const [llmClient, setLlmClient] = useState<LLMClient | null>(null);
 	const {
@@ -98,25 +98,15 @@ const LLMNodeComponent: React.FC<LLMNodeProps> = (props) => {
 	const refBus = useRef(refBusVal);
 	refBus.current = refBusVal;
 
-	// Load the API key from local storage and initialize LLM client when the component mounts.
-	useEffect(() => {
-		const storedApiKey = OpenAiKeyManager.loadKey();
-		if (storedApiKey) {
-			setApiKey(storedApiKey);
-			const client = LLMClientFactory.createClient(storedApiKey, {
-				systemPrompt: instructions,
-			});
-			setLlmClient(client);
-		}
-	}, [instructions]);
-
-	// Update LLM client when instructions change
+	// Initialize LLM client when API key or instructions change
 	useEffect(() => {
 		if (apiKey) {
 			const client = LLMClientFactory.createClient(apiKey, {
 				systemPrompt: instructions,
 			});
 			setLlmClient(client);
+		} else {
+			setLlmClient(null);
 		}
 	}, [apiKey, instructions]);
 

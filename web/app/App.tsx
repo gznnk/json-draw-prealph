@@ -1,11 +1,13 @@
 import type { ReactElement } from "react";
 import { useCallback, useEffect, useState } from "react";
 
+import { ApiKeyPrompt } from "./components/ApiKeyPrompt";
 import { CanvasView } from "./components/CanvasView";
 import { Page } from "./components/Page";
 import { PreAlphaWarningDialog } from "./components/PreAlphaWarningDialog";
 import { SplitView } from "./components/SplitView";
 import { CanvasDataProvider, useCanvasData } from "./context/CanvasDataContext";
+import { ApiKeyProvider } from "./contexts/ApiKeyContext";
 import type { FolderNode } from "./models/FolderTree";
 import {
 	ChatSpace,
@@ -317,9 +319,12 @@ const App = (): ReactElement => {
 	return (
 		<div className="App">
 			{showWarning && <PreAlphaWarningDialog onAccept={handleAcceptWarning} />}
-			<CanvasDataProvider>
-				<AppContent />
-			</CanvasDataProvider>
+			<ApiKeyProvider>
+				<ApiKeyPrompt />
+				<CanvasDataProvider>
+					<AppContent />
+				</CanvasDataProvider>
+			</ApiKeyProvider>
 		</div>
 	);
 };
