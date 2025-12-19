@@ -7,6 +7,7 @@ export const mimeToExtension = (mimeType: string): string => {
 		"image/webp": "webp",
 		"application/pdf": "pdf",
 		"text/plain": "txt",
+		"text/html": "html",
 	};
 
 	return map[mimeType] ?? "txt";

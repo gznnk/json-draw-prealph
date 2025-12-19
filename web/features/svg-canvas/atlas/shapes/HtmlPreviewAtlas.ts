@@ -10,6 +10,7 @@ import { HtmlPreviewFeatures } from "../../types/data/shapes/HtmlPreviewData";
 import type { HtmlPreviewProps } from "../../types/props/shapes/HtmlPreviewProps";
 import type { HtmlPreviewState } from "../../types/state/shapes/HtmlPreviewState";
 import { createHtmlPreviewState } from "../../utils/shapes/htmlPreview/createHtmlPreviewState";
+import { htmlPreviewToBlob } from "../../utils/shapes/htmlPreview/htmlPreviewToBlob";
 import { isHtmlPreviewData } from "../../utils/shapes/htmlPreview/isHtmlPreviewData";
 import { mapHtmlPreviewDataToState } from "../../utils/shapes/htmlPreview/mapHtmlPreviewDataToState";
 import { mapHtmlPreviewStateToData } from "../../utils/shapes/htmlPreview/mapHtmlPreviewStateToData";
@@ -73,7 +74,7 @@ export const HtmlPreviewAtlas: HtmlPreviewAtlas = {
 	// ============================================================================
 
 	createState: createHtmlPreviewState,
-	export: undefined,
+	export: htmlPreviewToBlob,
 	calcConnectPointPosition: () => [],
 	transformItems: undefined,
 	dataToState: mapHtmlPreviewDataToState as DataToStateMapper,
