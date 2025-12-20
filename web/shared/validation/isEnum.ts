@@ -5,5 +5,5 @@
 export const isEnum =
 	<T>(allowedValues: readonly T[]) =>
 	(value: unknown): value is T => {
-		return allowedValues.includes(value as T);
+		return allowedValues.indexOf(value as T) !== -1;
 	};

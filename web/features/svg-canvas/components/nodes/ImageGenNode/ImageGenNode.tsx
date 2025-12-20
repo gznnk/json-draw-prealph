@@ -54,7 +54,7 @@ const ImageGenNodeComponent: React.FC<ImageGenNodeProps> = (props) => {
 					size: "1024x1024",
 				});
 
-				const base64Image = response.data[0].b64_json;
+				const base64Image = response.data?.[0]?.b64_json;
 				if (base64Image) {
 					const eventId = newEventId();
 					props.onExecute?.({

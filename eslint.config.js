@@ -128,6 +128,10 @@ export default tseslint.config(
 
 			// React hooks rules
 			...reactHooks.configs.recommended.rules,
+			// Downgrade new strict rules to warnings for gradual migration
+			"react-hooks/set-state-in-effect": "warn",
+			"react-hooks/immutability": "warn",
+			"react-hooks/refs": "warn",
 
 			// Import rules
 			"import/order": [
